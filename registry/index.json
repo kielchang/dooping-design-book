@@ -1,210 +1,210 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
-  "name": "doping",
-  "homepage": "https://kielchang.github.io/doping-design-book",
+  "name": "dooping",
+  "homepage": "https://kielchang.github.io/dooping-design-book",
   "items": [
     {
       "name": "badge",
       "type": "registry:ui",
       "title": "Badge 狀態徽章",
       "description": "帶文字的狀態標記，不只靠顏色傳達語意。",
-      "url": "https://kielchang.github.io/doping-design-book/r/badge.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/badge.json"
     },
     {
       "name": "button",
       "type": "registry:ui",
       "title": "Button 按鈕",
       "description": "主要／次要／破壞性動作按鈕，含 asChild 組合。",
-      "url": "https://kielchang.github.io/doping-design-book/r/button.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/button.json"
     },
     {
       "name": "callout",
       "type": "registry:ui",
       "title": "Callout 提示框",
       "description": "良好／警示／提醒／危險四種語意提示。",
-      "url": "https://kielchang.github.io/doping-design-book/r/callout.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/callout.json"
     },
     {
       "name": "card",
       "type": "registry:ui",
       "title": "Card 卡片",
       "description": "內容容器：標題／描述／內容／頁尾。",
-      "url": "https://kielchang.github.io/doping-design-book/r/card.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/card.json"
     },
     {
       "name": "change-summary",
       "type": "registry:component",
       "title": "ChangeSummary 變更摘要",
       "description": "送出前的舊值→新值清單，可逐欄還原。",
-      "url": "https://kielchang.github.io/doping-design-book/r/change-summary.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/change-summary.json"
     },
     {
       "name": "checkbox",
       "type": "registry:ui",
       "title": "Checkbox 勾選框",
       "description": "單一勾選（Radix Checkbox）。",
-      "url": "https://kielchang.github.io/doping-design-book/r/checkbox.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/checkbox.json"
     },
     {
       "name": "chips",
       "type": "registry:ui",
       "title": "Chips 多選標籤片",
       "description": "已選與未選同時可見的多選控制項。",
-      "url": "https://kielchang.github.io/doping-design-book/r/chips.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/chips.json"
     },
     {
       "name": "coachmark",
       "type": "registry:ui",
       "title": "Coachmark 聚光導引",
       "description": "純呈現的引導聚光框，可縮小、可鍵盤操作、支援驗收標記。",
-      "url": "https://kielchang.github.io/doping-design-book/r/coachmark.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/coachmark.json"
     },
     {
       "name": "csv",
       "type": "registry:lib",
       "title": "csv 序列化",
       "description": "含 UTF-8 BOM 的 CSV 產出與解析。",
-      "url": "https://kielchang.github.io/doping-design-book/r/csv.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/csv.json"
     },
     {
       "name": "data-table",
       "type": "registry:ui",
       "title": "DataTable 資料表",
       "description": "搜尋・單欄篩選・排序・分頁・合計・凍結首欄・CSV 匯出。",
-      "url": "https://kielchang.github.io/doping-design-book/r/data-table.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/data-table.json"
     },
     {
       "name": "delta",
       "type": "registry:ui",
       "title": "Delta 變異顯示",
       "description": "箭頭＋文字＋顏色三重編碼的差異呈現。",
-      "url": "https://kielchang.github.io/doping-design-book/r/delta.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/delta.json"
     },
     {
       "name": "dialog",
       "type": "registry:ui",
       "title": "Dialog 對話框",
       "description": "模態對話框（Radix Dialog）。",
-      "url": "https://kielchang.github.io/doping-design-book/r/dialog.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/dialog.json"
     },
     {
       "name": "download",
       "type": "registry:lib",
       "title": "download 下載工具",
       "description": "觸發瀏覽器下載 Blob。",
-      "url": "https://kielchang.github.io/doping-design-book/r/download.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/download.json"
     },
     {
       "name": "editable-field",
       "type": "registry:component",
       "title": "EditableField 唯讀逐欄編輯",
       "description": "點擊才進編輯、改動標色、undo/redo 先確認。",
-      "url": "https://kielchang.github.io/doping-design-book/r/editable-field.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/editable-field.json"
     },
     {
       "name": "empty-state",
       "type": "registry:ui",
       "title": "EmptyState 空狀態",
       "description": "圖示＋標題＋說明＋行動呼籲。",
-      "url": "https://kielchang.github.io/doping-design-book/r/empty-state.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/empty-state.json"
     },
     {
       "name": "forms-diff",
       "type": "registry:lib",
       "title": "forms/diff 欄位比對",
       "description": "FieldSpec 驅動的變更偵測與顯示格式化。",
-      "url": "https://kielchang.github.io/doping-design-book/r/forms-diff.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/forms-diff.json"
     },
     {
       "name": "input",
       "type": "registry:ui",
       "title": "Input 輸入框",
       "description": "文字輸入，高度對齊控制項尺寸 token。",
-      "url": "https://kielchang.github.io/doping-design-book/r/input.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/input.json"
     },
     {
       "name": "label",
       "type": "registry:ui",
       "title": "Label 標籤",
       "description": "表單標籤（Radix Label）。",
-      "url": "https://kielchang.github.io/doping-design-book/r/label.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/label.json"
     },
     {
       "name": "mockup",
       "type": "registry:ui",
       "title": "Mockup 文件示意積木",
       "description": "Placeholder／Spotlight／MockScreenFrame：零截圖文件示意。",
-      "url": "https://kielchang.github.io/doping-design-book/r/mockup.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/mockup.json"
     },
     {
       "name": "number-input",
       "type": "registry:ui",
       "title": "NumberInput 數值輸入",
       "description": "右對齊等寬數字，行動裝置出數字鍵盤。",
-      "url": "https://kielchang.github.io/doping-design-book/r/number-input.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/number-input.json"
     },
     {
       "name": "seg-group",
       "type": "registry:ui",
       "title": "SegGroup 分段選擇",
       "description": "少量互斥選項，radiogroup ＋ roving tabindex。",
-      "url": "https://kielchang.github.io/doping-design-book/r/seg-group.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/seg-group.json"
     },
     {
       "name": "select",
       "type": "registry:ui",
       "title": "Select 下拉選單",
       "description": "單選下拉（Radix Select）。",
-      "url": "https://kielchang.github.io/doping-design-book/r/select.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/select.json"
     },
     {
       "name": "stepper",
       "type": "registry:ui",
       "title": "Stepper 步驟指示",
       "description": "多步驟流程進度，完成態同時用勾選與顏色。",
-      "url": "https://kielchang.github.io/doping-design-book/r/stepper.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/stepper.json"
     },
     {
       "name": "tab-pills",
       "type": "registry:ui",
       "title": "TabPills 分頁膠囊",
       "description": "分頁切換的統一元件，含 tablist 語意。",
-      "url": "https://kielchang.github.io/doping-design-book/r/tab-pills.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/tab-pills.json"
     },
     {
       "name": "table",
       "type": "registry:ui",
       "title": "Table 表格基礎件",
       "description": "表格語意元素＋數字欄／凍結首欄／可排序表頭。",
-      "url": "https://kielchang.github.io/doping-design-book/r/table.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/table.json"
     },
     {
       "name": "tooltip",
       "type": "registry:ui",
       "title": "Tooltip 提示泡泡",
       "description": "hover／鍵盤聚焦／長壓顯示，含邊緣防溢與截斷文字元件。",
-      "url": "https://kielchang.github.io/doping-design-book/r/tooltip.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/tooltip.json"
     },
     {
       "name": "use-record-diff",
       "type": "registry:component",
       "title": "useRecordDiff 變更追蹤",
       "description": "草稿 vs 原始值的差異與還原 hook。",
-      "url": "https://kielchang.github.io/doping-design-book/r/use-record-diff.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/use-record-diff.json"
     },
     {
       "name": "use-sort",
       "type": "registry:lib",
       "title": "useSort 排序 hook",
       "description": "無→大到小→小到大 的三態排序。",
-      "url": "https://kielchang.github.io/doping-design-book/r/use-sort.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/use-sort.json"
     },
     {
       "name": "utils",
       "type": "registry:lib",
       "title": "utils 通用工具",
       "description": "cn 與數值／金額／百分比格式化。",
-      "url": "https://kielchang.github.io/doping-design-book/r/utils.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/utils.json"
     }
   ]
 }

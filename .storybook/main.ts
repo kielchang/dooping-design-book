@@ -24,7 +24,7 @@ const config: StorybookConfig = {
       ...(cfg.css ?? {}),
       postcss: { plugins: [tailwindcss(tailwindConfig as never), autoprefixer()] },
     };
-    // 相對 base → 可發佈在 GitHub Pages 子路徑（/doping-design-book/storybook/）
+    // 相對 base → 可發佈在 GitHub Pages 子路徑（/dooping-design-book/storybook/）
     cfg.base = "./";
     return cfg;
   },

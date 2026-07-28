@@ -1,11 +1,11 @@
-# Doping Design Book
+# Dooping Design Book
 
 **一本可以被實作的設計語言。** 跨專案共用的設計 token、通用元件參考實作，
 以及後台系統的操作模式手冊。
 
-- 📘 文件站：<https://kielchang.github.io/doping-design-book/>
-- 🧩 Storybook：<https://kielchang.github.io/doping-design-book/storybook/>
-- 📦 Registry：`https://kielchang.github.io/doping-design-book/r/<name>.json`
+- 📘 文件站：<https://kielchang.github.io/dooping-design-book/>
+- 🧩 Storybook：<https://kielchang.github.io/dooping-design-book/storybook/>
+- 📦 Registry：`https://kielchang.github.io/dooping-design-book/r/<name>.json`
 
 ## 這是什麼
 

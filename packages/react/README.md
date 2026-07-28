@@ -1,13 +1,13 @@
 # @dooping/react
 
-Doping 設計語言的 React 參考實作。
+Dooping 設計語言的 React 參考實作。
 
 ## 這個套件**不發佈到 npm**
 
 散佈方式是 shadcn registry —— 把原始碼複製進你的專案：
 
 ```bash
-npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/data-table.json
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/data-table.json
 ```
 
 相依會自動一起裝（DataTable 會帶上 table / input / button / select / tooltip / utils…）。

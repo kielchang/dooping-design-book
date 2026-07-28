@@ -51,7 +51,7 @@ jobs:
       - name: 產生 registry JSON（base 指向正式站）
         run: node scripts/build-registry.mjs
         env:
-          REGISTRY_BASE: https://kielchang.github.io/doping-design-book
+          REGISTRY_BASE: https://kielchang.github.io/dooping-design-book
 
       - name: 建置文件站
         working-directory: book
@@ -59,7 +59,7 @@ jobs:
           npm ci
           npm run build
         env:
-          BOOK_BASE_URL: /doping-design-book/
+          BOOK_BASE_URL: /dooping-design-book/
           BOOK_SITE_URL: https://kielchang.github.io
 
       - name: 建置 Storybook → /storybook

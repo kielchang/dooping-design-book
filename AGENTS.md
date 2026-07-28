@@ -2,7 +2,7 @@
 
 這個 repo 是**設計方向的正本**。其他專案不在自己的 repo 裡重新發明按鈕、表格與確認流程，
 而是從這裡取用。這份文件是「怎麼取用、什麼不能改」的一頁式契約；
-完整說明在文件站 <https://kielchang.github.io/doping-design-book/>。
+完整說明在文件站 <https://kielchang.github.io/dooping-design-book/>。
 
 給 AI agent：接手一個要遵照本設計語言的專案時，先讀完這頁，再讀文件站對應章節。
 **不要憑印象重寫元件**——元件已經存在，用下面的指令裝進來。
@@ -21,11 +21,11 @@
 ## 取元件：shadcn registry
 
 ```bash
-npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/data-table.json
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/data-table.json
 ```
 
 相依會自動一起裝——`data-table` 會帶上 `table` / `input` / `button` / `select` / `tooltip` / `utils`。
-全部可用項目列在 <https://kielchang.github.io/doping-design-book/r/index.json>，
+全部可用項目列在 <https://kielchang.github.io/dooping-design-book/r/index.json>，
 單品 URL 一律是 `/r/<name>.json`。
 
 **前置條件**：專案要有 `components.json` 與 `@/*` 路徑別名。沒有的話先 `npx shadcn@latest init`。
@@ -34,11 +34,11 @@ npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/data-tabl
 
 ```
 src/
-├── components/doping/    ← 元件（.tsx）
-└── lib/doping/           ← 工具（utils、use-sort、csv、download、forms-diff）
+├── components/dooping/    ← 元件（.tsx）
+└── lib/dooping/           ← 工具（utils、use-sort、csv、download、forms-diff）
 ```
 
-放在 `doping/` 子目錄是為了讓「哪些是設計中心來的」一眼可辨，
+放在 `dooping/` 子目錄是為了讓「哪些是設計中心來的」一眼可辨，
 之後上游修 bug 時你才找得到要同步哪幾個檔案。
 
 ## 取 token
@@ -50,8 +50,8 @@ src/
 在發佈之前，可行的做法是把產物複製進你的專案：
 
 ```bash
-git clone https://github.com/kielchang/doping-design-book.git
-cd doping-design-book && npm ci && npm run build:tokens
+git clone https://github.com/kielchang/dooping-design-book.git
+cd dooping-design-book && npm ci && npm run build:tokens
 # 產物：packages/tokens/dist/tokens.css（純 CSS 變數）
 #       packages/tokens/tailwind-preset.cjs（Tailwind 專案用）
 ```
@@ -102,7 +102,7 @@ npm run build:registry # 元件改了就要重新產生 registry JSON 並一起�
 
 ## 入口
 
-- 📘 文件站 <https://kielchang.github.io/doping-design-book/>
-- 🧩 Storybook <https://kielchang.github.io/doping-design-book/storybook/>
-- 📦 Registry 索引 <https://kielchang.github.io/doping-design-book/r/index.json>
+- 📘 文件站 <https://kielchang.github.io/dooping-design-book/>
+- 🧩 Storybook <https://kielchang.github.io/dooping-design-book/storybook/>
+- 📦 Registry 索引 <https://kielchang.github.io/dooping-design-book/r/index.json>
 - 🧭 決策紀錄 [`docs/adr/`](docs/adr/README.md) — 「為什麼是這樣」都寫在這裡

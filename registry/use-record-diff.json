@@ -6,14 +6,14 @@
   "description": "草稿 vs 原始值的差異與還原 hook。",
   "dependencies": [],
   "registryDependencies": [
-    "https://kielchang.github.io/doping-design-book/r/forms-diff.json"
+    "https://kielchang.github.io/dooping-design-book/r/forms-diff.json"
   ],
   "files": [
     {
-      "path": "doping/form/use-record-diff.ts",
-      "content": "import { useMemo, useCallback } from \"react\";\nimport { diffRecord, type FieldSpec } from \"@/lib/doping/forms-diff\";\n\n/**\n * 表單草稿 vs 原始值的變更追蹤：回傳變更清單與逐欄／整批還原。\n *\n * `specs` 建議宣告成**模組常數**（穩定參考），否則每次 render 都是新陣列，\n * memo 失效、變更清單每次重算——欄位一多就會在打字時卡頓。\n */\nexport function useRecordDiff<T extends Record<string, unknown>>(\n  original: T | undefined,\n  draft: T,\n  setDraft: (updater: (d: T) => T) => void,\n  specs: FieldSpec[],\n) {\n  const changes = useMemo(() => diffRecord(original, draft, specs), [original, draft, specs]);\n\n  const revertField = useCallback(\n    (key: string) => {\n      setDraft((d) => ({ ...d, [key]: original ? original[key] : undefined }));\n    },\n    [original, setDraft],\n  );\n\n  const revertAll = useCallback(() => {\n    setDraft((d) => {\n      const next = { ...d } as T;\n      for (const s of specs) (next as Record<string, unknown>)[s.key] = original ? original[s.key] : undefined;\n      return next;\n    });\n  }, [original, setDraft, specs]);\n\n  return { changes, revertField, revertAll };\n}\n",
+      "path": "dooping/form/use-record-diff.ts",
+      "content": "import { useMemo, useCallback } from \"react\";\nimport { diffRecord, type FieldSpec } from \"@/lib/dooping/forms-diff\";\n\n/**\n * 表單草稿 vs 原始值的變更追蹤：回傳變更清單與逐欄／整批還原。\n *\n * `specs` 建議宣告成**模組常數**（穩定參考），否則每次 render 都是新陣列，\n * memo 失效、變更清單每次重算——欄位一多就會在打字時卡頓。\n */\nexport function useRecordDiff<T extends Record<string, unknown>>(\n  original: T | undefined,\n  draft: T,\n  setDraft: (updater: (d: T) => T) => void,\n  specs: FieldSpec[],\n) {\n  const changes = useMemo(() => diffRecord(original, draft, specs), [original, draft, specs]);\n\n  const revertField = useCallback(\n    (key: string) => {\n      setDraft((d) => ({ ...d, [key]: original ? original[key] : undefined }));\n    },\n    [original, setDraft],\n  );\n\n  const revertAll = useCallback(() => {\n    setDraft((d) => {\n      const next = { ...d } as T;\n      for (const s of specs) (next as Record<string, unknown>)[s.key] = original ? original[s.key] : undefined;\n      return next;\n    });\n  }, [original, setDraft, specs]);\n\n  return { changes, revertField, revertAll };\n}\n",
       "type": "registry:component",
-      "target": "components/doping/use-record-diff.tsx"
+      "target": "components/dooping/use-record-diff.tsx"
     }
   ]
 }

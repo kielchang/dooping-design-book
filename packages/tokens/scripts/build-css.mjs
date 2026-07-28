@@ -103,13 +103,13 @@ lines.push(`/* 觸控目標：粗指標（手機／平板）才放大，桌機�
 
 // ── 聚光脈動環（引導與文件示意共用同一種「看這裡」語言） ──────
 lines.push(`/* 聚光環：引導式導覽與文件示意共用同一視覺語言。尊重 prefers-reduced-motion。 */
-@keyframes doping-spotlight-pulse {
+@keyframes dooping-spotlight-pulse {
   0%   { box-shadow: 0 0 0 2px hsl(var(--primary)), 0 0 0 4px hsl(var(--primary) / 0.35); }
   70%  { box-shadow: 0 0 0 3px hsl(var(--primary)), 0 0 0 14px hsl(var(--primary) / 0); }
   100% { box-shadow: 0 0 0 2px hsl(var(--primary)), 0 0 0 4px hsl(var(--primary) / 0); }
 }
 .spotlight-ring {
-  animation: doping-spotlight-pulse var(--duration-slow) var(--easing-out) infinite;
+  animation: dooping-spotlight-pulse var(--duration-slow) var(--easing-out) infinite;
 }
 @media (prefers-reduced-motion: reduce) {
   .spotlight-ring {

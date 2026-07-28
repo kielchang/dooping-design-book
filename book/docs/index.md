@@ -1,10 +1,10 @@
 ---
-title: Doping Design Book
+title: Dooping Design Book
 slug: /
 sidebar_position: 0
 ---
 
-# Doping Design Book
+# Dooping Design Book
 
 **一本可以被實作的設計語言。** 給的是「這類介面該怎麼運作」的答案，不是一堆好看的色塊。
 

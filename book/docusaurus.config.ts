@@ -1,9 +1,9 @@
-// Doping Design Book — 設計語言文件站。
+// Dooping Design Book — 設計語言文件站。
 //
 // 兩個關鍵設定：
 // 1. kitPipeline：讓文件站直接編譯並渲染 repo 內的**真元件**（不是截圖、不是複製一份）。
 //    元件改了，文件裡的活範例當場跟著改，沒有東西會過期。
-// 2. baseUrl 由環境變數注入：本地 `/`、GitHub Pages `/doping-design-book/`。
+// 2. baseUrl 由環境變數注入：本地 `/`、GitHub Pages `/dooping-design-book/`。
 import path from "node:path";
 import { themes as prismThemes } from "prism-react-renderer";
 import type { Config } from "@docusaurus/types";
@@ -15,13 +15,13 @@ const STORYBOOK_URL = `${SITE_URL.replace(/\/$/, "")}${BASE_URL}storybook/`;
 const REGISTRY_BASE = `${SITE_URL.replace(/\/$/, "")}${BASE_URL}r`;
 
 const config: Config = {
-  title: "Doping Design Book",
+  title: "Dooping Design Book",
   tagline: "跨專案設計語言、操作模式與參考實作",
   favicon: "img/favicon.svg",
   url: SITE_URL,
   baseUrl: BASE_URL,
   organizationName: "kielchang",
-  projectName: "doping-design-book",
+  projectName: "dooping-design-book",
   trailingSlash: true,
   onBrokenLinks: "throw",
   markdown: { hooks: { onBrokenMarkdownLinks: "throw" } },
@@ -94,15 +94,15 @@ const config: Config = {
   themeConfig: {
     colorMode: { respectPrefersColorScheme: true },
     navbar: {
-      title: "Doping Design Book",
+      title: "Dooping Design Book",
       items: [
         { href: STORYBOOK_URL, label: "Storybook ↗", position: "right" },
-        { href: "https://github.com/kielchang/doping-design-book", label: "GitHub ↗", position: "right" },
+        { href: "https://github.com/kielchang/dooping-design-book", label: "GitHub ↗", position: "right" },
       ],
     },
     footer: {
       style: "dark",
-      copyright: "Doping Design Book · 設計語言與模式手冊 · MIT",
+      copyright: "Dooping Design Book · 設計語言與模式手冊 · MIT",
     },
     prism: { theme: prismThemes.github, darkTheme: prismThemes.dracula },
   } satisfies Preset.ThemeConfig,

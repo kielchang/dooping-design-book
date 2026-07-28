@@ -6,14 +6,14 @@
   "description": "分頁切換的統一元件，含 tablist 語意。",
   "dependencies": [],
   "registryDependencies": [
-    "https://kielchang.github.io/doping-design-book/r/utils.json"
+    "https://kielchang.github.io/dooping-design-book/r/utils.json"
   ],
   "files": [
     {
-      "path": "doping/ui/tab-pills.tsx",
-      "content": "import { type ReactNode } from \"react\";\nimport { cn } from \"@/lib/doping/utils\";\n\nexport type TabPill = { key: string; label: ReactNode; badge?: ReactNode; /** 導覽錨點屬性 */ dataTour?: string };\n\nexport interface TabPillsProps {\n  tabs: TabPill[];\n  value: string;\n  onChange: (key: string) => void;\n  className?: string;\n  /** 無障礙名稱（畫面上有標題時可省略，改用 aria-labelledby） */\n  label?: string;\n}\n\n/**\n * 分頁膠囊列。\n *\n * 存在的唯一理由是**收斂**：分頁列是最容易被各畫面各自手刻 `<button>` 的元件，\n * 一旦散開，改一次樣式就要全站找一遍，而且 `role=\"tablist\"` 語意會漏掉。\n */\nexport function TabPills({ tabs, value, onChange, className, label }: TabPillsProps) {\n  return (\n    <div role=\"tablist\" aria-label={label} className={cn(\"flex flex-wrap gap-1\", className)}>\n      {tabs.map((t) => {\n        const active = t.key === value;\n        return (\n          <button\n            key={t.key}\n            type=\"button\"\n            role=\"tab\"\n            aria-selected={active}\n            data-tour={t.dataTour}\n            onClick={() => onChange(t.key)}\n            className={cn(\n              \"tap-target-y inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors duration-fast\",\n              active ? \"bg-primary text-primary-foreground\" : \"bg-muted text-foreground hover:bg-accent\",\n            )}\n          >\n            {t.label}\n            {t.badge}\n          </button>\n        );\n      })}\n    </div>\n  );\n}\n",
+      "path": "dooping/ui/tab-pills.tsx",
+      "content": "import { type ReactNode } from \"react\";\nimport { cn } from \"@/lib/dooping/utils\";\n\nexport type TabPill = { key: string; label: ReactNode; badge?: ReactNode; /** 導覽錨點屬性 */ dataTour?: string };\n\nexport interface TabPillsProps {\n  tabs: TabPill[];\n  value: string;\n  onChange: (key: string) => void;\n  className?: string;\n  /** 無障礙名稱（畫面上有標題時可省略，改用 aria-labelledby） */\n  label?: string;\n}\n\n/**\n * 分頁膠囊列。\n *\n * 存在的唯一理由是**收斂**：分頁列是最容易被各畫面各自手刻 `<button>` 的元件，\n * 一旦散開，改一次樣式就要全站找一遍，而且 `role=\"tablist\"` 語意會漏掉。\n */\nexport function TabPills({ tabs, value, onChange, className, label }: TabPillsProps) {\n  return (\n    <div role=\"tablist\" aria-label={label} className={cn(\"flex flex-wrap gap-1\", className)}>\n      {tabs.map((t) => {\n        const active = t.key === value;\n        return (\n          <button\n            key={t.key}\n            type=\"button\"\n            role=\"tab\"\n            aria-selected={active}\n            data-tour={t.dataTour}\n            onClick={() => onChange(t.key)}\n            className={cn(\n              \"tap-target-y inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors duration-fast\",\n              active ? \"bg-primary text-primary-foreground\" : \"bg-muted text-foreground hover:bg-accent\",\n            )}\n          >\n            {t.label}\n            {t.badge}\n          </button>\n        );\n      })}\n    </div>\n  );\n}\n",
       "type": "registry:ui",
-      "target": "components/doping/tab-pills.tsx"
+      "target": "components/dooping/tab-pills.tsx"
     }
   ]
 }

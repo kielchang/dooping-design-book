@@ -63,7 +63,7 @@ module.exports = {
       transitionTimingFunction: Object.fromEntries(keys(tokens.easing).map((k) => [k, `var(--easing-${k})`])),
       spacing: Object.fromEntries(keys(tokens.size).map((k) => [k, `var(--size-${k})`])),
       keyframes: {
-        "doping-spotlight-pulse": {
+        "dooping-spotlight-pulse": {
           "0%": { boxShadow: "0 0 0 2px hsl(var(--primary)), 0 0 0 4px hsl(var(--primary) / 0.35)" },
           "70%": { boxShadow: "0 0 0 3px hsl(var(--primary)), 0 0 0 14px hsl(var(--primary) / 0)" },
           "100%": { boxShadow: "0 0 0 2px hsl(var(--primary)), 0 0 0 4px hsl(var(--primary) / 0)" },

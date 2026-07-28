@@ -1,7 +1,7 @@
 {
   "name": "@dooping/tokens",
   "version": "0.1.0",
-  "description": "Doping 設計 token — 框架中立的語意化設計變數（JSON 來源 → CSS 變數 + Tailwind preset）",
+  "description": "Dooping 設計 token — 框架中立的語意化設計變數（JSON 來源 → CSS 變數 + Tailwind preset）",
   "license": "MIT",
   "keywords": [
     "design-tokens",
@@ -12,13 +12,13 @@
     "theming",
     "dark-mode"
   ],
-  "homepage": "https://kielchang.github.io/doping-design-book/",
+  "homepage": "https://kielchang.github.io/dooping-design-book/",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kielchang/doping-design-book.git",
+    "url": "git+https://github.com/kielchang/dooping-design-book.git",
     "directory": "packages/tokens"
   },
-  "bugs": "https://github.com/kielchang/doping-design-book/issues",
+  "bugs": "https://github.com/kielchang/dooping-design-book/issues",
   "publishConfig": {
     "access": "public"
   },

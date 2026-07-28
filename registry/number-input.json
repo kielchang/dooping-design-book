@@ -6,15 +6,15 @@
   "description": "右對齊等寬數字，行動裝置出數字鍵盤。",
   "dependencies": [],
   "registryDependencies": [
-    "https://kielchang.github.io/doping-design-book/r/input.json",
-    "https://kielchang.github.io/doping-design-book/r/utils.json"
+    "https://kielchang.github.io/dooping-design-book/r/input.json",
+    "https://kielchang.github.io/dooping-design-book/r/utils.json"
   ],
   "files": [
     {
-      "path": "doping/ui/number-input.tsx",
-      "content": "import { Input } from \"@/components/doping/input\";\nimport { cn } from \"@/lib/doping/utils\";\n\nexport interface NumberInputProps {\n  value: number;\n  onChange: (v: number) => void;\n  className?: string;\n  step?: number;\n  min?: number;\n  max?: number;\n  disabled?: boolean;\n  \"aria-label\"?: string;\n}\n\n/**\n * 數值輸入。\n *\n * 三件小事，但每一件漏了都會被使用者罵：`inputMode=\"numeric\"`（手機直接出數字鍵盤）、\n * `tabular-nums`（等寬數字，上下對齊才看得出位數）、右對齊（數字靠右才好比大小）。\n * 底色套 `.field-editable`＝可編輯欄位的統一長相。\n */\nexport function NumberInput({ value, onChange, className, step, min, max, disabled, ...rest }: NumberInputProps) {\n  return (\n    <Input\n      type=\"number\"\n      inputMode=\"numeric\"\n      step={step}\n      min={min}\n      max={max}\n      disabled={disabled}\n      value={Number.isFinite(value) ? value : 0}\n      onChange={(e) => onChange(e.target.value === \"\" ? 0 : Number(e.target.value))}\n      className={cn(\"field-editable h-8 w-28 text-right tabular-nums\", className)}\n      {...rest}\n    />\n  );\n}\n",
+      "path": "dooping/ui/number-input.tsx",
+      "content": "import { Input } from \"@/components/dooping/input\";\nimport { cn } from \"@/lib/dooping/utils\";\n\nexport interface NumberInputProps {\n  value: number;\n  onChange: (v: number) => void;\n  className?: string;\n  step?: number;\n  min?: number;\n  max?: number;\n  disabled?: boolean;\n  \"aria-label\"?: string;\n}\n\n/**\n * 數值輸入。\n *\n * 三件小事，但每一件漏了都會被使用者罵：`inputMode=\"numeric\"`（手機直接出數字鍵盤）、\n * `tabular-nums`（等寬數字，上下對齊才看得出位數）、右對齊（數字靠右才好比大小）。\n * 底色套 `.field-editable`＝可編輯欄位的統一長相。\n */\nexport function NumberInput({ value, onChange, className, step, min, max, disabled, ...rest }: NumberInputProps) {\n  return (\n    <Input\n      type=\"number\"\n      inputMode=\"numeric\"\n      step={step}\n      min={min}\n      max={max}\n      disabled={disabled}\n      value={Number.isFinite(value) ? value : 0}\n      onChange={(e) => onChange(e.target.value === \"\" ? 0 : Number(e.target.value))}\n      className={cn(\"field-editable h-8 w-28 text-right tabular-nums\", className)}\n      {...rest}\n    />\n  );\n}\n",
       "type": "registry:ui",
-      "target": "components/doping/number-input.tsx"
+      "target": "components/dooping/number-input.tsx"
     }
   ]
 }

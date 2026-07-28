@@ -14,11 +14,11 @@ import { fileURLToPath } from "node:url";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = join(ROOT, "packages/react/src");
 const OUT = join(ROOT, "registry");
-const BASE = (process.env.REGISTRY_BASE ?? "https://kielchang.github.io/doping-design-book").replace(/\/$/, "");
+const BASE = (process.env.REGISTRY_BASE ?? "https://kielchang.github.io/dooping-design-book").replace(/\/$/, "");
 
-/** 目標專案的落點：元件一律 components/doping/、工具一律 lib/doping/。 */
-const COMPONENT_TARGET = (name) => `components/doping/${name}.tsx`;
-const LIB_TARGET = (name) => `lib/doping/${name}.ts`;
+/** 目標專案的落點：元件一律 components/dooping/、工具一律 lib/dooping/。 */
+const COMPONENT_TARGET = (name) => `components/dooping/${name}.tsx`;
+const LIB_TARGET = (name) => `lib/dooping/${name}.ts`;
 
 /** 來源模組路徑 → registry item 名稱 */
 const LIB_MODULES = {
@@ -51,12 +51,12 @@ function walk(dir) {
 /** 匯入路徑改寫：相對路徑 → 目標專案的 `@/` 別名。 */
 function rewrite(content) {
   return content
-    .replace(/from\s+["']\.\.\/lib\/forms\/diff["']/g, 'from "@/lib/doping/forms-diff"')
-    .replace(/from\s+["']\.\.\/\.\.\/lib\/forms\/diff["']/g, 'from "@/lib/doping/forms-diff"')
-    .replace(/from\s+["']\.\.\/lib\/([a-z-]+)["']/g, 'from "@/lib/doping/$1"')
-    .replace(/from\s+["']\.\.\/\.\.\/lib\/([a-z-]+)["']/g, 'from "@/lib/doping/$1"')
-    .replace(/from\s+["']\.\.\/(?:ui|form)\/([a-z-]+)["']/g, 'from "@/components/doping/$1"')
-    .replace(/from\s+["']\.\/([a-z-]+)["']/g, 'from "@/components/doping/$1"');
+    .replace(/from\s+["']\.\.\/lib\/forms\/diff["']/g, 'from "@/lib/dooping/forms-diff"')
+    .replace(/from\s+["']\.\.\/\.\.\/lib\/forms\/diff["']/g, 'from "@/lib/dooping/forms-diff"')
+    .replace(/from\s+["']\.\.\/lib\/([a-z-]+)["']/g, 'from "@/lib/dooping/$1"')
+    .replace(/from\s+["']\.\.\/\.\.\/lib\/([a-z-]+)["']/g, 'from "@/lib/dooping/$1"')
+    .replace(/from\s+["']\.\.\/(?:ui|form)\/([a-z-]+)["']/g, 'from "@/components/dooping/$1"')
+    .replace(/from\s+["']\.\/([a-z-]+)["']/g, 'from "@/components/dooping/$1"');
 }
 
 /** 從原始碼推導出這個檔案需要哪些 npm 套件與 registry 相依。 */
@@ -70,7 +70,7 @@ function analyse(content) {
     }
   }
   const registryDeps = new Set();
-  for (const m of content.matchAll(/from\s+["']@\/(?:components|lib)\/doping\/([a-z-]+)["']/g)) {
+  for (const m of content.matchAll(/from\s+["']@\/(?:components|lib)\/dooping\/([a-z-]+)["']/g)) {
     registryDeps.add(m[1]);
   }
   return { deps: [...deps].sort(), registryDeps: [...registryDeps].sort() };
@@ -133,7 +133,7 @@ for (const abs of walk(SRC)) {
     registryDependencies: registryDeps.map((d) => `${BASE}/r/${d}.json`),
     files: [
       {
-        path: `doping/${rel}`,
+        path: `dooping/${rel}`,
         content,
         type: isLib ? "registry:lib" : rel.startsWith("form/") ? "registry:component" : "registry:ui",
         target: isLib ? LIB_TARGET(name) : COMPONENT_TARGET(name),
@@ -147,7 +147,7 @@ for (const abs of walk(SRC)) {
 // registry 索引（給人看、也給工具列舉用）
 const index = {
   $schema: "https://ui.shadcn.com/schema/registry.json",
-  name: "doping",
+  name: "dooping",
   homepage: BASE,
   items: items
     .sort((a, b) => a.name.localeCompare(b.name))

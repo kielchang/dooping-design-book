@@ -1,11 +1,15 @@
 name: Deploy Design Book
 
-# 一次建置三個產物，發佈到同一個 GitHub Pages 站：
+# main＝其他系統參照的規範正本。這支把它發佈到 gh-pages 分支的根目錄：
 #   /            → 文件站（Docusaurus）
 #   /storybook/  → Storybook 活元件展示
 #   /r/*.json    → shadcn registry（npx shadcn add <URL> 可安裝）
 #
-# 三者互相依賴（文件站與 Storybook 都吃元件原始碼、registry 由原始碼產生），
+# gh-pages 上還有一個 /preview/，那是 dev 的預覽站（由 ci.yml 部署）。
+# 這支只動根目錄、絕不碰 preview/，反之亦然——邊界寫在 scripts/deploy-gh-pages.sh。
+# 兩支共用 concurrency group「gh-pages-write」序列化寫入，避免同時 push 互撞。
+#
+# 三個產物互相依賴（文件站與 Storybook 都吃元件原始碼、registry 由原始碼產生），
 # 所以刻意放在同一個 job 依序建置，避免版本不一致。
 on:
   push:
@@ -13,16 +17,14 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write # 推 gh-pages 分支
 
 concurrency:
-  group: pages
+  group: gh-pages-write
   cancel-in-progress: false
 
 jobs:
-  verify:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,17 +38,6 @@ jobs:
         run: npm run typecheck
       - name: 守衛測試（元件庫邊界、token 一致性、去領域化詞彙）
         run: npm test
-
-  build:
-    needs: verify
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: npm }
-
-      - run: npm ci
-      - run: npm run build:tokens
 
       - name: 產生 registry JSON（base 指向正式站）
         run: node scripts/build-registry.mjs
@@ -70,17 +61,6 @@ jobs:
           mkdir -p book/build/r
           cp registry/*.json book/build/r/
 
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: book/build
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - name: 發佈到 gh-pages 根目錄（保留 preview/）
+        run: |
+          bash scripts/deploy-gh-pages.sh book/build . "deploy(main) ${{ github.sha }}"

@@ -33,6 +33,38 @@ dev ──開發、CI 確認──▶ main ──▶ 文件站／Storybook／reg
 | 文件站 / Storybook / registry | 每次進版都更新（它們反映 `main` 的當下狀態） |
 | npm `@dooping/tokens` | **只在 token 內容真的變更時** bump |
 
+### 預覽站不是進版
+
+`dev` 推上去後會部署到 **`/preview/`**，給維護者在真實裝置上確認 UI——
+尤其是響應式與觸控目標，那是開發機看不出來的。
+
+:::danger 預覽站不可被參照
+`/preview/` 的內容隨時會被下一次 `dev` push 覆蓋，而且沒有經過進版。
+**其他系統一律以 `main` 的正式網址為準**，不得參照任何 `/preview/` 底下的東西。
+:::
+
+預覽站的 registry 檔案雖然存在，內容裡的相依網址仍指向**正式站**——
+就算誤複製了安裝指令，裝到的也是正式版本。
+
+### 三個版本座標，不要混用
+
+| 座標 | 什麼時候動 | 回答什麼問題 |
+| --- | --- | --- |
+| `@dooping/tokens` 的 npm 版號 | token 內容變更 | 取用端要鎖哪一版 |
+| `packages/react` 的版號（＝registry 戳記） | 元件變更 | 我抄走的是哪一版 |
+| **`release-YYYY-MM-DD` tag** | **每次 `dev` → `main`** | `main` 在那個時間點的完整狀態 |
+
+進版 tag 用日期而不是語意版號，因為一次進版不一定伴隨 token 或元件的版本變動
+（例如純文件的進版）。同一天多次進版就加後綴 `-2`。
+
+**`tokens-v*` 這個 tag 命名保留給 npm 發佈**（`publish-tokens.yml` 靠它觸發），不要混用。
+兩者是兩件事：`release-*` 只是座標，`tokens-v*` 才會真的送東西到 npm。
+
+```bash
+git tag -a release-2026-07-28 -m "進版：<一句話>"   # 座標，不碰 npm
+git tag -a tokens-v0.1.3      -m "tokens 0.1.3"     # 這個才會發佈
+```
+
 ## Token 的 SemVer 定義
 
 | 變更 | 級別 |

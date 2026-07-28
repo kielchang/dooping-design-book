@@ -1,12 +1,16 @@
 name: CI
 
-# dev 的把關。
+# dev 的把關與預覽站。
 #
 # 分支模型：dev 做開發與確認，確認過才併進 main；main 是其他系統參照的規範正本。
-# 這支只驗證、不部署也不發佈——deploy.yml 只認 main，publish-tokens.yml 只手動或 tag 觸發。
+# 這支只驗證與部署預覽站，**不碰 npm**——發佈只有 publish-tokens.yml 那條路。
 #
-# 沒有這支的話，「在 dev 確認」就只是一句話：deploy.yml 的 verify job 只在 push 到
-# main 時才跑，等於問題要等到已經進了正本才會被發現。
+# 刻意做成單一 job：驗證與預覽用同一次建置。拆成兩個 job 會讓文件站建置跑兩次、
+# book/ 跑兩次 npm ci，多花一兩分鐘卻換不到東西（onBrokenLinks 的檢查與 baseUrl 無關）。
+# 這個 repo 是主導整體開發的介面框架，看到 UI 的速度本身就是功能的一部分。
+#
+# 預覽站 https://kielchang.github.io/dooping-design-book/preview/ 隨時會被下一次
+# dev push 覆蓋，**不是進版**，其他系統一律不得參照。
 on:
   push:
     branches: [dev]
@@ -14,14 +18,14 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write # 推 gh-pages 分支的 preview/
 
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  group: gh-pages-write
+  cancel-in-progress: false
 
 jobs:
-  verify:
+  verify-and-preview:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -46,11 +50,45 @@ jobs:
             exit 1
           }
 
-      - name: "文件站建置（onBrokenLinks: throw，順帶檢查內部連結）"
+      # 「什麼時候該發 npm」的規則是：tokens.json 的內容有變才發。
+      # 這一步讓那條規則變成會擋人的檢查，而不是要記得的事。
+      - name: token 內容變更必須伴隨版號 bump
+        run: |
+          git fetch --depth=1 origin main || exit 0
+          git cat-file -e origin/main:packages/tokens/src/tokens.json 2>/dev/null || exit 0
+          OLD=$(git show origin/main:packages/tokens/src/tokens.json)
+          NEW=$(cat packages/tokens/src/tokens.json)
+          if [ "$(jq -S 'del(.meta)' <<<"$OLD")" != "$(jq -S 'del(.meta)' <<<"$NEW")" ] \
+             && [ "$(jq -r .meta.version <<<"$OLD")" = "$(jq -r .meta.version <<<"$NEW")" ]; then
+            echo "::error::tokens.json 的內容相對 main 有變，但版號還停在 $(jq -r .meta.version <<<"$NEW")。請同步 bump 三處版號（tokens/package.json、tokens.json 的 meta.version、react/package.json 的相依）並補一則 CHANGELOG。"
+            exit 1
+          fi
+
+      - name: 產生 registry JSON（base 指向正式站，預覽站不供安裝）
+        run: node scripts/build-registry.mjs
+        env:
+          REGISTRY_BASE: https://kielchang.github.io/dooping-design-book
+
+      - name: "建置文件站（baseUrl 指向 /preview/）"
         working-directory: book
         run: |
           npm ci
           npm run build
         env:
-          BOOK_BASE_URL: /dooping-design-book/
+          BOOK_BASE_URL: /dooping-design-book/preview/
           BOOK_SITE_URL: https://kielchang.github.io
+
+      - name: 建置 Storybook → /preview/storybook
+        run: npm run build-storybook -- -o book/build/storybook
+
+      - name: 放置 registry → /preview/r
+        run: |
+          mkdir -p book/build/r
+          cp registry/*.json book/build/r/
+
+      # PR 只驗證不部署——預覽站是 dev 的，不該被 PR 覆蓋。
+      - name: "發佈預覽站 → gh-pages:preview/"
+        if: github.event_name == 'push'
+        run: |
+          bash scripts/deploy-gh-pages.sh book/build preview "deploy(preview) ${{ github.sha }}"
+          echo "### 📱 預覽站 https://kielchang.github.io/dooping-design-book/preview/" >> "$GITHUB_STEP_SUMMARY"

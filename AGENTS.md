@@ -11,7 +11,7 @@
 
 | 層 | 內容 | 取用方式 | 改動權 |
 | --- | --- | --- | --- |
-| `packages/tokens` | 設計 token（語意色、間距、字級、陰影、動態） | 產物複製／未來 npm | **不可改語意，只可改值** |
+| `packages/tokens` | 設計 token（語意色、間距、字級、陰影、動態） | `npm install @dooping/tokens` | **不可改語意，只可改值** |
 | `packages/react` | React 參考實作（29 個 registry 項目） | `npx shadcn add <URL>` | 複製後就是你的，隨便改 |
 | `book/docs/4-patterns` | 操作模式（問題→做法→取捨→反例） | 讀懂，用你的技術棧實作 | 不含程式碼 |
 
@@ -43,21 +43,14 @@ src/
 
 ## 取 token
 
-⚠️ **`@dooping/tokens` 尚未發佈到 npm registry**（`npm install @dooping/tokens` 目前會 404）。
-發佈流水線已經備妥（`.github/workflows/publish-tokens.yml`，走 npm trusted publishing／OIDC，
-repo 裡不存長期 token）；文件站與 `packages/tokens/README.md` 寫的 npm 安裝方式是發佈後的目標狀態。
-
-在發佈之前，可行的做法是把產物複製進你的專案：
-
 ```bash
-git clone https://github.com/kielchang/dooping-design-book.git
-cd dooping-design-book && npm ci && npm run build:tokens
-# 產物：packages/tokens/dist/tokens.css（純 CSS 變數）
-#       packages/tokens/tailwind-preset.cjs（Tailwind 專案用）
+npm install @dooping/tokens
 ```
 
-```css title="你的全域 CSS"
-@import "./tokens.css";
+這是**唯一建議的硬相依**。四個進入點，挑你的宿主吃得下的用：
+
+```css title="純 CSS（任何宿主）"
+@import "@dooping/tokens/tokens.css";
 
 .my-alert {
   background: hsl(var(--danger) / 0.1);
@@ -66,8 +59,26 @@ cd dooping-design-book && npm ci && npm run build:tokens
 }
 ```
 
-`tokens.css` 是純 CSS 變數，不含 Tailwind 指令，任何宿主都吃得下。
-token 的來源正本是 `packages/tokens/src/tokens.json`，**不要手改 `dist/` 或 `src/tokens.data.ts`**。
+```js title="tailwind.config.js"
+module.exports = {
+  presets: [require("@dooping/tokens/tailwind-preset")],
+  content: ["./src/**/*.{ts,tsx}"],
+};
+```
+
+```ts title="JS API（Canvas 圖表、伺服器端 PDF、Figma plugin…）"
+import { semanticColors, chartColors, TOKENS_VERSION } from "@dooping/tokens";
+
+chartColors("dark");   // 8 色色盲友善色票
+semanticColors();      // 35 個語意色（HSL 三元組）
+```
+
+第四個是 `@dooping/tokens/tokens.json`（來源正本，給非 JS 工具鏈讀）。
+
+`tokens.css` 是純 CSS 變數、不含任何 Tailwind 指令，所以不用 Tailwind 也能用。
+深色模式 `.dark` class 與 `[data-theme="dark"]` 屬性兩種鉤子都內建。
+
+要改 token 值請改 `packages/tokens/src/tokens.json`，**不要手改 `dist/` 或 `src/tokens.data.ts`**——那是產物。
 
 ## 不可改的契約
 

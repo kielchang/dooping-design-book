@@ -1,4 +1,4 @@
-/* 活元件示例的樣式管線：token（來自 @doping/tokens 的產物）＋ Tailwind utilities。
+/* 活元件示例的樣式管線：token（來自 @dooping/tokens 的產物）＋ Tailwind utilities。
    preflight 已在 tailwind.config.js 關閉——只產 utilities，不注入第二套 reset。 */
 @import "../../../packages/tokens/dist/tokens.css";
 

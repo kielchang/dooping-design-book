@@ -1,0 +1,65 @@
+name: Publish tokens
+
+# 只發佈 @dooping/tokens —— 三層裡唯一該進 npm 的一層。
+#
+# 元件不發套件（ADR-0004：元件一定會被改，走 registry 複製原始碼），
+# 所以這條流水線刻意只認 packages/tokens 一個 workspace。
+#
+# 兩種觸發：
+#   workflow_dispatch  → 手動，預設是「試跑」，確認 tarball 內容用
+#   tag tokens-v*      → 真的發佈（例：git tag tokens-v0.1.0 && git push --tags）
+#
+# 發佈前一定重跑守衛：token 是契約，發壞了每個宿主都會痛。
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "試跑（不真的發佈，只印出會送出什麼）"
+        type: boolean
+        default: true
+  push:
+    tags: ["tokens-v*"]
+
+permissions:
+  contents: read
+  id-token: write # npm provenance：把套件綁到產生它的這次 workflow run
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: 檢查 NPM_TOKEN 有沒有設
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::error::找不到 NPM_TOKEN secret。請到 Settings → Secrets and variables → Actions 新增，權限只需 @dooping scope 的 read+write。"
+            exit 1
+          fi
+
+      - run: npm ci
+      - name: 建置 token（CSS 產物是後續所有步驟的前提）
+        run: npm run build:tokens
+      - name: 型別檢查
+        run: npm run typecheck
+      - name: 守衛測試
+        run: npm test
+
+      - name: 發佈
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "::notice::試跑模式 —— 不會真的發佈"
+            npm publish --workspace @dooping/tokens --dry-run
+          else
+            npm publish --workspace @dooping/tokens --provenance
+          fi

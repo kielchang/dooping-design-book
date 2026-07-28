@@ -1,4 +1,4 @@
-# @doping/react
+# @dooping/react
 
 Doping 設計語言的 React 參考實作。
 
@@ -22,7 +22,7 @@ npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/data-tabl
 元件**只能**依賴：
 
 - 相對路徑的同伴模組
-- `@doping/tokens`
+- `@dooping/tokens`
 - 白名單外部套件：`react` / `react-dom` / `@radix-ui/*` / `lucide-react` / `clsx` /
   `tailwind-merge` / `class-variance-authority`
 

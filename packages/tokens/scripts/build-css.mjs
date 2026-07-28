@@ -23,7 +23,7 @@ function vars(obj, prefix = "") {
 
 const lines = [];
 lines.push("/**");
-lines.push(" * @doping/tokens — 由 src/tokens.json 產生，請勿手改。");
+lines.push(" * @dooping/tokens — 由 src/tokens.json 產生，請勿手改。");
 lines.push(` * 版本 ${tokens.meta.version}`);
 lines.push(" */");
 lines.push("");
@@ -147,7 +147,7 @@ lines.push(`/* 列印：畫面底色在後台系統裡是「內容」不是裝�
 const css = lines.join("\n");
 mkdirSync(join(ROOT, "dist"), { recursive: true });
 writeFileSync(join(ROOT, "dist/tokens.css"), css, "utf8");
-console.log(`[@doping/tokens] dist/tokens.css ${css.length} bytes`);
+console.log(`[@dooping/tokens] dist/tokens.css ${css.length} bytes`);
 
 // ── 同時產出 TS 資料模組 ──────────────────────────────────────
 // 不讓 index.ts 直接 `import ... from "./tokens.json"`：import attributes（`with { type: "json" }`）
@@ -156,4 +156,4 @@ const ts = `// 由 scripts/build-css.mjs 從 tokens.json 產生，請勿手改�
 export default ${JSON.stringify(tokens, null, 2)} as const;
 `;
 writeFileSync(join(ROOT, "src/tokens.data.ts"), ts, "utf8");
-console.log("[@doping/tokens] src/tokens.data.ts 已更新");
+console.log("[@dooping/tokens] src/tokens.data.ts 已更新");

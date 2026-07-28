@@ -1,8 +1,27 @@
 {
-  "name": "@doping/tokens",
+  "name": "@dooping/tokens",
   "version": "0.1.0",
   "description": "Doping 設計 token — 框架中立的語意化設計變數（JSON 來源 → CSS 變數 + Tailwind preset）",
   "license": "MIT",
+  "keywords": [
+    "design-tokens",
+    "design-system",
+    "css-variables",
+    "tailwindcss",
+    "tailwind-preset",
+    "theming",
+    "dark-mode"
+  ],
+  "homepage": "https://kielchang.github.io/doping-design-book/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kielchang/doping-design-book.git",
+    "directory": "packages/tokens"
+  },
+  "bugs": "https://github.com/kielchang/doping-design-book/issues",
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -18,7 +37,8 @@
   "files": [
     "dist",
     "src/tokens.json",
-    "tailwind-preset.cjs"
+    "tailwind-preset.cjs",
+    "LICENSE"
   ],
   "scripts": {
     "build": "node scripts/build-css.mjs && tsc -p tsconfig.build.json",

@@ -1,4 +1,4 @@
-// @doping/tokens — 型別化的 token 讀取入口。
+// @dooping/tokens — 型別化的 token 讀取入口。
 //
 // 這一層存在的理由：JSON 是來源、CSS 是產物，但「非 CSS 的宿主」（React Native、Canvas 圖表、
 // 產生 PDF 的伺服器端、Figma plugin）需要在 JS 裡拿到值。因此提供一組小而穩定的讀取 API，

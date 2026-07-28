@@ -1,7 +1,7 @@
 // 元件庫邊界守衛 — 這支測試就是「工具箱能被任何專案拿去用」的自動化保證。
 //
-// 規則：@doping/react 的每個檔案只能依賴
-//   (a) 相對路徑的同伴模組，(b) @doping/tokens，(c) 白名單內的通用外部套件。
+// 規則：@dooping/react 的每個檔案只能依賴
+//   (a) 相對路徑的同伴模組，(b) @dooping/tokens，(c) 白名單內的通用外部套件。
 // 任何「應用層概念」（狀態管理、路由、API client、業務型別、領域計算）一旦滲進來，
 // 這支測試就會紅——在它變成技術債之前先擋下來。
 //
@@ -24,7 +24,7 @@ const ALLOWED_EXTERNAL = [
   "clsx",
   "tailwind-merge",
   "class-variance-authority",
-  "@doping/tokens",
+  "@dooping/tokens",
 ];
 
 /** 明確禁止的相依類型（出現即代表元件庫被應用層污染）。 */

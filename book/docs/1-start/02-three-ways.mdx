@@ -53,18 +53,18 @@ src/
 ## 方式三：安裝 token 套件（唯一建議的硬相依）
 
 ```bash
-npm install @doping/tokens
+npm install @dooping/tokens
 ```
 
 ```js title="tailwind.config.js"
 module.exports = {
-  presets: [require("@doping/tokens/tailwind-preset")],
+  presets: [require("@dooping/tokens/tailwind-preset")],
   content: ["./src/**/*.{ts,tsx}"],
 };
 ```
 
 ```css title="你的全域 CSS"
-@import "@doping/tokens/tokens.css";
+@import "@dooping/tokens/tokens.css";
 ```
 
 沒有用 Tailwind 也可以——`tokens.css` 是純 CSS 變數，任何宿主都吃得下：
@@ -80,7 +80,7 @@ module.exports = {
 需要在 JS 裡拿值（Canvas 圖表、伺服器端產 PDF、Figma plugin）：
 
 ```ts
-import { semanticColors, chartColors } from "@doping/tokens";
+import { semanticColors, chartColors } from "@dooping/tokens";
 
 const palette = chartColors("dark");   // ["#2a5ae5", "#0e9488", …]
 const colors = semanticColors();        // { primary: "222.2 47.4% 11.2%", … }

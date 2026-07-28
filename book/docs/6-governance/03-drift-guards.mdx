@@ -21,7 +21,7 @@ title: 漂移防護
 
 ```ts
 const ALLOWED_EXTERNAL = ["react", "react-dom", "@radix-ui/", "lucide-react",
-                          "clsx", "tailwind-merge", "class-variance-authority", "@doping/tokens"];
+                          "clsx", "tailwind-merge", "class-variance-authority", "@dooping/tokens"];
 
 const FORBIDDEN = [
   { re: /from\s+["']zustand/,        why: "狀態管理屬於應用層" },
@@ -81,7 +81,7 @@ expect(hits).toEqual([]);
 ## 加分：讓文件站直接吃元件原始碼
 
 ```ts
-resolve: { alias: { "@doping/react": path.resolve("../packages/react/src") } }
+resolve: { alias: { "@dooping/react": path.resolve("../packages/react/src") } }
 ```
 
 文件裡的範例是**真元件**，不是複製品、不是截圖。

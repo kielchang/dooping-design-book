@@ -13,7 +13,7 @@ import {
   DataTable, TabPills, Delta, EmptyState, Stepper,
   Placeholder, Spotlight, MockScreenFrame, MockRow,
   EditableField, ChangeSummary,
-} from "@doping/react";
+} from "@dooping/react";
 
 export default {
   ...MDXComponents,

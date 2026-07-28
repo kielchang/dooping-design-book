@@ -2,7 +2,7 @@
   "extends": "@docusaurus/tsconfig",
   "compilerOptions": {
     "baseUrl": ".",
-    "paths": { "@doping/react": ["../packages/react/src"], "@doping/tokens": ["../packages/tokens/src/index.ts"] }
+    "paths": { "@dooping/react": ["../packages/react/src"], "@dooping/tokens": ["../packages/tokens/src/index.ts"] }
   },
   "exclude": [".docusaurus", "build"]
 }

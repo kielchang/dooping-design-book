@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build:tokens": "npm run build --workspace @doping/tokens",
+    "build:tokens": "npm run build --workspace @dooping/tokens",
     "build:registry": "node scripts/build-registry.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",

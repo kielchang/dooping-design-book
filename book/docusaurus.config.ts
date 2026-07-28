@@ -42,8 +42,8 @@ const config: Config = {
           return {
             resolve: {
               alias: {
-                "@doping/react": path.resolve(pkgs, "react/src"),
-                "@doping/tokens": path.resolve(pkgs, "tokens/src/index.ts"),
+                "@dooping/react": path.resolve(pkgs, "react/src"),
+                "@dooping/tokens": path.resolve(pkgs, "tokens/src/index.ts"),
               },
             },
             module: {

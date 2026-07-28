@@ -1,9 +1,9 @@
-// @doping/tokens — Tailwind preset（CommonJS，讓 Docusaurus/PostCSS 的 require() 也能吃）
+// @dooping/tokens — Tailwind preset（CommonJS，讓 Docusaurus/PostCSS 的 require() 也能吃）
 //
-// 用法：tailwind.config.js → presets: [require("@doping/tokens/tailwind-preset")]
+// 用法：tailwind.config.js → presets: [require("@dooping/tokens/tailwind-preset")]
 //
 // 這個 preset 只做「token → utility 名稱」的對映，不決定任何值：值都在 CSS 變數裡，
-// 由 @doping/tokens/tokens.css 提供。因此同一份 class 可以在不同宿主換皮而不重編譯。
+// 由 @dooping/tokens/tokens.css 提供。因此同一份 class 可以在不同宿主換皮而不重編譯。
 const tokens = require("./src/tokens.json");
 
 const isToken = (v) => v && typeof v === "object" && typeof v.value === "string";

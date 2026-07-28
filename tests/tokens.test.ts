@@ -7,7 +7,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { createRequire } from "node:module";
-import { semanticColors, chartColors, TOKENS_VERSION } from "@doping/tokens";
+import { semanticColors, chartColors, TOKENS_VERSION } from "@dooping/tokens";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const require = createRequire(import.meta.url);

@@ -23,12 +23,12 @@
 **採 B。**
 
 ```
-硬相依   @doping/tokens   ← 唯一建議 npm 安裝的一層
-複製走   @doping/react    ← registry，複製後就是你的
+硬相依   @dooping/tokens   ← 唯一建議 npm 安裝的一層
+複製走   @dooping/react    ← registry，複製後就是你的
 只讀     模式 Patterns     ← 用你自己的技術棧實作
 ```
 
-`@doping/tokens` 的產物刻意做成**框架中立**：
+`@dooping/tokens` 的產物刻意做成**框架中立**：
 
 - `tokens.css`：純 CSS 變數，任何宿主都吃得下（不含任何 Tailwind 指令）
 - `tailwind-preset.cjs`：可選，給用 Tailwind 的人

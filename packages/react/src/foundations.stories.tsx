@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { tokens } from "@doping/tokens";
+import { tokens } from "@dooping/tokens";
 
 const meta: Meta = { title: "基礎/設計 Token" };
 export default meta;

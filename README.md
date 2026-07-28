@@ -36,8 +36,8 @@ npm --prefix book start    # 文件站 http://localhost:3000
 
 ```
 packages/
-├── tokens/        @doping/tokens — tokens.json（來源）→ CSS 變數 ＋ Tailwind preset ＋ TS API
-└── react/         @doping/react  — React 參考實作（元件 ＋ stories ＋ 示範資料）
+├── tokens/        @dooping/tokens — tokens.json（來源）→ CSS 變數 ＋ Tailwind preset ＋ TS API
+└── react/         @dooping/react  — React 參考實作（元件 ＋ stories ＋ 示範資料）
 registry/          shadcn registry JSON（由 scripts/build-registry.mjs 產生）
 book/              Docusaurus 文件站（中文搜尋、可列印、內嵌真元件）
 docs/adr/          決策紀錄正本（build 時同步到文件站）

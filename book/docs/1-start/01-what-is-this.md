@@ -22,9 +22,9 @@ title: 這本書是什麼
 ## 三個層次，三種相依強度
 
 ```
-硬相依   @doping/tokens      設計 token（色彩語意、間距、字級、動態…）
+硬相依   @dooping/tokens      設計 token（色彩語意、間距、字級、動態…）
   ↑                          ← 唯一建議直接安裝的一層。它是契約。
-複製走   @doping/react       React 參考實作（registry 複製原始碼進你的專案）
+複製走   @dooping/react       React 參考實作（registry 複製原始碼進你的專案）
   ↑                          ← 複製走之後就是你的程式碼，隨你改。
 只讀     模式 Patterns        操作邏輯與取捨
                              ← 用你自己的技術棧實作，這本書只負責把坑講清楚。

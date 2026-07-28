@@ -1,11 +1,11 @@
-# @doping/tokens
+# @dooping/tokens
 
 框架中立的設計 token：**JSON 是來源，CSS 與 Tailwind preset 是產物。**
 
 ## 安裝
 
 ```bash
-npm install @doping/tokens
+npm install @dooping/tokens
 ```
 
 ## 用法
@@ -13,7 +13,7 @@ npm install @doping/tokens
 ### 純 CSS（任何宿主）
 
 ```css
-@import "@doping/tokens/tokens.css";
+@import "@dooping/tokens/tokens.css";
 
 .my-alert {
   background: hsl(var(--danger) / 0.1);
@@ -26,7 +26,7 @@ npm install @doping/tokens
 
 ```js title="tailwind.config.js"
 module.exports = {
-  presets: [require("@doping/tokens/tailwind-preset")],
+  presets: [require("@dooping/tokens/tailwind-preset")],
   content: ["./src/**/*.{ts,tsx}"],
 };
 ```
@@ -38,7 +38,7 @@ module.exports = {
 ### JavaScript（Canvas 圖表、伺服器端 PDF、Figma plugin…）
 
 ```ts
-import { semanticColors, chartColors, chartChrome, TOKENS_VERSION } from "@doping/tokens";
+import { semanticColors, chartColors, chartChrome, TOKENS_VERSION } from "@dooping/tokens";
 
 chartColors("dark");   // ["#2a5ae5", "#0e9488", …]
 semanticColors();      // { primary: "222.2 47.4% 11.2%", … }（HSL 三元組）

@@ -1,6 +1,6 @@
 /* Storybook 樣式管線：token（CSS 變數）＋ Tailwind utilities。
    preflight（reset）在這裡是需要的——Storybook canvas 是乾淨的頁面。 */
-@import "@doping/tokens/tokens.css";
+@import "@dooping/tokens/tokens.css";
 
 @tailwind base;
 @tailwind components;

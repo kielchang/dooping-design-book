@@ -7,7 +7,7 @@
 
 元件庫的散佈方式有兩種主流：
 
-1. **npm 套件**：`npm install @doping/react`，import 使用
+1. **npm 套件**：`npm install @dooping/react`，import 使用
 2. **registry / 複製原始碼**：把元件原始碼複製進使用者的專案
 
 ## 選項
@@ -22,7 +22,7 @@
 
 **採 B：只提供 registry。**
 
-同時**保留 `@doping/react` workspace 套件**作為開發與文件站的來源，
+同時**保留 `@dooping/react` workspace 套件**作為開發與文件站的來源，
 但不發佈到 npm；它的存在是為了 Storybook、文件站活範例與守衛測試。
 
 ## 理由

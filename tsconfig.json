@@ -16,9 +16,9 @@
     "noEmit": true,
     "types": ["node"],
     "paths": {
-      "@doping/tokens": ["./packages/tokens/src/index.ts"],
-      "@doping/react": ["./packages/react/src/index.ts"],
-      "@doping/react/*": ["./packages/react/src/*"]
+      "@dooping/tokens": ["./packages/tokens/src/index.ts"],
+      "@dooping/react": ["./packages/react/src/index.ts"],
+      "@dooping/react/*": ["./packages/react/src/*"]
     },
     "baseUrl": "."
   },

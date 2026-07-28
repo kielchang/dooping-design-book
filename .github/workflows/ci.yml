@@ -46,7 +46,7 @@ jobs:
             exit 1
           }
 
-      - name: 文件站建置（onBrokenLinks: throw，順帶檢查內部連結）
+      - name: "文件站建置（onBrokenLinks: throw，順帶檢查內部連結）"
         working-directory: book
         run: |
           npm ci

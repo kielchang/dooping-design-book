@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "label",
+  "type": "registry:ui",
+  "title": "Label 標籤",
+  "description": "表單標籤（Radix Label）。",
+  "dependencies": [
+    "@radix-ui/react-label"
+  ],
+  "registryDependencies": [
+    "https://kielchang.github.io/doping-design-book/r/utils.json"
+  ],
+  "files": [
+    {
+      "path": "doping/ui/label.tsx",
+      "content": "import * as React from \"react\";\nimport * as LabelPrimitive from \"@radix-ui/react-label\";\nimport { cn } from \"@/lib/doping/utils\";\n\nconst Label = React.forwardRef<\n  React.ElementRef<typeof LabelPrimitive.Root>,\n  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>\n>(({ className, ...props }, ref) => (\n  <LabelPrimitive.Root\n    ref={ref}\n    className={cn(\"text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70\", className)}\n    {...props}\n  />\n));\nLabel.displayName = LabelPrimitive.Root.displayName;\n\nexport { Label };\n",
+      "type": "registry:ui",
+      "target": "components/doping/label.tsx"
+    }
+  ]
+}

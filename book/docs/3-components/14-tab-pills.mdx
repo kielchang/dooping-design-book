@@ -1,0 +1,54 @@
+---
+title: TabPills 分頁膠囊
+---
+
+# TabPills 分頁膠囊
+
+同一區塊內切換不同視角。
+
+## 存在的唯一理由是收斂
+
+分頁列是最容易被各畫面各自手刻 `<button>` 的元件。一旦散開：改一次樣式要全站找一遍，
+而且 `role="tablist"` 語意一定會漏掉。
+
+<Rules>
+  <Do><p>所有分頁切換一律用 TabPills。</p></Do>
+  <Dont><p>不要手刻 <code>&lt;div&gt;&lt;button&gt;…&lt;/button&gt;&lt;/div&gt;</code> 分頁列。</p></Dont>
+</Rules>
+
+<Demo title="分頁膠囊（可帶徽章）">
+  <TabPills
+    label="訂單狀態"
+    value="confirmed"
+    onChange={() => {}}
+    tabs={[
+      { key: "all", label: "全部" },
+      { key: "draft", label: "草稿", badge: <Badge variant="secondary">3</Badge> },
+      { key: "confirmed", label: "已確認", badge: <Badge variant="info">7</Badge> },
+      { key: "shipped", label: "已出貨" },
+    ]}
+  />
+</Demo>
+
+## 何時不要用
+
+<Rules>
+  <Do><p>分頁數 <strong>2–6</strong>、內容互斥、切換不改變網址主要語意。</p></Do>
+  <Dont><p>分頁超過 6 個 → 那是導覽，該進側邊欄。
+  分頁內容需要深連結分享 → 該用路由，或至少同步到 query string。</p></Dont>
+</Rules>
+
+## 建議同步到網址
+
+`?tab=confirmed`。使用者會想把「目前這個視角」貼給同事——
+分頁狀態只存在記憶體裡，等於這個連結永遠打不開他看到的畫面。
+
+## 無障礙
+
+`role="tablist"` ＋ 每項 `role="tab"` `aria-selected`；觸控目標套 `tap-target-y`。
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/tab-pills.json
+```

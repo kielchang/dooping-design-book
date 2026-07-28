@@ -1,0 +1,63 @@
+---
+title: Dialog 對話框
+---
+
+# Dialog 對話框
+
+打斷使用者，要一個決定。
+
+## 何時不要用
+
+<Rules>
+  <Do><p>破壞性動作的二次確認、需要專注填寫的小表單。</p></Do>
+  <Dont><p>不要拿來裝大型表單或多步驟流程——對話框裡沒有麵包屑、不能深連結、
+  在手機上幾乎不能用。那應該是一個頁面。</p></Dont>
+</Rules>
+
+<Demo title="破壞性動作確認">
+  <Dialog>
+    <DialogTrigger asChild><Button variant="destructive">取消訂單</Button></DialogTrigger>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>確定要取消訂單 SO-2403？</DialogTitle>
+        <DialogDescription>
+          取消後將釋放已保留的庫存，且此動作會寫入異動紀錄。已出貨的項目不受影響。
+        </DialogDescription>
+      </DialogHeader>
+      <DialogFooter>
+        <DialogClose asChild><Button variant="outline">返回</Button></DialogClose>
+        <Button variant="destructive">確定取消訂單</Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+</Demo>
+
+## 標題問問題，按鈕給答案
+
+<Rules>
+  <Do>
+    <p>標題：「確定要取消訂單 SO-2403？」<br />按鈕：「確定取消訂單」／「返回」</p>
+  </Do>
+  <Dont>
+    <p>標題：「確認」，按鈕：「是」／「否」。使用者滑掉上下文之後，
+    「是」是指是要取消還是是要保留？</p>
+  </Dont>
+</Rules>
+
+按鈕文字要能**單獨讀懂**——很多人只看按鈕不看標題。
+
+## 行動版是置中卡片，不是全螢幕
+
+後台對話框通常是「確認一件事」，全螢幕會讓使用者失去背景脈絡
+（他正在看的那一列到底是誰）。所以留邊距、維持置中。
+
+## 無障礙
+
+Radix Dialog 已處理焦點鎖定、Esc 關閉、`aria-modal`、還原焦點。
+**務必**提供 `DialogTitle`——沒有標題的 modal 對螢幕報讀器是一片空白。
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/dialog.json
+```

@@ -1,0 +1,96 @@
+---
+title: 漂移防護
+---
+
+# 漂移防護
+
+## 問題
+
+設計系統的規則寫在文件裡，三個月後就沒有人記得。
+
+不是因為大家不專業，是因為趕時間的時候，**違反規則永遠是比較快的選項**：
+硬編一個顏色比查 token 快、複製一段 `<table>` 比讀 DataTable 的 API 快。
+
+## 做法：把規則寫成測試
+
+規則寫進 CI，違反就紅燈。這是唯一能撐過三個月的方式。
+
+以下四支守衛是這個 repo 實際在跑的，可以直接抄。
+
+### 1. 邊界守衛：元件不得依賴應用層
+
+```ts
+const ALLOWED_EXTERNAL = ["react", "react-dom", "@radix-ui/", "lucide-react",
+                          "clsx", "tailwind-merge", "class-variance-authority", "@doping/tokens"];
+
+const FORBIDDEN = [
+  { re: /from\s+["']zustand/,        why: "狀態管理屬於應用層" },
+  { re: /from\s+["']react-router/,   why: "路由屬於應用層" },
+  { re: /from\s+["']@\//,            why: "@/ 別名指向宿主專案" },
+];
+
+for (const file of shippedFiles) {
+  for (const spec of imports(file)) {
+    if (spec.startsWith(".")) continue;
+    expect(ALLOWED_EXTERNAL.some((p) => spec.startsWith(p))).toBe(true);
+  }
+}
+```
+
+這支測試就是「元件庫能被任何專案拿去用」的自動化保證。
+任何應用層概念滲進來，它會在變成技術債之前先紅。
+
+### 2. Barrel 覆蓋率：新元件不會被漏掉
+
+```ts
+const missing = shippedFiles
+  .map(toModuleName)
+  .filter((m) => !barrelSource.includes(`"./${m}"`));
+expect(missing).toEqual([]);
+```
+
+沒有這條，新元件會安靜地不出現在公開 API 裡，然後有人繞過 barrel 直接深層 import。
+
+### 3. Token 一致性：淺深成對、CSS 與來源同步
+
+```ts
+// 最容易發生的漂移：加了淺色 token 忘了配深色
+const light = Object.keys(semanticColors("light"));
+const dark  = new Set(Object.keys(semanticColors("dark")));
+expect(light.filter((k) => !dark.has(k))).toEqual([]);
+
+// CSS 產物與來源同步（防止有人手改 dist）
+expect(missingInCss).toEqual([]);
+```
+
+深色缺一個 token，通常要等到有人切到深色才會發現——可能是三個月後的客訴。
+
+### 4. 詞彙守衛：防止領域語意回流
+
+```ts
+const FORBIDDEN_TERMS = ["…產業術語…", "…角色流程詞…"];
+// 掃描 packages/、book/docs、docs/adr、registry
+expect(hits).toEqual([]);
+```
+
+這支是本 repo 特有的：工具箱萃取自一套特定產業的系統，
+守衛確保「示範資料與文件裡一個領域詞都不留」。
+
+你的專案未必需要這一支，但值得想一想：**你的設計系統有沒有偷偷綁定某個業務假設？**
+
+## 加分：讓文件站直接吃元件原始碼
+
+```ts
+resolve: { alias: { "@doping/react": path.resolve("../packages/react/src") } }
+```
+
+文件裡的範例是**真元件**，不是複製品、不是截圖。
+元件改了、範例當場跟著改——文件不可能過期，因為它根本沒有自己的副本。
+
+## 不要只靠 code review
+
+<Rules>
+  <Do><p>能寫成測試的規則就寫成測試。人只 review 寫不成測試的部分（命名、文案、取捨）。</p></Do>
+  <Dont><p>不要把「請記得用 token」寫在 wiki 然後期待大家自律。
+  三個月後那頁 wiki 沒有人打開過。</p></Dont>
+</Rules>

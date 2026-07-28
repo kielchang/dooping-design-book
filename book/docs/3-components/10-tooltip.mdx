@@ -1,0 +1,57 @@
+---
+title: Tooltip 提示泡泡
+---
+
+# Tooltip 提示泡泡
+
+補充說明，或顯示被截斷的完整內容。
+
+## 何時不要用
+
+<Rules>
+  <Do><p>補充性資訊（欄位定義、被 <code>…</code> 截斷的完整文字）。</p></Do>
+  <Dont><p>不要放<strong>必要</strong>資訊。觸控裝置要長壓才看得到，
+  鍵盤使用者要 Tab 到才看得到——任何「不看就不會用」的說明都該直接寫在畫面上。</p></Dont>
+</Rules>
+
+<Demo title="提示與截斷">
+  <div className="space-y-6 py-6">
+    <p className="text-sm">
+      訂單狀態
+      <Tooltip content="「已確認」代表已鎖定價格與數量，尚未安排出貨。" className="ml-1">
+        <span className="cursor-help underline decoration-dotted underline-offset-2">已確認</span>
+      </Tooltip>
+    </p>
+    <div className="max-w-[220px] rounded-md border p-2">
+      <TruncatedText text="工業級軸承 6204 / 深溝球 / 雙面防塵蓋 / 內徑 20mm" />
+    </div>
+  </div>
+</Demo>
+
+## 三種觸發，缺一不可
+
+| 裝置 | 觸發 |
+| --- | --- |
+| 桌機 | hover |
+| 鍵盤 | 聚焦（需 `focusable`） |
+| 觸控 | **長壓約 0.35 秒**，放開後短暫保留 |
+
+行動裝置沒有 hover。不處理長壓，所有靠泡泡補充的資訊在手機上等於不存在。
+
+## 邊緣防溢
+
+泡泡掛載後量測自身：溢出視窗左右緣就水平夾擠，上緣不足就翻到下方。
+沒有這段，靠右的欄位泡泡會被切掉一半。
+
+## `focusable` 的使用界線
+
+<Rules>
+  <Do><p>用在「非互動但內容被截斷」的地方（表格儲存格）。</p></Do>
+  <Dont><p>不要用在已是互動元素的內部。巢狀可聚焦元素會讓鍵盤使用者多按一次 Tab 才走得掉。</p></Dont>
+</Rules>
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/tooltip.json
+```

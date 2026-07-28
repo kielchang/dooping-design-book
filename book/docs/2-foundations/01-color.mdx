@@ -1,0 +1,131 @@
+---
+title: 色彩語意
+---
+
+# 色彩語意
+
+**這一章講的不是色票，是意思。**
+
+Token 的名字說的是「這個顏色代表什麼」，不是「這是什麼顏色」。
+所以沒有 `--blue-500`，只有 `--primary`、`--danger`、`--field-editable`。
+換品牌色時改的是值，不是任何一行使用它的程式碼。理由見 [ADR-0001](/adr)。
+
+## 四組語意，職責不重疊
+
+### 1. 表面與文字（結構）
+
+| Token | 意思 |
+| --- | --- |
+| `--background` / `--foreground` | 頁面底色與主要文字 |
+| `--card` / `--card-foreground` | 卡片表面 |
+| `--popover` / `--popover-foreground` | 浮層表面（下拉、泡泡、篩選面板） |
+| `--muted` / `--muted-foreground` | 弱化表面與次要文字 |
+| `--accent` / `--accent-foreground` | hover／被指向的表面 |
+| `--border` / `--input` / `--ring` | 分隔線、控制項邊框、鍵盤聚焦環 |
+
+深色模式下這五種表面構成**抬升層次**：`background < card < popover < muted < border`。
+深色不是把淺色反轉——反轉出來的介面會扁平到分不出層。
+
+### 2. 動作（控制項）
+
+| Token | 用在哪 |
+| --- | --- |
+| `--primary` | 主要動作、品牌強調 |
+| `--secondary` | 次要動作 |
+| `--destructive` | **破壞性動作的控制項**（刪除鈕） |
+
+### 3. 狀態（訊息與資料）
+
+| Token | 意思 |
+| --- | --- |
+| `--success` | 良好／已完成／通過 |
+| `--warning` | 需要注意，但不阻擋 |
+| `--info` | 中性提示／補充說明 |
+| `--danger` | 異常／錯誤／不合格 |
+
+:::tip `destructive` 與 `danger` 為什麼分開
+一個是「按下去會刪東西」，一個是「這筆資料有問題」。
+同一個畫面上兩者常常同時出現（一列紅色的異常資料，右邊一顆紅色的刪除鈕）。
+混用會讓紅色失去意義——使用者不再知道紅色到底在警告什麼。
+:::
+
+### 4. 欄位（可編輯 vs 唯讀）
+
+| Token | 意思 |
+| --- | --- |
+| `--field-editable` ＋ `--field-border` | 這一格你可以改 |
+| `--field-readonly` | 這一格是算出來的／唯讀 |
+| `--edit` / `--edit-bg` / `--edit-foreground` | **已改動未送出**（保留色） |
+
+<Demo title="欄位只有兩種語意">
+  <div className="grid max-w-lg gap-3 sm:grid-cols-3">
+    <div>
+      <p className="mb-1 text-xs font-medium">可編輯</p>
+      <div className="field-editable rounded-md border px-3 py-2 text-sm">1,500,000</div>
+    </div>
+    <div>
+      <p className="mb-1 text-xs font-medium">唯讀／計算值</p>
+      <div className="field-readonly rounded-md border px-3 py-2 text-sm">1,380,000</div>
+    </div>
+    <div>
+      <p className="mb-1 text-xs font-medium">已改動未送出</p>
+      <div className="rounded-md border border-edit bg-edit-bg px-3 py-2 text-sm text-edit-foreground">1,650,000</div>
+    </div>
+  </div>
+</Demo>
+
+<Rules>
+  <Do>
+    <p>欄位只分<strong>兩種</strong>：可編輯、唯讀。加上「已改動未送出」總共三種狀態，
+    使用者掃一眼就懂。</p>
+  </Do>
+  <Dont>
+    <p>不要做「輸入／假設／公式」三色。那是試算表的儲存格慣例，
+    對網頁表單的使用者不成立——他不在乎這格背後是不是公式，他只在乎能不能改。
+    （這是實際踩過的坑，見 <a href="/adr">ADR-0002</a>）</p>
+  </Dont>
+</Rules>
+
+## 保留色：琥珀＝已改動未送出
+
+`--edit` 這一組琥珀色**只做一件事**：標記「使用者改了，但還沒送出」。
+
+不得挪作他用——不能拿來當高亮、當「新功能」標記、當任何其他強調。
+一旦琥珀色在畫面上有第二種意思，「我改了什麼」這個最重要的訊號就被稀釋了。
+
+理由與被否決的替代方案見 [ADR-0002](/adr)。
+
+## 分類色票與狀態語意脫鉤
+
+圖表的 8 色分類色票（`--chart-1` … `--chart-8`）**不參與**狀態語意。
+換一整套圖表色票，不會讓「紅＝異常」跟著變。
+
+色票本身沿色相環排序（藍→青→綠→金→橙→粉→紅→紫），
+並刻意把色覺障礙下最難分辨的一段（藍↔紫）拆到陣列兩端，讓相鄰系列永遠是安全的組合。
+
+<Demo title="分類色票（8 色）">
+  <div className="flex flex-wrap gap-2">
+    {[1,2,3,4,5,6,7,8].map((n) => (
+      <div key={n} className="flex items-center gap-2 rounded-md border px-2 py-1 text-xs">
+        <span className="size-4 rounded" style={{ background: `var(--chart-${n})` }} />
+        <code>--chart-{n}</code>
+      </div>
+    ))}
+  </div>
+</Demo>
+
+## 對比要求
+
+所有前景／背景配對都要通過 WCAG AA（一般文字 4.5:1、大字 3:1）。
+淺色與深色**各自**驗一次——深色下的低飽和色很容易掉到 3:1 以下。
+
+## 顏色永遠不是唯一線索
+
+這條規則貫穿整本書：
+
+- 狀態徽章要有**文字**
+- 變異數字要有**箭頭 ▲▼ 與文字**
+- 選中狀態要有**打勾**
+- 提示框要有**圖示**
+
+灰階列印一份試試看——如果語意消失了，就是還沒做完。

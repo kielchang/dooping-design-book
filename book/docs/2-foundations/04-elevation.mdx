@@ -1,0 +1,63 @@
+---
+title: 陰影與層次
+---
+
+# 陰影與層次
+
+陰影是**表面抬升的層級**，不是裝飾。所以只有 3 階。
+
+| Token | 意思 | 用在哪 |
+| --- | --- | --- |
+| `shadow-sm` | 貼地 | 卡片、輸入框 |
+| `shadow-md` | 抬起 | 下拉選單 |
+| `shadow-lg` | 浮起 | 對話框、導引卡 |
+
+<Demo title="三階陰影">
+  <div className="flex flex-wrap gap-6 p-4">
+    {["sm","md","lg"].map((s) => (
+      <div key={s} className={`flex size-24 items-center justify-center rounded-lg border bg-card shadow-${s}`}>
+        <code className="text-xs">{s}</code>
+      </div>
+    ))}
+  </div>
+</Demo>
+
+## 深色模式靠表面亮度分層，不靠陰影
+
+深色背景上的陰影本來就幾乎看不見。所以深色模式的層次來自**表面亮度**：
+
+```
+background (8%)  <  card (12%)  <  popover (15%)  <  muted (18%)  <  border (22%)
+```
+
+這也是為什麼深色 token **不是**淺色的機械式反轉。反轉出來的深色介面，
+`background` 和 `card` 會變成同一個值，整個介面扁平到分不出哪一塊是浮起來的。
+
+<Demo title="深色的五級表面（把文件切到深色模式看差異）">
+  <div className="space-y-2">
+    {[
+      ["background", "頁面底"],
+      ["card", "卡片"],
+      ["popover", "浮層"],
+      ["muted", "弱化區塊"],
+    ].map(([t, label]) => (
+      <div key={t} className="flex items-center gap-3 rounded-md border p-3" style={{ background: `hsl(var(--${t}))` }}>
+        <code className="text-xs">--{t}</code>
+        <span className="text-xs text-muted-foreground">{label}</span>
+      </div>
+    ))}
+  </div>
+</Demo>
+
+## z-index 分層
+
+沒有把 z-index 做成 token，但有約定：
+
+| 範圍 | 用途 |
+| --- | --- |
+| 10 | 黏性表頭、凍結首欄 |
+| 50 | 下拉／對話框／浮層 |
+| 55–60 | 表格欄位篩選面板（要蓋過凍結首欄） |
+| 200 | 引導聚光層（要蓋過一切） |
+
+刻意留大間隔：需要插一層時不用重排全部。

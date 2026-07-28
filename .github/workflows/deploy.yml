@@ -1,0 +1,86 @@
+name: Deploy Design Book
+
+# 一次建置三個產物，發佈到同一個 GitHub Pages 站：
+#   /            → 文件站（Docusaurus）
+#   /storybook/  → Storybook 活元件展示
+#   /r/*.json    → shadcn registry（npx shadcn add <URL> 可安裝）
+#
+# 三者互相依賴（文件站與 Storybook 都吃元件原始碼、registry 由原始碼產生），
+# 所以刻意放在同一個 job 依序建置，避免版本不一致。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+
+      - run: npm ci
+      - name: 建置 token（CSS 產物是後續所有步驟的前提）
+        run: npm run build:tokens
+      - name: 型別檢查
+        run: npm run typecheck
+      - name: 守衛測試（元件庫邊界、token 一致性、去領域化詞彙）
+        run: npm test
+
+  build:
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+
+      - run: npm ci
+      - run: npm run build:tokens
+
+      - name: 產生 registry JSON（base 指向正式站）
+        run: node scripts/build-registry.mjs
+        env:
+          REGISTRY_BASE: https://kielchang.github.io/doping-design-book
+
+      - name: 建置文件站
+        working-directory: book
+        run: |
+          npm ci
+          npm run build
+        env:
+          BOOK_BASE_URL: /doping-design-book/
+          BOOK_SITE_URL: https://kielchang.github.io
+
+      - name: 建置 Storybook → /storybook
+        run: npm run build-storybook -- -o book/build/storybook
+
+      - name: 放置 registry → /r
+        run: |
+          mkdir -p book/build/r
+          cp registry/*.json book/build/r/
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: book/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

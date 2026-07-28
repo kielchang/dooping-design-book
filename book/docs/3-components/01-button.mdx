@@ -1,0 +1,69 @@
+---
+title: Button 按鈕
+---
+
+# Button 按鈕
+
+觸發一個動作。
+
+## 何時不要用
+
+<Rules>
+  <Do><p>導向另一個頁面 → 用連結（<code>&lt;a&gt;</code>）。需要長得像按鈕就用 <code>asChild</code>。</p></Do>
+  <Dont><p>不要用 <code>&lt;button onClick=&#123;() =&gt; navigate()&#125;&gt;</code> 做導覽——
+  使用者沒辦法中鍵開新分頁、沒辦法複製網址，而且搜尋引擎與螢幕報讀器都讀不懂。</p></Dont>
+</Rules>
+
+## 變體
+
+`default` 主要動作 · `secondary` 次要 · `outline` 外框 · `ghost` 淡化 · `link` 連結樣式 · `destructive` 破壞性動作
+
+<Demo title="變體與尺寸">
+  <div className="space-y-3">
+    <div className="flex flex-wrap items-center gap-2">
+      <Button>主要動作</Button>
+      <Button variant="secondary">次要動作</Button>
+      <Button variant="outline">外框</Button>
+      <Button variant="ghost">淡化</Button>
+      <Button variant="link">連結樣式</Button>
+      <Button variant="destructive">刪除訂單</Button>
+    </div>
+    <div className="flex flex-wrap items-center gap-2">
+      <Button size="sm">小</Button>
+      <Button>預設</Button>
+      <Button size="lg">大</Button>
+    </div>
+    <div className="flex flex-wrap items-center gap-2">
+      <Button disabled>停用</Button>
+    </div>
+  </div>
+</Demo>
+
+## 狀態
+
+| 狀態 | 表現 |
+| --- | --- |
+| 預設 | 依變體 |
+| hover | 底色加深 10–20%，150ms |
+| focus-visible | 2px 聚焦環 ＋ 2px 偏移（**只在鍵盤操作時出現**） |
+| disabled | 透明度 50%、`pointer-events: none` |
+| loading | **沒有獨立變體**：設 `disabled`、換旋轉圖示、改文案 |
+
+為什麼沒有 loading 變體：多一個變體只會讓人猶豫該用哪個。
+用既有的 disabled ＋ 圖示 ＋ 文案，語意更清楚（「正在處理，現在不能按」）。
+
+## 一顆畫面上只有一顆主要按鈕
+
+`default` 變體是「這個畫面最主要的那件事」。兩顆並排的深色按鈕等於沒有主次。
+
+## 無障礙
+
+- 圖示按鈕**必須**有 `aria-label`
+- 破壞性動作建議搭配 [Dialog](/components/dialog) 二次確認
+- 觸控裝置的按鈕至少 44px（`size="default"` 已達 40px，密集區域加 `tap-target`）
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/button.json
+```

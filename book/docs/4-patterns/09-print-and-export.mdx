@@ -1,0 +1,100 @@
+---
+title: 列印與匯出
+---
+
+# 列印與匯出
+
+## 問題
+
+大多數團隊只設計淺色與深色兩種主題。後台系統還有第三種：**印出來的那一份**。
+
+而列印是後台系統真正的交付物之一——報表要印出來給主管簽名、
+要存成 PDF 附在流程裡、要寄給不用系統的人。
+
+沒有處理列印樣式的結果：側邊欄佔掉半頁、狀態徽章變成白色方塊、
+表格被切成兩半而且第二頁沒有表頭。
+
+## 做法：五條列印規則
+
+### 1. 底色是內容，不是裝飾
+
+```css
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+```
+
+後台介面的徽章、提示框、佔位塊**全靠底色辨義**。瀏覽器預設會剝掉背景色
+（除非使用者勾「列印背景圖形」，而沒有人會記得去勾），剝掉之後整塊語意就消失了。
+
+補一層保底：佔位塊之類純靠底色的元素，在列印時補上淡邊框——
+有些印表機驅動仍會剝背景，至少留下形狀。
+
+### 2. 控制項一律隱藏
+
+搜尋框、篩選鈕、分頁器、匯出鈕、側邊欄、導覽——印出來要是一份**乾淨文件**。
+
+元件內建 `print-hidden` class；容器層另外隱藏站台外殼。
+
+### 3. 不跨頁截斷
+
+```css
+@media print {
+  thead { display: table-header-group; }   /* 每頁重複表頭 */
+  tfoot { display: table-footer-group; }
+  tr, img, svg, figure, .print-block { break-inside: avoid; }
+  h1, h2, h3, h4 { break-after: avoid; }   /* 標題不孤懸頁底 */
+  p { orphans: 3; widows: 3; }             /* 段落至少留 3 行 */
+}
+```
+
+`break-inside: avoid` 是**盡力而為**——整塊超過一頁時瀏覽器仍會就地分頁。
+所以大區塊要能自己再細分（例如逐步驟各自 avoid）。
+
+### 4. 黏性元素要解除
+
+```css
+@media print { .sticky-header { position: static !important; } }
+```
+
+黏性表頭在列印時會壓在第一頁的內容上。表頭重複交給 `table-header-group` 處理就好。
+
+### 5. 動畫改印靜態版本
+
+```css
+@media print {
+  .spotlight-ring {
+    animation: none !important;
+    box-shadow: 0 0 0 3px hsl(var(--primary)), 0 0 0 6px hsl(var(--primary) / 0.3) !important;
+  }
+}
+```
+
+注意是**換成靜態版本**，不是直接拿掉。直接 `animation: none` 會讓聚光完全消失。
+
+## 匯出（CSV）
+
+| 規則 | 為什麼 |
+| --- | --- |
+| **加 UTF-8 BOM** | 沒有 BOM，中文在 Excel 開起來就是亂碼 |
+| **匯出＝目前畫面**（篩選＋排序後） | 「我明明篩好了，匯出卻是全部」 |
+| 跳脫引號、逗號、換行 | 品名裡有逗號是常態 |
+| 檔名帶語意（`orders-2024-02.csv`） | 使用者的下載資料夾裡有 40 個 `export.csv` |
+
+## 取捨
+
+**代價：每個新頁面都要想一次列印。**
+
+減災：把列印規則做進 **token 層的 CSS**（`.print-hidden`、`.print-block`、`.print-only`），
+讓它預設就對，而不是每頁各寫一份 `@media print`。
+
+## 反例
+
+<Rules>
+  <Do><p>提供頁面層級的「🖨 列印此頁」按鈕，讓使用者知道這件事被支援。</p></Do>
+  <Dont><p>不要另外做一個「列印版頁面」。兩份版面一定會不同步，
+  而且使用者會問「為什麼列印版少了那一欄」。</p></Dont>
+</Rules>

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "empty-state",
+  "type": "registry:ui",
+  "title": "EmptyState 空狀態",
+  "description": "圖示＋標題＋說明＋行動呼籲。",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "https://kielchang.github.io/doping-design-book/r/utils.json"
+  ],
+  "files": [
+    {
+      "path": "doping/ui/empty-state.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Inbox } from \"lucide-react\";\nimport { cn } from \"@/lib/doping/utils\";\n\nexport interface EmptyStateProps {\n  icon?: ReactNode;\n  title: string;\n  /** 說明「為什麼是空的」或「下一步該做什麼」——只寫「無資料」等於沒說。 */\n  hint?: string;\n  /** 行動呼籲（新增第一筆、清除篩選…） */\n  action?: ReactNode;\n  className?: string;\n  compact?: boolean;\n}\n\n/**\n * 空狀態。\n *\n * 三種空是不一樣的，文案必須分開：**還沒有資料**（引導建立）、\n * **篩選後沒有結果**（引導放寬條件）、**沒有權限看**（說明原因）。\n * 全部塞同一句「查無資料」是最常見、也最讓人卡住的偷懶做法。\n */\nexport function EmptyState({ icon, title, hint, action, className, compact = false }: EmptyStateProps) {\n  return (\n    <div className={cn(\"flex flex-col items-center justify-center text-center\", compact ? \"py-6\" : \"py-10\", className)}>\n      <div className=\"mb-2 text-muted-foreground/60\">{icon ?? <Inbox className=\"size-7\" />}</div>\n      <p className=\"text-sm font-medium\">{title}</p>\n      {hint && <p className=\"mt-0.5 max-w-sm text-xs text-muted-foreground\">{hint}</p>}\n      {action && <div className=\"mt-3\">{action}</div>}\n    </div>\n  );\n}\n",
+      "type": "registry:ui",
+      "target": "components/doping/empty-state.tsx"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+build/
+storybook-static/
+.docusaurus/
+.cache/
+*.tsbuildinfo
+.DS_Store
+
+# ADR 副本由 book/scripts/sync-adr.mjs 於 build 前產生（正本在 docs/adr/）
+book/docs/7-adr/*.md

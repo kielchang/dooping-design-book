@@ -1,0 +1,147 @@
+---
+title: DataTable 資料表
+---
+
+export const rows = [
+  { id: "SO-2401", customer: "遠東貿易", item: "工業級軸承 6204", qty: 120, amount: 84000, status: "已出貨" },
+  { id: "SO-2402", customer: "宏昌實業", item: "不鏽鋼板 304 2mm", qty: 40, amount: 156400, status: "已確認" },
+  { id: "SO-2403", customer: "台興機械", item: "伺服馬達 750W", qty: 6, amount: 213000, status: "已確認" },
+  { id: "SO-2404", customer: "遠東貿易", item: "潤滑油 20L", qty: 80, amount: 32800, status: "草稿" },
+  { id: "SO-2405", customer: "永盛五金", item: "六角螺栓 M10", qty: 5000, amount: 47500, status: "已出貨" },
+  { id: "SO-2406", customer: "中鼎工程", item: "控制箱 IP65", qty: 12, amount: 268800, status: "已確認" },
+  { id: "SO-2407", customer: "宏昌實業", item: "鋁擠型 40x40", qty: 300, amount: 91200, status: "已取消" },
+];
+
+export const nt = (n) => n.toLocaleString("en-US");
+
+export const columns = [
+  { key: "id", header: "訂單編號", freeze: true, cell: (r) => r.id, sortValue: (r) => r.id, filterText: (r) => r.id },
+  { key: "customer", header: "客戶", cell: (r) => r.customer, sortValue: (r) => r.customer, filterText: (r) => r.customer, filter: "select" },
+  { key: "item", header: "品項", truncate: 160, cell: (r) => r.item, sortValue: (r) => r.item, filterText: (r) => r.item },
+  { key: "qty", header: "數量", numeric: true, cell: (r) => nt(r.qty), sortValue: (r) => r.qty, total: (rs) => nt(rs.reduce((s, r) => s + r.qty, 0)) },
+  { key: "amount", header: "金額", numeric: true, cell: (r) => `$${nt(r.amount)}`, sortValue: (r) => r.amount, total: (rs) => `$${nt(rs.reduce((s, r) => s + r.amount, 0))}` },
+  { key: "status", header: "狀態", cell: (r) => r.status, sortValue: (r) => r.status, filterText: (r) => r.status, filter: "select" },
+];
+
+# DataTable 資料表
+
+**後台系統的主力元件。** 一份欄位設定，換來搜尋、篩選、排序、分頁、合計、凍結首欄與匯出。
+
+## 為什麼要收斂成一個元件
+
+因為表格是最容易被各畫面各自手刻的東西。手刻三張表之後，你會得到三種搜尋框位置、
+三種排序箭頭、三種「查無資料」文案，而且改一次樣式要找三個地方。
+
+<Rules>
+  <Do><p>凡是「使用者要在裡面找某一筆」的清單，一律用 DataTable。</p></Do>
+  <Dont><p>不要為了少寫幾行而退回手刻 <code>&lt;table&gt;</code>。
+  第一張表確實比較快，第三張表開始還債。</p></Dont>
+</Rules>
+
+<Demo title="完整功能（試試搜尋、點欄頭排序、點漏斗篩選、拖曳欄邊界）">
+  <DataTable
+    rows={rows}
+    columns={columns}
+    getRowKey={(r) => r.id}
+    initialSort={{ key: "amount", dir: "desc" }}
+    pageSize={5}
+    csv={{
+      headers: ["訂單編號", "客戶", "品項", "數量", "金額", "狀態"],
+      row: (r) => [r.id, r.customer, r.item, r.qty, r.amount, r.status],
+      fileName: "orders.csv",
+    }}
+  />
+</Demo>
+
+## 欄位設定就是全部的 API
+
+```tsx
+const columns: Column<Order>[] = [
+  {
+    key: "amount",
+    header: "金額",
+    numeric: true,                          // 右對齊 ＋ 等寬數字
+    cell: (r) => formatMoney(r.amount),     // 顯示
+    sortValue: (r) => r.amount,             // 有這個才可排序
+    filterText: (r) => String(r.amount),    // 參與關鍵字搜尋
+    filter: "range",                        // 單欄篩選型態（可自動判定）
+    total: (rows) => formatMoney(sum(rows)),// 合計
+    freeze: true,                           // 凍結首欄
+    truncate: 180,                          // 超寬截斷 ＋ 提示泡泡
+  },
+];
+```
+
+## 三個刻意的決定
+
+### 1. 門檻式分頁
+
+資料筆數沒超過一頁就**不顯示分頁器**。永遠顯示「第 1 頁 / 共 1 頁」只是噪音。
+
+### 2. 合計算「篩選後全部」，不是當頁
+
+使用者篩完就是要那個總數。只加總當頁是經典的對帳災難——
+而且錯得很安靜，通常要等到有人拿去跟別的系統對才會發現。
+
+### 3. 匯出跟著畫面
+
+匯出的是他**現在看到的**（篩選＋排序後），不是原始全量。
+「我明明篩好了，匯出卻是全部」是使用者最常見的困惑之一。
+
+## 單欄篩選的三種型態
+
+| 型態 | 互動 | 自動判定條件 |
+| --- | --- | --- |
+| `text` | 可加多筆關鍵字，**符合任一即列出**（同欄 OR、跨欄 AND） | 有 `filterText`／`sortValue` |
+| `range` | 最小～最大 | 數字欄且可排序 |
+| `select` | 從該欄不重複值多選 | 需明確指定 |
+
+文字篩選面板會依輸入推薦最相似的 3 個既有值——
+使用者常常記得「大概長怎樣」但打不出完整字串，尤其中文品名與代碼混排時。
+
+## 篩選條件可以逐條移除
+
+每個條件都是獨立標籤，能個別拿掉。只提供「一次全清」會逼使用者從頭再篩一次。
+
+## 空狀態分兩種
+
+| 情境 | 文案 |
+| --- | --- |
+| 沒有資料 | 用 `empty` prop 自訂，通常帶「建立第一筆」的行動 |
+| 篩選後沒有結果 | 元件自動切換成「查無符合的資料／請調整關鍵字或欄位篩選」 |
+
+<Demo title="空狀態（自動辨識）">
+  <DataTable rows={[]} columns={columns} getRowKey={(r) => r.id}
+    empty={{ title: "還沒有任何訂單", hint: "建立第一筆訂單後，這裡會顯示明細與合計。" }} />
+</Demo>
+
+## 十字對準
+
+滑鼠指到哪一格，就 highlight 整行整列。20 欄的表格靠這個才不會看錯行。
+
+實作細節：highlight 用**背景漸層圖層**而不是 `background-color`——
+漸層疊在儲存格既有底色之上，不會蓋掉凍結首欄與黏性表頭的不透明底
+（否則被指到的黏性格會透出後面捲過去的欄位，看起來像凍結失效）。
+
+## 文案可整包覆寫
+
+```tsx
+<DataTable labels={{ search: "Search…", exportCsv: "Export CSV", prev: "Prev", next: "Next" }} … />
+```
+
+## 無障礙
+
+- 排序表頭帶 `aria-sort`
+- 篩選鈕帶 `aria-label`（「篩選 客戶」）
+- 可點擊列有 `role="button"`、`tabIndex`、Enter/Space 觸發
+- 篩選面板走 portal ＋ fixed 定位，避免被表格捲動裁切
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/data-table.json
+```
+
+相依會自動一起裝：table、input、button、select、tooltip、empty-state、use-sort、csv、download、utils。
+
+延伸閱讀：[模式 → 資料表標準](/patterns/data-table-standard)

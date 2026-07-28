@@ -1,0 +1,94 @@
+/* 文件站主題：主色對齊 token 的冷靛藍，深色由 Docusaurus 內建切換（同時觸發 token 的
+   [data-theme="dark"] 鉤子，所以嵌在文件裡的真元件會跟著換皮）。 */
+:root {
+  --ifm-color-primary: #1e293b;
+  --ifm-color-primary-dark: #1b2434;
+  --ifm-color-primary-darker: #192231;
+  --ifm-color-primary-darkest: #151c29;
+  --ifm-color-primary-light: #223047;
+  --ifm-color-primary-lighter: #24334c;
+  --ifm-color-primary-lightest: #2b3d5a;
+  --ifm-code-font-size: 95%;
+}
+
+html[data-theme="dark"] {
+  --ifm-color-primary: #93b4e8;
+  --ifm-color-primary-dark: #74a0e2;
+  --ifm-color-primary-darker: #6496df;
+  --ifm-color-primary-darkest: #3577d5;
+  --ifm-color-primary-light: #b2c8ee;
+  --ifm-color-primary-lighter: #c2d2f1;
+  --ifm-color-primary-lightest: #f0f4fc;
+}
+
+/* ── 活範例外框 ─────────────────────────────────────────── */
+.demo {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 10px;
+  margin: 1rem 0 1.5rem;
+  overflow: hidden;
+}
+.demo-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  background: var(--ifm-color-emphasis-100);
+  font-size: 12px;
+  color: var(--ifm-color-emphasis-700);
+}
+.demo-title::before {
+  content: "活範例";
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--ifm-color-emphasis-200);
+  font-size: 10px;
+}
+.demo-body { padding: 16px; overflow-x: auto; }
+
+/* 規範條目：做 / 不做 */
+.rule-grid { display: grid; gap: 12px; grid-template-columns: 1fr; }
+@media (min-width: 720px) { .rule-grid { grid-template-columns: 1fr 1fr; } }
+.rule-do, .rule-dont { border-radius: 8px; padding: 12px 14px; font-size: 14px; }
+.rule-do { border: 1px solid hsl(var(--success) / 0.35); background: hsl(var(--success) / 0.08); }
+.rule-dont { border: 1px solid hsl(var(--danger) / 0.35); background: hsl(var(--danger) / 0.08); }
+.rule-do > strong, .rule-dont > strong { display: block; margin-bottom: 4px; }
+
+/* ── 每頁列印 ───────────────────────────────────────────── */
+.doc-print-bar { display: flex; justify-content: flex-end; margin-bottom: 0.5rem; }
+.doc-print-bar button {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background: transparent;
+  color: var(--ifm-font-color-base);
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.doc-print-bar button:hover { background: var(--ifm-color-emphasis-100); }
+
+@media print {
+  /* 底色在後台介面裡是內容不是裝飾（徽章／提示框／佔位塊全靠底色辨義）。
+     使用者不會記得去勾「列印背景圖形」，所以逐元素強制。 */
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  /* 佔位塊保底：仍被剝背景時至少留下形狀與標籤 */
+  .mock-placeholder { border: 1px solid var(--ifm-color-emphasis-400); }
+  /* 站台外殼與互動控制一律隱藏：印出來要是一份乾淨文件 */
+  .navbar, .theme-doc-sidebar-container, .theme-doc-toc-desktop, .theme-doc-toc-mobile,
+  .pagination-nav, .theme-doc-breadcrumbs, .theme-edit-this-page, .theme-last-updated,
+  footer, .doc-print-bar { display: none !important; }
+  main, .container, .row .col { max-width: 100% !important; width: 100% !important; }
+  /* min-height:100vh 會多印一張空白尾頁 */
+  html, body, #__docusaurus, .main-wrapper { height: auto !important; min-height: 0 !important; }
+  /* 動畫印不出來 → 改印靜態聚光環（同 reduced-motion 降級） */
+  .spotlight-ring {
+    animation: none !important;
+    box-shadow: 0 0 0 3px hsl(var(--primary)), 0 0 0 6px hsl(var(--primary) / 0.3) !important;
+  }
+  /* 不跨頁截斷 */
+  p, li, blockquote, pre, figure, .theme-admonition, .alert, table, tr, .demo { break-inside: avoid; }
+  h1, h2, h3, h4 { break-after: avoid; break-inside: avoid; }
+  p { orphans: 3; widows: 3; }
+  a[target="_blank"]::after { content: ""; }
+}

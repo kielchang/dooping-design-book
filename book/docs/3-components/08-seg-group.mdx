@@ -1,0 +1,50 @@
+---
+title: SegGroup 分段選擇
+---
+
+# SegGroup 分段選擇
+
+少量互斥選項，一眼看完、一下點完。
+
+## 何時用、何時不要用
+
+<Rules>
+  <Do><p>選項 <strong>2–5 個</strong>、標籤短、清單固定。</p></Do>
+  <Dont><p>選項超過 5 個、標籤長、或會動態增減 → 用 <a href="/components/checkbox-select">Select</a>。
+  分段列一旦換行就失去「一眼看完」的優勢，反而比下拉更亂。</p></Dont>
+</Rules>
+
+<Demo title="狀態">
+  <div className="space-y-4">
+    <SegGroup label="客戶等級" value="gold" onPick={() => {}} options={[
+      { value: "bronze", label: "銅級" }, { value: "silver", label: "銀級" },
+      { value: "gold", label: "金級" }, { value: "platinum", label: "白金級" },
+    ]} />
+    <div>
+      <p className="mb-1 text-xs text-muted-foreground">已改動未送出</p>
+      <SegGroup label="等級（已改動）" value="silver" onPick={() => {}} changed options={[
+        { value: "bronze", label: "銅級" }, { value: "silver", label: "銀級" }, { value: "gold", label: "金級" },
+      ]} />
+    </div>
+    <div>
+      <p className="mb-1 text-xs text-muted-foreground">鎖定（可聚焦，hover 有原因）</p>
+      <SegGroup label="等級（鎖定）" value="gold" onPick={() => {}} disabled lockHint="此筆已結案，需先解除鎖定" options={[
+        { value: "silver", label: "銀級" }, { value: "gold", label: "金級" },
+      ]} />
+    </div>
+  </div>
+</Demo>
+
+## 無障礙：這才是重點
+
+- `role="radiogroup"` ＋ 每項 `role="radio"` `aria-checked`
+- **Roving tabindex**：整組只佔**一個** Tab 停留點。四個選項各佔一個停留點，
+  對鍵盤使用者是災難——他要按四次 Tab 才能離開一個欄位。
+- 方向鍵在選項間移動、Space/Enter 選定、Esc 取消
+- 選中項**同時打勾與填色**，不只靠顏色
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/seg-group.json
+```

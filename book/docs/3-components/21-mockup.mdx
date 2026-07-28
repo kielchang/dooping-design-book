@@ -1,0 +1,67 @@
+---
+title: Mockup 文件示意積木
+---
+
+# Mockup 文件示意積木
+
+**寫文件的工具，不是產品元件。**
+
+## 問題：截圖第一天就開始過期
+
+改一次按鈕位置，全手冊的圖都要重錄。於是沒人重錄。於是手冊開始說謊，
+而且說謊的方式很難察覺——圖看起來很專業，只是跟現在的系統不一樣。
+
+## 做法：用真元件排出示意圖
+
+- 重點控制項 → **元件庫的真元件** ＋ `<Spotlight>` 圈起來
+- 其餘區域 → `<Placeholder>` 佔位留白
+- 整體版面 → `<MockScreenFrame>`
+
+元件改版，示意圖跟著改版。沒有人需要去重拍任何東西。
+
+<Demo title="一步操作示意">
+  <div className="overflow-x-auto rounded-lg border">
+    <MockScreenFrame>
+      <div className="flex items-center gap-2">
+        <TabPills value="confirmed" onChange={() => {}} tabs={[{ key: "all", label: "全部" }, { key: "confirmed", label: "已確認" }]} />
+        <span className="ml-auto"><Spotlight label="① 先切到「已確認」"><Badge variant="info">7 筆</Badge></Spotlight></span>
+      </div>
+      <MockRow />
+      <MockRow focus={<Spotlight><Button size="sm" variant="outline">安排出貨</Button></Spotlight>} />
+      <MockRow />
+    </MockScreenFrame>
+  </div>
+</Demo>
+
+## 使用規約
+
+<Rules>
+  <Do><p>重點包 <code>Spotlight</code>（真元件），其餘一律 <code>Placeholder</code>。</p></Do>
+  <Dont><p>不要用 Placeholder 去「假裝」一個真元件。那又變成一種會過期的截圖，
+  只是畫得比較醜。</p></Dont>
+</Rules>
+
+## 聚光用的是同一套視覺語言
+
+`<Spotlight>` 用的 `.spotlight-ring` 與 [Coachmark](/components/coachmark) 完全相同。
+讀者在文件與系統裡看到的是**同一種**「看這裡」。
+
+琥珀色專屬「已改動未送出」，不得用於聚光。
+
+## 取捨
+
+示意圖不會百分百等於實際畫面（版面是簡化的）。這是刻意的——
+讀者需要的是「該點哪裡」，不是像素級復刻。
+
+## 列印
+
+`.mock-placeholder` 在列印樣式下補淡邊框：部分印表機仍會剝掉背景色，
+補邊框至少保留形狀與標籤。詳見 [列印與匯出](/patterns/print-and-export)。
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/mockup.json
+```
+
+延伸閱讀：[模式 → 零截圖文件示意](/patterns/zero-screenshot-docs)

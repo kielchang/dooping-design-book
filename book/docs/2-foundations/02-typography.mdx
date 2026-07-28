@@ -1,0 +1,86 @@
+---
+title: 字級與排版
+---
+
+# 字級與排版
+
+**只有 7 階，而且刻意很少。**
+
+資訊密度高的後台介面靠「字重＋顏色」分層，不靠字級爆炸。
+一個畫面上出現五種字級，使用者感覺到的不是層次，是雜訊。
+
+| Token | 值 | 用在哪 |
+| --- | --- | --- |
+| `micro` | 10px | 徽章內文字、極次要註記 |
+| `tiny` | 11px | 欄位說明、圖例 |
+| `xs` | 12px | 表格次要欄、標籤 |
+| `sm` | **14px** | **介面預設字級** |
+| `base` | 16px | 內文 |
+| `lg` | 18px | 卡片標題 |
+| `xl` | 24px | 頁面標題 |
+
+<Demo title="七階字級">
+  <div className="space-y-2">
+    <p style={{ fontSize: "var(--font-size-xl)" }} className="font-semibold">24px — 頁面標題</p>
+    <p style={{ fontSize: "var(--font-size-lg)" }} className="font-semibold">18px — 卡片標題</p>
+    <p style={{ fontSize: "var(--font-size-base)" }}>16px — 內文</p>
+    <p style={{ fontSize: "var(--font-size-sm)" }}>14px — 介面預設字級，表格與表單都用這個</p>
+    <p style={{ fontSize: "var(--font-size-xs)" }} className="text-muted-foreground">12px — 標籤與次要欄位</p>
+    <p style={{ fontSize: "var(--font-size-tiny)" }} className="text-muted-foreground">11px — 欄位說明</p>
+    <p style={{ fontSize: "var(--font-size-micro)" }} className="text-muted-foreground">10px — 徽章內文字</p>
+  </div>
+</Demo>
+
+## 為什麼預設是 14px 而不是 16px
+
+後台系統的一列資料常常有 10 個欄位。16px 會讓表格橫向捲動，而橫向捲動是後台介面體驗的頭號殺手。
+14px 是「還看得清楚」與「一列塞得下」之間實測出來的平衡點。
+
+內文型頁面（說明、公告）仍然用 16px——那裡不需要塞下 10 個欄位。
+
+## 數字一律等寬
+
+```jsx
+<td className="text-right tabular-nums">1,284,000</td>
+```
+
+<Rules>
+  <Do>
+    <p>數字欄<strong>右對齊 ＋ 等寬數字（tabular-nums）</strong>。位數對齊，
+    使用者不必讀就看得出量級差異。</p>
+  </Do>
+  <Dont>
+    <p>不要讓數字左對齊或用比例字寬。<code>1,284,000</code> 和 <code>984,000</code>
+    在比例字寬下長度接近，掃視時會誤判一個數量級。</p>
+  </Dont>
+</Rules>
+
+## 負值用會計括號
+
+金額負值顯示為 `($2,000)` 而不是 `-$2,000`。紅字是加分，不是唯一線索——
+括號本身就已經表達了負值，灰階列印仍然讀得懂。
+
+<Demo title="金額格式">
+  <div className="space-y-1 text-sm tabular-nums">
+    <p>正常：<code>$1,284,000</code></p>
+    <p>負值：<code className="text-danger">($2,000)</code></p>
+    <p>差異：<Delta value={-12800} posLabel="增加 " negLabel="減少 " /></p>
+  </div>
+</Demo>
+
+## 顯示不四捨五入
+
+格式化函式一律 `maximumFractionDigits: 10`，顯示層**不偷偷進位**。
+
+一旦顯示層自己 round，使用者會拿畫面上的數字去對帳，然後發現對不起來，
+然後花一整個下午找那個其實不存在的 bug。要進位請在計算層明確進位。
+
+## 字體
+
+```css
+--font-family-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+                    "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+```
+
+用系統字體堆疊，不載自訂字體。理由：後台系統的首屏速度比字體個性重要，
+而且中文自訂字體動輒數 MB，在內網環境常常是災難。

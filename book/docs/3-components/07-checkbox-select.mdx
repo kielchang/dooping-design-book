@@ -1,0 +1,54 @@
+---
+title: Checkbox 與 Select
+---
+
+# Checkbox 與 Select
+
+兩個 Radix 基礎件的薄封裝。
+
+<Demo title="勾選與下拉">
+  <div className="max-w-sm space-y-4">
+    <div className="flex items-center gap-2">
+      <Checkbox id="c1" defaultChecked />
+      <Label htmlFor="c1">啟用此客戶</Label>
+    </div>
+    <div className="space-y-1">
+      <Label>客戶等級</Label>
+      <Select defaultValue="gold">
+        <SelectTrigger><SelectValue /></SelectTrigger>
+        <SelectContent>
+          <SelectItem value="bronze">銅級</SelectItem>
+          <SelectItem value="silver">銀級</SelectItem>
+          <SelectItem value="gold">金級</SelectItem>
+          <SelectItem value="platinum">白金級</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  </div>
+</Demo>
+
+## 什麼時候不要用 Select
+
+<Rules>
+  <Do>
+    <p>選項 <strong>6 個以上</strong>、或會動態增減 → Select。</p>
+  </Do>
+  <Dont>
+    <p>選項只有 2–5 個且標籤短 → 用 <a href="/components/seg-group">SegGroup</a>。
+    Select 要點兩下（開、選）才看得到全部選項；分段選擇一眼看完、一下點完。</p>
+  </Dont>
+</Rules>
+
+多選需求請用 [Chips](/components/chips)，不要做 multi-select 下拉——
+選完就看不見選了什麼，是後台最常見的抱怨之一。
+
+## Checkbox 一定要配 Label
+
+`<Label htmlFor>` 讓點文字也能勾選，觸控裝置上差別非常明顯（16px 的方框 vs 整行可點）。
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/checkbox.json
+npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/select.json
+```

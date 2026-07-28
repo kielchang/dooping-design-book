@@ -1,0 +1,67 @@
+---
+title: 空狀態、變異與狀態徽章
+---
+
+# 空狀態、變異與狀態徽章
+
+三個小元件，共用同一條規則：**顏色永遠不是唯一線索。**
+
+## 空狀態：三種空不一樣
+
+| 情境 | 使用者的問題 | 文案要回答 |
+| --- | --- | --- |
+| 還沒有資料 | 我該做什麼？ | 引導建立第一筆 |
+| 篩選後沒結果 | 我是不是篩錯了？ | 說出目前條件，引導放寬 |
+| 沒有權限 | 是壞掉了嗎？ | 說明原因與找誰 |
+
+<Demo title="三種空狀態的文案差異">
+  <div className="grid gap-3 md:grid-cols-3">
+    <div className="rounded-lg border"><EmptyState compact title="還沒有任何訂單" hint="建立第一筆訂單後，這裡會顯示明細與合計。" /></div>
+    <div className="rounded-lg border"><EmptyState compact title="查無符合的資料" hint="目前篩選：客戶＝宏昌實業、狀態＝已出貨。試著放寬其中一項。" /></div>
+    <div className="rounded-lg border"><EmptyState compact title="沒有檢視權限" hint="此區資料僅限訂單管理員檢視，請洽系統管理者。" /></div>
+  </div>
+</Demo>
+
+<Rules>
+  <Do><p>空狀態要有<strong>下一步</strong>。使用者到這裡是卡住了。</p></Do>
+  <Dont><p>不要三種情境共用一句「查無資料」。</p></Dont>
+</Rules>
+
+## 變異：▲▼ ＋ 文字 ＋ 顏色
+
+<Demo title="三重編碼">
+  <div className="space-y-1 text-sm">
+    <p>營收：<Delta value={128400} posLabel="增加 " negLabel="減少 " /></p>
+    <p>庫存差異（越少越好）：<Delta value={340} goodWhen="negative" posLabel="超出 " negLabel="短少 " /></p>
+    <p>持平：<Delta value={0} /></p>
+  </div>
+</Demo>
+
+**好壞是業務決定，不是數學決定。** 成本、延遲、退貨率的正值都是壞消息，
+所以元件不預設「正值＝綠色」，由呼叫端指定 `goodWhen`。
+
+零值顯示「— 持平」而不是空白：空白會讓人以為資料沒載入。
+
+## 狀態徽章：一定要有文字
+
+<Demo title="狀態徽章">
+  <div className="flex flex-wrap gap-2">
+    <Badge variant="success">已出貨</Badge>
+    <Badge variant="info">審核中</Badge>
+    <Badge variant="warning">待補件</Badge>
+    <Badge variant="danger">已退回</Badge>
+    <Badge variant="secondary">草稿</Badge>
+  </div>
+</Demo>
+
+## 共同的驗收方法
+
+**把畫面用灰階印出來。** 如果語意消失了，就是還沒做完。
+
+這不是比喻——後台系統的報表**一定**會被印出來簽核，而且印表機通常是黑白的。
+
+<Rules>
+  <Do><p>色彩是第三條線索。前兩條是<strong>形狀／符號</strong>與<strong>文字</strong>。</p></Do>
+  <Dont><p>不要用純色點表示狀態。它在灰階列印、色覺障礙、深色模式低飽和色下
+  都會失去意義——而這三種情況在後台系統裡都很常見。</p></Dont>
+</Rules>

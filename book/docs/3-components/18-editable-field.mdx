@@ -1,0 +1,87 @@
+---
+title: EditableField 唯讀逐欄編輯
+---
+
+# EditableField 唯讀逐欄編輯
+
+**預設是唯讀，點一下才變成輸入框。**
+
+## 為什麼順序要反過來
+
+後台主檔表單的使用者，90% 的時間在「看」，只有 10% 在「改」。
+一整片輸入框有兩個問題：
+
+1. 分不清「哪些是我改過的」——所有欄位長得一模一樣
+2. 很容易誤觸改壞資料——尤其是滑鼠滾輪掃過數字欄
+
+唯讀優先解決了這兩件事，代價是多一次點擊。這個交易在主檔表單是划算的。
+
+<Demo title="點一下值就能編輯">
+  <div className="max-w-sm space-y-4">
+    <EditableField label="信用額度" kind="money" value={1650000} original={1500000}
+      onChange={() => {}} onRevert={() => {}}
+      help="改過的欄位會標成琥珀色，並出現還原鈕。" />
+    <EditableField label="客戶代號（鎖定）" kind="text" value="C-1042" original="C-1042"
+      onChange={() => {}} disabled lockHint="代號建立後不可變更" />
+  </div>
+</Demo>
+
+## 支援的欄位型態
+
+| `kind` | 編輯態 |
+| --- | --- |
+| `text` / `date` | 輸入框 |
+| `number` / `money` / `rate` | 右對齊數字輸入 |
+| `select` | 下拉（點擊即自動展開） |
+| `radio` / `checkbox` | [SegGroup](/components/seg-group) 分段選擇 |
+| `multiselect` | [Chips](/components/chips) 標籤片 |
+
+`rate` 欄位對使用者說的是「%」，存的是比值——輸入時 ×100、送出時 ÷100。
+別讓使用者自己去換算，那是每個系統都會被回報一次的 bug。
+
+## 已改動未送出＝琥珀
+
+值 ≠ 原值時整欄標琥珀（邊框＋底色＋文字＋「已變更」標籤）。
+這個顏色是[保留色](/foundations/color)，不做別的用途。
+
+## undo / redo 都會先確認
+
+顯示「舊值 → 新值」，確認才執行。
+
+<Rules>
+  <Do><p>還原前先問一次。<strong>「還原」本身也是一次資料變更</strong>。</p></Do>
+  <Dont><p>不要做一鍵無聲還原。它跟一鍵無聲改壞一樣危險，
+  而且使用者按下去之後沒有任何線索知道剛剛發生了什麼。</p></Dont>
+</Rules>
+
+## 可發現性：低調的鉛筆
+
+唯讀態右側有一個很淡的鉛筆圖示，hover 加深；觸控裝置上恆微顯（沒有 hover 可用）。
+沒有這個線索，使用者不會知道這格可以點。
+
+## 鎖定態
+
+`disabled` ＋ `lockHint`。三個細節：
+
+- 顯示鎖頭圖示（不只是變灰）
+- **仍然可以聚焦**——螢幕報讀器要唸得到「為什麼不能改」
+- `aria-label` 帶上鎖定原因
+
+搭配[硬鎖定模式](/patterns/hard-lock)使用。
+
+## 新增模式
+
+```tsx
+<EditableField alwaysEdit trackChanges={false} … />
+```
+
+恆為輸入態，且不會把整張表單標成「已變更」（新增時每個欄位都「不同於原值」，
+不關掉的話整張表都是琥珀色，訊號完全失效）。
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/editable-field.json
+```
+
+延伸閱讀：[模式 → 唯讀逐欄編輯](/patterns/inline-field-editing)

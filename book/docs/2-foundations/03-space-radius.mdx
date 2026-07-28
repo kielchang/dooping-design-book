@@ -1,0 +1,72 @@
+---
+title: 間距與圓角
+---
+
+# 間距與圓角
+
+## 間距：4px 基準
+
+所有間距都是 4px 的倍數。理由不是美學，是**可預測**——
+當所有人都用同一組數字，版面自然對齊，不必逐處微調。
+
+| Token | 值 | 典型用途 |
+| --- | --- | --- |
+| `0.5` / `1` | 2px / 4px | 圖示與文字之間 |
+| `1.5` / `2` | 6px / 8px | 元素之間、密集表格內距 |
+| `2.5` / `3` | 10px / 12px | 卡片內部區塊間距 |
+| `4` / `6` | 16px / 24px | 卡片內距、區塊間距 |
+| `8` / `12` | 32px / 48px | 頁面區段之間 |
+
+<Demo title="間距階">
+  <div className="space-y-2">
+    {["0.25rem","0.5rem","0.75rem","1rem","1.5rem","2rem"].map((v) => (
+      <div key={v} className="flex items-center gap-3 text-xs">
+        <span className="h-3 bg-primary/70" style={{ width: v }} />
+        <code className="text-muted-foreground">{v}</code>
+      </div>
+    ))}
+  </div>
+</Demo>
+
+## 圓角：一個變數控制全站
+
+```css
+--radius: 0.5rem;              /* 基準 */
+--radius-sm: calc(var(--radius) - 4px);
+--radius-md: calc(var(--radius) - 2px);
+--radius-lg: var(--radius);
+```
+
+改 `--radius` 一個值，整站從方到圓。這是最常被要求的品牌調整，
+所以刻意做成單一開關。
+
+<Demo title="圓角階">
+  <div className="flex flex-wrap items-end gap-3">
+    {[
+      ["sm", "var(--radius-sm)"],
+      ["md", "var(--radius-md)"],
+      ["lg", "var(--radius-lg)"],
+      ["full", "9999px"],
+    ].map(([name, v]) => (
+      <div key={name} className="text-center">
+        <div className="size-16 border-2 border-primary/40 bg-primary/10" style={{ borderRadius: v }} />
+        <p className="mt-1 text-xs text-muted-foreground">{name}</p>
+      </div>
+    ))}
+  </div>
+</Demo>
+
+## 控制項尺寸
+
+| Token | 值 | 用在哪 |
+| --- | --- | --- |
+| `control-sm` | 32px | 密集表格內的控制項 |
+| `control` | **36px** | 預設輸入框／欄位高度 |
+| `control-lg` | 40px | 主要按鈕 |
+| `tap-target` | **44px** | 粗指標裝置的最小觸控目標 |
+
+Input、Select、EditableField 全部是 36px。這不是巧合——
+把三種控制項排在同一列時，任何 1–2px 的差異都會被看見。
+
+觸控目標 44px 只在 `@media (pointer: coarse)` 生效：手機平板放大，桌機維持精簡。
+詳見[無障礙](/accessibility/principles)。

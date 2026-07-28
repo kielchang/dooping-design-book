@@ -1,0 +1,46 @@
+---
+title: Delta 變異顯示
+---
+
+# Delta 變異顯示
+
+顯示「和基準比差了多少」。
+
+## 三重編碼
+
+**箭頭 ▲▼ ＋ 文字 ＋ 顏色。** 顏色是三者中最弱的一環：
+
+- 約 8% 男性有紅綠色覺障礙
+- 後台報表幾乎一定會被灰階印出來簽核
+
+所以箭頭與文字必須**自己就能把話說完**，顏色只是加速。
+
+<Demo title="變異顯示">
+  <div className="space-y-2 text-sm">
+    <p>本月營收與上月比較：<Delta value={128400} posLabel="增加 " negLabel="減少 " /></p>
+    <p>庫存差異（越少越好）：<Delta value={340} goodWhen="negative" posLabel="超出 " negLabel="短少 " /></p>
+    <p>交期落差：<Delta value={-3} goodWhen="negative" posLabel="延遲 " negLabel="提前 " format={(n) => `${n} 天`} /></p>
+    <p>與上期持平：<Delta value={0} /></p>
+  </div>
+</Demo>
+
+## `goodWhen`：好壞是業務決定，不是數學決定
+
+「庫存差異 +100」可能是好（備料充足）也可能是壞（積壓）。
+元件不猜，由呼叫端明確告訴它哪個方向算好。
+
+<Rules>
+  <Do><p>每次用 Delta 都想一次：這個數字變大，對使用者是好消息還是壞消息？</p></Do>
+  <Dont><p>不要預設「正值＝綠色」。成本、延遲、退貨率的正值都是壞消息。</p></Dont>
+</Rules>
+
+## 零值也要說話
+
+`value === 0` 顯示「— 持平」，而不是空白或 `0`。
+空白會讓人以為資料沒載入；`0` 會讓人以為是計算結果為零（可能是錯的）。
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/delta.json
+```

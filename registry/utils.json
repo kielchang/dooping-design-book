@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "utils",
+  "type": "registry:lib",
+  "title": "utils 通用工具",
+  "description": "cn 與數值／金額／百分比格式化。",
+  "dependencies": [
+    "clsx",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "doping/lib/utils.ts",
+      "content": "import { clsx, type ClassValue } from \"clsx\";\nimport { twMerge } from \"tailwind-merge\";\n\n/** class 合併：後者覆蓋前者的同類 Tailwind utility（避免 `p-2 p-4` 這種順序賭博）。 */\nexport function cn(...inputs: ClassValue[]) {\n  return twMerge(clsx(inputs));\n}\n\n/**\n * 數字顯示：千分位、**不四捨五入**。\n *\n * 「顯示端不進位」是刻意的：一旦顯示層偷偷 round，使用者就會拿畫面上的數字去對帳、\n * 然後發現對不起來。要進位請在計算層明確進位，顯示層只負責忠實呈現。\n */\nexport function formatNumber(n: number, locale = \"en-US\"): string {\n  if (!Number.isFinite(n)) return String(n);\n  return n.toLocaleString(locale, { maximumFractionDigits: 10 });\n}\n\n/**\n * 金額顯示：符號＋千分位；負值採會計慣例的括號（`($2,000)`）。\n * 紅字由 UI 決定（顏色不是唯一線索——括號本身就已經表達負值）。\n */\nexport function formatMoney(n: number, opts?: { symbol?: string; locale?: string }): string {\n  if (!Number.isFinite(n)) return String(n);\n  const symbol = opts?.symbol ?? \"$\";\n  const body = formatNumber(Math.abs(n), opts?.locale);\n  return n < 0 ? `(${symbol}${body})` : `${symbol}${body}`;\n}\n\n/** 比率→百分比字串。`0.085` → `\"8.5%\"`。比值一律以百分比呈現，見 ADR-0003 的顯示規約。 */\nexport function formatPercent(value: number, digits = 1): string {\n  return `${(value * 100).toFixed(digits)}%`;\n}\n\n/**\n * 比較基準值→百分比（`1.05` → `\"105%\"`）。\n * 與 `formatPercent` 分開命名，是因為兩者語意不同：一個是「佔比」，一個是「相對於基準的倍數」。\n */\nexport function formatRatio(value: number, digits = 0): string {\n  return `${(value * 100).toFixed(digits)}%`;\n}\n\n/** 帶正負號的數字（差異欄用）：`1234` → `\"+1,234\"`、`-1234` → `\"−1,234\"`（真減號 U+2212）。 */\nexport function formatSigned(n: number, format: (v: number) => string = formatNumber): string {\n  if (n === 0) return format(0);\n  return `${n > 0 ? \"+\" : \"−\"}${format(Math.abs(n))}`;\n}\n",
+      "type": "registry:lib",
+      "target": "lib/doping/utils.ts"
+    }
+  ]
+}

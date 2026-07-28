@@ -1,0 +1,23 @@
+{
+  "name": "@doping/react",
+  "version": "0.1.0",
+  "description": "Doping React 參考實作 — 通用元件庫，只依賴 @doping/tokens 與彼此",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
+  "files": [
+    "src"
+  ],
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "dependencies": {
+    "@doping/tokens": "0.1.0"
+  }
+}

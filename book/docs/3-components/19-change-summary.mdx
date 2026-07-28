@@ -1,0 +1,55 @@
+---
+title: ChangeSummary 變更摘要
+---
+
+export const changes = [
+  { field: "creditLimit", label: "信用額度", before: 1500000, after: 1650000, beforeText: "$1,500,000", afterText: "$1,650,000" },
+  { field: "tier", label: "客戶等級", before: "silver", after: "gold", beforeText: "銀級", afterText: "金級" },
+  { field: "contact", label: "聯絡方式", before: "採購部 分機 214", after: "採購部 分機 220", beforeText: "採購部 分機 214", afterText: "採購部 分機 220" },
+];
+
+# ChangeSummary 變更摘要
+
+送出前，把「我到底改了什麼」攤開來。
+
+## 為什麼值得做成元件
+
+使用者在一張 30 欄的主檔表單上改了 3 個欄位。送出前他唯一想知道的就是那 3 個是哪 3 個。
+沒有這一塊，他只能靠記憶，或整頁重新掃一遍。
+
+<Demo title="變更摘要（可逐欄或整批還原）">
+  <div className="max-w-md">
+    <ChangeSummary changes={changes} onRevertField={() => {}} onRevertAll={() => {}} />
+  </div>
+</Demo>
+
+## 關鍵：它和稽核記錄用同一份資料
+
+`Change[]` 這個結構同時餵給三個地方：
+
+```
+FieldSpec[] 宣告
+   ↓ diffRecord()
+Change[] ──┬─→ ChangeSummary（送出前給使用者看）
+           ├─→ 稽核記錄的 before/after（送出後留痕）
+           └─→ 還原功能的資料來源
+```
+
+**使用者送出前看到的，就是稽核記錄之後會呈現的。** 這不是巧合，是刻意設計——
+兩邊各寫一份格式化邏輯，遲早會不一致，然後就會有人拿稽核記錄來質疑畫面。
+
+## 空狀態要明說
+
+沒有變更時顯示「尚無變更」的虛線框，而不是整塊消失。
+消失會讓使用者以為功能壞了，或以為自己的修改沒被偵測到。
+
+## 還原也要先確認
+
+逐欄還原與整批還原都顯示「現值 → 還原後」，確認才執行。理由同
+[EditableField](/components/editable-field#undo--redo-都會先確認)。
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/change-summary.json
+```

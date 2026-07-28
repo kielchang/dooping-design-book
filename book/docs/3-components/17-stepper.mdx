@@ -1,0 +1,50 @@
+---
+title: Stepper 步驟指示
+---
+
+# Stepper 步驟指示
+
+多步驟流程走到哪了。
+
+<Demo title="步驟指示（可點擊回頭）">
+  <div className="max-w-2xl">
+    <Stepper
+      current="items"
+      onStep={() => {}}
+      completed={{ customer: true }}
+      steps={[
+        { key: "customer", label: "選擇客戶", hint: "或建立新客戶" },
+        { key: "items", label: "加入品項", hint: "數量與單價" },
+        { key: "shipping", label: "出貨資訊" },
+        { key: "review", label: "確認送出" },
+      ]}
+    />
+  </div>
+</Demo>
+
+## 步驟一定要可以點回去
+
+多步驟表單最常見的挫折：「我想回去確認第 2 步填了什麼，但只能一路取消重來。」
+
+<Rules>
+  <Do><p>已完成與已走過的步驟都可點擊回頭，資料保留。</p></Do>
+  <Dont><p>不要做成單向流程。使用者會回頭確認，這是正常行為，不是誤操作。</p></Dont>
+</Rules>
+
+## 完成態用勾選，不只用綠色
+
+`state === "done"` 顯示 ✓ 圖示。綠色圓圈在灰階列印與色覺障礙下與「目前步驟」分不開。
+
+## 何時不要用
+
+<Rules>
+  <Do><p>步驟 <strong>3–6</strong>、順序有意義、使用者需要知道還剩幾步。</p></Do>
+  <Dont><p>只有 2 步不需要 Stepper（一個標題就夠）。
+  超過 6 步該考慮拆成不同頁面或分組——沒有人會在 8 步表單裡感覺良好。</p></Dont>
+</Rules>
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/stepper.json
+```

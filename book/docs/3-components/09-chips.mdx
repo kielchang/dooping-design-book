@@ -1,0 +1,44 @@
+---
+title: Chips 多選標籤片
+---
+
+# Chips 多選標籤片
+
+多選，而且**已選與未選同時看得見**。
+
+## 為什麼不用多選下拉
+
+多選下拉最大的問題是「選完就看不見選了什麼」。而在後台系統裡，
+使用者按下送出前，幾乎一定會想再確認一次自己勾了哪些。
+
+<Rules>
+  <Do><p>選項<strong>固定且不多（≤ 12）</strong>、使用者需要對照著選。</p></Do>
+  <Dont><p>選項上百個（例如全部品項）→ 那需要的是帶搜尋的多選面板，
+  不是把 100 個標籤片攤在畫面上。</p></Dont>
+</Rules>
+
+<Demo title="多選">
+  <div className="max-w-md">
+    <Chips
+      label="下單管道"
+      selected={["web", "phone"]}
+      onToggle={() => {}}
+      options={[
+        { value: "web", label: "線上下單" }, { value: "phone", label: "電話" },
+        { value: "email", label: "電子郵件" }, { value: "onsite", label: "業務到府" },
+      ]}
+    />
+  </div>
+</Demo>
+
+## 無障礙
+
+- `role="group"` 裡放一組 `role="checkbox"`（**不是** radiogroup——可複選）
+- Roving tabindex ＋ 方向鍵移動、Space/Enter 切換、Esc 收合
+- 選中同時打勾與填色
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/chips.json
+```

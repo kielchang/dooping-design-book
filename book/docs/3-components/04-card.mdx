@@ -1,0 +1,49 @@
+---
+title: Card 卡片
+---
+
+# Card 卡片
+
+把相關內容包成一個可辨識的區塊。
+
+## 何時不要用
+
+<Rules>
+  <Do><p>內容<strong>成組</strong>且需要與周圍區隔（統計卡、設定區塊、清單項目）。</p></Do>
+  <Dont><p>不要把整個頁面包在一張卡裡。全頁一張卡＝沒有卡，只是多了一圈邊框和內距。</p></Dont>
+</Rules>
+
+<Demo title="卡片結構">
+  <Card className="max-w-sm">
+    <CardHeader>
+      <CardTitle>本月訂單</CardTitle>
+      <CardDescription>2024 年 2 月，截至今日</CardDescription>
+    </CardHeader>
+    <CardContent className="text-3xl font-semibold tabular-nums">1,284</CardContent>
+    <CardFooter className="gap-2">
+      <Button size="sm">查看明細</Button>
+      <Button size="sm" variant="outline">匯出</Button>
+    </CardFooter>
+  </Card>
+</Demo>
+
+## 組成
+
+`Card` / `CardHeader` / `CardTitle` / `CardDescription` / `CardContent` / `CardFooter`
+
+全部可選。只需要一個容器時，直接用 `Card` 包住內容即可。
+
+## 卡片不要巢狀超過一層
+
+兩層以上的卡片邊框會讓人搞不清楚哪個層級才是重點。需要更多層次時改用分隔線或標題。
+
+## 列印
+
+卡片預設加 `print-block`（`break-inside: avoid`），避免一張卡被切成兩頁。
+見 [列印與匯出](/patterns/print-and-export)。
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/card.json
+```

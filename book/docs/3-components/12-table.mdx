@@ -1,0 +1,56 @@
+---
+title: Table 表格基礎件
+---
+
+# Table 表格基礎件
+
+語意表格元素 ＋ 三個實用擴充。
+
+## 何時用它、何時用 DataTable
+
+<Rules>
+  <Do><p>版面固定、資料筆數少、不需要搜尋排序（例如兩欄的規格對照）→ 用 Table。</p></Do>
+  <Dont><p>只要出現「使用者要找某一筆」的需求，就直接用
+  <a href="/components/data-table">DataTable</a>。自己補搜尋排序分頁，
+  三個畫面之後就會長出三種不一樣的表格。</p></Dont>
+</Rules>
+
+<Demo title="基礎表格">
+  <Table zebra>
+    <TableHeader>
+      <TableRow>
+        <TableHead>訂單編號</TableHead>
+        <TableHead>客戶</TableHead>
+        <NumHead>金額</NumHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      <TableRow><TableCell>SO-2401</TableCell><TableCell>遠東貿易</TableCell><NumCell>84,000</NumCell></TableRow>
+      <TableRow><TableCell>SO-2402</TableCell><TableCell>宏昌實業</TableCell><NumCell>156,400</NumCell></TableRow>
+      <TableRow><TableCell>SO-2403</TableCell><TableCell>台興機械</TableCell><NumCell>213,000</NumCell></TableRow>
+    </TableBody>
+    <TableFooter>
+      <TableRow><TableCell colSpan={2}>合計</TableCell><NumCell>453,400</NumCell></TableRow>
+    </TableFooter>
+  </Table>
+</Demo>
+
+## 三個擴充
+
+| 名稱 | 作用 |
+| --- | --- |
+| `NumHead` / `NumCell` | 數字欄：右對齊 ＋ 等寬數字 |
+| `freezeFirst` | 凍結首欄：長表水平捲動時保留「這一列是誰」 |
+| `SortHead` | 可排序表頭：三態循環，箭頭標示狀態 |
+
+## 黏性表頭在列印時要關掉
+
+`TableHeader sticky` 會在列印時自動 `position: static`——
+印出來的表頭改由 `display: table-header-group` 每頁重複。
+兩者同時開會讓表頭壓在第一頁的內容上。
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/table.json
+```

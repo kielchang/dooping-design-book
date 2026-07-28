@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": ["node"],
+    "paths": {
+      "@doping/tokens": ["./packages/tokens/src/index.ts"],
+      "@doping/react": ["./packages/react/src/index.ts"],
+      "@doping/react/*": ["./packages/react/src/*"]
+    },
+    "baseUrl": "."
+  },
+  "include": ["packages/*/src", "tests", ".storybook", "scripts"],
+  "exclude": ["**/node_modules", "**/dist", "book"]
+}

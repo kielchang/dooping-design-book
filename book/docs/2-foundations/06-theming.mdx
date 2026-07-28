@@ -1,0 +1,74 @@
+---
+title: 深淺主題
+---
+
+# 深淺主題
+
+## 兩種宿主鉤子，同時支援
+
+```css
+.dark,
+[data-theme="dark"] {
+  --background: 222 22% 8%;
+  /* … */
+}
+```
+
+- `.dark` class —— Tailwind / shadcn 生態的慣例
+- `[data-theme="dark"]` 屬性 —— Docusaurus、多數文件站與部分後台框架的慣例
+
+兩個都支援的成本只是 CSS 多一個選擇器，但少支援一個，
+這套 token 就少掉一整類可以用它的宿主。你正在讀的這個文件站就是靠 `[data-theme]` 那條。
+
+## 切換要掛在 `documentElement`
+
+```ts
+document.documentElement.classList.toggle("dark", isDark);
+document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+```
+
+<Rules>
+  <Do>
+    <p>把主題 class 切在 <code>&lt;html&gt;</code> 上。</p>
+  </Do>
+  <Dont>
+    <p>不要只切在某個 wrapper <code>&lt;div&gt;</code> 上。Dialog / Select / Tooltip
+    走 portal 掛到 <code>&lt;body&gt;</code>，wrapper 內的 class 它們抓不到——
+    結果是浮層永遠是淺色，而且很難查。</p>
+  </Dont>
+</Rules>
+
+## 深色是設計出來的，不是算出來的
+
+深色 token **不是**淺色的反轉：
+
+| 做法 | 結果 |
+| --- | --- |
+| 機械式反轉亮度 | `background` 與 `card` 撞在一起，介面扁平無層次 |
+| 沿用同色相、壓低飽和度、建立表面抬升階 | 沉靜的墨色底＋清楚的層次 |
+
+這套 token 的深色沿用淺色的冷靛藍色相，飽和度從 84% 壓到 16–22%，
+並建立五級表面抬升。每個值都對深色實際背景重新驗過對比，不是沿用淺色的數字。
+
+:::warning 對比要在真正的背景上驗
+色票研究時常用的比較背景（例如 `#020817`）和實際頁面背景（`#101319`）亮度不同。
+背景換了，對比結果就要重跑。這是實際踩過的坑。
+:::
+
+## 圖表色票要分別驗
+
+分類色票在淺色背景上安全，不代表在深色背景上安全。
+這套色票的 8 色裡有 2 色在深色下換了較亮的步階，其餘 6 色兩種模式共用。
+
+```ts
+import { chartColors } from "@doping/tokens";
+
+chartColors("light"); // ["#1d4ed8", …]
+chartColors("dark");  // ["#2a5ae5", …] ← 第 1 色與第 7 色不同
+```
+
+## 列印是第三種主題
+
+大多數團隊只想到淺／深兩種。後台系統還有第三種：**印出來的那一份**。
+
+見 [模式 → 列印與匯出](/patterns/print-and-export)。

@@ -1,0 +1,44 @@
+---
+title: Input 輸入框
+---
+
+# Input 輸入框
+
+單行文字輸入。
+
+## 何時不要用
+
+<Rules>
+  <Do><p>需要自由輸入的短文字。</p></Do>
+  <Dont><p>數值請用 <a href="/components/number-input">NumberInput</a>；
+  在主檔表單裡，預設應該是 <a href="/components/editable-field">EditableField</a>（唯讀優先），
+  不是一整片輸入框。</p></Dont>
+</Rules>
+
+<Demo title="狀態">
+  <div className="max-w-sm space-y-3">
+    <div><Label htmlFor="d1">客戶名稱</Label><Input id="d1" defaultValue="遠東貿易股份有限公司" /></div>
+    <div><Label htmlFor="d2">客戶代號</Label><Input id="d2" placeholder="例：C-1042" /></div>
+    <div><Label htmlFor="d3">建立日期（停用）</Label><Input id="d3" defaultValue="2019-04-01" disabled /></div>
+    <div><Label htmlFor="d4">可編輯欄位語意</Label><Input id="d4" className="field-editable" defaultValue="可以改我" /></div>
+  </div>
+</Demo>
+
+## 高度是 36px，而且不要改
+
+Input、Select、EditableField 全部 36px（`--size-control`）。
+把三種控制項排在同一列時，任何 1–2px 的差異都會被看見——而後台表單一定會這樣排。
+
+## placeholder 不是 label
+
+<Rules>
+  <Do><p>永遠有 <code>&lt;Label&gt;</code>。placeholder 放<strong>格式範例</strong>（「例：C-1042」）。</p></Do>
+  <Dont><p>不要用 placeholder 當 label。使用者一開始打字它就消失了，
+  然後他忘記這格要填什麼——這是無障礙與可用性雙輸的做法。</p></Dont>
+</Rules>
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/input.json
+```

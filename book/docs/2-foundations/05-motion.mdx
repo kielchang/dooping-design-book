@@ -1,0 +1,54 @@
+---
+title: 動態
+---
+
+# 動態
+
+**後台系統的動畫只有一個目的：讓狀態變化被看見。** 不是為了好看。
+
+| Token | 值 | 用在哪 |
+| --- | --- | --- |
+| `duration-instant` | 0ms | reduced-motion 的降級目標 |
+| `duration-fast` | **150ms** | 顏色／透明度回饋（hover、focus） |
+| `duration-normal` | 200ms | 浮層出現、展開收合 |
+| `duration-slow` | 1500ms | 循環式引導脈動（唯一允許的長動畫） |
+
+<Rules>
+  <Do>
+    <p>互動回饋一律 <strong>150ms</strong>。使用者按下按鈕後 150ms 內看到反應，
+    感覺是「即時」。</p>
+  </Do>
+  <Dont>
+    <p>不要用 300ms 以上的轉場。後台系統一天要點幾百次，每次多等 200ms
+    就是每天多等好幾分鐘，而且會累積成「這系統好慢」的印象。</p>
+  </Dont>
+</Rules>
+
+## 唯一的長動畫：聚光脈動
+
+引導與文件示意共用的 `.spotlight-ring` 是 1.5 秒的呼吸式外擴光暈。
+它是**循環**的，因為它的任務是持續把視線拉到「該點這裡」，不是一次性回饋。
+
+<Demo title="聚光環">
+  <div className="py-6">
+    <Spotlight label="從這裡匯出"><Button variant="outline" size="sm">匯出 CSV</Button></Spotlight>
+  </div>
+</Demo>
+
+## prefers-reduced-motion 是必須，不是加分
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  .spotlight-ring {
+    animation: none;
+    /* 降級成靜態環——訊息不能消失，只是不動 */
+    box-shadow: 0 0 0 3px hsl(var(--primary)), 0 0 0 6px hsl(var(--primary) / 0.3);
+  }
+}
+```
+
+注意降級的方式：**不是把效果拿掉，是換成靜態版本**。
+如果直接 `animation: none` 而沒有補靜態樣式，開啟減少動態的使用者就完全看不到聚光在哪——
+一個無障礙設定反而讓介面變得不可用，這是最糟的結果。
+
+列印時同理：動畫印不出來，所以列印樣式也印靜態環。

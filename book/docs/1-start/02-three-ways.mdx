@@ -1,0 +1,100 @@
+---
+title: 三種取用方式
+---
+
+# 三種取用方式
+
+三種都是「正確用法」，可以混用。**不必全有全無**——這正是這本書拆成三層的原因。
+
+## 方式一：只讀規範（零相依）
+
+最輕的用法。讀 [基礎](/foundations)、[模式](/patterns)、[無障礙](/accessibility)，
+用你自己的技術棧實作。適合：
+
+- 已經有一套元件庫，只想統一「操作邏輯」
+- 不是 React（Vue / Svelte / Blazor / 原生）
+- 只想解決一個具體問題（例如「送出前的變更摘要該長怎樣」）
+
+模式章每一則都寫成「問題 → 做法 → 取捨 → 反例」，可以直接當規格書用。
+
+## 方式二：registry 複製元件（推薦）
+
+把元件**原始碼**複製進你的專案。之後它就是你的程式碼，改壞了不會影響別人，
+升級也不會半夜被 breaking change 叫醒。
+
+```bash
+# 一次裝一個
+npx shadcn@latest add https://kielchang.github.io/doping-design-book/r/data-table.json
+
+# 相依會自動一起裝（DataTable 會帶上 table / input / button / select / tooltip / utils…）
+```
+
+安裝後的落點：
+
+```
+src/
+├── components/doping/    ← 元件
+└── lib/doping/           ← 工具（cn、useSort、csv、download、forms-diff）
+```
+
+:::note 前置條件
+你的專案要有 `components.json`（shadcn 的設定檔）與 `@/*` 路徑別名。
+還沒有的話先跑一次 `npx shadcn@latest init`。
+:::
+
+<Demo title="registry 裝進來的就是這個東西">
+  <div className="flex flex-wrap items-center gap-2">
+    <Button>主要動作</Button>
+    <Badge variant="success">已出貨</Badge>
+    <Delta value={12800} posLabel="增加 " negLabel="減少 " />
+  </div>
+</Demo>
+
+## 方式三：安裝 token 套件（唯一建議的硬相依）
+
+```bash
+npm install @doping/tokens
+```
+
+```js title="tailwind.config.js"
+module.exports = {
+  presets: [require("@doping/tokens/tailwind-preset")],
+  content: ["./src/**/*.{ts,tsx}"],
+};
+```
+
+```css title="你的全域 CSS"
+@import "@doping/tokens/tokens.css";
+```
+
+沒有用 Tailwind 也可以——`tokens.css` 是純 CSS 變數，任何宿主都吃得下：
+
+```css
+.my-alert {
+  background: hsl(var(--danger) / 0.1);
+  border: 1px solid hsl(var(--danger) / 0.35);
+  color: hsl(var(--danger));
+}
+```
+
+需要在 JS 裡拿值（Canvas 圖表、伺服器端產 PDF、Figma plugin）：
+
+```ts
+import { semanticColors, chartColors } from "@doping/tokens";
+
+const palette = chartColors("dark");   // ["#2a5ae5", "#0e9488", …]
+const colors = semanticColors();        // { primary: "222.2 47.4% 11.2%", … }
+```
+
+## 該選哪一種
+
+<Rules>
+  <Do>
+    <p>新專案、React、要快 → <strong>方式二 ＋ 方式三</strong>。token 保證換皮一致，元件直接抄。</p>
+  </Do>
+  <Dont>
+    <p>不要為了「統一」而把已經上線的舊系統整包換掉。先只導入 token，讓兩套介面顏色一致，其餘慢慢來。</p>
+  </Dont>
+</Rules>
+
+導入節奏見 [治理 → 導入三階段](/governance/adoption)。

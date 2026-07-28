@@ -18,6 +18,21 @@ describe("設計 token", () => {
     expect(TOKENS_VERSION).toMatch(/^\d+\.\d+\.\d+$/);
   });
 
+  // 版號散落在三個檔案：npm 看 package.json，取用端讀到的 TOKENS_VERSION 來自
+  // tokens.json 的 meta，而 @dooping/react 另外釘一次相依版本。
+  // 發版時 `npm version` 只會動第一個，另外兩個要手動跟上——漏了就會出現
+  // 「npm 上是 0.1.1、程式裡回報 0.1.0」這種對不起來的狀況，而且不會有任何東西報錯。
+  it("三處版號一致（package.json／tokens.json meta／react 的相依）", () => {
+    const read = (p: string) => JSON.parse(readFileSync(join(ROOT, p), "utf8"));
+    const pkg = read("packages/tokens/package.json").version;
+    const meta = read("packages/tokens/src/tokens.json").meta.version;
+    const dep = read("packages/react/package.json").dependencies["@dooping/tokens"];
+
+    expect(meta, "tokens.json 的 meta.version 與 package.json 不一致").toBe(pkg);
+    expect(dep, "@dooping/react 釘的 tokens 版本與 package.json 不一致").toBe(pkg);
+    expect(TOKENS_VERSION, "請重新執行 npm run build:tokens").toBe(pkg);
+  });
+
   it("每個淺色語意 token 都有對應的深色值", () => {
     const light = Object.keys(semanticColors("light"));
     const dark = new Set(Object.keys(semanticColors("dark")));

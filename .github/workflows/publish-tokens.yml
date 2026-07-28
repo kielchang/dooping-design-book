@@ -5,6 +5,23 @@ name: Publish tokens
 # 元件不發套件（ADR-0004：元件一定會被改，走 registry 複製原始碼），
 # 所以這條流水線刻意只認 packages/tokens 一個 workspace。
 #
+# 認證走 npm Trusted Publishing（OIDC）：npm 信任「這個 repo 的這支 workflow」，
+# 每次執行當場換發一組短效憑證，repo 裡不存任何長期 token。
+# 這是 npm 官方對 CI 的建議做法——classic token 的「bypass 2FA」選項等於把一把
+# 能繞過雙因素的長期鑰匙放進 secret 裡，外洩就等於帳號被接管。
+#
+# ── npm 端一次性設定 ──────────────────────────────────────────
+#   套件頁 → Settings → Trusted publishing → 新增 GitHub Actions：
+#     Organization or user:  kielchang
+#     Repository:            dooping-design-book
+#     Workflow filename:     publish-tokens.yml     ← 必須與本檔名一致
+#
+#   注意：npm 目前要求「套件已存在」才能在套件頁設定 trusted publisher。
+#   若 @dooping 組織的 Settings → Trusted Publishers 可以先替未發佈的套件設定，
+#   就走那條、完全不需要 token；否則第一次發佈需要一枚一次性的 granular token
+#   （見下方 NPM_TOKEN 後備），發完立刻撤銷並改用 OIDC。
+# ─────────────────────────────────────────────────────────────
+#
 # 兩種觸發：
 #   workflow_dispatch  → 手動，預設是「試跑」，確認 tarball 內容用
 #   tag tokens-v*      → 真的發佈（例：git tag tokens-v0.1.0 && git push --tags）
@@ -22,7 +39,7 @@ on:
 
 permissions:
   contents: read
-  id-token: write # npm provenance：把套件綁到產生它的這次 workflow run
+  id-token: write # OIDC：trusted publishing 與 provenance 都靠這個
 
 jobs:
   publish:
@@ -35,14 +52,12 @@ jobs:
           cache: npm
           registry-url: https://registry.npmjs.org
 
-      - name: 檢查 NPM_TOKEN 有沒有設
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # Node 22 內建的 npm 是 10.x，不支援 OIDC。
+      # Trusted publishing 需要 npm >= 11.5.1，所以這一步不能省。
+      - name: 升級 npm（trusted publishing 需要 >= 11.5.1）
         run: |
-          if [ -z "$NODE_AUTH_TOKEN" ]; then
-            echo "::error::找不到 NPM_TOKEN secret。請到 Settings → Secrets and variables → Actions 新增，權限只需 @dooping scope 的 read+write。"
-            exit 1
-          fi
+          npm install -g npm@latest
+          echo "npm $(npm -v) / node $(node -v)"
 
       - run: npm ci
       - name: 建置 token（CSS 產物是後續所有步驟的前提）
@@ -52,14 +67,24 @@ jobs:
       - name: 守衛測試
         run: npm test
 
+      # 認證優先序由 npm CLI 決定：偵測得到 OIDC 就用 OIDC，
+      # 偵測不到才回頭吃 NODE_AUTH_TOKEN。所以 NPM_TOKEN secret 是選用的——
+      # 沒設就是純 trusted publishing，設了則作為第一次發佈的後備。
+      #
+      # 不需要 --provenance：trusted publishing 會自動產生並附上 provenance。
       - name: 發佈
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: |
+          if [ -n "$NODE_AUTH_TOKEN" ]; then
+            echo "::warning::偵測到 NPM_TOKEN。OIDC 可用時會優先使用；若這次是靠 token 發佈成功，請在 npm 設好 trusted publisher 後撤銷此 token。"
+          else
+            echo "::notice::未設 NPM_TOKEN —— 走 trusted publishing（OIDC）。"
+          fi
           if [ "$DRY_RUN" = "true" ]; then
             echo "::notice::試跑模式 —— 不會真的發佈"
             npm publish --workspace @dooping/tokens --dry-run
           else
-            npm publish --workspace @dooping/tokens --provenance
+            npm publish --workspace @dooping/tokens
           fi

@@ -44,8 +44,8 @@ src/
 ## 取 token
 
 ⚠️ **`@dooping/tokens` 尚未發佈到 npm registry**（`npm install @dooping/tokens` 目前會 404）。
-發佈流水線已經備妥（`.github/workflows/publish-tokens.yml`），只等 `NPM_TOKEN` secret 就位；
-文件站與 `packages/tokens/README.md` 寫的 npm 安裝方式是發佈後的目標狀態。
+發佈流水線已經備妥（`.github/workflows/publish-tokens.yml`，走 npm trusted publishing／OIDC，
+repo 裡不存長期 token）；文件站與 `packages/tokens/README.md` 寫的 npm 安裝方式是發佈後的目標狀態。
 
 在發佈之前，可行的做法是把產物複製進你的專案：
 

@@ -3,7 +3,7 @@ export default {
   "$comment": "Dooping 設計 token 唯一來源（框架中立）。CSS 變數與 Tailwind preset 皆由此檔產生，勿直接改 dist/。色彩值以 HSL 三元組字串表示（可被 hsl(var(--x) / <alpha>) 套用透明度）；chart.* 例外為 hex（SVG fill/stroke 直接吃 var()，不經 hsl() 包裝）。",
   "meta": {
     "name": "dooping",
-    "version": "0.1.1"
+    "version": "0.1.2"
   },
   "color": {
     "$comment": "語意色：命名說的是「這個顏色代表什麼意思」，不是「這是什麼顏色」。換色票時只改這裡，全站語意不變。詳見 ADR-0001。",

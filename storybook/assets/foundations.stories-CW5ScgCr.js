@@ -1,0 +1,61 @@
+import{j as e}from"./jsx-runtime-D_zvdyIk.js";const r={color:{light:{background:{value:"0 0% 100%",desc:"頁面底色"},foreground:{value:"222.2 84% 4.9%",desc:"頁面主要文字"},card:{value:"0 0% 100%",desc:"卡片表面"},"card-foreground":{value:"222.2 84% 4.9%",desc:"卡片上的文字"},popover:{value:"0 0% 100%",desc:"浮層表面（下拉／泡泡／篩選面板）"},"popover-foreground":{value:"222.2 84% 4.9%",desc:"浮層文字"},primary:{value:"222.2 47.4% 11.2%",desc:"主要動作／品牌強調"},"primary-foreground":{value:"210 40% 98%",desc:"主色上的文字"},secondary:{value:"210 40% 96.1%",desc:"次要動作表面"},"secondary-foreground":{value:"222.2 47.4% 11.2%",desc:"次要動作文字"},muted:{value:"210 40% 96.1%",desc:"弱化表面（唯讀區、斑馬列）"},"muted-foreground":{value:"215.4 16.3% 46.9%",desc:"次要／說明文字"},accent:{value:"210 40% 96.1%",desc:"hover／被指向的表面"},"accent-foreground":{value:"222.2 47.4% 11.2%",desc:"accent 上的文字"},destructive:{value:"0 84.2% 60.2%",desc:"破壞性動作控制項（刪除鈕）——控制項語意，非狀態語意"},"destructive-foreground":{value:"210 40% 98%",desc:"destructive 上的文字"},border:{value:"214.3 31.8% 91.4%",desc:"一般分隔線／邊框"},input:{value:"214.3 31.8% 91.4%",desc:"表單控制項邊框"},ring:{value:"222.2 84% 4.9%",desc:"鍵盤聚焦環"},success:{value:"160 84% 39%",desc:"狀態：良好／已完成／通過"},"success-foreground":{value:"0 0% 100%",desc:"success 底上的文字"},warning:{value:"38 92% 50%",desc:"狀態：需要注意但不阻擋"},"warning-foreground":{value:"0 0% 100%",desc:"warning 底上的文字"},info:{value:"199 89% 48%",desc:"狀態：中性提示／補充說明"},"info-foreground":{value:"0 0% 100%",desc:"info 底上的文字"},danger:{value:"347 77% 50%",desc:"狀態：異常／錯誤／不合格（訊息與數值用；控制項用 destructive）"},"danger-foreground":{value:"0 0% 100%",desc:"danger 底上的文字"},edit:{value:"43 96% 56%",desc:"保留色：已改動未送出（邊框）。此琥珀不得挪作他用，見 ADR-0002"},"edit-foreground":{value:"23 78% 26%",desc:"已改動未送出（文字）"},"edit-bg":{value:"48 100% 96%",desc:"已改動未送出（底色）"},"field-editable":{value:"214 100% 98%",desc:"欄位語意：可編輯（極淡冷底）"},"field-editable-foreground":{value:"222 47% 11%",desc:"可編輯欄位文字"},"field-readonly":{value:"214 15% 95%",desc:"欄位語意：唯讀／計算值"},"field-readonly-foreground":{value:"215 16% 40%",desc:"唯讀欄位文字"},"field-border":{value:"214 30% 80%",desc:"可編輯欄位邊框（冷灰藍，刻意不像狀態色）"}}},chart:{light:{"chart-1":{value:"#1d4ed8",desc:"藍寶石"},"chart-2":{value:"#0e9488",desc:"海藍寶石"},"chart-3":{value:"#0e8a5f",desc:"祖母綠"},"chart-4":{value:"#b88d0a",desc:"黃玉"},"chart-5":{value:"#cf4217",desc:"紅玉髓"},"chart-6":{value:"#db5a79",desc:"粉晶"},"chart-7":{value:"#a3123a",desc:"石榴石"},"chart-8":{value:"#7e3af2",desc:"紫水晶"},"chart-axis":{value:"#cbd5e1",desc:"座標軸"},"chart-grid":{value:"#e2e8f0",desc:"格線"},"chart-text":{value:"#475569",desc:"圖表文字"}}},radius:{$comment:"圓角以 --radius 為基準推導，換一個值即可整站從方到圓。",base:{value:"0.5rem"},sm:{value:"calc(var(--radius) - 4px)"},md:{value:"calc(var(--radius) - 2px)"},lg:{value:"var(--radius)"},full:{value:"9999px"}},space:{1:{value:"0.25rem"},2:{value:"0.5rem"},3:{value:"0.75rem"},4:{value:"1rem"},6:{value:"1.5rem"},8:{value:"2rem"},12:{value:"3rem"},$comment:"4px 基準的間距階；元件內距（p-2/p-3/p-6）與元素間距（gap-1/gap-2）都取自這裡。","0.5":{value:"0.125rem"},"1.5":{value:"0.375rem"},"2.5":{value:"0.625rem"}},fontSize:{$comment:"字級只有 6 階，刻意少：資訊密度高的後台介面靠「字重＋顏色」分層，不靠字級爆炸。",micro:{value:"0.625rem",lineHeight:"0.875rem",desc:"10px：徽章內文字、極次要註記"},tiny:{value:"0.6875rem",lineHeight:"1rem",desc:"11px：欄位說明、圖例"},xs:{value:"0.75rem",lineHeight:"1rem",desc:"12px：表格次要欄、標籤"},sm:{value:"0.875rem",lineHeight:"1.25rem",desc:"14px：介面預設字級"},base:{value:"1rem",lineHeight:"1.5rem",desc:"16px：內文"},lg:{value:"1.125rem",lineHeight:"1.75rem",desc:"18px：卡片標題"},xl:{value:"1.5rem",lineHeight:"2rem",desc:"24px：頁面標題"}},fontFamily:{sans:{value:'ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif'},mono:{value:"ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"}},shadow:{$comment:"陰影＝表面抬升層級，不是裝飾。深色模式靠表面亮度分層，陰影效果本來就弱，所以層級最多 3 階。",sm:{value:"0 1px 2px 0 rgb(0 0 0 / 0.05)",desc:"貼地：卡片、輸入框"},md:{value:"0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",desc:"抬起：下拉選單"},lg:{value:"0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",desc:"浮起：對話框、導引卡"}},duration:{$comment:"動態時長：介面回饋越即時越好。超過 300ms 的動畫在後台系統只會讓人等。全部受 prefers-reduced-motion 保護。",instant:{value:"0ms",desc:"無動畫（reduced-motion 降級目標）"},fast:{value:"150ms",desc:"顏色／透明度回饋（hover、focus）"},normal:{value:"200ms",desc:"浮層出現、展開收合"},slow:{value:"1500ms",desc:"循環式引導脈動（唯一允許的長動畫，且必須可停）"}},easing:{standard:{value:"cubic-bezier(0.4, 0, 0.2, 1)"},out:{value:"cubic-bezier(0, 0, 0.2, 1)"}},size:{$comment:"互動尺寸：粗指標裝置的觸控目標下限來自 WCAG 2.5.5。","control-sm":{value:"2rem",desc:"32px：密集表格內的控制項"},control:{value:"2.25rem",desc:"36px：預設輸入框／欄位高度"},"control-lg":{value:"2.5rem",desc:"40px：主要按鈕"},"tap-target":{value:"44px",desc:"粗指標裝置的最小觸控目標（WCAG 2.5.5）"}}},z=s=>typeof s=="object"&&s!==null&&typeof s.value=="string";function d(s){const a={};for(const[m,u]of Object.entries(s))z(u)&&(a[m]=u.value);return a}d(r.radius);d(r.space);d(r.fontSize);d(r.fontFamily);d(r.shadow);d(r.duration);d(r.easing);d(r.size);const o=r,R={title:"基礎/設計 Token"},i=s=>Object.entries(s).filter(([,a])=>typeof a=="object"&&a!==null&&"value"in a);function S({name:s,entry:a}){const m=a.value.startsWith("#");return e.jsxs("div",{className:"flex items-center gap-3 rounded-md border p-2",children:[e.jsx("span",{className:"size-9 shrink-0 rounded border",style:{background:m?a.value:`hsl(var(--${s}))`},"aria-hidden":!0}),e.jsxs("div",{className:"min-w-0",children:[e.jsxs("p",{className:"truncate font-mono text-xs",children:["--",s]}),a.desc&&e.jsx("p",{className:"truncate text-tiny text-muted-foreground",children:a.desc})]})]})}const n={render:()=>e.jsxs("div",{className:"space-y-6",children:[e.jsx("p",{className:"max-w-2xl text-sm text-muted-foreground",children:"命名說的是「這個顏色代表什麼意思」，不是「這是什麼顏色」。因此換色票時只改值、不改任何一行使用它的程式碼。 用 Storybook 工具列切換淺／深色，同一個 token 名稱會給出兩套值。"}),e.jsx("div",{className:"grid gap-2 sm:grid-cols-2 lg:grid-cols-3",children:i(o.color.light).map(([s,a])=>e.jsx(S,{name:s,entry:a},s))})]})},t={render:()=>e.jsxs("div",{className:"space-y-4",children:[e.jsxs("p",{className:"max-w-2xl text-sm text-muted-foreground",children:["分類色票與狀態語意",e.jsx("strong",{children:"刻意脫鉤"}),"：換一套分類色票，不會讓「紅＝異常」跟著變。 8 色沿色相環排序，最不安全的相鄰組合（藍↔紫）被拆到陣列兩端。"]}),e.jsx("div",{className:"grid gap-2 sm:grid-cols-2 lg:grid-cols-3",children:i(o.chart.light).map(([s,a])=>e.jsx(S,{name:s,entry:a},s))})]})},c={render:()=>e.jsxs("div",{className:"grid gap-8 md:grid-cols-2",children:[e.jsxs("div",{className:"space-y-3",children:[e.jsx("h3",{className:"text-sm font-semibold",children:"字級（只有 7 階，刻意少）"}),i(o.fontSize).map(([s,a])=>e.jsxs("div",{className:"flex items-baseline gap-3 border-b pb-1",children:[e.jsx("span",{className:"w-16 shrink-0 font-mono text-tiny text-muted-foreground",children:s}),e.jsx("span",{style:{fontSize:a.value},children:"資訊密度高的介面靠字重與顏色分層"})]},s))]}),e.jsxs("div",{className:"space-y-3",children:[e.jsx("h3",{className:"text-sm font-semibold",children:"間距（4px 基準）"}),i(o.space).map(([s,a])=>e.jsxs("div",{className:"flex items-center gap-3",children:[e.jsx("span",{className:"w-12 shrink-0 font-mono text-tiny text-muted-foreground",children:s}),e.jsx("span",{className:"h-3 bg-primary/70",style:{width:a.value},"aria-hidden":!0}),e.jsx("span",{className:"text-tiny text-muted-foreground",children:a.value})]},s))]})]})},l={render:()=>e.jsxs("div",{className:"max-w-lg space-y-3",children:[e.jsxs("p",{className:"text-sm text-muted-foreground",children:["欄位只有兩種語意：",e.jsx("strong",{children:"可編輯"}),"與",e.jsx("strong",{children:"唯讀"}),"。"]}),e.jsxs("div",{className:"grid gap-3 sm:grid-cols-2",children:[e.jsxs("div",{className:"space-y-1",children:[e.jsx("p",{className:"text-xs font-medium",children:"可編輯"}),e.jsx("div",{className:"field-editable rounded-md border px-3 py-2 text-sm",children:"1,500,000"})]}),e.jsxs("div",{className:"space-y-1",children:[e.jsx("p",{className:"text-xs font-medium",children:"唯讀／計算值"}),e.jsx("div",{className:"field-readonly rounded-md border px-3 py-2 text-sm",children:"1,380,000"})]})]}),e.jsxs("div",{className:"space-y-1",children:[e.jsx("p",{className:"text-xs font-medium",children:"已改動未送出（保留色，不得挪作他用）"}),e.jsx("div",{className:"rounded-md border border-edit bg-edit-bg px-3 py-2 text-sm text-edit-foreground",children:"1,650,000"})]})]})};var p,v,x;n.parameters={...n.parameters,docs:{...(p=n.parameters)==null?void 0:p.docs,source:{originalSource:`{
+  render: () => <div className="space-y-6">
+      <p className="max-w-2xl text-sm text-muted-foreground">
+        命名說的是「這個顏色代表什麼意思」，不是「這是什麼顏色」。因此換色票時只改值、不改任何一行使用它的程式碼。
+        用 Storybook 工具列切換淺／深色，同一個 token 名稱會給出兩套值。
+      </p>
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {list(tokens.color.light as Record<string, unknown>).map(([k, v]) => <Swatch key={k} name={k} entry={v} />)}
+      </div>
+    </div>
+}`,...(x=(v=n.parameters)==null?void 0:v.docs)==null?void 0:x.source}}};var g,f,h;t.parameters={...t.parameters,docs:{...(g=t.parameters)==null?void 0:g.docs,source:{originalSource:`{
+  render: () => <div className="space-y-4">
+      <p className="max-w-2xl text-sm text-muted-foreground">
+        分類色票與狀態語意<strong>刻意脫鉤</strong>：換一套分類色票，不會讓「紅＝異常」跟著變。
+        8 色沿色相環排序，最不安全的相鄰組合（藍↔紫）被拆到陣列兩端。
+      </p>
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {list(tokens.chart.light as Record<string, unknown>).map(([k, v]) => <Swatch key={k} name={k} entry={v} />)}
+      </div>
+    </div>
+}`,...(h=(f=t.parameters)==null?void 0:f.docs)==null?void 0:h.source}}};var N,y,b;c.parameters={...c.parameters,docs:{...(N=c.parameters)==null?void 0:N.docs,source:{originalSource:`{
+  render: () => <div className="grid gap-8 md:grid-cols-2">
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold">字級（只有 7 階，刻意少）</h3>
+        {list(tokens.fontSize as Record<string, unknown>).map(([k, v]) => <div key={k} className="flex items-baseline gap-3 border-b pb-1">
+            <span className="w-16 shrink-0 font-mono text-tiny text-muted-foreground">{k}</span>
+            <span style={{
+          fontSize: v.value
+        }}>資訊密度高的介面靠字重與顏色分層</span>
+          </div>)}
+      </div>
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold">間距（4px 基準）</h3>
+        {list(tokens.space as Record<string, unknown>).map(([k, v]) => <div key={k} className="flex items-center gap-3">
+            <span className="w-12 shrink-0 font-mono text-tiny text-muted-foreground">{k}</span>
+            <span className="h-3 bg-primary/70" style={{
+          width: v.value
+        }} aria-hidden />
+            <span className="text-tiny text-muted-foreground">{v.value}</span>
+          </div>)}
+      </div>
+    </div>
+}`,...(b=(y=c.parameters)==null?void 0:y.docs)==null?void 0:b.source}}};var j,k,w;l.parameters={...l.parameters,docs:{...(j=l.parameters)==null?void 0:j.docs,source:{originalSource:`{
+  render: () => <div className="max-w-lg space-y-3">
+      <p className="text-sm text-muted-foreground">欄位只有兩種語意：<strong>可編輯</strong>與<strong>唯讀</strong>。</p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="space-y-1">
+          <p className="text-xs font-medium">可編輯</p>
+          <div className="field-editable rounded-md border px-3 py-2 text-sm">1,500,000</div>
+        </div>
+        <div className="space-y-1">
+          <p className="text-xs font-medium">唯讀／計算值</p>
+          <div className="field-readonly rounded-md border px-3 py-2 text-sm">1,380,000</div>
+        </div>
+      </div>
+      <div className="space-y-1">
+        <p className="text-xs font-medium">已改動未送出（保留色，不得挪作他用）</p>
+        <div className="rounded-md border border-edit bg-edit-bg px-3 py-2 text-sm text-edit-foreground">1,650,000</div>
+      </div>
+    </div>
+}`,...(w=(k=l.parameters)==null?void 0:k.docs)==null?void 0:w.source}}};const $=["語意色","圖表色票","字級與間距","欄位語意"];export{$ as __namedExportsOrder,R as default,t as 圖表色票,c as 字級與間距,l as 欄位語意,n as 語意色};

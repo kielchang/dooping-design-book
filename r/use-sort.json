@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-sort",
+  "version": "0.1.0",
+  "type": "registry:lib",
+  "title": "useSort 排序 hook",
+  "description": "無→大到小→小到大 的三態排序。",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "dooping/lib/use-sort.ts",
+      "content": "import { useMemo, useState } from \"react\";\n\nexport type SortDir = \"asc\" | \"desc\";\nexport type SortState = { key: string; dir: SortDir } | null;\n\n/**\n * 表格排序狀態。點欄頭循環：**無 → 由大到小 → 由小到大 → 無**。\n *\n * 為什麼第一下是「由大到小」：後台表格點欄頭的第一意圖幾乎都是「誰最多／最嚴重」。\n * 為什麼要有「無」這一態：使用者需要回到原始（通常是有意義的）排序，否則資料順序一去不回。\n *\n * @param accessors 欄位 key → 取值器（數字或字串）。字串以 `localeCompare` 比較，\n *                  預設 locale 交由呼叫端指定（中文字典序與英文不同）。\n */\nexport function useSort<T>(\n  rows: T[],\n  accessors: Record<string, (row: T) => number | string>,\n  initial: SortState = null,\n  locale = \"zh-Hant\",\n) {\n  const [sort, setSort] = useState<SortState>(initial);\n\n  const sorted = useMemo(() => {\n    if (!sort) return rows;\n    const acc = accessors[sort.key];\n    if (!acc) return rows;\n    return [...rows].sort((a, b) => {\n      const va = acc(a);\n      const vb = acc(b);\n      const cmp =\n        typeof va === \"number\" && typeof vb === \"number\"\n          ? va - vb\n          : String(va).localeCompare(String(vb), locale);\n      return sort.dir === \"asc\" ? cmp : -cmp;\n    });\n  }, [rows, sort, accessors, locale]);\n\n  const toggle = (key: string) =>\n    setSort((s) => (s && s.key === key ? (s.dir === \"desc\" ? { key, dir: \"asc\" } : null) : { key, dir: \"desc\" }));\n\n  return { sorted, sort, toggle };\n}\n",
+      "type": "registry:lib",
+      "target": "lib/dooping/use-sort.ts"
+    }
+  ]
+}

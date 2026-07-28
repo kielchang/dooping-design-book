@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "mockup",
+  "version": "0.1.0",
+  "type": "registry:ui",
+  "title": "Mockup 文件示意積木",
+  "description": "Placeholder／Spotlight／MockScreenFrame：零截圖文件示意。",
+  "dependencies": [],
+  "registryDependencies": [
+    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+  ],
+  "files": [
+    {
+      "path": "dooping/ui/mockup.tsx",
+      "content": "// 模擬畫面積木 — **寫文件的工具，不是產品元件**。\n//\n// 為什麼要有這一組：操作手冊配截圖，截圖第一天就開始過期。改一次按鈕位置，\n// 全手冊的圖都要重錄，於是沒人重錄，於是手冊開始說謊。\n//\n// 這裡的做法是「零截圖」：示意圖用**元件庫的真元件**排出來，非重點區域用 Placeholder 佔位，\n// 重點用 Spotlight 圈起來。元件改版，示意圖跟著改版，不會有人需要去重拍任何東西。\n//\n// 用法規約：重點控制項＝真元件包 `<Spotlight>`；其餘一律 `<Placeholder>` 留白。\n// 不要用 Placeholder 去「假裝」一個真元件——那又變成一種會過期的截圖。\nimport type { ReactNode } from \"react\";\nimport { cn } from \"@/lib/dooping/utils\";\n\n/** 佔位塊：非重點區域一律留白（muted 圓角塊，可帶淡字標籤）。 */\nexport function Placeholder({\n  w, h = 14, label, className,\n}: { w?: number | string; h?: number; label?: string; className?: string }) {\n  return (\n    <div\n      className={cn(\n        \"mock-placeholder flex shrink-0 items-center justify-center overflow-hidden whitespace-nowrap rounded-md bg-muted text-tiny text-muted-foreground\",\n        className,\n      )}\n      style={{ width: w ?? \"100%\", height: h }}\n    >\n      {label ?? \"\"}\n    </div>\n  );\n}\n\n/**\n * 聚光：包住「重點元件」。\n * 用的是與 Coachmark 同一個 `.spotlight-ring`——讀者在文件與系統裡看到的是**同一種**「看這裡」語言。\n * 琥珀色專屬「已改動未送出」，不得用於聚光。\n */\nexport function Spotlight({ children, label, className }: { children: ReactNode; label?: string; className?: string }) {\n  return (\n    <span className={cn(\"spotlight-ring relative inline-block rounded-lg p-1\", className)}>\n      {children}\n      {label && (\n        <span\n          className=\"absolute left-2 whitespace-nowrap rounded-md bg-primary px-2 py-0.5 text-tiny text-primary-foreground\"\n          style={{ top: -10, transform: \"translateY(-100%)\" }}\n        >\n          {label}\n        </span>\n      )}\n    </span>\n  );\n}\n\n/**\n * 畫面框：模擬系統版面（側欄／頂欄＝佔位），children 放該步驟的排版。\n * `min-w` 保底：小螢幕靠外層容器橫向捲動，不擠壞排版（擠壞的示意圖比沒有示意圖更糟）。\n */\nexport function MockScreenFrame({\n  children, className, navLabel = \"選單\", topLabel = \"頂部狀態列\",\n}: { children: ReactNode; className?: string; navLabel?: string; topLabel?: string }) {\n  return (\n    <div className={cn(\"flex min-w-[460px] gap-2.5 bg-background p-3 text-foreground\", className)} style={{ minHeight: 230 }}>\n      <div className=\"flex w-[90px] flex-col gap-1.5\">\n        <Placeholder h={22} label={navLabel} />\n        <Placeholder h={14} /><Placeholder h={14} /><Placeholder h={14} /><Placeholder h={14} /><Placeholder h={14} />\n      </div>\n      <div className=\"flex min-w-0 flex-1 flex-col gap-2.5\">\n        <Placeholder h={20} label={topLabel} />\n        <div className=\"flex flex-col items-stretch gap-2.5\">{children}</div>\n      </div>\n    </div>\n  );\n}\n\n/** 表格假列（可帶一個重點格）。 */\nexport function MockRow({ focus }: { focus?: ReactNode }) {\n  return (\n    <div className=\"flex items-center gap-2\">\n      <Placeholder w={64} /><Placeholder w={90} /><Placeholder /><Placeholder w={70} />\n      {focus ?? <Placeholder w={64} h={22} />}\n    </div>\n  );\n}\n",
+      "type": "registry:ui",
+      "target": "components/dooping/mockup.tsx"
+    }
+  ]
+}

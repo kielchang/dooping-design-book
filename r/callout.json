@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "callout",
+  "version": "0.1.0",
+  "type": "registry:ui",
+  "title": "Callout 提示框",
+  "description": "良好／警示／提醒／危險四種語意提示。",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+  ],
+  "files": [
+    {
+      "path": "dooping/ui/callout.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport type { LucideIcon } from \"lucide-react\";\nimport { CheckCircle2, AlertTriangle, Lightbulb, AlertCircle } from \"lucide-react\";\nimport { cn } from \"@/lib/dooping/utils\";\n\nexport type CalloutVariant = \"success\" | \"warning\" | \"info\" | \"danger\";\n\nconst VARIANT: Record<CalloutVariant, { wrap: string; color: string; icon: LucideIcon }> = {\n  success: { wrap: \"border-success/30 bg-success/10\", color: \"text-success\", icon: CheckCircle2 },\n  warning: { wrap: \"border-warning/40 bg-warning/10\", color: \"text-warning\", icon: AlertTriangle },\n  info: { wrap: \"border-info/30 bg-info/10\", color: \"text-info\", icon: Lightbulb },\n  danger: { wrap: \"border-danger/30 bg-danger/10\", color: \"text-danger\", icon: AlertCircle },\n};\n\nexport interface CalloutProps {\n  variant: CalloutVariant;\n  title: ReactNode;\n  /** 短標籤（如規則代號、分類），顯示在標題前 */\n  tag?: string;\n  icon?: LucideIcon;\n  children?: ReactNode;\n  className?: string;\n}\n\n/**\n * 狀態提示框（良好／警示／提醒／危險）。\n *\n * 走語意 token 而非硬編色，換色票或切深色時不會漂移；四種變體各自帶固定圖示，\n * 因此「這是什麼等級的訊息」不是只靠顏色傳達。\n */\nexport function Callout({ variant, title, tag, icon, children, className }: CalloutProps) {\n  const v = VARIANT[variant];\n  const Icon = icon ?? v.icon;\n  return (\n    <div className={cn(\"flex items-start gap-2.5 rounded-md border p-3\", v.wrap, className)}>\n      <Icon className={cn(\"mt-0.5 size-4 shrink-0\", v.color)} aria-hidden />\n      <div className=\"min-w-0 flex-1\">\n        <p className={cn(\"text-sm font-semibold\", v.color)}>\n          {tag && (\n            <span className=\"mr-1.5 rounded bg-background/70 px-1 py-0.5 align-middle text-micro font-medium\">\n              {tag}\n            </span>\n          )}\n          {title}\n        </p>\n        {children && <div className=\"mt-0.5 text-xs leading-relaxed text-muted-foreground\">{children}</div>}\n      </div>\n    </div>\n  );\n}\n",
+      "type": "registry:ui",
+      "target": "components/dooping/callout.tsx"
+    }
+  ]
+}

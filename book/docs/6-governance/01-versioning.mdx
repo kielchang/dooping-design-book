@@ -12,6 +12,27 @@ title: 版本策略
 | `@dooping/react` | 參考實作。使用者複製走之後就與版號脫鉤 |
 | 文件站 | 跟著 repo，不獨立發版 |
 
+## 進版是什麼事件
+
+```
+dev ──開發、CI 確認──▶ main ──▶ 文件站／Storybook／registry 自動更新
+                        │
+                        └─ token 內容有變才 bump npm 版號
+```
+
+**`dev` 併進 `main` 就是一次進版。** 其他系統一律以 `main` 為參照，不看 `dev`。
+
+一次進版對應
+[CHANGELOG](https://github.com/kielchang/dooping-design-book/blob/main/CHANGELOG.md) 的一則。
+寫不出「取用者要做什麼」的變更，就不是一次進版，繼續留在 `dev`。
+
+**兩條散佈通道的更新時機不同**，這個區分很重要：
+
+| 通道 | 何時更新 |
+| --- | --- |
+| 文件站 / Storybook / registry | 每次進版都更新（它們反映 `main` 的當下狀態） |
+| npm `@dooping/tokens` | **只在 token 內容真的變更時** bump |
+
 ## Token 的 SemVer 定義
 
 | 變更 | 級別 |
@@ -23,11 +44,26 @@ title: 版本策略
 | 微調色值但語意不變（對比修正） | patch |
 | 修正 CSS 產物的 bug | patch |
 
+### 什麼**不該**發版
+
+上面那張表定義了「什麼變更算哪一級」，但漏了另一半——不是每次進版都該動 npm 版號：
+
+| 變更 | npm 版號 | 進 `main` |
+| --- | --- | --- |
+| 封裝設定（`exports`、`files`） | **不 bump** | ✅ |
+| CI、建置腳本、測試 | **不 bump** | ✅ |
+| 文件、註解、重構、改名 | **不 bump** | ✅ |
+
+這些照樣進 `main`、文件站與 registry 照樣更新，但**躺著等下次真的有 token 變更時順路帶出去**。
+
 <Rules>
   <Do><p>移除 token 前先<strong>標記棄用</strong>，保留至少一個 minor 版本，
   並在 CHANGELOG 寫清楚替代方案。</p></Do>
   <Dont><p>不要「順手改名」。token 名稱是契約，改名對所有宿主都是編譯失敗
   或更糟——樣式默默失效。</p></Dont>
+  <Dont><p><strong>不要為了驗證發佈管線而發版。</strong>沒有內容變更的版本會稀釋
+  「token 幾乎不會被改，所以它才是契約」這個主張——取用者看到版號一直跳，
+  就不會相信它穩定。要驗證管線請用 <code>--dry-run</code>。</p></Dont>
 </Rules>
 
 ## 元件的 SemVer 定義
@@ -42,6 +78,14 @@ title: 版本策略
 
 **視覺變更也算變更。** 「只是把 padding 從 8px 改成 12px」對已經對齊過版面的使用者
 就是一次 breaking change。至少要 patch，而且要寫進 CHANGELOG。
+
+元件走 registry 複製散佈，沒有 npm 版號可以鎖，所以版號改用**戳記**的形式交付：
+每個 registry item 與 `/r/index.json` 都帶 `version` 欄位。取用端因此答得出兩個問題——
+「我抄的是哪一版」（看複製進來那份）與「現在最新是哪一版」（看線上 index）。
+
+```bash
+curl -s https://kielchang.github.io/dooping-design-book/r/index.json | jq -r .version
+```
 
 ## CHANGELOG 寫給誰看
 

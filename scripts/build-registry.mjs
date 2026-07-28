@@ -108,6 +108,18 @@ const TITLES = {
   "forms-diff": ["forms/diff 欄位比對", "FieldSpec 驅動的變更偵測與顯示格式化。"],
 };
 
+/**
+ * 每個 item 都戳上產生它的元件庫版號。
+ *
+ * 元件是複製走的（ADR-0004），複製完就與上游脫鉤——所以取用端要問的不是
+ * 「該鎖哪一版」，而是「我抄的是哪一版」，這樣上游修 bug 時才知道要不要同步。
+ * 版號的正本是 packages/react/package.json；version.ts 的 KIT_VERSION 是它的
+ * 執行期複本，兩者一致由 tests/tokens.test.ts 把關。
+ */
+const KIT_VERSION = JSON.parse(
+  readFileSync(join(ROOT, "packages/react/package.json"), "utf8"),
+).version;
+
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 
@@ -126,6 +138,7 @@ for (const abs of walk(SRC)) {
   const item = {
     $schema: "https://ui.shadcn.com/schema/registry-item.json",
     name,
+    version: KIT_VERSION,
     type: isLib ? "registry:lib" : rel.startsWith("form/") ? "registry:component" : "registry:ui",
     title,
     description,
@@ -141,13 +154,16 @@ for (const abs of walk(SRC)) {
     ],
   };
   writeFileSync(join(OUT, `${name}.json`), `${JSON.stringify(item, null, 2)}\n`, "utf8");
-  items.push({ name, type: item.type, title, description });
+  items.push({ name, version: KIT_VERSION, type: item.type, title, description });
 }
 
-// registry 索引（給人看、也給工具列舉用）
+// registry 索引（給人看、也給工具列舉用）。
+// 索引上的 version 是「main 目前發佈的版本」——取用端拿它跟自己抄走那份比對，
+// 就知道自己落後多少。
 const index = {
   $schema: "https://ui.shadcn.com/schema/registry.json",
   name: "dooping",
+  version: KIT_VERSION,
   homepage: BASE,
   items: items
     .sort((a, b) => a.name.localeCompare(b.name))

@@ -1,0 +1,56 @@
+name: CI
+
+# dev 的把關。
+#
+# 分支模型：dev 做開發與確認，確認過才併進 main；main 是其他系統參照的規範正本。
+# 這支只驗證、不部署也不發佈——deploy.yml 只認 main，publish-tokens.yml 只手動或 tag 觸發。
+#
+# 沒有這支的話，「在 dev 確認」就只是一句話：deploy.yml 的 verify job 只在 push 到
+# main 時才跑，等於問題要等到已經進了正本才會被發現。
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+
+      - run: npm ci
+      - name: 建置 token（CSS 產物是後續所有步驟的前提）
+        run: npm run build:tokens
+      - name: 型別檢查
+        run: npm run typecheck
+      - name: 守衛測試（元件庫邊界、token 一致性、去領域化詞彙）
+        run: npm test
+
+      # registry/*.json 是進版控的產物。改了 packages/react/src 卻沒重跑產生器，
+      # 線上 registry 就會跟原始碼對不起來——這裡當場擋下來。
+      - name: registry 與原始碼一致
+        run: |
+          npm run build:registry
+          git diff --exit-code -- registry/ || {
+            echo "::error::registry/ 與原始碼不同步。請執行 npm run build:registry 並提交結果。"
+            exit 1
+          }
+
+      - name: 文件站建置（onBrokenLinks: throw，順帶檢查內部連結）
+        working-directory: book
+        run: |
+          npm ci
+          npm run build
+        env:
+          BOOK_BASE_URL: /dooping-design-book/
+          BOOK_SITE_URL: https://kielchang.github.io

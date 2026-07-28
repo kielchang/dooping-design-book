@@ -91,6 +91,40 @@ semanticColors();      // 35 個語意色（HSL 三元組）
    掛在 wrapper 上會讓 Dialog / Select / Tooltip 這類 portal 浮層抓不到。
 4. **不要靠顏色單獨傳達語意。** 狀態要同時有文字或圖示——見[無障礙原則](book/docs/5-accessibility/01-principles.mdx)。
 
+## 相容性與版本
+
+**以 `main` 為參照。** `dev` 是開發中的分支，不要拿它當來源。
+
+兩層的版本模型不同，因為相依模型不同：
+
+| 層 | 怎麼鎖 | 怎麼知道自己落後了 |
+| --- | --- | --- |
+| token | `"@dooping/tokens": "^0.1.0"` | `npm outdated @dooping/tokens` |
+| 元件 | **鎖不了，也不需要**——複製走就是你的程式碼 | 比對戳記（見下） |
+
+元件複製進來時會帶著產生它的版號戳記。要知道自己抄的是哪一版、線上又是哪一版：
+
+```bash
+# 線上最新
+curl -s https://kielchang.github.io/dooping-design-book/r/index.json | jq -r .version
+
+# 你抄走那一版：看安裝當下的 registry JSON，或比對上游 CHANGELOG
+```
+
+落後不代表要升。元件複製走之後就是你的程式碼——**只有在上游修了你也踩到的 bug 時才需要同步**，
+CHANGELOG 會寫清楚那個修正影響哪個檔案。
+
+### 0.x 期間的穩定性聲明
+
+現在是 `0.x`，依 SemVer 慣例**任何版本都可能 breaking**。實務上：
+
+- **語意色的名稱**已經穩定，可以放心依賴（改名一律 major，且會先標記棄用）
+- 色值、間距、元件 API 在 0.x 期間仍可能調整
+- 等第一個專案完整導入過一輪、暴露出命名與缺漏問題並修正後，才會切 1.0.0
+
+變更一律記在 [CHANGELOG](https://github.com/kielchang/dooping-design-book/blob/main/CHANGELOG.md)。
+每則都回答「改了什麼／你要做什麼／為什麼改」，不需要調整時會明說。
+
 ## 想把東西加回這個 repo
 
 三條收錄原則，全過才收：

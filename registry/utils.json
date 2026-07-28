@@ -1,6 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "utils",
+  "version": "0.1.0",
   "type": "registry:lib",
   "title": "utils 通用工具",
   "description": "cn 與數值／金額／百分比格式化。",

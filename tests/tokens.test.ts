@@ -33,6 +33,25 @@ describe("設計 token", () => {
     expect(TOKENS_VERSION, "請重新執行 npm run build:tokens").toBe(pkg);
   });
 
+  // 元件庫版號同樣有兩份：packages/react/package.json 是正本，version.ts 的
+  // KIT_VERSION 是給執行期讀的複本，而 registry 產生器會把正本戳進每個 item。
+  // 戳記的用途是讓取用端答得出「我抄的是哪一版」——複本一旦漂移，戳記就會說謊。
+  it("元件庫版號一致（react package.json／version.ts／registry 戳記）", () => {
+    const read = (p: string) => JSON.parse(readFileSync(join(ROOT, p), "utf8"));
+    const pkg = read("packages/react/package.json").version;
+
+    const src = readFileSync(join(ROOT, "packages/react/src/version.ts"), "utf8");
+    const kit = src.match(/version:\s*"([^"]+)"/)?.[1];
+    expect(kit, "version.ts 的 KIT_VERSION 與 react/package.json 不一致").toBe(pkg);
+
+    const indexPath = join(ROOT, "registry/index.json");
+    if (existsSync(indexPath)) {
+      const index = read("registry/index.json");
+      expect(index.version, "registry/index.json 的戳記過期，請重跑 npm run build:registry").toBe(pkg);
+      expect(read("registry/button.json").version, "registry item 的戳記過期").toBe(pkg);
+    }
+  });
+
   it("每個淺色語意 token 都有對應的深色值", () => {
     const light = Object.keys(semanticColors("light"));
     const dark = new Set(Object.keys(semanticColors("dark")));

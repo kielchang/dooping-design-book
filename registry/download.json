@@ -1,6 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "download",
+  "version": "0.1.0",
   "type": "registry:lib",
   "title": "download 下載工具",
   "description": "觸發瀏覽器下載 Blob。",

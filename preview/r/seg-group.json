@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "seg-group",
+  "version": "0.1.0",
+  "type": "registry:ui",
+  "title": "SegGroup 分段選擇",
+  "description": "少量互斥選項，radiogroup ＋ roving tabindex。",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+  ],
+  "files": [
+    {
+      "path": "dooping/ui/seg-group.tsx",
+      "content": "import { useEffect, useRef } from \"react\";\nimport { Check, Lock } from \"lucide-react\";\nimport { cn } from \"@/lib/dooping/utils\";\n\nexport interface SegOption {\n  value: string;\n  label: string;\n}\n\nexport interface SegGroupProps {\n  options: SegOption[];\n  value: string;\n  onPick: (v: string) => void;\n  label?: string;\n  autoFocus?: boolean;\n  onEscape?: () => void;\n  disabled?: boolean;\n  lockHint?: string;\n  /** 標成「已改動未送出」（琥珀） */\n  changed?: boolean;\n  className?: string;\n}\n\n/**\n * 分段選擇（少量互斥選項）。\n *\n * 何時用它取代原生 radio：選項 **2–5 個、標籤短、需要一眼看完**時。\n * 選項超過 5 個或標籤長，用 Select；選項會動態增減，用 Select。\n *\n * 無障礙：`role=\"radiogroup\"` ＋ roving tabindex（整組只佔一個 Tab 停留點），\n * 方向鍵移動、Space/Enter 選定、Esc 取消。選中項同時打勾與填色——不只靠顏色。\n */\nexport function SegGroup({\n  options, value, onPick, label, autoFocus, onEscape, disabled, lockHint, changed = false, className,\n}: SegGroupProps) {\n  const btns = useRef<(HTMLButtonElement | null)[]>([]);\n  const activeIdx = options.findIndex((o) => o.value === value);\n  const focusIdx = activeIdx >= 0 ? activeIdx : 0;\n\n  useEffect(() => {\n    if (autoFocus) btns.current[focusIdx]?.focus();\n    // eslint-disable-next-line react-hooks/exhaustive-deps\n  }, [autoFocus]);\n\n  const move = (from: number, dir: number) => {\n    const n = options.length;\n    if (!n) return;\n    btns.current[(from + dir + n) % n]?.focus();\n  };\n  const onKey = (e: React.KeyboardEvent, idx: number) => {\n    if (disabled) return;\n    if (e.key === \"ArrowRight\" || e.key === \"ArrowDown\") { e.preventDefault(); move(idx, 1); }\n    else if (e.key === \"ArrowLeft\" || e.key === \"ArrowUp\") { e.preventDefault(); move(idx, -1); }\n    else if (e.key === \" \" || e.key === \"Enter\") { e.preventDefault(); onPick(options[idx].value); }\n    else if (e.key === \"Escape\") { e.preventDefault(); onEscape?.(); }\n  };\n\n  return (\n    <div\n      role=\"radiogroup\"\n      aria-label={label}\n      title={disabled ? lockHint : undefined}\n      className={cn(\n        \"inline-flex flex-wrap items-center gap-0.5 rounded-md border p-0.5\",\n        changed ? \"border-edit bg-edit-bg\" : \"border-input bg-background\",\n        disabled && \"cursor-not-allowed opacity-60\",\n        className,\n      )}\n    >\n      {options.map((o, idx) => {\n        const active = value === o.value;\n        return (\n          <button\n            key={o.value}\n            ref={(el) => { btns.current[idx] = el; }}\n            type=\"button\"\n            role=\"radio\"\n            aria-checked={active}\n            tabIndex={disabled ? -1 : idx === focusIdx ? 0 : -1}\n            disabled={disabled}\n            onClick={() => !disabled && onPick(o.value)}\n            onKeyDown={(e) => onKey(e, idx)}\n            className={cn(\n              \"tap-target-y inline-flex items-center justify-center gap-1 rounded px-3 py-1 text-sm transition-colors duration-fast\",\n              active ? \"bg-primary text-primary-foreground\" : \"text-muted-foreground hover:bg-accent\",\n            )}\n          >\n            {active && <Check aria-hidden className=\"size-3.5 shrink-0\" />}\n            {o.label}\n          </button>\n        );\n      })}\n      {disabled && <Lock className=\"mx-1 size-3.5 opacity-60\" aria-hidden />}\n    </div>\n  );\n}\n",
+      "type": "registry:ui",
+      "target": "components/dooping/seg-group.tsx"
+    }
+  ]
+}

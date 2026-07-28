@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tooltip",
+  "version": "0.1.0",
+  "type": "registry:ui",
+  "title": "Tooltip 提示泡泡",
+  "description": "hover／鍵盤聚焦／長壓顯示，含邊緣防溢與截斷文字元件。",
+  "dependencies": [],
+  "registryDependencies": [
+    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+  ],
+  "files": [
+    {
+      "path": "dooping/ui/tooltip.tsx",
+      "content": "import { useId, useLayoutEffect, useRef, useState, type ReactNode } from \"react\";\nimport { cn } from \"@/lib/dooping/utils\";\n\n/**\n * 顯示時機：桌機 hover／鍵盤聚焦；行動裝置**長壓約 0.35 秒**，放開後短暫保留再消失。\n * 行動端沒有 hover，若不處理長壓，所有靠 tooltip 補充的資訊在手機上等於不存在。\n */\nfunction useHoverTouch() {\n  const [open, setOpen] = useState(false);\n  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);\n  const clear = () => { if (timer.current) { clearTimeout(timer.current); timer.current = null; } };\n  const handlers = {\n    onMouseEnter: () => setOpen(true),\n    onMouseLeave: () => setOpen(false),\n    onTouchStart: () => { clear(); timer.current = setTimeout(() => setOpen(true), 350); },\n    onTouchEnd: () => { clear(); timer.current = setTimeout(() => setOpen(false), 1500); },\n    onTouchMove: () => clear(),\n  };\n  return { open, setOpen, handlers };\n}\n\nconst bubbleCls =\n  \"pointer-events-none absolute bottom-full left-0 z-50 mb-1 w-max max-w-[260px] whitespace-normal break-words rounded-md bg-foreground px-2 py-1 text-xs font-normal leading-snug text-background shadow-lg\";\n\n/** 泡泡：掛載後量測自身，溢出視窗左右緣就水平夾擠、上緣不足就翻到下方。 */\nfunction Bubble({ id, children }: { id?: string; children: ReactNode }) {\n  const ref = useRef<HTMLSpanElement>(null);\n  const [style, setStyle] = useState<React.CSSProperties>({ visibility: \"hidden\" });\n  useLayoutEffect(() => {\n    const el = ref.current;\n    if (!el) return;\n    const r = el.getBoundingClientRect();\n    const pad = 8;\n    let dx = 0;\n    if (r.right > window.innerWidth - pad) dx = window.innerWidth - pad - r.right;\n    if (r.left + dx < pad) dx = pad - r.left;\n    const flipDown = r.top < pad;\n    setStyle({\n      visibility: \"visible\",\n      transform: dx ? `translateX(${dx}px)` : undefined,\n      ...(flipDown ? { top: \"100%\", bottom: \"auto\", marginTop: 4, marginBottom: 0 } : {}),\n    });\n  }, []);\n  return (\n    <span ref={ref} role=\"tooltip\" id={id} style={style} className={bubbleCls}>\n      {children}\n    </span>\n  );\n}\n\nexport interface TooltipProps {\n  content: ReactNode;\n  children: ReactNode;\n  className?: string;\n  /**\n   * 讓觸發器本身可被 Tab 聚焦並以 `aria-describedby` 關聯。\n   * 用於「非互動但內容被截斷」的地方（表格儲存格）；**不要**用在已是互動元素的內部，\n   * 否則會產生巢狀可聚焦元素，鍵盤使用者要多按一次 Tab 才走得掉。\n   */\n  focusable?: boolean;\n}\n\nexport function Tooltip({ content, children, className, focusable }: TooltipProps) {\n  const { open, setOpen, handlers } = useHoverTouch();\n  const id = useId();\n  if (content == null || content === \"\") return <>{children}</>;\n  return (\n    <span\n      className={cn(\"relative inline-flex max-w-full select-none\", className)}\n      {...handlers}\n      {...(focusable\n        ? { tabIndex: 0, onFocus: () => setOpen(true), onBlur: () => setOpen(false), \"aria-describedby\": open ? id : undefined }\n        : {})}\n    >\n      {children}\n      {open && <Bubble id={focusable ? id : undefined}>{content}</Bubble>}\n    </span>\n  );\n}\n\n/** 單行截斷文字＋提示泡泡：超出以 … 表示，hover／長壓看完整內容。 */\nexport function TruncatedText({ text, className, numeric }: { text: string; className?: string; numeric?: boolean }) {\n  const { open, handlers } = useHoverTouch();\n  const hasTip = Boolean(text) && text !== \"—\";\n  return (\n    <span className={cn(\"relative block min-w-0 flex-1 select-none\", numeric && \"text-right\")} {...handlers}>\n      <span className={cn(\"block truncate\", numeric && \"tabular-nums\", className)}>{text}</span>\n      {open && hasTip && <Bubble>{text}</Bubble>}\n    </span>\n  );\n}\n",
+      "type": "registry:ui",
+      "target": "components/dooping/tooltip.tsx"
+    }
+  ]
+}

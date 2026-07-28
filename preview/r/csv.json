@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "csv",
+  "version": "0.1.0",
+  "type": "registry:lib",
+  "title": "csv 序列化",
+  "description": "含 UTF-8 BOM 的 CSV 產出與解析。",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "dooping/lib/csv.ts",
+      "content": "// CSV 序列化／解析。\n//\n// 為什麼自己寫而不是拉套件：需求只有「跳脫 + BOM」兩件事，但 BOM 那件事沒有它中文在 Excel\n// 開起來就是亂碼——這是每個交付到台灣／日本辦公室的系統都會踩的坑，所以它必須是預設行為。\n\nexport function csvEscape(v: string | number): string {\n  const s = String(v ?? \"\");\n  return /[\",\\n\\r]/.test(s) ? `\"${s.replace(/\"/g, '\"\"')}\"` : s;\n}\n\n/** 表頭＋資料列 → CSV 文字。預設加 UTF-8 BOM（Excel 才會用 UTF-8 解讀）。 */\nexport function csvSerialize(headers: string[], rows: (string | number)[][], bom = true): string {\n  const body = [headers, ...rows].map((r) => r.map(csvEscape).join(\",\")).join(\"\\r\\n\");\n  return (bom ? \"﻿\" : \"\") + body;\n}\n\n/** CSV 文字 → 二維字串陣列。處理引號內逗號／換行、跳脫 `\"\"`、CRLF、開頭 BOM；略過全空白列。 */\nexport function csvParse(text: string): string[][] {\n  const src = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;\n  const out: string[][] = [];\n  let row: string[] = [];\n  let field = \"\";\n  let inQuotes = false;\n  let i = 0;\n  while (i < src.length) {\n    const c = src[i];\n    if (inQuotes) {\n      if (c === '\"') {\n        if (src[i + 1] === '\"') { field += '\"'; i += 2; continue; }\n        inQuotes = false; i++; continue;\n      }\n      field += c; i++; continue;\n    }\n    if (c === '\"') { inQuotes = true; i++; continue; }\n    if (c === \",\") { row.push(field); field = \"\"; i++; continue; }\n    if (c === \"\\r\") { i++; continue; }\n    if (c === \"\\n\") { row.push(field); out.push(row); row = []; field = \"\"; i++; continue; }\n    field += c; i++;\n  }\n  if (field.length > 0 || row.length > 0) { row.push(field); out.push(row); }\n  return out.filter((r) => r.some((cell) => cell.trim() !== \"\"));\n}\n",
+      "type": "registry:lib",
+      "target": "lib/dooping/csv.ts"
+    }
+  ]
+}

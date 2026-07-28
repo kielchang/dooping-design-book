@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "download",
+  "version": "0.1.0",
+  "type": "registry:lib",
+  "title": "download 下載工具",
+  "description": "觸發瀏覽器下載 Blob。",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "dooping/lib/download.ts",
+      "content": "/** 觸發瀏覽器下載一個 Blob。無框架相依，供 CSV／檔案匯出共用。 */\nexport function saveBlob(blob: Blob, fileName: string): void {\n  const url = URL.createObjectURL(blob);\n  const a = document.createElement(\"a\");\n  a.href = url;\n  a.download = fileName;\n  document.body.appendChild(a);\n  a.click();\n  a.remove();\n  URL.revokeObjectURL(url);\n}\n",
+      "type": "registry:lib",
+      "target": "lib/dooping/download.ts"
+    }
+  ]
+}

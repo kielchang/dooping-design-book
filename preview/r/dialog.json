@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dialog",
+  "version": "0.1.0",
+  "type": "registry:ui",
+  "title": "Dialog 對話框",
+  "description": "模態對話框（Radix Dialog）。",
+  "dependencies": [
+    "@radix-ui/react-dialog",
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+  ],
+  "files": [
+    {
+      "path": "dooping/ui/dialog.tsx",
+      "content": "import * as React from \"react\";\nimport * as DialogPrimitive from \"@radix-ui/react-dialog\";\nimport { X } from \"lucide-react\";\nimport { cn } from \"@/lib/dooping/utils\";\n\nconst Dialog = DialogPrimitive.Root;\nconst DialogTrigger = DialogPrimitive.Trigger;\nconst DialogPortal = DialogPrimitive.Portal;\nconst DialogClose = DialogPrimitive.Close;\n\nconst DialogOverlay = React.forwardRef<\n  React.ElementRef<typeof DialogPrimitive.Overlay>,\n  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>\n>(({ className, ...props }, ref) => (\n  <DialogPrimitive.Overlay ref={ref} className={cn(\"fixed inset-0 z-50 bg-black/70\", className)} {...props} />\n));\nDialogOverlay.displayName = DialogPrimitive.Overlay.displayName;\n\nconst DialogContent = React.forwardRef<\n  React.ElementRef<typeof DialogPrimitive.Content>,\n  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { closeLabel?: string }\n>(({ className, children, closeLabel = \"關閉\", ...props }, ref) => (\n  <DialogPortal>\n    <DialogOverlay />\n    <DialogPrimitive.Content\n      ref={ref}\n      className={cn(\n        // 行動版留邊距成置中卡片，不做全螢幕 sheet：後台對話框通常是「確認／小表單」，\n        // 全螢幕會讓使用者失去背景脈絡（他正在看的那一列是誰）。\n        \"fixed left-1/2 top-1/2 z-50 grid w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border bg-background p-6 shadow-lg\",\n        className,\n      )}\n      {...props}\n    >\n      {children}\n      <DialogPrimitive.Close className=\"absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2\">\n        <X className=\"size-4\" />\n        <span className=\"sr-only\">{closeLabel}</span>\n      </DialogPrimitive.Close>\n    </DialogPrimitive.Content>\n  </DialogPortal>\n));\nDialogContent.displayName = DialogPrimitive.Content.displayName;\n\nconst DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (\n  <div className={cn(\"flex flex-col space-y-1.5 text-center sm:text-left\", className)} {...props} />\n);\nDialogHeader.displayName = \"DialogHeader\";\n\nconst DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (\n  <div className={cn(\"flex flex-col-reverse gap-2 sm:flex-row sm:justify-end\", className)} {...props} />\n);\nDialogFooter.displayName = \"DialogFooter\";\n\nconst DialogTitle = React.forwardRef<\n  React.ElementRef<typeof DialogPrimitive.Title>,\n  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>\n>(({ className, ...props }, ref) => (\n  <DialogPrimitive.Title ref={ref} className={cn(\"text-lg font-semibold leading-none tracking-tight\", className)} {...props} />\n));\nDialogTitle.displayName = DialogPrimitive.Title.displayName;\n\nconst DialogDescription = React.forwardRef<\n  React.ElementRef<typeof DialogPrimitive.Description>,\n  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>\n>(({ className, ...props }, ref) => (\n  <DialogPrimitive.Description ref={ref} className={cn(\"text-sm text-muted-foreground\", className)} {...props} />\n));\nDialogDescription.displayName = DialogPrimitive.Description.displayName;\n\nexport {\n  Dialog, DialogPortal, DialogOverlay, DialogClose, DialogTrigger,\n  DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription,\n};\n",
+      "type": "registry:ui",
+      "target": "components/dooping/dialog.tsx"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "badge",
+  "version": "0.1.0",
+  "type": "registry:ui",
+  "title": "Badge 狀態徽章",
+  "description": "帶文字的狀態標記，不只靠顏色傳達語意。",
+  "dependencies": [
+    "class-variance-authority"
+  ],
+  "registryDependencies": [
+    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+  ],
+  "files": [
+    {
+      "path": "dooping/ui/badge.tsx",
+      "content": "import * as React from \"react\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\nimport { cn } from \"@/lib/dooping/utils\";\n\nconst badgeVariants = cva(\n  \"inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none\",\n  {\n    variants: {\n      variant: {\n        default: \"border-transparent bg-primary text-primary-foreground\",\n        secondary: \"border-transparent bg-secondary text-secondary-foreground\",\n        outline: \"text-foreground\",\n        success: \"border-transparent bg-success text-success-foreground\",\n        warning: \"border-transparent bg-warning text-warning-foreground\",\n        info: \"border-transparent bg-info text-info-foreground\",\n        danger: \"border-transparent bg-danger text-danger-foreground\",\n        /** 已改動未送出——保留給這個語意的琥珀色，不要拿來當一般高亮（ADR-0002）。 */\n        edit: \"border-edit bg-edit-bg text-edit-foreground\",\n      },\n    },\n    defaultVariants: { variant: \"default\" },\n  },\n);\n\nexport interface BadgeProps\n  extends React.HTMLAttributes<HTMLSpanElement>,\n    VariantProps<typeof badgeVariants> {}\n\n/**\n * 狀態徽章。\n *\n * 規約：徽章上永遠要有**文字**，顏色只是加速辨識。純色點／純色塊在灰階列印與色覺障礙下等於消失，\n * 而後台系統的表格幾乎一定會被印出來簽核。\n */\nfunction Badge({ className, variant, ...props }: BadgeProps) {\n  return <span className={cn(badgeVariants({ variant }), className)} {...props} />;\n}\n\nexport { Badge, badgeVariants };\n",
+      "type": "registry:ui",
+      "target": "components/dooping/badge.tsx"
+    }
+  ]
+}

@@ -47,7 +47,7 @@ function walk(dir: string): string[] {
   return out;
 }
 
-/** 隨套件出貨的檔案（stories 與 demo 資料不出貨，可用示範資料）。 */
+/** 隨套件發佈的檔案（stories 與 demo 資料不發佈，可用示範資料）。 */
 const shipped = (abs: string) => !/\.stories\.tsx$/.test(abs) && !abs.includes(`${"demo"}/`);
 
 function imports(src: string): string[] {
@@ -89,7 +89,7 @@ describe("元件庫邊界", () => {
 describe("barrel 覆蓋率", () => {
   const barrel = readFileSync(join(KIT, "index.ts"), "utf8");
 
-  it("每個出貨的元件檔都有從 index.ts 匯出", () => {
+  it("每個發佈的元件檔都有從 index.ts 匯出", () => {
     const missing = shippedFiles
       .map((abs) => relative(KIT, abs).replace(/\\/g, "/").replace(/\.tsx?$/, ""))
       .filter((mod) => mod !== "index" && mod !== "version")

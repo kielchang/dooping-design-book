@@ -8,7 +8,7 @@ title: 稽核與回復
 
 「這個欄位上週不是這個值，誰改的？」
 
-大多數系統的稽核記錄只能回答一半：有時間、有操作者、有「更新了客戶 C-1042」，
+大多數系統的稽核記錄只能回答一半：有時間、有操作者、有「更新了單位 U-1042」，
 但沒有**改了什麼**，更不用說**改回去**。
 
 ## 做法
@@ -20,9 +20,9 @@ title: 稽核與回復
 ```ts
 {
   action: "update",
-  target: { kind: "customer", id: "C-1042" },
+  target: { kind: "customer", id: "U-1042" },
   scenario: "tier-upgrade",        // 情境（若走情境化申請單）
-  reason: "年度採購量達標，依合約升等",
+  reason: "年度累計量達標，依規則升等",
   before: { tier: "silver", creditLimit: 1_000_000 },
   after:  { tier: "gold",   creditLimit: 1_500_000 },
   restoreKind: "customer",          // 有這個才可回復

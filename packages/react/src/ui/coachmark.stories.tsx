@@ -9,8 +9,8 @@ export default meta;
 type Story = StoryObj;
 
 const STEPS = [
-  { title: "先選擇客戶", body: <>從這裡挑一個既有客戶，或直接建立新的。</> },
-  { title: "加入品項", body: <>可以一次加入多筆；數量與單價都能之後再調整。</>, actionHint: "👆 點上方圈起來的按鈕試試" },
+  { title: "先選擇單位", body: <>從這裡挑一個既有單位，或直接建立新的。</> },
+  { title: "加入項目", body: <>可以一次加入多筆；數量與金額都能之後再調整。</>, actionHint: "👆 點上方圈起來的按鈕試試" },
   { title: "最後確認", body: <>送出前會顯示<strong>本次變更摘要</strong>，確認無誤再送出。</> },
 ];
 
@@ -36,10 +36,10 @@ export const 三步導引: Story = {
       <div className="space-y-4">
         <Button onClick={() => { setStep(0); setOpen(true); }}>開始導引</Button>
         <Card className="max-w-xl">
-          <CardHeader><CardTitle>建立訂單</CardTitle></CardHeader>
+          <CardHeader><CardTitle>建立一筆資料</CardTitle></CardHeader>
           <CardContent className="flex flex-wrap gap-2">
-            <Button ref={refs[0]} variant="outline">選擇客戶</Button>
-            <Button ref={refs[1]} variant="outline">加入品項</Button>
+            <Button ref={refs[0]} variant="outline">選擇單位</Button>
+            <Button ref={refs[1]} variant="outline">加入項目</Button>
             <Button ref={refs[2]}>確認送出</Button>
           </CardContent>
         </Card>
@@ -79,7 +79,7 @@ export const 驗收模式: Story = {
       <div className="space-y-4">
         <Button onClick={() => setOpen(true)}>開始驗收</Button>
         <Card className="max-w-md">
-          <CardHeader><CardTitle>訂單清單</CardTitle></CardHeader>
+          <CardHeader><CardTitle>資料清單</CardTitle></CardHeader>
           <CardContent><Button ref={anchor} variant="outline">匯出 CSV</Button></CardContent>
         </Card>
         <p className="text-xs text-muted-foreground">

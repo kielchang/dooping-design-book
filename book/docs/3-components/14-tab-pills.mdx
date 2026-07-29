@@ -18,14 +18,14 @@ title: TabPills 分頁膠囊
 
 <Demo title="分頁膠囊（可帶徽章）">
   <TabPills
-    label="訂單狀態"
+    label="處理狀態"
     value="confirmed"
     onChange={() => {}}
     tabs={[
       { key: "all", label: "全部" },
       { key: "draft", label: "草稿", badge: <Badge variant="secondary">3</Badge> },
       { key: "confirmed", label: "已確認", badge: <Badge variant="info">7</Badge> },
-      { key: "shipped", label: "已出貨" },
+      { key: "shipped", label: "已完成" },
     ]}
   />
 </Demo>

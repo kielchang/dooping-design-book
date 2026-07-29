@@ -13,8 +13,8 @@ export const 提示泡泡: Story = {
   render: () => (
     <div className="space-y-6 py-8">
       <p className="text-sm">
-        訂單狀態
-        <Tooltip content="「已確認」代表已鎖定價格與數量，尚未安排出貨。" className="ml-1">
+        處理狀態
+        <Tooltip content="「已確認」代表已鎖定內容與數量，尚未進入處理。" className="ml-1">
           <span className="cursor-help underline decoration-dotted underline-offset-2">已確認</span>
         </Tooltip>
       </p>
@@ -37,17 +37,17 @@ export const 提示泡泡: Story = {
 export const 對話框: Story = {
   render: () => (
     <Dialog>
-      <DialogTrigger asChild><Button variant="destructive">取消訂單</Button></DialogTrigger>
+      <DialogTrigger asChild><Button variant="destructive">作廢這筆</Button></DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>確定要取消訂單 SO-2403？</DialogTitle>
+          <DialogTitle>確定要作廢 R-2403？</DialogTitle>
           <DialogDescription>
-            取消後將釋放已保留的庫存，且此動作會寫入異動紀錄。已出貨的項目不受影響。
+            作廢後將釋放已保留的配額，且此動作會寫入異動紀錄。已完成的項目不受影響。
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild><Button variant="outline">返回</Button></DialogClose>
-          <Button variant="destructive">確定取消訂單</Button>
+          <Button variant="destructive">確定作廢</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

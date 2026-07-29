@@ -45,7 +45,7 @@ export * from "./form/editable-field";
 export * from "./form/change-summary";
 export * from "./form/use-record-diff";
 
-// 通用工具（隨元件庫一起出貨）
+// 通用工具（隨元件庫一起發佈）
 export * from "./lib/utils";
 export * from "./lib/use-sort";
 export * from "./lib/csv";

@@ -19,15 +19,15 @@ title: EmptyState 空狀態
 <Demo title="三種空狀態">
   <div className="grid gap-4 md:grid-cols-3">
     <div className="rounded-lg border">
-      <EmptyState title="還沒有任何訂單" hint="建立第一筆訂單後，這裡會顯示明細與合計。"
-        action={<Button size="sm">建立訂單</Button>} />
+      <EmptyState title="還沒有任何資料" hint="建立第一筆後，這裡會顯示明細與合計。"
+        action={<Button size="sm">新增一筆</Button>} />
     </div>
     <div className="rounded-lg border">
-      <EmptyState title="查無符合的資料" hint="目前篩選：客戶＝宏昌實業、狀態＝已出貨。試著放寬其中一項。"
+      <EmptyState title="查無符合的資料" hint="目前篩選：單位＝宏昌實業、狀態＝已完成。試著放寬其中一項。"
         action={<Button size="sm" variant="outline">清除篩選</Button>} />
     </div>
     <div className="rounded-lg border">
-      <EmptyState title="沒有檢視權限" hint="此區資料僅限訂單管理員檢視，請洽系統管理者。" />
+      <EmptyState title="沒有檢視權限" hint="此區資料僅限管理員檢視，請洽系統管理者。" />
     </div>
   </div>
 </Demo>

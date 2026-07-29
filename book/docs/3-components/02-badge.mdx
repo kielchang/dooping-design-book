@@ -9,7 +9,7 @@ title: Badge 狀態徽章
 ## 何時不要用
 
 <Rules>
-  <Do><p>表示<strong>狀態</strong>（已出貨、待審核、已退回）或<strong>數量</strong>（未讀 3）。</p></Do>
+  <Do><p>表示<strong>狀態</strong>（已完成、待審核、已退回）或<strong>數量</strong>（未讀 3）。</p></Do>
   <Dont><p>不要拿來當可點擊的篩選器。看起來像標籤、按下去卻有動作，
   使用者要試過才知道——那應該是按鈕或 <a href="/components/chips">Chips</a>。</p></Dont>
 </Rules>
@@ -19,7 +19,7 @@ title: Badge 狀態徽章
     <Badge>預設</Badge>
     <Badge variant="secondary">次要</Badge>
     <Badge variant="outline">外框</Badge>
-    <Badge variant="success">已出貨</Badge>
+    <Badge variant="success">已完成</Badge>
     <Badge variant="warning">待補件</Badge>
     <Badge variant="info">審核中</Badge>
     <Badge variant="danger">已退回</Badge>
@@ -31,7 +31,7 @@ title: Badge 狀態徽章
 
 純色點、純色塊在以下情況等於消失：
 
-- 灰階列印（後台系統的報表**一定**會被印出來簽核）
+- 灰階列印（後台系統的報表**一定**會被印出來存檔）
 - 紅綠色覺障礙（約 8% 男性）
 - 深色模式下的低飽和色
 
@@ -45,7 +45,7 @@ title: Badge 狀態徽章
 
 | 語意 | variant | 例 |
 | --- | --- | --- |
-| 完成／通過 | `success` | 已出貨、已核准 |
+| 完成／通過 | `success` | 已完成、已核准 |
 | 進行中／中性 | `info` | 審核中、處理中 |
 | 需注意但不阻擋 | `warning` | 待補件、即將到期 |
 | 異常／失敗 | `danger` | 已退回、已取消 |

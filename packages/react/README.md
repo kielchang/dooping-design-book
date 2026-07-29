@@ -38,7 +38,7 @@ src/
 ├── ui/          基礎元件（含 *.stories.tsx）
 ├── form/        唯讀逐欄編輯系統
 ├── lib/         通用工具（cn、useSort、csv、download、forms/diff）
-├── demo/        示範資料（**不出貨**，僅供 stories 與文件站）
+├── demo/        示範資料（**不發佈**，僅供 stories 與文件站）
 └── index.ts     公開匯出＝元件庫範圍清單
 ```
 

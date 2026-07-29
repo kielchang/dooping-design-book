@@ -16,9 +16,9 @@ title: 空狀態、變異與狀態徽章
 
 <Demo title="三種空狀態的文案差異">
   <div className="grid gap-3 md:grid-cols-3">
-    <div className="rounded-lg border"><EmptyState compact title="還沒有任何訂單" hint="建立第一筆訂單後，這裡會顯示明細與合計。" /></div>
-    <div className="rounded-lg border"><EmptyState compact title="查無符合的資料" hint="目前篩選：客戶＝宏昌實業、狀態＝已出貨。試著放寬其中一項。" /></div>
-    <div className="rounded-lg border"><EmptyState compact title="沒有檢視權限" hint="此區資料僅限訂單管理員檢視，請洽系統管理者。" /></div>
+    <div className="rounded-lg border"><EmptyState compact title="還沒有任何資料" hint="建立第一筆後，這裡會顯示明細與合計。" /></div>
+    <div className="rounded-lg border"><EmptyState compact title="查無符合的資料" hint="目前篩選：單位＝宏昌實業、狀態＝已完成。試著放寬其中一項。" /></div>
+    <div className="rounded-lg border"><EmptyState compact title="沒有檢視權限" hint="此區資料僅限管理員檢視，請洽系統管理者。" /></div>
   </div>
 </Demo>
 
@@ -32,7 +32,7 @@ title: 空狀態、變異與狀態徽章
 <Demo title="三重編碼">
   <div className="space-y-1 text-sm">
     <p>營收：<Delta value={128400} posLabel="增加 " negLabel="減少 " /></p>
-    <p>庫存差異（越少越好）：<Delta value={340} goodWhen="negative" posLabel="超出 " negLabel="短少 " /></p>
+    <p>誤差數（越少越好）：<Delta value={340} goodWhen="negative" posLabel="超出 " negLabel="短少 " /></p>
     <p>持平：<Delta value={0} /></p>
   </div>
 </Demo>
@@ -46,7 +46,7 @@ title: 空狀態、變異與狀態徽章
 
 <Demo title="狀態徽章">
   <div className="flex flex-wrap gap-2">
-    <Badge variant="success">已出貨</Badge>
+    <Badge variant="success">已完成</Badge>
     <Badge variant="info">審核中</Badge>
     <Badge variant="warning">待補件</Badge>
     <Badge variant="danger">已退回</Badge>
@@ -58,7 +58,7 @@ title: 空狀態、變異與狀態徽章
 
 **把畫面用灰階印出來。** 如果語意消失了，就是還沒做完。
 
-這不是比喻——後台系統的報表**一定**會被印出來簽核，而且印表機通常是黑白的。
+這不是比喻——後台系統的報表**一定**會被印出來存檔，而且印表機通常是黑白的。
 
 <Rules>
   <Do><p>色彩是第三條線索。前兩條是<strong>形狀／符號</strong>與<strong>文字</strong>。</p></Do>

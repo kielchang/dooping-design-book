@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">ADR-0003：硬鎖定不自動解除 | Dooping Design Book</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://kielchang.github.io/dooping-design-book/preview/adr/hard-lock-no-auto-unlock/"><meta data-rh="true" property="og:locale" content="zh_Hant"><meta data-rh="true" name="docusaurus_locale" content="zh-Hant"><meta data-rh="true" name="docsearch:language" content="zh-Hant"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="ADR-0003：硬鎖定不自動解除 | Dooping Design Book"><meta data-rh="true" name="description" content="- 狀態：已採用"><meta data-rh="true" property="og:description" content="- 狀態：已採用"><link data-rh="true" rel="icon" href="/dooping-design-book/preview/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://kielchang.github.io/dooping-design-book/preview/adr/hard-lock-no-auto-unlock/"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/preview/adr/hard-lock-no-auto-unlock/" hreflang="zh-Hant"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/preview/adr/hard-lock-no-auto-unlock/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"決策紀錄 ADR","item":"https://kielchang.github.io/dooping-design-book/preview/adr"},{"@type":"ListItem","position":2,"name":"ADR-0003：硬鎖定不自動解除","item":"https://kielchang.github.io/dooping-design-book/preview/adr/hard-lock-no-auto-unlock"}]}</script><link rel="stylesheet" href="/dooping-design-book/preview/assets/css/styles.dca17ef7.css">
-<script src="/dooping-design-book/preview/assets/js/runtime~main.9b6c365f.js" defer="defer"></script>
+<script src="/dooping-design-book/preview/assets/js/runtime~main.87c049dc.js" defer="defer"></script>
 <script src="/dooping-design-book/preview/assets/js/main.cc5661c6.js" defer="defer"></script>
 </head>
 <body>
@@ -32,7 +32,7 @@
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="理由">理由<a href="#理由" class="hash-link" aria-label="理由的直接連結" title="理由的直接連結" translate="no">​</a></h2>
 <p>選項 B 的實際災難：</p>
 <p>使用者只是想看看某個欄位能不能改，點了一下——整筆單據退回未確認狀態，
-<strong>而且沒有任何提示</strong>。下游流程（已排程的出貨、已送出的請款）跟著全部回捲，
+<strong>而且沒有任何提示</strong>。下游流程（已排程的作業、已送出的請款）跟著全部回捲，
 而沒有人知道是誰、什麼時候觸發的。</p>
 <p>選項 C 的多一步是<strong>故意的</strong>：它把「我要改一筆已核准的東西」
 從一次不小心的點擊，變成一個需要刻意做的決定。</p>

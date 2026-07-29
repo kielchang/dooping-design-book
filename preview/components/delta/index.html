@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">Delta 變異顯示 | Dooping Design Book</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://kielchang.github.io/dooping-design-book/preview/components/delta/"><meta data-rh="true" property="og:locale" content="zh_Hant"><meta data-rh="true" name="docusaurus_locale" content="zh-Hant"><meta data-rh="true" name="docsearch:language" content="zh-Hant"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Delta 變異顯示 | Dooping Design Book"><meta data-rh="true" name="description" content="顯示「和基準比差了多少」。"><meta data-rh="true" property="og:description" content="顯示「和基準比差了多少」。"><link data-rh="true" rel="icon" href="/dooping-design-book/preview/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://kielchang.github.io/dooping-design-book/preview/components/delta/"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/preview/components/delta/" hreflang="zh-Hant"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/preview/components/delta/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"元件 Components","item":"https://kielchang.github.io/dooping-design-book/preview/components"},{"@type":"ListItem","position":2,"name":"Delta 變異顯示","item":"https://kielchang.github.io/dooping-design-book/preview/components/delta"}]}</script><link rel="stylesheet" href="/dooping-design-book/preview/assets/css/styles.dca17ef7.css">
-<script src="/dooping-design-book/preview/assets/js/runtime~main.9b6c365f.js" defer="defer"></script>
+<script src="/dooping-design-book/preview/assets/js/runtime~main.87c049dc.js" defer="defer"></script>
 <script src="/dooping-design-book/preview/assets/js/main.cc5661c6.js" defer="defer"></script>
 </head>
 <body>
@@ -17,12 +17,12 @@
 <p><strong>箭頭 ▲▼ ＋ 文字 ＋ 顏色。</strong> 顏色是三者中最弱的一環：</p>
 <ul>
 <li class="">約 8% 男性有紅綠色覺障礙</li>
-<li class="">後台報表幾乎一定會被灰階印出來簽核</li>
+<li class="">後台報表幾乎一定會被灰階印出來存檔</li>
 </ul>
 <p>所以箭頭與文字必須<strong>自己就能把話說完</strong>，顏色只是加速。</p>
-<div class="demo"><div class="demo-title">變異顯示</div><div class="demo-body"><div class="space-y-2 text-sm"><p>本月營收與上月比較：<span class="inline-flex items-center gap-0.5 tabular-nums text-success" title="增加 128,400"><span aria-hidden="true">▲</span><span>增加 </span>128,400</span></p><p>庫存差異（越少越好）：<span class="inline-flex items-center gap-0.5 tabular-nums text-danger" title="超出 340"><span aria-hidden="true">▲</span><span>超出 </span>340</span></p><p>交期落差：<span class="inline-flex items-center gap-0.5 tabular-nums text-success" title="提前 3 天"><span aria-hidden="true">▼</span><span>提前 </span>3 天</span></p><p>與上期持平：<span class="tabular-nums text-muted-foreground">— <!-- -->持平</span></p></div></div></div>
+<div class="demo"><div class="demo-title">變異顯示</div><div class="demo-body"><div class="space-y-2 text-sm"><p>本月營收與上月比較：<span class="inline-flex items-center gap-0.5 tabular-nums text-success" title="增加 128,400"><span aria-hidden="true">▲</span><span>增加 </span>128,400</span></p><p>誤差數（越少越好）：<span class="inline-flex items-center gap-0.5 tabular-nums text-danger" title="超出 340"><span aria-hidden="true">▲</span><span>超出 </span>340</span></p><p>交期落差：<span class="inline-flex items-center gap-0.5 tabular-nums text-success" title="提前 3 天"><span aria-hidden="true">▼</span><span>提前 </span>3 天</span></p><p>與上期持平：<span class="tabular-nums text-muted-foreground">— <!-- -->持平</span></p></div></div></div>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="goodwhen好壞是業務決定不是數學決定"><code>goodWhen</code>：好壞是業務決定，不是數學決定<a href="#goodwhen好壞是業務決定不是數學決定" class="hash-link" aria-label="goodwhen好壞是業務決定不是數學決定的直接連結" title="goodwhen好壞是業務決定不是數學決定的直接連結" translate="no">​</a></h2>
-<p>「庫存差異 +100」可能是好（備料充足）也可能是壞（積壓）。
+<p>「差異 +100」可能是好（餘裕充足）也可能是壞（累積過多）。
 元件不猜，由呼叫端明確告訴它哪個方向算好。</p>
 <div class="rule-grid"><div class="rule-do"><strong>✅ 這樣做</strong><p>每次用 Delta 都想一次：這個數字變大，對使用者是好消息還是壞消息？</p></div><div class="rule-dont"><strong>🚫 不要這樣</strong><p>不要預設「正值＝綠色」。成本、延遲、退貨率的正值都是壞消息。</p></div></div>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="零值也要說話">零值也要說話<a href="#零值也要說話" class="hash-link" aria-label="零值也要說話的直接連結" title="零值也要說話的直接連結" translate="no">​</a></h2>

@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "delta",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "registry:ui",
   "title": "Delta 變異顯示",
   "description": "箭頭＋文字＋顏色三重編碼的差異呈現。",
@@ -12,7 +12,7 @@
   "files": [
     {
       "path": "dooping/ui/delta.tsx",
-      "content": "import { cn, formatNumber } from \"@/lib/dooping/utils\";\n\nexport interface DeltaProps {\n  value: number;\n  /**\n   * 哪個方向算「好」。差異數字的好壞是**業務決定**、不是數學決定：\n   * 「庫存差異 +100」可能是好（備料充足）也可能是壞（積壓），元件不猜。\n   */\n  goodWhen?: \"positive\" | \"negative\";\n  /** 正值前綴文字（如「超出」「增加」） */\n  posLabel?: string;\n  /** 負值前綴文字（如「短少」「減少」） */\n  negLabel?: string;\n  format?: (n: number) => string;\n  zeroLabel?: string;\n  className?: string;\n}\n\n/**\n * 變異顯示。\n *\n * 三重編碼：**箭頭符號 ▲▼ ＋ 文字 ＋ 顏色**。顏色是三者中最弱的一環——\n * 8% 的男性有紅綠色覺障礙，而後台報表幾乎一定會被灰階列印出來簽核。\n * 因此箭頭與文字必須自己就能把話說完，顏色只是加速。\n */\nexport function Delta({\n  value,\n  goodWhen = \"positive\",\n  posLabel = \"\",\n  negLabel = \"\",\n  format = formatNumber,\n  zeroLabel = \"持平\",\n  className,\n}: DeltaProps) {\n  if (value === 0) {\n    return <span className={cn(\"tabular-nums text-muted-foreground\", className)}>— {zeroLabel}</span>;\n  }\n  const positive = value > 0;\n  const good = goodWhen === \"positive\" ? positive : !positive;\n  const arrow = positive ? \"▲\" : \"▼\";\n  const label = positive ? posLabel : negLabel;\n  return (\n    <span\n      className={cn(\"inline-flex items-center gap-0.5 tabular-nums\", good ? \"text-success\" : \"text-danger\", className)}\n      title={`${label}${format(Math.abs(value))}`}\n    >\n      <span aria-hidden>{arrow}</span>\n      {label && <span>{label}</span>}\n      {format(Math.abs(value))}\n    </span>\n  );\n}\n",
+      "content": "import { cn, formatNumber } from \"@/lib/dooping/utils\";\n\nexport interface DeltaProps {\n  value: number;\n  /**\n   * 哪個方向算「好」。差異數字的好壞是**業務決定**、不是數學決定：\n   * 「差異 +100」可能是好（餘裕充足）也可能是壞（累積過多），元件不猜。\n   */\n  goodWhen?: \"positive\" | \"negative\";\n  /** 正值前綴文字（如「超出」「增加」） */\n  posLabel?: string;\n  /** 負值前綴文字（如「短少」「減少」） */\n  negLabel?: string;\n  format?: (n: number) => string;\n  zeroLabel?: string;\n  className?: string;\n}\n\n/**\n * 變異顯示。\n *\n * 三重編碼：**箭頭符號 ▲▼ ＋ 文字 ＋ 顏色**。顏色是三者中最弱的一環——\n * 8% 的男性有紅綠色覺障礙，而後台報表幾乎一定會被灰階列印出來存檔。\n * 因此箭頭與文字必須自己就能把話說完，顏色只是加速。\n */\nexport function Delta({\n  value,\n  goodWhen = \"positive\",\n  posLabel = \"\",\n  negLabel = \"\",\n  format = formatNumber,\n  zeroLabel = \"持平\",\n  className,\n}: DeltaProps) {\n  if (value === 0) {\n    return <span className={cn(\"tabular-nums text-muted-foreground\", className)}>— {zeroLabel}</span>;\n  }\n  const positive = value > 0;\n  const good = goodWhen === \"positive\" ? positive : !positive;\n  const arrow = positive ? \"▲\" : \"▼\";\n  const label = positive ? posLabel : negLabel;\n  return (\n    <span\n      className={cn(\"inline-flex items-center gap-0.5 tabular-nums\", good ? \"text-success\" : \"text-danger\", className)}\n      title={`${label}${format(Math.abs(value))}`}\n    >\n      <span aria-hidden>{arrow}</span>\n      {label && <span>{label}</span>}\n      {format(Math.abs(value))}\n    </span>\n  );\n}\n",
       "type": "registry:ui",
       "target": "components/dooping/delta.tsx"
     }

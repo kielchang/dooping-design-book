@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">ADR-0006：去領域化是硬性驗收，不是盡量 | Dooping Design Book</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://kielchang.github.io/dooping-design-book/preview/adr/de-domainization-as-hard-gate/"><meta data-rh="true" property="og:locale" content="zh_Hant"><meta data-rh="true" name="docusaurus_locale" content="zh-Hant"><meta data-rh="true" name="docsearch:language" content="zh-Hant"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="ADR-0006：去領域化是硬性驗收，不是盡量 | Dooping Design Book"><meta data-rh="true" name="description" content="- 狀態：已採用"><meta data-rh="true" property="og:description" content="- 狀態：已採用"><link data-rh="true" rel="icon" href="/dooping-design-book/preview/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://kielchang.github.io/dooping-design-book/preview/adr/de-domainization-as-hard-gate/"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/preview/adr/de-domainization-as-hard-gate/" hreflang="zh-Hant"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/preview/adr/de-domainization-as-hard-gate/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"決策紀錄 ADR","item":"https://kielchang.github.io/dooping-design-book/preview/adr"},{"@type":"ListItem","position":2,"name":"ADR-0006：去領域化是硬性驗收，不是盡量","item":"https://kielchang.github.io/dooping-design-book/preview/adr/de-domainization-as-hard-gate"}]}</script><link rel="stylesheet" href="/dooping-design-book/preview/assets/css/styles.dca17ef7.css">
-<script src="/dooping-design-book/preview/assets/js/runtime~main.9b6c365f.js" defer="defer"></script>
+<script src="/dooping-design-book/preview/assets/js/runtime~main.87c049dc.js" defer="defer"></script>
 <script src="/dooping-design-book/preview/assets/js/main.cc5661c6.js" defer="defer"></script>
 </head>
 <body>
@@ -35,13 +35,36 @@
 <p>選項 A 被否決的關鍵：它會在<strong>示範資料</strong>這一層失守，而那正是傷害最大的地方。</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="影響">影響<a href="#影響" class="hash-link" aria-label="影響的直接連結" title="影響的直接連結" translate="no">​</a></h2>
 <ul>
-<li class="">所有示範資料統一使用中性商業情境：訂單、客戶、庫存品項、工單。</li>
 <li class="">ADR 的「背景」段落只說「來自一套內部後台系統」，不說是什麼系統。
 這犧牲了一點脈絡，換來的是任何產業的讀者都不會覺得「這不是給我的」。</li>
 <li class="">守衛測試的詞表本身就是一份「不要用什麼字」的規範，
 未來新增文件時它會即時提醒。</li>
 <li class="">這支守衛是本 repo 特有的。但它示範了一個更一般的問題：
 <strong>你的設計系統有沒有偷偷綁定某個業務假設？</strong></li>
-</ul></div></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="文件選項卡"><a class="pagination-nav__link pagination-nav__link--prev" href="/dooping-design-book/preview/adr/tokens-are-the-only-hard-dependency/"><div class="pagination-nav__sublabel">上一頁</div><div class="pagination-nav__label">ADR-0005：token 是唯一的硬相依</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#背景" class="table-of-contents__link toc-highlight">背景</a></li><li><a href="#選項" class="table-of-contents__link toc-highlight">選項</a></li><li><a href="#決定" class="table-of-contents__link toc-highlight">決定</a></li><li><a href="#理由" class="table-of-contents__link toc-highlight">理由</a></li><li><a href="#影響" class="table-of-contents__link toc-highlight">影響</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Dooping Design Book · 設計語言與模式手冊 · MIT</div></div></div></footer></div>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="修訂v021從不留來源語彙擴為不綁死任何產業">修訂（v0.2.1）：從「不留來源語彙」擴為「不綁死任何產業」<a href="#修訂v021從不留來源語彙擴為不綁死任何產業" class="hash-link" aria-label="修訂（v0.2.1）：從「不留來源語彙」擴為「不綁死任何產業」的直接連結" title="修訂（v0.2.1）：從「不留來源語彙」擴為「不綁死任何產業」的直接連結" translate="no">​</a></h2>
+<p>原本的「影響」寫著：<em>所有示範資料統一使用中性商業情境。</em> 而當時挑的那套「中性商業情境」，
+是一整組交易型系統的欄位——單據、往來對象與其明細。</p>
+<p><strong>那不是中性，只是換了一個領域。</strong> 它犯的正是上面「理由 1」講的錯：
+抄走示範的人會連那套資料模型一起抄走。之所以三個版本都沒被發現，
+只是因為它不在守衛的詞表上——<strong>守衛只認得它被教過的那一個領域</strong>。</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="修訂後的規則">修訂後的規則<a href="#修訂後的規則" class="hash-link" aria-label="修訂後的規則的直接連結" title="修訂後的規則的直接連結" translate="no">​</a></h3>
+<ol>
+<li class=""><strong>示範資料一律抽象</strong>：欄位用「項目／單位／類別／負責組別／狀態」這種不對應任何
+真實業務物件的名稱，值用甲乙丙丁。長短差異只為了示範截斷與欄寬，不為了像真的。</li>
+<li class=""><strong>詞表涵蓋四層</strong>：來源專案領域、企業系統（ERP／CRM／BPM／MES）、其他產業
+（醫療／教育／金融／零售餐飲／物流／法律不動產）、英文對應詞。</li>
+<li class=""><strong>示範資料只能有一個來源</strong>：<code>packages/react/src/demo/sample-data.ts</code>。
+文件與 stories 不得自行宣告資料集——每一份複本都是新領域可以溜進來的入口。
+守衛見 <code>tests/demo-data.test.ts</code>。</li>
+<li class=""><strong>守衛自己要被驗證</strong>：比對邏輯抽成可測函式並附自我測試。
+沒有這一步，「全綠」與「空轉」在報告上長得一模一樣。</li>
+</ol>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="代價要說清楚">代價（要說清楚）<a href="#代價要說清楚" class="hash-link" aria-label="代價（要說清楚）的直接連結" title="代價（要說清楚）的直接連結" translate="no">​</a></h3>
+<p>這些詞從此在本 repo 內<strong>連舉例都不能用</strong>。想寫「假設你在做一個某某系統」會被擋下來，
+要改寫成抽象敘述。這是刻意的：舉例正是領域滲進來最常見的路徑。</p>
+<p>確有必要保留某個詞，開一則新的 ADR 討論，不要默默把它從詞表刪掉。</p>
+<p>刻意<strong>不列</strong>的三個詞是判斷而非遺漏——<code>主管</code>（「印出來給主管簽名」是通用敘述）、
+<code>中位數</code>（統計詞彙不是領域詞彙）、<code>跟進</code>（「需不需要跟進」是通用中文）。</p></div></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="文件選項卡"><a class="pagination-nav__link pagination-nav__link--prev" href="/dooping-design-book/preview/adr/tokens-are-the-only-hard-dependency/"><div class="pagination-nav__sublabel">上一頁</div><div class="pagination-nav__label">ADR-0005：token 是唯一的硬相依</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#背景" class="table-of-contents__link toc-highlight">背景</a></li><li><a href="#選項" class="table-of-contents__link toc-highlight">選項</a></li><li><a href="#決定" class="table-of-contents__link toc-highlight">決定</a></li><li><a href="#理由" class="table-of-contents__link toc-highlight">理由</a></li><li><a href="#影響" class="table-of-contents__link toc-highlight">影響</a></li><li><a href="#修訂v021從不留來源語彙擴為不綁死任何產業" class="table-of-contents__link toc-highlight">修訂（v0.2.1）：從「不留來源語彙」擴為「不綁死任何產業」</a><ul><li><a href="#修訂後的規則" class="table-of-contents__link toc-highlight">修訂後的規則</a></li><li><a href="#代價要說清楚" class="table-of-contents__link toc-highlight">代價（要說清楚）</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Dooping Design Book · 設計語言與模式手冊 · MIT</div></div></div></footer></div>
 </body>
 </html>

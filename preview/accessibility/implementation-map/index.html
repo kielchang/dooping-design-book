@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">實作對照 | Dooping Design Book</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://kielchang.github.io/dooping-design-book/preview/accessibility/implementation-map/"><meta data-rh="true" property="og:locale" content="zh_Hant"><meta data-rh="true" name="docusaurus_locale" content="zh-Hant"><meta data-rh="true" name="docsearch:language" content="zh-Hant"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="實作對照 | Dooping Design Book"><meta data-rh="true" name="description" content="四條原則講的是該做什麼，驗收清單"><meta data-rh="true" property="og:description" content="四條原則講的是該做什麼，驗收清單"><link data-rh="true" rel="icon" href="/dooping-design-book/preview/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://kielchang.github.io/dooping-design-book/preview/accessibility/implementation-map/"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/preview/accessibility/implementation-map/" hreflang="zh-Hant"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/preview/accessibility/implementation-map/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"無障礙 Accessibility","item":"https://kielchang.github.io/dooping-design-book/preview/accessibility"},{"@type":"ListItem","position":2,"name":"實作對照","item":"https://kielchang.github.io/dooping-design-book/preview/accessibility/implementation-map"}]}</script><link rel="stylesheet" href="/dooping-design-book/preview/assets/css/styles.dca17ef7.css">
-<script src="/dooping-design-book/preview/assets/js/runtime~main.9b6c365f.js" defer="defer"></script>
+<script src="/dooping-design-book/preview/assets/js/runtime~main.87c049dc.js" defer="defer"></script>
 <script src="/dooping-design-book/preview/assets/js/main.cc5661c6.js" defer="defer"></script>
 </head>
 <body>
@@ -45,7 +45,7 @@
 <p>元件幫你處理的是<strong>結構性</strong>的無障礙。剩下這些只有你自己能做，
 而且是<a class="" href="/dooping-design-book/preview/accessibility/checklist/">驗收清單</a>真正要檢查的部分：</p>
 <ul>
-<li class=""><strong>文案</strong>：<code>aria-label</code> 寫「關閉」還是「關閉客戶編輯對話框」，差別很大</li>
+<li class=""><strong>文案</strong>：<code>aria-label</code> 寫「關閉」還是「關閉單位編輯對話框」，差別很大</li>
 <li class=""><strong>順序</strong>：DOM 順序＝閱讀順序。用 CSS 調換視覺位置會讓報讀器讀出錯的順序</li>
 <li class=""><strong>錯誤訊息</strong>：要和欄位關聯（<code>aria-describedby</code>），不是只在頁面頂端放一段紅字</li>
 <li class=""><strong>焦點去向</strong>：刪除一列之後焦點該落在哪？沒有指定的話會回到 <code>&lt;body&gt;</code></li>

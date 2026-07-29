@@ -40,8 +40,14 @@ const PAGE_BG = {
 // ── 六組主題色 ─────────────────────────────────────────────
 // hue 是 OKLCH 角度。狀態色佔用 danger 17.7°／destructive 25.3°／warning 70.6°／
 // edit 83.9°／success 162.4°／info 238.1°，主題色相刻意與這些保持距離。
+// `neutralBrand` = 這一組**沒有品牌色**，`--brand` 直接鏡射 `--primary`。
+//
+// 石墨的定位是「不挑主題時等同現況」，而現況本來就沒有 `--brand`。先前讓它照公式生成
+// 一個 chroma 0.030 的灰藍，結果填色按鈕與**停用**按鈕幾乎同色——實測距停用外觀
+// 只有 ΔE00 8.5（淺）／7.9（深），低於 10 就是實務上分不開。
+// 那不是色相問題，是「用一個近中性色去做實色填底」本身就會撞到 disabled 的視覺位置。
 const THEMES = [
-  { name: "graphite", label: "石墨", hue: 265, cap: 0.030 },
+  { name: "graphite", label: "石墨", hue: 265, cap: 0.030, neutralBrand: true },
   { name: "indigo",   label: "靛藍", hue: 272, cap: 0.150 },
   { name: "violet",   label: "藍紫", hue: 292, cap: 0.150 },
   { name: "amethyst", label: "紫晶", hue: 305, cap: 0.150 },
@@ -100,7 +106,7 @@ function tintNeutral(mode, hue) {
   return out;
 }
 
-function buildTheme({ hue, cap }) {
+function buildTheme({ hue, cap, neutralBrand = false }) {
   const out = { light: {}, dark: {} };
 
   for (const mode of ["light", "dark"]) {
@@ -113,8 +119,17 @@ function buildTheme({ hue, cap }) {
 
     // brand：關鍵 CTA 的填色。解 L 使白字達 4.5:1，取最亮的合格解——
     // 最亮＝色彩最鮮明而不過於沉重，且仍留在文字對比門檻內。
-    const brand = solveLightness(hue, c, WHITE, 4.5, { from: 0.30, to: 0.80, prefer: "max" });
+    //
+    // 無彩主題例外：鏡射 primary。前景**必須跟著鏡射 primary-foreground**，
+    // 不能沿用下面寫死的白——深色模式的 primary 是近白（`210 40% 98%`），
+    // 配白字會變成白底白字。
+    const brand = neutralBrand
+      ? { rgb: px({ mode, name: "primary" }) }
+      : solveLightness(hue, c, WHITE, 4.5, { from: 0.30, to: 0.80, prefer: "max" });
     if (!brand) throw new Error(`${mode} brand 無解（hue ${hue}）`);
+    const brandFg = neutralBrand
+      ? tokens.color[mode]["primary-foreground"].value
+      : "0 0% 100%";
 
     // brand-subtle：選中的導覽項、分頁底線區的淡底。
     //
@@ -151,8 +166,13 @@ function buildTheme({ hue, cap }) {
 
     out[mode] = {
       ...neutral,
-      brand: { value: rgb8ToHsl(brand.rgb), desc: "主題色：關鍵動作填色／品牌強調" },
-      "brand-foreground": { value: "0 0% 100%", desc: "brand 上的文字" },
+      brand: {
+        value: rgb8ToHsl(brand.rgb),
+        desc: neutralBrand
+          ? "主題色：本組無品牌色，鏡射 primary"
+          : "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）",
+      },
+      "brand-foreground": { value: brandFg, desc: "brand 上的文字" },
       "brand-subtle": { value: rgb8ToHsl(subtle), desc: "主題色淡底：選中的導覽項、分頁底線區" },
       "brand-subtle-foreground": { value: rgb8ToHsl(onSubtle.rgb), desc: "brand-subtle 上的文字" },
       ring: { value: rgb8ToHsl(ring.rgb), desc: "鍵盤聚焦環（吃主題色相）" },
@@ -391,15 +411,23 @@ if (statusLog.length) {
   for (const l of statusLog) console.log(l);
   console.log("");
 }
-console.log("主題色（brand 白字 4.5:1／ring 對該模式最亮表面 3:1）");
+console.log("主題色（brand 對其前景 4.5:1／ring 對該模式最亮表面 3:1）");
 for (const t of THEMES) {
   const th = themes[t.name];
+  // 一律拿**該主題自己的**前景與表面去量，不要拿理想白或未轉色相的基準值——
+  // 這支報告先前兩次都犯過：ring 拿沒轉色相的 muted 去比，brand 拿純白去比，
+  // 於是印出低於門檻的假數字。報告算錯對象比不印還糟，它會讓人去修沒壞的東西。
+  const cB = (m) => contrast(hslToRgb8(th[m].brand.value), hslToRgb8(th[m]["brand-foreground"].value));
+  const cR = (m) => contrast(
+    hslToRgb8(th[m].ring.value),
+    hslToRgb8((th[m][m === "light" ? "background" : "muted"] ?? tokens.color[m][m === "light" ? "background" : "muted"]).value),
+  );
   const b = { l: hslToRgb8(th.light.brand.value), d: hslToRgb8(th.dark.brand.value) };
   const r = { l: hslToRgb8(th.light.ring.value), d: hslToRgb8(th.dark.ring.value) };
   console.log(
     `  ${t.label} ${t.name.padEnd(9)} H=${String(t.hue).padStart(3)}  ` +
-    `brand ${rgb8ToHex(b.l)}/${rgb8ToHex(b.d)} 白字 ${contrast(b.l, WHITE).toFixed(2)}/${contrast(b.d, WHITE).toFixed(2)}  ` +
-    `ring ${rgb8ToHex(r.l)}/${rgb8ToHex(r.d)} ${contrast(r.l, HARDEST_SURFACE.light).toFixed(2)}/${contrast(r.d, HARDEST_SURFACE.dark).toFixed(2)}`,
+    `brand ${rgb8ToHex(b.l)}/${rgb8ToHex(b.d)} 前景 ${cB("light").toFixed(2)}/${cB("dark").toFixed(2)}  ` +
+    `ring ${rgb8ToHex(r.l)}/${rgb8ToHex(r.d)} ${cR("light").toFixed(2)}/${cR("dark").toFixed(2)}`,
   );
 }
 console.log("\n圖表色票");

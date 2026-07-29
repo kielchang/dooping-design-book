@@ -27,6 +27,8 @@ const DANGER_MIN = 18;     // 分類色與 danger 的距離：紅線會被讀成
 const BRAND_STATUS_MIN = 12; // 主題色與狀態色的感知距離：主色像成功色會讓「綠色＝通過」失效
 const BRAND_HUE_GAP = 25;  // 主題色與狀態色的**色相**距離：警報色域（0–95°）是保留區
 const SUBTLE_MIN = 6;      // brand-subtle 與 muted 的距離：否則「被選中」看起來只是「有點灰」
+const BRAND_DISABLED_MIN = 12; // brand 與停用外觀的距離：近中性的主題色會被讀成 disabled
+const CHROMATIC_MIN = 0.04;    // 低於此視為無彩：色相角度在近中性色上沒有感知意義
 
 const MODES = ["light", "dark"];
 const STATUS = ["success", "warning", "danger", "info", "destructive", "edit"];
@@ -103,20 +105,40 @@ export function runChecks() {
       //    danger 18°／destructive 25°／warning 71°／edit 83° 把 0–95° 整段吃滿。
       //    主題落在那裡就算個別色票分得開（明度差會把 ΔE00 拉大），
       //    也等於把「瞬間反應」這個通道花在品牌上——畫面上到處是暖色，紅色就不再突出。
+      //    **色相規則只在顏色真的有彩度時才成立。** 近中性色的色相角度數值上存在、
+      //    感知上不存在——一顆近白的按鈕不可能「佔用警報色域」。石墨的 brand 鏡射
+      //    primary 之後在深色是近白（chroma 0.0035），量出來距 info 只有 13°，
+      //    但那是把一個無意義的角度拿去比。低於這個彩度就跳過色相檢查。
       const hueGap = (a, b) => { const d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; };
-      const bh = rgb8ToOklch(brand)[2];
-      let nearH = { g: 360, s: "" };
-      for (const s of STATUS) {
-        const g = hueGap(bh, rgb8ToOklch(px(mode, s))[2]);
-        if (g < nearH.g) nearH = { g, s };
+      const [, brandChroma, bh] = rgb8ToOklch(brand);
+      if (brandChroma >= CHROMATIC_MIN) {
+        let nearH = { g: 360, s: "" };
+        for (const s of STATUS) {
+          const g = hueGap(bh, rgb8ToOklch(px(mode, s))[2]);
+          if (g < nearH.g) nearH = { g, s };
+        }
+        push(nearH.g >= BRAND_HUE_GAP,
+          `${tag} brand 色相距 ${nearH.s} 只有 ${nearH.g.toFixed(0)}°（需 ${BRAND_HUE_GAP}°）` +
+          `——主題不該住進警報色域`);
       }
-      push(nearH.g >= BRAND_HUE_GAP,
-        `${tag} brand 色相距 ${nearH.s} 只有 ${nearH.g.toFixed(0)}°（需 ${BRAND_HUE_GAP}°）` +
-        `——主題不該住進警報色域`);
+
+      // 1b. brand 當實色填底時，不得被讀成**停用**。
+      //
+      // `Button` 的停用態是 `disabled:opacity-50`，所以使用者看到的「停用外觀」
+      // 就是 primary 以 50% 疊在背景上。近中性的主題色做成填色按鈕會正好撞進那個位置——
+      // 石墨先前照公式生成的 chroma 0.030 灰藍，距停用外觀只有 ΔE00 8.5／7.9，
+      // 使用者實際看 Storybook 時第一眼就說它「像停用」。
+      // 修法是讓無彩主題的 brand 直接鏡射 primary（近黑／近白），而不是硬擠出一個灰。
+      const disabled = px(mode, "primary").map((v, i) =>
+        Math.round(v * 0.5 + pageBgOf(name, mode)[i] * 0.5));
+      const dDisabled = deltaE00(lab(brand), lab(disabled));
+      push(dDisabled >= BRAND_DISABLED_MIN,
+        `${tag} brand 與停用外觀只差 ΔE00 ${dDisabled.toFixed(1)}（需 ${BRAND_DISABLED_MIN}）` +
+        `——填色按鈕會被讀成停用`);
 
       // 2. 飽和度層：警報必須是畫面上最飽和的東西。
       //    danger 的 chroma 若被主題超過，紅色就從「最搶眼」降級成「其中一個彩色」。
-      const cBrandChroma = rgb8ToOklch(brand)[1];
+      const cBrandChroma = brandChroma;
       const cDanger = rgb8ToOklch(px(mode, "danger"))[1];
       push(cBrandChroma < cDanger,
         `${tag} brand 的 chroma ${cBrandChroma.toFixed(3)} 不低於 danger 的 ${cDanger.toFixed(3)}` +

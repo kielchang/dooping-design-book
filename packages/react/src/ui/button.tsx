@@ -43,7 +43,24 @@ export interface ButtonProps
  * `brand` 是**色相主題色**，跟著 `<html data-color-theme>` 走；`default` 則是中性的近黑殼，
  * 與主題無關。這個分工是刻意的：資料密集的後台畫面上按鈕很多，全部吃主題色會讓
  * 高飽和色的出現面積失控（色彩疲勞管的是面積與頻率，不是色相數量）。
- * 因此 `brand` 只給**一頁一顆**的關鍵動作，其餘一律 `default`。
+ *
+ * ## `brand` 不要用在「確認／送出／儲存」上
+ *
+ * 這兩件事的職責不同：`--brand` 負責**識別**（這是誰的產品），確認按鈕負責
+ * **指示可供性**（按下去會提交）。讓一個 token 同時做兩件事，就是 `destructive`
+ * 與 `danger` 當初分家的那個錯。
+ *
+ * 而且色相帶著既成慣例：綠＝通行、藍＝系統預設動作、紅＝停止、灰＝停用。
+ * 紫與洋紅**沒有動作慣例**，放在確認按鈕上會被讀成裝飾而不是功能控制項——
+ * 主題切到藍紫或紫晶時，一顆紫色的「送出申請」就是這樣來的。
+ *
+ * | 用 `brand` | 用 `default`（`--primary`） |
+ * | --- | --- |
+ * | logo 區、品牌強調 | **確認、送出、儲存、套用** |
+ * | 「開始新流程」這類非提交型入口 | 一般操作 |
+ * | 選中的導覽項（走 `--brand-subtle`） | 取消、返回 |
+ *
+ * 提交性動作在**任何主題下都用 `default`**，色相就永遠不會與動作語意打架。
  */
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {

@@ -3,7 +3,7 @@ export default {
   "$comment": "Dooping 設計 token 唯一來源（框架中立）。CSS 變數與 Tailwind preset 皆由此檔產生，勿直接改 dist/。色彩值以 HSL 三元組字串表示（可被 hsl(var(--x) / <alpha>) 套用透明度）；chart.* 例外為 hex（SVG fill/stroke 直接吃 var()，不經 hsl() 包裝）。",
   "meta": {
     "name": "dooping",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "defaultTheme": "graphite"
   },
   "color": {
@@ -611,11 +611,11 @@ export default {
           "desc": "欄位語意：唯讀／計算值"
         },
         "brand": {
-          "value": "220 10.9% 48.4%",
-          "desc": "主題色：關鍵動作填色／品牌強調"
+          "value": "222.2 47.4% 11.2%",
+          "desc": "主題色：本組無品牌色，鏡射 primary"
         },
         "brand-foreground": {
-          "value": "0 0% 100%",
+          "value": "210 40% 98%",
           "desc": "brand 上的文字"
         },
         "brand-subtle": {
@@ -669,11 +669,11 @@ export default {
           "value": "220 16% 15%"
         },
         "brand": {
-          "value": "220 8.6% 48%",
-          "desc": "主題色：關鍵動作填色／品牌強調"
+          "value": "210 40% 98%",
+          "desc": "主題色：本組無品牌色，鏡射 primary"
         },
         "brand-foreground": {
-          "value": "0 0% 100%",
+          "value": "222.2 47.4% 11.2%",
           "desc": "brand 上的文字"
         },
         "brand-subtle": {
@@ -744,7 +744,7 @@ export default {
         },
         "brand": {
           "value": "229.7 55.5% 58.6%",
-          "desc": "主題色：關鍵動作填色／品牌強調"
+          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
         },
         "brand-foreground": {
           "value": "0 0% 100%",
@@ -802,7 +802,7 @@ export default {
         },
         "brand": {
           "value": "228.5 39.2% 55.5%",
-          "desc": "主題色：關鍵動作填色／品牌強調"
+          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
         },
         "brand-foreground": {
           "value": "0 0% 100%",
@@ -876,7 +876,7 @@ export default {
         },
         "brand": {
           "value": "254.3 49.3% 59.8%",
-          "desc": "主題色：關鍵動作填色／品牌強調"
+          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
         },
         "brand-foreground": {
           "value": "0 0% 100%",
@@ -934,7 +934,7 @@ export default {
         },
         "brand": {
           "value": "252.2 33.6% 56.9%",
-          "desc": "主題色：關鍵動作填色／品牌強調"
+          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
         },
         "brand-foreground": {
           "value": "0 0% 100%",
@@ -1008,7 +1008,7 @@ export default {
         },
         "brand": {
           "value": "269.4 44.5% 56.9%",
-          "desc": "主題色：關鍵動作填色／品牌強調"
+          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
         },
         "brand-foreground": {
           "value": "0 0% 100%",
@@ -1066,7 +1066,7 @@ export default {
         },
         "brand": {
           "value": "268.3 31% 54.5%",
-          "desc": "主題色：關鍵動作填色／品牌強調"
+          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
         },
         "brand-foreground": {
           "value": "0 0% 100%",
@@ -1140,7 +1140,7 @@ export default {
         },
         "brand": {
           "value": "180.5 100% 26.1%",
-          "desc": "主題色：關鍵動作填色／品牌強調"
+          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
         },
         "brand-foreground": {
           "value": "0 0% 100%",
@@ -1198,7 +1198,7 @@ export default {
         },
         "brand": {
           "value": "180.5 100% 26.1%",
-          "desc": "主題色：關鍵動作填色／品牌強調"
+          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
         },
         "brand-foreground": {
           "value": "0 0% 100%",
@@ -1272,7 +1272,7 @@ export default {
         },
         "brand": {
           "value": "96 48% 34.7%",
-          "desc": "主題色：關鍵動作填色／品牌強調"
+          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
         },
         "brand-foreground": {
           "value": "0 0% 100%",
@@ -1330,7 +1330,7 @@ export default {
         },
         "brand": {
           "value": "98.4 31% 38.6%",
-          "desc": "主題色：關鍵動作填色／品牌強調"
+          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
         },
         "brand-foreground": {
           "value": "0 0% 100%",

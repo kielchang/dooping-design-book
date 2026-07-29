@@ -14,7 +14,7 @@ export const 按鈕: Story = {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         <Button>主要動作</Button>
-        <Button variant="brand">送出申請</Button>
+        <Button variant="brand">開始新流程</Button>
         <Button variant="secondary">次要動作</Button>
         <Button variant="outline">外框</Button>
         <Button variant="ghost">淡化</Button>
@@ -23,9 +23,28 @@ export const 按鈕: Story = {
       </div>
       <p className="max-w-2xl text-xs text-muted-foreground">
         用工具列的<strong>色相</strong>切主題：只有 <code>brand</code> 那顆會變，其餘全部不動。
-        這是刻意的——資料密集的畫面上按鈕很多，全部吃主題色會讓高飽和色的<strong>出現面積</strong>失控
-        （色彩疲勞管的是面積與頻率，不是色相種類數）。<code>brand</code> 只給一頁一顆的關鍵動作。
+        資料密集的畫面上按鈕很多，全部吃主題色會讓高飽和色的<strong>出現面積</strong>失控
+        （色彩疲勞管的是面積與頻率，不是色相種類數）。切到<strong>石墨</strong>時 <code>brand</code>
+        會與 <code>default</code> 完全一樣——那一組刻意沒有品牌色。
       </p>
+
+      <div className="max-w-2xl space-y-2 rounded-md border border-l-4 border-l-danger bg-danger-subtle p-3 text-danger-subtle-foreground">
+        <p className="text-xs font-semibold">brand 不要用在確認／送出／儲存上</p>
+        <div className="flex flex-wrap items-center gap-4">
+          <span className="flex items-center gap-2 text-xs">
+            <Button size="sm">送出申請</Button> 正確
+          </span>
+          <span className="flex items-center gap-2 text-xs">
+            <Button size="sm" variant="brand">送出申請</Button> 錯誤
+          </span>
+        </div>
+        <p className="text-xs leading-relaxed">
+          <code>--brand</code> 的職責是<strong>識別</strong>（這是誰的產品），確認按鈕的職責是
+          <strong>指示可供性</strong>（按下去會提交）。色相帶著既成慣例——綠＝通行、藍＝系統預設、
+          紅＝停止、灰＝停用；紫與洋紅<strong>沒有動作慣例</strong>，放在確認按鈕上會讀成裝飾。
+          把工具列切到藍紫或紫晶，比較上面兩顆就看得出來。
+        </p>
+      </div>
       <div className="flex flex-wrap items-center gap-2">
         <Button size="sm">小</Button>
         <Button>預設</Button>

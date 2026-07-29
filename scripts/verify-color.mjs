@@ -1,4 +1,4 @@
-// 色彩驗收 —— 七組色相主題 × 淺深兩模式，所有門檻都在這裡擋。
+// 色彩驗收 —— 六組色相主題 × 淺深兩模式，所有門檻都在這裡擋。
 //
 //   node scripts/verify-color.mjs        # 印報告，不合格時 exit 1
 //
@@ -66,8 +66,9 @@ export function runChecks() {
       const dMuted = deltaE00(lab(at("brand-subtle")), lab(px(mode, "muted")));
       push(dMuted >= SUBTLE_MIN, `${tag} brand-subtle 與 muted 只差 ΔE00 ${dMuted.toFixed(1)}（需 ${SUBTLE_MIN}）`);
 
-      // brand 與狀態色的感知距離。松綠 178° 距 success 162° 只有 16°，這條專門盯它——
-      // 主色如果看起來像「成功」，使用者會停止把綠色讀成狀態。
+      // brand 與狀態色的感知距離。主色如果看起來像「成功」，使用者會停止把綠色讀成狀態。
+      // 這條擋掉過一組候選：松綠 178° 距 success 162° 只有 16°，量出來 ΔE00 17.4——
+      // 數字過得了門檻，但它確實是最像狀態色的一組，因此沒有收進預設清單。
       let nearest = { d: Infinity, s: "" };
       for (const s of STATUS) {
         const d = deltaE00(lab(brand), lab(px(mode, s)));

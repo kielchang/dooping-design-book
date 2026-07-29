@@ -37,7 +37,7 @@ const PAGE_BG = {
   dark: px({ mode: "dark", name: "background" }),
 };
 
-// ── 七組主題色 ─────────────────────────────────────────────
+// ── 六組主題色 ─────────────────────────────────────────────
 // hue 是 OKLCH 角度。狀態色佔用 danger 17.7°／destructive 25.3°／warning 70.6°／
 // edit 83.9°／success 162.4°／info 238.1°，主題色相刻意與這些保持距離。
 const THEMES = [
@@ -46,7 +46,6 @@ const THEMES = [
   { name: "violet",   label: "藍紫", hue: 292, cap: 0.150 },
   { name: "amethyst", label: "紫晶", hue: 305, cap: 0.150 },
   { name: "teal",     label: "青玉", hue: 195, cap: 0.130 },
-  { name: "pine",     label: "松綠", hue: 178, cap: 0.130 },
   { name: "moss",     label: "苔綠", hue: 135, cap: 0.130 },
 ];
 const DEFAULT_THEME = "graphite";

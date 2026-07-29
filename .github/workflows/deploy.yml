@@ -64,3 +64,30 @@ jobs:
       - name: 發佈到 gh-pages 根目錄（保留 preview/）
         run: |
           bash scripts/deploy-gh-pages.sh book/build . "deploy(main) ${{ github.sha }}"
+
+      # 進版 tag 是部署的「紀錄」，不是閘門——真正的閘門是 dev → main 的合併。
+      # 放在發佈之後：部署失敗就不會有 tag，tag 永遠代表「真的上線過」。
+      #
+      # 這個 tag 不觸發任何東西：release-* 不符合 publish-tokens.yml 的 tokens-v*
+      # glob，而且 GITHUB_TOKEN 建立的 ref 依 GitHub 防遞迴機制不會觸發其他
+      # workflow——雙重保險。npm 發佈仍然只有人工的 tokens-v* 或 workflow_dispatch。
+      - name: 蓋上進版 tag（release-YYYY-MM-DD）
+        run: |
+          git fetch --tags -q origin
+          # 不用 grep -q：pipefail 下 -q 提早退出可能讓 git tag 吃 SIGPIPE，
+          # 把「已有 tag」誤判成「沒有」。不加 -q 會讀完整個輸出，順便印出既有 tag。
+          if git tag --points-at HEAD | grep '^release-'; then
+            echo "此 commit 已有進版 tag，跳過（重跑不重複打）"
+            exit 0
+          fi
+          BASE="release-$(TZ=Asia/Taipei date +%F)"
+          TAG="$BASE"; N=2
+          while git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; do
+            TAG="$BASE-$N"; N=$((N+1))
+          done
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "進版 $TAG" -m "commit ${{ github.sha }}" \
+            -m "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          git push origin "$TAG"
+          echo "### 🏷 $TAG" >> "$GITHUB_STEP_SUMMARY"

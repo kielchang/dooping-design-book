@@ -2,6 +2,27 @@
 title: 資料表標準
 ---
 
+export const rows = [
+  { id: "SO-2401", customer: "遠東貿易", item: "工業級軸承 6204", qty: 120, amount: 84000, status: "已出貨" },
+  { id: "SO-2402", customer: "宏昌實業", item: "不鏽鋼板 304 2mm", qty: 40, amount: 156400, status: "已確認" },
+  { id: "SO-2403", customer: "台興機械", item: "伺服馬達 750W", qty: 6, amount: 213000, status: "已確認" },
+  { id: "SO-2404", customer: "遠東貿易", item: "潤滑油 20L", qty: 80, amount: 32800, status: "草稿" },
+  { id: "SO-2405", customer: "永盛五金", item: "六角螺栓 M10", qty: 5000, amount: 47500, status: "已出貨" },
+  { id: "SO-2406", customer: "中鼎工程", item: "控制箱 IP65", qty: 12, amount: 268800, status: "已確認" },
+  { id: "SO-2407", customer: "宏昌實業", item: "鋁擠型 40x40", qty: 300, amount: 91200, status: "已取消" },
+];
+
+export const nt = (n) => n.toLocaleString("en-US");
+
+export const columns = [
+  { key: "id", header: "訂單編號", freeze: true, cell: (r) => r.id, sortValue: (r) => r.id, filterText: (r) => r.id },
+  { key: "customer", header: "客戶", cell: (r) => r.customer, sortValue: (r) => r.customer, filterText: (r) => r.customer, filter: "select" },
+  { key: "item", header: "品項", truncate: 160, cell: (r) => r.item, sortValue: (r) => r.item, filterText: (r) => r.item },
+  { key: "qty", header: "數量", numeric: true, cell: (r) => nt(r.qty), sortValue: (r) => r.qty, total: (rs) => nt(rs.reduce((s, r) => s + r.qty, 0)) },
+  { key: "amount", header: "金額", numeric: true, cell: (r) => `$${nt(r.amount)}`, sortValue: (r) => r.amount, total: (rs) => `$${nt(rs.reduce((s, r) => s + r.amount, 0))}` },
+  { key: "status", header: "狀態", cell: (r) => r.status, sortValue: (r) => r.status, filterText: (r) => r.status, filter: "select" },
+];
+
 # 資料表標準
 
 ## 問題
@@ -26,6 +47,28 @@ title: 資料表標準
   freeze: true,                         // 凍結首欄
 }
 ```
+
+上面那份設定產出的，就是下面這張表——**九條標準全部由欄位設定驅動，沒有一條是另外寫的**：
+
+<Demo title="試試搜尋、點欄頭排序、點漏斗篩選、拖曳欄邊界">
+  <DataTable
+    rows={rows}
+    columns={columns}
+    getRowKey={(r) => r.id}
+    initialSort={{ key: "amount", dir: "desc" }}
+    pageSize={5}
+    csv={{
+      headers: ["訂單編號", "客戶", "品項", "數量", "金額", "狀態"],
+      row: (r) => [r.id, r.customer, r.item, r.qty, r.amount, r.status],
+      fileName: "orders.csv",
+    }}
+  />
+</Demo>
+
+:::note 這是真元件
+文件站直接編譯 `packages/react` 的原始碼，不是截圖。
+逐條 API 說明在 [DataTable 元件頁](/components/data-table)。
+:::
 
 ## 九條標準
 

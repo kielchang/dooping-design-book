@@ -11,9 +11,59 @@ title: 漂移防護
 不是因為大家不專業，是因為趕時間的時候，**違反規則永遠是比較快的選項**：
 硬編一個顏色比查 token 快、複製一段 `<table>` 比讀 DataTable 的 API 快。
 
-## 做法：把規則寫成測試
+## 三道防線，依「防漏成本」排序
 
-規則寫進 CI，違反就紅燈。這是唯一能撐過三個月的方式。
+同一條規則可以擋在三個不同的地方，越前面越便宜：
+
+| 防線 | 手段 | 擋掉什麼 |
+| --- | --- | --- |
+| **① 編譯層** | 清空 Tailwind 預設色盤 | `bg-red-500` **根本產不出樣式**，不必靠人抓 |
+| **② lint** | ESLint 規則 | 繞過編譯層的逃逸路徑：`bg-[#fff]`、inline style 硬編色、深入內部路徑 |
+| **③ 測試** | 守衛測試 | 結構性規則：相依邊界、token 成對、產物同步 |
+
+:::tip 前兩道保護「取用端」，第三道保護「規範本身」
+只做測試守衛的話，規範 repo 很乾淨，但**取用端照樣可以硬編顏色**——
+而跨系統一致正是設計系統存在的理由。三道要一起上。
+:::
+
+### ① 編譯層：讓違規寫不出來
+
+`@dooping/tokens` 的 Tailwind preset **覆蓋**（而非 extend）`theme.colors`，
+所以套用 preset 之後，Tailwind 的預設色盤整個消失：
+
+```js title="tailwind.config.js"
+module.exports = {
+  presets: [require("@dooping/tokens/tailwind-preset")],
+  content: ["./src/**/*.{ts,tsx}"],
+};
+```
+
+```jsx
+<div className="bg-red-500" />   {/* ❌ 產不出樣式，畫面上直接看得出來 */}
+<div className="bg-danger/10" /> {/* ✅ */}
+```
+
+保留 `transparent`／`current`／`inherit`／`white`／`black`——它們不承載品牌語意。
+真的需要額外色階，在自己的 config 用 `theme.extend.colors` 加回去：那是**明示的例外，會出現在 diff 裡**，
+比默默用預設色盤好。
+
+### ② lint：堵住繞路
+
+編譯層擋不住的是**繞路**——`bg-[#ff0000]`、`style={{ color: '#f00' }}`、
+直接 import 上游內部路徑。這些用 ESLint 擋：
+
+```bash
+# 複製到你的專案（跟元件一樣走複製，不是 npm 套件）
+curl -O https://raw.githubusercontent.com/kielchang/dooping-design-book/main/templates/eslint.dooping.cjs
+```
+
+```js title=".eslintrc.cjs"
+module.exports = { extends: ["./eslint.dooping.cjs"] };
+```
+
+規則本身很短，值得讀過再用——尤其 `overrides` 那段要依你的專案結構調整。
+
+## ③ 把結構性規則寫成測試
 
 以下四支守衛是這個 repo 實際在跑的，可以直接抄。
 

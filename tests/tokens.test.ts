@@ -90,11 +90,35 @@ describe("設計 token", () => {
 
   it("Tailwind preset 對映到每個語意色（少一個就會有人回頭硬編色）", () => {
     const preset = require("../packages/tokens/tailwind-preset.cjs");
-    const flat = JSON.stringify(preset.theme.extend.colors);
+    // 色彩刻意放在 theme.colors（覆蓋）而不是 theme.extend.colors（擴充）——見下一支測試。
+    const flat = JSON.stringify(preset.theme.colors);
     const missing = Object.keys(semanticColors("light"))
       .filter((k) => !k.endsWith("-foreground"))
       .filter((k) => !flat.includes(`--${k})`));
     expect(missing, `preset 未對映：${missing.join(", ")}`).toEqual([]);
+  });
+
+  // 三道防漂移防線的第一道：清空 Tailwind 預設色盤，讓 bg-red-500 在取用端
+  // 編譯期就產不出樣式。這一條一旦被改回 extend，防線會安靜地失效——
+  // 畫面不會壞、測試不會紅、只有一致性慢慢流失。所以要有守衛盯著。
+  it("編譯層防線：預設色盤已清空，只留結構性色值與語意色", () => {
+    const preset = require("../packages/tokens/tailwind-preset.cjs");
+
+    expect(preset.theme.colors, "色彩必須放在 theme.colors 覆蓋預設色盤").toBeTruthy();
+    expect(preset.theme.extend?.colors, "色彩不可放在 theme.extend.colors，那樣預設色盤會留著").toBeUndefined();
+
+    const names = Object.keys(preset.theme.colors);
+    const leaked = ["red", "blue", "green", "slate", "gray", "zinc", "amber", "yellow"]
+      .filter((c) => names.includes(c));
+    expect(leaked, `Tailwind 預設色盤外洩：${leaked.join(", ")}`).toEqual([]);
+
+    // 這五個不承載品牌語意，拿掉只會逼人改用 hex 繞路
+    for (const keep of ["transparent", "current", "inherit", "white", "black"]) {
+      expect(names, `結構性色值 ${keep} 不應被移除`).toContain(keep);
+    }
+
+    // 間距／圓角／字級刻度仍走 extend——那些不需要清空（語意化間距是反模式）
+    expect(preset.theme.extend?.spacing, "間距應維持 extend，不要覆蓋 Tailwind 數字刻度").toBeTruthy();
   });
 
   it("深色模式的鉤子兩者皆生效（darkMode 設定含 class 與 data-theme）", () => {

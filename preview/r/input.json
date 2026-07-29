@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "input",
-  "version": "0.2.1",
+  "version": "0.4.0",
   "type": "registry:ui",
   "title": "Input 輸入框",
   "description": "文字輸入，高度對齊控制項尺寸 token。",
@@ -12,7 +12,7 @@
   "files": [
     {
       "path": "dooping/ui/input.tsx",
-      "content": "import * as React from \"react\";\nimport { cn } from \"@/lib/dooping/utils\";\n\n/**\n * 文字輸入。高度對齊 `--size-control`（36px），與 Select／EditableField 同高，\n * 這樣把三種控制項排在同一列時不會出現 1–2px 的參差。\n */\nconst Input = React.forwardRef<HTMLInputElement, React.ComponentProps<\"input\">>(\n  ({ className, type, ...props }, ref) => (\n    <input\n      type={type}\n      className={cn(\n        \"flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors duration-fast file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50\",\n        className,\n      )}\n      ref={ref}\n      {...props}\n    />\n  ),\n);\nInput.displayName = \"Input\";\n\nexport { Input };\n",
+      "content": "import * as React from \"react\";\nimport { cn } from \"@/lib/dooping/utils\";\n\n/**\n * 文字輸入。高度對齊 `--size-control`（36px），與 Select／EditableField 同高，\n * 這樣把三種控制項排在同一列時不會出現 1–2px 的參差。\n */\nconst Input = React.forwardRef<HTMLInputElement, React.ComponentProps<\"input\">>(\n  ({ className, type, ...props }, ref) => (\n    <input\n      type={type}\n      className={cn(\n        \"flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors duration-fast file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background aria-[invalid=true]:border-danger aria-[invalid=true]:bg-danger-subtle disabled:cursor-not-allowed disabled:opacity-50\",\n        className,\n      )}\n      ref={ref}\n      {...props}\n    />\n  ),\n);\nInput.displayName = \"Input\";\n\nexport { Input };\n",
       "type": "registry:ui",
       "target": "components/dooping/input.tsx"
     }

@@ -34,6 +34,45 @@ export function chartColors(mode: ThemeMode = "light"): string[] {
     .map((k) => all[k]);
 }
 
+// 色相主題。`$label`／`$hue` 是註記欄（與 `$comment` 同類），`flatten()` 會自動略過，
+// 因此它們不會混進 token 對映裡。這裡經 `unknown` 轉一次型別：tokens.data.ts 是
+// `as const` 的字面量型別，與這個較寬的結構沒有足夠重疊，直接 cast 會被 TS 擋下。
+type ThemeGroup = { $label?: string; $hue?: number; light: TokenGroup; dark: TokenGroup };
+const allThemes = (raw as unknown as { themes?: Record<string, ThemeGroup> }).themes ?? {};
+
+/** 可用的色相主題名稱（`data-color-theme` 的合法值），依 tokens.json 宣告順序。 */
+export function themeNames(): string[] {
+  return Object.keys(allThemes);
+}
+
+/** 預設主題名稱——宿主未設 `data-color-theme` 時生效的那一組。 */
+export const DEFAULT_THEME: string =
+  (raw.meta as { defaultTheme?: string }).defaultTheme ?? "";
+
+/** 主題的顯示名稱與 OKLCH 色相角度，給文件站與主題切換器用。 */
+export function themeMeta(): { name: string; label: string; hue: number }[] {
+  return Object.entries(allThemes).map(([name, t]) => ({
+    name,
+    label: t.$label ?? name,
+    hue: t.$hue ?? 0,
+  }));
+}
+
+/**
+ * 某個色相主題的 5 個 token（HSL 三元組字串）。
+ *
+ * 主題只影響 brand 三件組與 ring；背景、邊框、狀態色在所有主題之間相同，
+ * 要拿那些請用 `semanticColors()`。
+ */
+export function themeColors(
+  name: string = DEFAULT_THEME,
+  mode: ThemeMode = "light",
+): Record<string, string> {
+  const theme = allThemes[name];
+  if (!theme) throw new Error(`未知的色相主題：${name}（可用：${themeNames().join(", ")}）`);
+  return flatten(theme[mode]);
+}
+
 /** 圖表輔助色（軸線／格線／文字）。 */
 export function chartChrome(mode: ThemeMode = "light"): { axis: string; grid: string; text: string } {
   const all = flatten(raw.chart[mode] as TokenGroup);

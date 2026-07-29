@@ -35,6 +35,14 @@ colors.field = {
   "readonly-foreground": hsl("field-readonly-foreground"),
   border: hsl("field-border"),
 };
+// 主題色（brand 三件組）：preset 只做名稱對映，值由 <html data-color-theme> 決定。
+// 這裡刻意不列舉七組主題——那會變成「preset 知道有哪些主題」，換一組就要改兩個地方。
+colors.brand = {
+  DEFAULT: hsl("brand"),
+  foreground: hsl("brand-foreground"),
+  subtle: hsl("brand-subtle"),
+  "subtle-foreground": hsl("brand-subtle-foreground"),
+};
 // 圖表色票是 hex（SVG 直接吃），不包 hsl()
 colors.chart = Object.fromEntries(keys(tokens.chart.light).map((k) => [k.replace(/^chart-/, ""), `var(--${k})`]));
 

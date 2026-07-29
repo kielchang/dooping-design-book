@@ -9,6 +9,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        brand: "bg-brand text-brand-foreground hover:bg-brand/90",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
@@ -38,6 +39,11 @@ export interface ButtonProps
  *
  * `destructive` 是**控制項語意**（這顆按下去會刪東西），與狀態語意 `danger`（這筆資料有問題）
  * 刻意分成兩個 token — 同一個畫面上兩者常常同時出現，混用會讓「紅色」失去意義。
+ *
+ * `brand` 是**色相主題色**，跟著 `<html data-color-theme>` 走；`default` 則是中性的近黑殼，
+ * 與主題無關。這個分工是刻意的：資料密集的後台畫面上按鈕很多，全部吃主題色會讓
+ * 高飽和色的出現面積失控（色彩疲勞管的是面積與頻率，不是色相數量）。
+ * 因此 `brand` 只給**一頁一顆**的關鍵動作，其餘一律 `default`。
  */
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {

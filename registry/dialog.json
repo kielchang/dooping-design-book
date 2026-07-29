@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "dialog",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "type": "registry:ui",
   "title": "Dialog 對話框",
   "description": "模態對話框（Radix Dialog）。",

@@ -55,17 +55,74 @@ document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
 背景換了，對比結果就要重跑。這是實際踩過的坑。
 :::
 
-## 圖表色票要分別驗
+## 圖表色票是兩組獨立的值，不是「有幾色不一樣」
 
-分類色票在淺色背景上安全，不代表在深色背景上安全。
-這套色票的 8 色裡有 2 色在深色下換了較亮的步階，其餘 6 色兩種模式共用。
+分類色票在淺色背景上安全，不代表在深色背景上安全——但真正的重點不是「驗兩次」，
+是**不要共用**。
+
+一個顏色要同時對白底與深底都達 3:1，OKLCH 的 L 只能落在 `[0.49, 0.67]`，寬度 0.17。
+八色共用一組值，就必然全部擠在中明度；而二色覺者失去的正是色相辨別、保留的是明度。
+共用等於把唯一還能用的維度放棄掉。
 
 ```ts
 import { chartColors } from "@dooping/tokens";
 
-chartColors("light"); // ["#1d4ed8", …]
-chartColors("dark");  // ["#2a5ae5", …] ← 第 1 色與第 7 色不同
+chartColors("light"); // 8 色，L* 落在 30–62
+chartColors("dark");  // 另外 8 色，L* 落在 49–86 —— 沒有任何一色與淺色相同
 ```
+
+`npm run verify:color` 有一條專門擋這件事：只要淺深出現共用值就不合格。
+本書上一版 8 色裡共用了 6 色，就是這樣壞掉的，見 [色彩語意](/foundations/color)。
+
+## 多色相主題
+
+深／淺是**明度**的兩種模式，色相主題是另一個維度。兩者正交，可以任意組合。
+
+```html
+<html data-theme="dark" data-color-theme="indigo">
+```
+
+- `data-theme` / `.dark` —— 明暗，既有機制不變
+- `data-color-theme` —— 色相，**不設就是預設主題（石墨）**，輸出與沒有這個功能時完全一樣
+
+### 主題只影響 5 個 token
+
+| 受主題影響 | 與主題無關 |
+| --- | --- |
+| `--brand` / `--brand-foreground` | `--background`、`--card`、`--border` |
+| `--brand-subtle` / `--brand-subtle-foreground` | `--primary`、`--secondary` |
+| `--ring` | 全部狀態色與圖表色票 |
+
+這是刻意的取捨：換主題**不會**讓介面重心整個變吵，也不會讓同一筆資料在不同主題下換色。
+
+### 七組預設主題
+
+| 名稱 | `data-color-theme` | OKLCH 色相 |
+| --- | --- | --- |
+| 石墨（預設） | `graphite` | 265° |
+| 靛藍 | `indigo` | 272° |
+| 藍紫 | `violet` | 292° |
+| 紫晶 | `amethyst` | 305° |
+| 青玉 | `teal` | 195° |
+| 松綠 | `pine` | 178° |
+| 苔綠 | `moss` | 135° |
+
+### 色相是被狀態色瓜分過的
+
+新增主題時色相不能亂選——狀態色已經佔掉幾段，主色相如果落在附近，
+使用者會停止把那個顏色讀成狀態。
+
+```
+danger 17.7°  destructive 25.3°  warning 70.6°
+edit 83.9°    success 162.4°     info 238.1°
+```
+
+`info` 在 238° 這件事影響最大：**企業系統最常用的藍色主色區被狀態色卡住了**。
+想用傳統企業藍（約 245°）就得先把 `info` 移開，那是會波及既有畫面的決定。
+
+新增主題請改 `packages/tokens/scripts/generate-theme.mjs` 的 `THEMES`，
+跑 `npm run build:theme` 生成，再跑 `npm run verify:color` 驗收——
+其中一條會擋「brand 與最近的狀態色距離不足」。
 
 ## 列印是第三種主題
 

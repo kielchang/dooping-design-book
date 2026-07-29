@@ -3,7 +3,8 @@ export default {
   "$comment": "Dooping 設計 token 唯一來源（框架中立）。CSS 變數與 Tailwind preset 皆由此檔產生，勿直接改 dist/。色彩值以 HSL 三元組字串表示（可被 hsl(var(--x) / <alpha>) 套用透明度）；chart.* 例外為 hex（SVG fill/stroke 直接吃 var()，不經 hsl() 包裝）。",
   "meta": {
     "name": "dooping",
-    "version": "0.1.2"
+    "version": "0.2.0",
+    "defaultTheme": "graphite"
   },
   "color": {
     "$comment": "語意色：命名說的是「這個顏色代表什麼意思」，不是「這是什麼顏色」。換色票時只改這裡，全站語意不變。詳見 ADR-0001。",
@@ -65,7 +66,7 @@ export default {
         "desc": "accent 上的文字"
       },
       "destructive": {
-        "value": "0 84.2% 60.2%",
+        "value": "357.9 70.6% 52%",
         "desc": "破壞性動作控制項（刪除鈕）——控制項語意，非狀態語意"
       },
       "destructive-foreground": {
@@ -89,7 +90,7 @@ export default {
         "desc": "狀態：良好／已完成／通過"
       },
       "success-foreground": {
-        "value": "0 0% 100%",
+        "value": "158.8 100% 12.7%",
         "desc": "success 底上的文字"
       },
       "warning": {
@@ -97,7 +98,7 @@ export default {
         "desc": "狀態：需要注意但不阻擋"
       },
       "warning-foreground": {
-        "value": "0 0% 100%",
+        "value": "37.3 100% 19.2%",
         "desc": "warning 底上的文字"
       },
       "info": {
@@ -105,7 +106,7 @@ export default {
         "desc": "狀態：中性提示／補充說明"
       },
       "info-foreground": {
-        "value": "0 0% 100%",
+        "value": "200.3 100% 15.7%",
         "desc": "info 底上的文字"
       },
       "danger": {
@@ -212,22 +213,22 @@ export default {
         "value": "160 60% 45%"
       },
       "success-foreground": {
-        "value": "0 0% 100%"
+        "value": "162.1 100% 13.1%"
       },
       "warning": {
         "value": "38 92% 55%"
       },
       "warning-foreground": {
-        "value": "0 0% 100%"
+        "value": "38 100% 20%"
       },
       "info": {
         "value": "199 89% 55%"
       },
       "info-foreground": {
-        "value": "0 0% 100%"
+        "value": "198.5 100% 18.4%"
       },
       "danger": {
-        "value": "347 77% 58%"
+        "value": "345.8 69% 53.1%"
       },
       "danger-foreground": {
         "value": "0 0% 100%"
@@ -259,39 +260,30 @@ export default {
     }
   },
   "chart": {
-    "$comment": "分類色票（8 色）：色盲友善。取寶石色相沿色相環一圈排序（藍→青→綠→金→橙→粉→紅→紫），刻意把最不安全的接縫（藍↔紫）拆到陣列兩端不相鄰。狀態語意（success/warning/danger）與分類色票脫鉤：換色票不會改變「紅＝異常」。",
     "light": {
       "chart-1": {
-        "value": "#1d4ed8",
-        "desc": "藍寶石"
+        "value": "#0071c3"
       },
       "chart-2": {
-        "value": "#0e9488",
-        "desc": "海藍寶石"
+        "value": "#8b9e00"
       },
       "chart-3": {
-        "value": "#0e8a5f",
-        "desc": "祖母綠"
+        "value": "#8d1339"
       },
       "chart-4": {
-        "value": "#b88d0a",
-        "desc": "黃玉"
+        "value": "#00a597"
       },
       "chart-5": {
-        "value": "#cf4217",
-        "desc": "紅玉髓"
+        "value": "#955400"
       },
       "chart-6": {
-        "value": "#db5a79",
-        "desc": "粉晶"
+        "value": "#7d1e6c"
       },
       "chart-7": {
-        "value": "#a3123a",
-        "desc": "石榴石"
+        "value": "#00a2c5"
       },
       "chart-8": {
-        "value": "#7e3af2",
-        "desc": "紫水晶"
+        "value": "#008f4e"
       },
       "chart-axis": {
         "value": "#cbd5e1",
@@ -308,28 +300,28 @@ export default {
     },
     "dark": {
       "chart-1": {
-        "value": "#2a5ae5"
+        "value": "#5aa6f2"
       },
       "chart-2": {
-        "value": "#0e9488"
+        "value": "#8b7200"
       },
       "chart-3": {
-        "value": "#0e8a5f"
+        "value": "#67edc0"
       },
       "chart-4": {
-        "value": "#b88d0a"
+        "value": "#008589"
       },
       "chart-5": {
-        "value": "#cf4217"
+        "value": "#f0a150"
       },
       "chart-6": {
-        "value": "#db5a79"
+        "value": "#6a6cc5"
       },
       "chart-7": {
-        "value": "#c11f4a"
+        "value": "#ffb8e1"
       },
       "chart-8": {
-        "value": "#7e3af2"
+        "value": "#f6888d"
       },
       "chart-axis": {
         "value": "#3a465c"
@@ -340,7 +332,8 @@ export default {
       "chart-text": {
         "value": "#94a3b8"
       }
-    }
+    },
+    "$comment": "分類色票（8 色）：淺／深各生一組獨立值，不共用。共用會把 L 鎖在 [0.49,0.67] 的窄帶，八色擠在中明度，二色覺下必然糊成一團。順序即安全性順序——最遠點插入的副產物，取用端拿 chart-1..chart-k 永遠是近似最佳的 k 色子集。狀態語意與分類色票脫鉤，且分類色與 danger 的感知距離硬性 ≥18（紅線會被讀成警告）。"
   },
   "radius": {
     "$comment": "圓角以 --radius 為基準推導，換一個值即可整站從方到圓。",
@@ -498,6 +491,344 @@ export default {
     "tap-target": {
       "value": "44px",
       "desc": "粗指標裝置的最小觸控目標（WCAG 2.5.5）"
+    }
+  },
+  "themes": {
+    "graphite": {
+      "$label": "石墨",
+      "$hue": 265,
+      "light": {
+        "brand": {
+          "value": "220 10.9% 48.4%",
+          "desc": "主題色：關鍵動作填色／品牌強調"
+        },
+        "brand-foreground": {
+          "value": "0 0% 100%",
+          "desc": "brand 上的文字"
+        },
+        "brand-subtle": {
+          "value": "220.6 100% 93.3%",
+          "desc": "主題色淡底：選中的導覽項、分頁底線區"
+        },
+        "brand-subtle-foreground": {
+          "value": "221.5 11.9% 42.7%",
+          "desc": "brand-subtle 上的文字"
+        },
+        "ring": {
+          "value": "220.7 13.9% 60.4%",
+          "desc": "鍵盤聚焦環（吃主題色相）"
+        }
+      },
+      "dark": {
+        "brand": {
+          "value": "220 8.6% 48%",
+          "desc": "主題色：關鍵動作填色／品牌強調"
+        },
+        "brand-foreground": {
+          "value": "0 0% 100%",
+          "desc": "brand 上的文字"
+        },
+        "brand-subtle": {
+          "value": "222.9 58.3% 14.1%",
+          "desc": "主題色淡底：選中的導覽項、分頁底線區"
+        },
+        "brand-subtle-foreground": {
+          "value": "219 8.3% 52.9%",
+          "desc": "brand-subtle 上的文字"
+        },
+        "ring": {
+          "value": "219 8.4% 46.7%",
+          "desc": "鍵盤聚焦環（吃主題色相）"
+        }
+      }
+    },
+    "indigo": {
+      "$label": "靛藍",
+      "$hue": 272,
+      "light": {
+        "brand": {
+          "value": "229.7 55.5% 58.6%",
+          "desc": "主題色：關鍵動作填色／品牌強調"
+        },
+        "brand-foreground": {
+          "value": "0 0% 100%",
+          "desc": "brand 上的文字"
+        },
+        "brand-subtle": {
+          "value": "226.5 100% 93.9%",
+          "desc": "主題色淡底：選中的導覽項、分頁底線區"
+        },
+        "brand-subtle-foreground": {
+          "value": "230.5 47.5% 52.9%",
+          "desc": "brand-subtle 上的文字"
+        },
+        "ring": {
+          "value": "228.8 82.6% 70.8%",
+          "desc": "鍵盤聚焦環（吃主題色相）"
+        }
+      },
+      "dark": {
+        "brand": {
+          "value": "228.5 39.2% 55.5%",
+          "desc": "主題色：關鍵動作填色／品牌強調"
+        },
+        "brand-foreground": {
+          "value": "0 0% 100%",
+          "desc": "brand 上的文字"
+        },
+        "brand-subtle": {
+          "value": "229 50% 15%",
+          "desc": "主題色淡底：選中的導覽項、分頁底線區"
+        },
+        "brand-subtle-foreground": {
+          "value": "227.5 45.3% 60.6%",
+          "desc": "brand-subtle 上的文字"
+        },
+        "ring": {
+          "value": "227.9 38.2% 54.3%",
+          "desc": "鍵盤聚焦環（吃主題色相）"
+        }
+      }
+    },
+    "violet": {
+      "$label": "藍紫",
+      "$hue": 292,
+      "light": {
+        "brand": {
+          "value": "254.3 49.3% 59.8%",
+          "desc": "主題色：關鍵動作填色／品牌強調"
+        },
+        "brand-foreground": {
+          "value": "0 0% 100%",
+          "desc": "brand 上的文字"
+        },
+        "brand-subtle": {
+          "value": "248.6 100% 95.9%",
+          "desc": "主題色淡底：選中的導覽項、分頁底線區"
+        },
+        "brand-subtle-foreground": {
+          "value": "255 43.5% 54.9%",
+          "desc": "brand-subtle 上的文字"
+        },
+        "ring": {
+          "value": "253.3 74.3% 72.5%",
+          "desc": "鍵盤聚焦環（吃主題色相）"
+        }
+      },
+      "dark": {
+        "brand": {
+          "value": "252.2 33.6% 56.9%",
+          "desc": "主題色：關鍵動作填色／品牌強調"
+        },
+        "brand-foreground": {
+          "value": "0 0% 100%",
+          "desc": "brand 上的文字"
+        },
+        "brand-subtle": {
+          "value": "255 42% 15%",
+          "desc": "主題色淡底：選中的導覽項、分頁底線區"
+        },
+        "brand-subtle-foreground": {
+          "value": "252 38.5% 61.8%",
+          "desc": "brand-subtle 上的文字"
+        },
+        "ring": {
+          "value": "252.2 32.7% 55.7%",
+          "desc": "鍵盤聚焦環（吃主題色相）"
+        }
+      }
+    },
+    "amethyst": {
+      "$label": "紫晶",
+      "$hue": 305,
+      "light": {
+        "brand": {
+          "value": "269.4 44.5% 56.9%",
+          "desc": "主題色：關鍵動作填色／品牌強調"
+        },
+        "brand-foreground": {
+          "value": "0 0% 100%",
+          "desc": "brand 上的文字"
+        },
+        "brand-subtle": {
+          "value": "266.3 100% 96.9%",
+          "desc": "主題色淡底：選中的導覽項、分頁底線區"
+        },
+        "brand-subtle-foreground": {
+          "value": "269.7 40.9% 53.5%",
+          "desc": "brand-subtle 上的文字"
+        },
+        "ring": {
+          "value": "269.4 64.1% 69.4%",
+          "desc": "鍵盤聚焦環（吃主題色相）"
+        }
+      },
+      "dark": {
+        "brand": {
+          "value": "268.3 31% 54.5%",
+          "desc": "主題色：關鍵動作填色／品牌強調"
+        },
+        "brand-foreground": {
+          "value": "0 0% 100%",
+          "desc": "brand 上的文字"
+        },
+        "brand-subtle": {
+          "value": "271 44% 14%",
+          "desc": "主題色淡底：選中的導覽項、分頁底線區"
+        },
+        "brand-subtle-foreground": {
+          "value": "268.3 35% 59.6%",
+          "desc": "brand-subtle 上的文字"
+        },
+        "ring": {
+          "value": "268.7 30% 53.5%",
+          "desc": "鍵盤聚焦環（吃主題色相）"
+        }
+      }
+    },
+    "teal": {
+      "$label": "青玉",
+      "$hue": 195,
+      "light": {
+        "brand": {
+          "value": "180.5 100% 26.1%",
+          "desc": "主題色：關鍵動作填色／品牌強調"
+        },
+        "brand-foreground": {
+          "value": "0 0% 100%",
+          "desc": "brand 上的文字"
+        },
+        "brand-subtle": {
+          "value": "178.6 100% 91.6%",
+          "desc": "主題色淡底：選中的導覽項、分頁底線區"
+        },
+        "brand-subtle-foreground": {
+          "value": "180.5 100% 24.9%",
+          "desc": "brand-subtle 上的文字"
+        },
+        "ring": {
+          "value": "180.4 100% 32.5%",
+          "desc": "鍵盤聚焦環（吃主題色相）"
+        }
+      },
+      "dark": {
+        "brand": {
+          "value": "180.5 100% 26.1%",
+          "desc": "主題色：關鍵動作填色／品牌強調"
+        },
+        "brand-foreground": {
+          "value": "0 0% 100%",
+          "desc": "brand 上的文字"
+        },
+        "brand-subtle": {
+          "value": "180 100% 6.9%",
+          "desc": "主題色淡底：選中的導覽項、分頁底線區"
+        },
+        "brand-subtle-foreground": {
+          "value": "180 68.2% 34.5%",
+          "desc": "brand-subtle 上的文字"
+        },
+        "ring": {
+          "value": "180 100% 25.3%",
+          "desc": "鍵盤聚焦環（吃主題色相）"
+        }
+      }
+    },
+    "pine": {
+      "$label": "松綠",
+      "$hue": 178,
+      "light": {
+        "brand": {
+          "value": "171.5 100% 26.3%",
+          "desc": "主題色：關鍵動作填色／品牌強調"
+        },
+        "brand-foreground": {
+          "value": "0 0% 100%",
+          "desc": "brand 上的文字"
+        },
+        "brand-subtle": {
+          "value": "164.6 100% 92.4%",
+          "desc": "主題色淡底：選中的導覽項、分頁底線區"
+        },
+        "brand-subtle-foreground": {
+          "value": "171.6 100% 25.1%",
+          "desc": "brand-subtle 上的文字"
+        },
+        "ring": {
+          "value": "171.7 100% 32.7%",
+          "desc": "鍵盤聚焦環（吃主題色相）"
+        }
+      },
+      "dark": {
+        "brand": {
+          "value": "170.4 72.7% 30.2%",
+          "desc": "主題色：關鍵動作填色／品牌強調"
+        },
+        "brand-foreground": {
+          "value": "0 0% 100%",
+          "desc": "brand 上的文字"
+        },
+        "brand-subtle": {
+          "value": "169.7 100% 6.9%",
+          "desc": "主題色淡底：選中的導覽項、分頁底線區"
+        },
+        "brand-subtle-foreground": {
+          "value": "168.9 53.4% 37.8%",
+          "desc": "brand-subtle 上的文字"
+        },
+        "ring": {
+          "value": "171 82% 28%",
+          "desc": "鍵盤聚焦環（吃主題色相）"
+        }
+      }
+    },
+    "moss": {
+      "$label": "苔綠",
+      "$hue": 135,
+      "light": {
+        "brand": {
+          "value": "96 48% 34.7%",
+          "desc": "主題色：關鍵動作填色／品牌強調"
+        },
+        "brand-foreground": {
+          "value": "0 0% 100%",
+          "desc": "brand 上的文字"
+        },
+        "brand-subtle": {
+          "value": "100 100% 92%",
+          "desc": "主題色淡底：選中的導覽項、分頁底線區"
+        },
+        "brand-subtle-foreground": {
+          "value": "95.6 51.8% 32.5%",
+          "desc": "brand-subtle 上的文字"
+        },
+        "ring": {
+          "value": "97.7 35.8% 47.1%",
+          "desc": "鍵盤聚焦環（吃主題色相）"
+        }
+      },
+      "dark": {
+        "brand": {
+          "value": "98.4 31% 38.6%",
+          "desc": "主題色：關鍵動作填色／品牌強調"
+        },
+        "brand-foreground": {
+          "value": "0 0% 100%",
+          "desc": "brand 上的文字"
+        },
+        "brand-subtle": {
+          "value": "97.5 84.2% 7.5%",
+          "desc": "主題色淡底：選中的導覽項、分頁底線區"
+        },
+        "brand-subtle-foreground": {
+          "value": "98.4 26.9% 44.5%",
+          "desc": "brand-subtle 上的文字"
+        },
+        "ring": {
+          "value": "97.4 31.9% 37.5%",
+          "desc": "鍵盤聚焦環（吃主題色相）"
+        }
+      }
     }
   }
 } as const;

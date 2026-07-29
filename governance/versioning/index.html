@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
-<title data-rh="true">版本策略 | Dooping Design Book</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://kielchang.github.io/dooping-design-book/governance/versioning/"><meta data-rh="true" property="og:locale" content="zh_Hant"><meta data-rh="true" name="docusaurus_locale" content="zh-Hant"><meta data-rh="true" name="docsearch:language" content="zh-Hant"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="版本策略 | Dooping Design Book"><meta data-rh="true" name="description" content="三層各自獨立版號，因為它們的變動頻率與影響半徑完全不同。"><meta data-rh="true" property="og:description" content="三層各自獨立版號，因為它們的變動頻率與影響半徑完全不同。"><link data-rh="true" rel="icon" href="/dooping-design-book/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://kielchang.github.io/dooping-design-book/governance/versioning/"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/governance/versioning/" hreflang="zh-Hant"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/governance/versioning/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"治理 Governance","item":"https://kielchang.github.io/dooping-design-book/governance"},{"@type":"ListItem","position":2,"name":"版本策略","item":"https://kielchang.github.io/dooping-design-book/governance/versioning"}]}</script><link rel="stylesheet" href="/dooping-design-book/assets/css/styles.dca17ef7.css">
-<script src="/dooping-design-book/assets/js/runtime~main.bf2e926f.js" defer="defer"></script>
+<title data-rh="true">版本策略 | Dooping Design Book</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://kielchang.github.io/dooping-design-book/governance/versioning/"><meta data-rh="true" property="og:locale" content="zh_Hant"><meta data-rh="true" name="docusaurus_locale" content="zh-Hant"><meta data-rh="true" name="docsearch:language" content="zh-Hant"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="版本策略 | Dooping Design Book"><meta data-rh="true" name="description" content="三層各自獨立版號，因為它們的變動頻率與影響半徑完全不同。"><meta data-rh="true" property="og:description" content="三層各自獨立版號，因為它們的變動頻率與影響半徑完全不同。"><link data-rh="true" rel="icon" href="/dooping-design-book/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://kielchang.github.io/dooping-design-book/governance/versioning/"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/governance/versioning/" hreflang="zh-Hant"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/governance/versioning/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"治理 Governance","item":"https://kielchang.github.io/dooping-design-book/governance"},{"@type":"ListItem","position":2,"name":"版本策略","item":"https://kielchang.github.io/dooping-design-book/governance/versioning"}]}</script><link rel="stylesheet" href="/dooping-design-book/assets/css/styles.9458e0bc.css">
+<script src="/dooping-design-book/assets/js/runtime~main.32bc431e.js" defer="defer"></script>
 <script src="/dooping-design-book/assets/js/main.807bd399.js" defer="defer"></script>
 </head>
 <body>
@@ -74,9 +74,63 @@ registry 戳記由它產生（守衛測試強制四處一致），所以 tag、�
 <li class="">我需要做什麼（不需要就明說「無須調整」）</li>
 <li class="">為什麼改（連到 ADR）</li>
 </ol>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="文件版本對映產品版號">文件版本對映產品版號<a href="#文件版本對映產品版號" class="hash-link" aria-label="文件版本對映產品版號的直接連結" title="文件版本對映產品版號的直接連結" translate="no">​</a></h2>
+<p>上面講的是三層各自怎麼編號。但有兩個問題<strong>完全在讀者那一側</strong>，規則本身回答不了：
+我現在讀的這頁文件對應哪一版產品？我手上這份產出物是哪一版產的？</p>
+<p>文件站與產品同 repo 時，很容易讓文件永遠只有一個版本＝主線最新狀態。
+問題在於<strong>產品有版本，而使用者手上的不一定是最新版</strong>：</p>
+<blockquote>
+<p>「文件說設定頁有這個開關，我這裡沒有。」
+「喔那是下一版才有的。」</p>
+</blockquote>
+<p>這句對話會反覆發生，而每一次都在消耗使用者對文件的信任。
+發生幾次之後，他不會再查文件，他會直接問人——那就是文件站失效的那一刻。</p>
+<p>做法：文件也做版本快照，<strong>版號直接沿用產品版號</strong>。</p>
+<table><thead><tr><th>版本</th><th>內容</th><th>標示</th></tr></thead><tbody><tr><td><code>current</code>（掛在 <code>/next</code>）</td><td>開發中、尚未發佈</td><td><strong>未發佈橫幅</strong>，每頁常駐</td></tr><tr><td>最新快照</td><td>＝正式環境現在跑的版本</td><td>預設顯示</td></tr><tr><td>舊快照</td><td>還有人在用的舊版</td><td>版本下拉可切</td></tr></tbody></table>
+<p>三個實作細節，每一個都對應一種會出錯的方式：</p>
+<ol>
+<li class=""><strong>預設顯示「最新快照」，不是 <code>current</code>。</strong> 預設值決定 99% 的讀者看到什麼；
+<code>current</code> 是還沒發佈的內容，把它當預設等於讓多數讀者讀到一份描述未來的文件。</li>
+<li class=""><strong>未發佈的內容要有橫幅，而且要在每一頁。</strong> 讀者多半從搜尋引擎或別人貼的連結
+直接落到某一頁，他不會經過首頁，也不會去看下拉選單。</li>
+<li class=""><strong>設定要動態讀取已有的快照清單。</strong> 手寫版本清單會撞上先有雞還先有蛋：
+設定裡宣告了 <code>v1.5.0</code> 但快照指令還沒跑，文件站當場建置失敗——
+而這件事發生的時間點，永遠是你正在發佈的時候。</li>
+</ol>
+<p>發佈 SOP 要把快照綁進去：<code>bump 版號 → 寫 CHANGELOG → 快照文件 → 合併發佈</code>。
+<strong>快照要跟在 bump 後面，成為同一個步驟。</strong> 拆成兩件事的話，被跳過的永遠是文件那一件——
+而跳過一次之後，那一版就永遠沒有對應的文件了。</p>
+<div class="rule-grid"><div class="rule-do"><strong>✅ 這樣做</strong><p>文件版號<strong>直接用產品版號</strong>，不要另起一套。
+讀者要對照的是「我用的系統是哪一版」，不是「文件寫到第幾版」。</p></div><div class="rule-dont"><strong>🚫 不要這樣</strong><p>不要每次改錯字都快照一次。快照的意義是<strong>對映一次發佈</strong>；
+快照數量應該等於發佈次數，多於它就只是在製造要維護的舊分支。</p></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="產出物的身分provenance">產出物的身分（provenance）<a href="#產出物的身分provenance" class="hash-link" aria-label="產出物的身分（provenance）的直接連結" title="產出物的身分（provenance）的直接連結" translate="no">​</a></h2>
+<p>版號不只是給開發者看的。<strong>每一個離開系統的產出物，都要帶著自己的身分。</strong></p>
+<p>單一來源、建置時注入、三個地方顯示：</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">建置時注入：</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">  __APP_VERSION__ = package.json 的 version</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">  __GIT_SHA__     = CI 環境變數的 commit（取前 7 碼），本地建置＝ &quot;dev&quot;</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">  __BUILD_TIME__  = 建置當下時間</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">單一來源：</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">  version.ts 讀這三個常數，對外只匯出組好的字串與連結</span><br></div></code></pre></div></div>
+<table><thead><tr><th>顯示位置</th><th>形式</th><th>為什麼是這裡</th></tr></thead><tbody><tr><td>側邊欄最底</td><td><code>v1.4.2 · a3f9c21</code>（可點開對應 commit）</td><td>常駐但不佔位。要回報問題時看一眼就有</td></tr><tr><td>設定 →「關於」</td><td>版號、commit 連結、建置時間、環境</td><td>需要完整資訊時的去處</td></tr><tr><td><strong>列印頁尾</strong></td><td><code>v1.4.2 · a3f9c21　2026-07-29 14:20 產生</code></td><td><strong>最重要的一個</strong>，理由見下</td></tr></tbody></table>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="為什麼列印頁尾最重要">為什麼列印頁尾最重要<a href="#為什麼列印頁尾最重要" class="hash-link" aria-label="為什麼列印頁尾最重要的直接連結" title="為什麼列印頁尾最重要的直接連結" translate="no">​</a></h3>
+<p>螢幕上的東西可以隨時再看一次；<strong>印出來的那張紙不會更新</strong>。</p>
+<p>使用者拿著一份三個月前印出來的文件說「這個數字不對」時，
+你要回答的第一個問題是「這是哪一版算出來的」。
+如果那張紙上沒有版號，這個問題<strong>無解</strong>——沒有人記得三個月前的那一天系統是哪一版，
+而在那之後可能已經修過三次計算邏輯。</p>
+<p>有了頁尾那一行，同一個回報就從「無法重現」變成「用 a3f9c21 重跑一次」。
+做法見<a class="" href="/dooping-design-book/patterns/print-and-export/">列印與匯出</a>第 6 條。</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="本地建置要顯示-dev">本地建置要顯示 <code>dev</code><a href="#本地建置要顯示-dev" class="hash-link" aria-label="本地建置要顯示-dev的直接連結" title="本地建置要顯示-dev的直接連結" translate="no">​</a></h3>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">v1.4.2 · dev        ← 有人在自己機器上建的</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">v1.4.2 · a3f9c21    ← CI 建的，可追溯</span><br></div></code></pre></div></div>
+<p>這一個字省下的是另一種難查的問題：有人把本機建置的版本部署上去，
+之後所有回報都對不到任何一個 commit。顯示 <code>dev</code> 讓這件事在第一眼就被看見。</p>
+<div class="rule-grid"><div class="rule-do"><strong>✅ 這樣做</strong><p>版號字串<strong>只有一個來源</strong>，側邊欄、關於頁、列印頁尾共用同一個匯出。</p></div><div class="rule-dont"><strong>🚫 不要這樣</strong><p>不要在列印頁尾另外寫一次版號。兩處手寫的版本字串一定會分歧，
+而分歧的那一份通常就是印在紙上的那一份——最不容易被發現、也最需要正確的那一份。</p></div></div>
+<div class="rule-grid"><div class="rule-do"><strong>✅ 這樣做</strong><p>注入機制要<strong>防呆</strong>：常數沒被注入時（例如某個測試環境直接跑原始碼）
+也不能讓畫面崩掉，退成 <code>dev</code> 即可。</p></div><div class="rule-dont"><strong>🚫 不要這樣</strong><p>不要讓「顯示版號」這件小事有能力讓整個應用程式白屏。
+它的重要性在於出事時能追溯，不在於它自己出事。</p></div></div>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="為什麼元件版號與-token-分開">為什麼元件版號與 token 分開<a href="#為什麼元件版號與-token-分開" class="hash-link" aria-label="為什麼元件版號與 token 分開的直接連結" title="為什麼元件版號與 token 分開的直接連結" translate="no">​</a></h2>
 <p>元件是要被複製走的。使用者複製之後，它就是使用者的程式碼——
 再幫他管版號沒有意義。元件版號存在的目的只有一個：<strong>讓人知道自己抄的是哪一版</strong>，
-方便日後對照上游的修正。</p></div></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="文件選項卡"><a class="pagination-nav__link pagination-nav__link--prev" href="/dooping-design-book/governance/"><div class="pagination-nav__sublabel">上一頁</div><div class="pagination-nav__label">治理 Governance</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/dooping-design-book/governance/rfc/"><div class="pagination-nav__sublabel">下一頁</div><div class="pagination-nav__label">回饋與 RFC 流程</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#進版是什麼事件" class="table-of-contents__link toc-highlight">進版是什麼事件</a><ul><li><a href="#預覽站不是進版" class="table-of-contents__link toc-highlight">預覽站不是進版</a></li><li><a href="#兩個對外訊號" class="table-of-contents__link toc-highlight">兩個對外訊號</a></li><li><a href="#進版流程工程師提議維護者在-github-上確認" class="table-of-contents__link toc-highlight">進版流程：工程師提議，維護者在 GitHub 上確認</a></li></ul></li><li><a href="#token-的-semver-定義" class="table-of-contents__link toc-highlight">Token 的 SemVer 定義</a><ul><li><a href="#什麼不該發版" class="table-of-contents__link toc-highlight">什麼<strong>不該</strong>發版</a></li></ul></li><li><a href="#元件的-semver-定義" class="table-of-contents__link toc-highlight">元件的 SemVer 定義</a></li><li><a href="#changelog-寫給誰看" class="table-of-contents__link toc-highlight">CHANGELOG 寫給誰看</a></li><li><a href="#為什麼元件版號與-token-分開" class="table-of-contents__link toc-highlight">為什麼元件版號與 token 分開</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Dooping Design Book · 設計語言與模式手冊 · MIT</div></div></div></footer></div>
+方便日後對照上游的修正。</p>
+<p>也因為如此，版號檔放在元件庫<strong>裡面</strong>（<code>packages/react/src/version.ts</code>），
+不只是 <code>package.json</code>。元件是要被複製走的——複製走之後 <code>package.json</code> 留在原地，
+而使用者最需要的資訊正是「我手上這份是哪一版」。</p></div></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="文件選項卡"><a class="pagination-nav__link pagination-nav__link--prev" href="/dooping-design-book/governance/"><div class="pagination-nav__sublabel">上一頁</div><div class="pagination-nav__label">治理 Governance</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/dooping-design-book/governance/rfc/"><div class="pagination-nav__sublabel">下一頁</div><div class="pagination-nav__label">回饋與 RFC 流程</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#進版是什麼事件" class="table-of-contents__link toc-highlight">進版是什麼事件</a><ul><li><a href="#預覽站不是進版" class="table-of-contents__link toc-highlight">預覽站不是進版</a></li><li><a href="#兩個對外訊號" class="table-of-contents__link toc-highlight">兩個對外訊號</a></li><li><a href="#進版流程工程師提議維護者在-github-上確認" class="table-of-contents__link toc-highlight">進版流程：工程師提議，維護者在 GitHub 上確認</a></li></ul></li><li><a href="#token-的-semver-定義" class="table-of-contents__link toc-highlight">Token 的 SemVer 定義</a><ul><li><a href="#什麼不該發版" class="table-of-contents__link toc-highlight">什麼<strong>不該</strong>發版</a></li></ul></li><li><a href="#元件的-semver-定義" class="table-of-contents__link toc-highlight">元件的 SemVer 定義</a></li><li><a href="#changelog-寫給誰看" class="table-of-contents__link toc-highlight">CHANGELOG 寫給誰看</a></li><li><a href="#文件版本對映產品版號" class="table-of-contents__link toc-highlight">文件版本對映產品版號</a></li><li><a href="#產出物的身分provenance" class="table-of-contents__link toc-highlight">產出物的身分（provenance）</a><ul><li><a href="#為什麼列印頁尾最重要" class="table-of-contents__link toc-highlight">為什麼列印頁尾最重要</a></li><li><a href="#本地建置要顯示-dev" class="table-of-contents__link toc-highlight">本地建置要顯示 <code>dev</code></a></li></ul></li><li><a href="#為什麼元件版號與-token-分開" class="table-of-contents__link toc-highlight">為什麼元件版號與 token 分開</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Dooping Design Book · 設計語言與模式手冊 · MIT</div></div></div></footer></div>
 </body>
 </html>

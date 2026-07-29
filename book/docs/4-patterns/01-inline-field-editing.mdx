@@ -39,6 +39,28 @@ title: 唯讀逐欄編輯
 
 搭配[送出前變更摘要](/components/change-summary)，形成完整迴路。
 
+<Demo title="四種狀態並列（第二欄是已變更態）">
+  <div className="max-w-sm space-y-4">
+    <EditableField label="客戶名稱" kind="text" value="宏昌實業股份有限公司" original="宏昌實業股份有限公司"
+      onChange={() => {}} help="唯讀態：值的樣子，右側有淡鉛筆。" />
+    <EditableField label="信用額度" kind="money" value={1650000} original={1500000}
+      onChange={() => {}} onRevert={() => {}}
+      help="已變更態：整欄琥珀＋還原鈕。改了什麼掃一眼就知道。" />
+    <EditableField label="付款條件" kind="select" value="net30"
+      options={[{ value: "net30", label: "月結 30 天" }, { value: "net60", label: "月結 60 天" }]}
+      original="net30" onChange={() => {}} help="select 欄位：點擊即展開，不必多按一次。" />
+    <EditableField label="客戶代號" kind="text" value="C-1042" original="C-1042"
+      onChange={() => {}} disabled lockHint="代號建立後不可變更"
+      help="鎖定態：顯示鎖頭與原因，而不是直接不給點。" />
+  </div>
+</Demo>
+
+:::note 這是真元件
+上面不是截圖——文件站直接編譯 `packages/react` 的原始碼。
+元件改了，這裡當場跟著改。互動細節請到
+[EditableField 元件頁](/components/editable-field)試。
+:::
+
 ## 取捨
 
 **代價：多一次點擊。** 這在「主要是看、偶爾才改」的主檔表單划算，

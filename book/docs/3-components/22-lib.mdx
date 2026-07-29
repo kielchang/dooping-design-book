@@ -1,0 +1,133 @@
+---
+title: 工具函式與 hook
+---
+
+# 工具函式與 hook
+
+這六項是元件的**相依**——你 `npx shadcn add` 任何一個元件時，需要的會被自動裝進
+`lib/dooping/`。它們單獨也能用。
+
+```
+src/lib/dooping/
+├── utils.ts        cn ＋ 數值格式化
+├── use-sort.ts     三態排序
+├── csv.ts          CSV 序列化與解析
+├── download.ts     觸發瀏覽器下載
+└── forms-diff.ts   FieldSpec 驅動的變更偵測
+src/components/dooping/
+└── use-record-diff.ts   草稿 vs 原始值
+```
+
+:::note 為什麼合成一頁
+它們各自太小，撐不起一頁；而且實際使用時常常是一起出現的
+（`DataTable` 匯出 CSV 就同時用到 `csv` 與 `download`）。
+:::
+
+## `utils` — `cn` 與數值格式化
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/utils.json
+```
+
+**`cn(...inputs)`** 是每個 shadcn 專案都有的那一個：`clsx` ＋ `tailwind-merge`，
+讓後面的 class 能正確覆蓋前面的。所有元件都依賴它，所以它是最常被自動裝進來的一項。
+
+```ts
+cn("px-2 py-1", isActive && "bg-primary", className)
+```
+
+其餘五個是**數值顯示**的格式化。後台系統的數字欄位如果各寫各的，
+同一份報表會出現三種千分位寫法：
+
+| 函式 | 用途 |
+| --- | --- |
+| `formatNumber(n, locale?)` | 千分位整數 |
+| `formatMoney(n, { symbol?, locale? })` | 金額，預設 `$` |
+| `formatPercent(value, digits = 1)` | 百分比 |
+| `formatRatio(value, digits = 0)` | 比率 |
+| `formatSigned(n, format?)` | 帶正負號，可換底層格式化器 |
+
+`formatSigned` 的第二參數是為了組合：`formatSigned(delta, formatMoney)`
+就是「帶正負號的金額」。[Delta 變異顯示](/components/delta)內部用的就是這個。
+
+## `use-sort` — 三態排序
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/use-sort.json
+```
+
+```ts
+const { sorted, sortState, toggleSort } = useSort(rows, initialState);
+```
+
+排序狀態是 **無 → 大到小 → 小到大 → 無** 的三態循環，不是兩態。
+
+理由：後台表格的預設順序通常有意義（建檔序、單號序），
+只有兩態的話**回不到原始順序**——使用者一旦點了排序就再也看不到原本的排列。
+
+`SortState` 是 `{ key, dir } | null`，`null` 就是那個「無」。
+
+## `csv` — 序列化與解析
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/csv.json
+```
+
+| 函式 | 說明 |
+| --- | --- |
+| `csvSerialize(headers, rows, bom = true)` | 產出 CSV 字串 |
+| `csvEscape(v)` | 單一值的跳脫（逗號、引號、換行） |
+| `csvParse(text)` | 解析回二維陣列 |
+
+**`bom` 預設是 `true`，不要關掉。** 沒有 UTF-8 BOM 的話，Excel 開啟中文 CSV 會是亂碼——
+而後台系統匯出的檔案，十次有九次是要用 Excel 打開的。
+
+## `download` — 觸發瀏覽器下載
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/download.json
+```
+
+```ts
+saveBlob(new Blob([csv], { type: "text/csv" }), "報表.csv");
+```
+
+只有一個函式，做的事也只有一件：建立暫時的 object URL、觸發下載、清理。
+獨立成一項是因為**每個要匯出的地方都會重寫一次**，而且常常忘記 `revokeObjectURL`。
+
+## `forms-diff` — FieldSpec 驅動的變更偵測
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/forms-diff.json
+```
+
+這是[逐欄編輯](/patterns/inline-field-editing)與[變更摘要](/components/change-summary)的底層。
+
+核心概念是 **`FieldSpec`**：用資料描述每個欄位「叫什麼、是什麼型別、怎麼顯示」，
+比對與顯示就都能由它推導，不必為每個欄位手寫比對邏輯。
+
+| 匯出 | 用途 |
+| --- | --- |
+| `FieldSpec` / `FieldKind` / `Change` | 型別 |
+| `eqValue(a, b)` | 值比對——**空字串、`null`、`undefined` 視為相同** |
+| `isEmptyValue(v)` | 空值判定 |
+| `fmtValue(v, kind, format?, unit?)` | 依欄位型別格式化顯示值 |
+
+`eqValue` 那條規則是重點：表單裡「清空一個本來就是 `null` 的欄位」不該被算成一次變更，
+否則送出前的變更摘要會列出一堆使用者根本沒改的東西。
+
+## `use-record-diff` — 草稿 vs 原始值
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/use-record-diff.json
+```
+
+```ts
+const { draft, changes, setField, revertField, revertAll } = useRecordDiff(original, specs);
+```
+
+把「原始值」與「草稿」分開保存，隨時算得出兩者的差異。
+[ChangeSummary](/components/change-summary) 吃的就是它的 `changes`。
+
+分開保存的好處是**逐欄還原**變得理所當然——`revertField(key)` 只是把草稿的那一格
+寫回原始值，不需要另外記錄「這一格改了什麼」。

@@ -1,0 +1,135 @@
+---
+title: Storybook 設定
+---
+
+# Storybook 設定
+
+這一頁的每一條，本 repo 的 `.storybook/` 都已經這樣做了。寫下來的原因是：
+**這些決定原本只活在程式碼註解裡，而註解只有改那個檔案的人會讀到**——
+下一個開新專案的人不會打開它。
+
+## 主題切換切在 `documentElement`，不是 wrapper
+
+這是整份設定裡最容易錯、也最難察覺的一條。
+
+直覺做法是在 decorator 裡包一層 `<div className="dark">`。它在多數 story 上看起來完全正常，
+直到你打開一個 Dialog、Select 或 Tooltip——**浮層是深色模式下的一片白**。
+
+原因：這些元件用 portal 把內容掛到 `document.body`，它**不在** wrapper div 底下，
+所以拿不到那個 `.dark` class。
+
+```tsx
+function ThemeSwitch({ theme, children }) {
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.toggle("dark", theme === "dark");
+    root.setAttribute("data-theme", theme);   // 兩種宿主鉤子都掛
+  }, [theme]);
+  return <>{children}</>;
+}
+```
+
+五行，解決一整類「只有浮層是白的」問題。
+
+**為什麼同時掛 class 與 `data-theme`**：token 支援[兩種宿主鉤子](/foundations/theming)，
+Storybook 順便當成它們的驗證場——只掛一種的話，另一種壞掉不會有人發現。
+
+<Rules>
+  <Do><p>任何全域樣式狀態（主題、文字方向、密度）都掛在 <code>documentElement</code>。</p></Do>
+  <Dont><p>不要包 wrapper div 就當作完成。它會通過 90% 的 story，
+  然後在最需要對比度的浮層上失敗。</p></Dont>
+</Rules>
+
+## Preview 的 decorator 不要注入應用狀態
+
+Storybook 的 preview 是**元件庫的展示台**，不是應用程式的縮小版。
+
+一旦 decorator 裡出現「初始化某個應用層 store」「包一層路由」「載入示範資料」，
+就發生了三件事：
+
+1. 元件庫的展示環境開始依賴應用層——而元件庫的整個賣點是「不依賴應用層」
+2. 新開一個專案想沿用這套 story，得先把那些 store 也搬過去
+3. 守衛測試看不到它——`.storybook/` 通常不在[邊界守衛](/governance/drift-guards)的掃描範圍內，
+   這個耦合會安靜地存在很久
+
+<Rules>
+  <Do><p>decorator 只放主題、背景、內距這類<strong>純呈現</strong>的東西。</p></Do>
+  <Dont><p>不要在 preview 裡塞應用層的狀態容器或路由。需要狀態的 story，
+  把狀態宣告在該支 story 的 <code>render</code> 裡（見 <a href="/governance/story-conventions">Story 撰寫慣例</a>）。</p></Dont>
+</Rules>
+
+## `viteFinal`：三件必須手動補的事
+
+Storybook 有自己的建置流程，**不會**沿用你 app 的 `vite.config`。以下三件要自己補：
+
+```ts
+viteFinal: async (cfg) => {
+  cfg.resolve.alias = {
+    ...cfg.resolve.alias,
+    // 1. 直接指到套件原始碼：改元件立刻可見，不必先 build
+    "@dooping/react": path.resolve(process.cwd(), "packages/react/src"),
+  };
+  // 2. PostCSS 寫在這裡，不要放 repo 根目錄
+  cfg.css = { postcss: { plugins: [tailwindcss(tailwindConfig), autoprefixer()] } };
+  // 3. 相對 base → 可發佈在靜態主機的子路徑
+  cfg.base = "./";
+  return cfg;
+}
+```
+
+| 項目 | 不做會怎樣 |
+| --- | --- |
+| **alias 指向原始碼** | 改一次元件要先 build 一次才看得到。開發回饋從 1 秒變成 30 秒，然後大家就不用 Storybook 了 |
+| **PostCSS 寫在 `viteFinal`** | 放在 repo 根目錄的 `postcss.config.cjs` 會被**同一個 repo 裡的其他工具沿目錄向上找到**（例如文件站），讓它套用到錯的設定。症狀是「文件站的樣式莫名其妙壞掉」，而且很難聯想到是 Storybook 的設定檔造成的 |
+| **`base: "./"`** | 發佈到靜態主機子路徑時，所有資源都去根目錄找，整站空白 |
+
+## storySort 必須涵蓋**所有**頂層分類
+
+```ts
+options: {
+  storySort: {
+    order: ["基礎", "元件", ["基礎", "表單", "資料", "狀態", "浮層", "引導", "文件示意"]],
+  },
+}
+```
+
+`order` 沒列到的分類會落到清單尾端，順序由檔案系統決定——**看起來像隨機的**。
+
+<Rules>
+  <Do><p>新增一個頂層分類時，<strong>同時</strong>更新 <code>order</code>。</p></Do>
+  <Dont><p>不要只列「主要的那幾個」。沒被列到的那些不是消失，是排到最後面，
+  而且沒有人知道為什麼側邊欄長那樣。</p></Dont>
+</Rules>
+
+## title 的命名慣例：一種寫法，不要兩種
+
+```
+元件/基礎/按鈕・徽章・提示・卡片
+元件/表單/唯讀逐欄編輯
+元件/資料/資料表 DataTable
+```
+
+三段式：`元件 / 分類 / 名稱`。**斜線前後不加空格。**
+
+看起來很瑣碎，但混用會造成兩個真實問題：
+
+1. Storybook 用字串比對做分組。`"元件庫 / 總覽"` 和 `"元件/基礎"` 會被視為
+   **兩個不同的頂層分類**（一個叫「元件庫 」，一個叫「元件」）——側邊欄長出重複的樹枝
+2. storySort 的 `order` 字串必須完全吻合，多一個空格就對不上，而且**不會報錯**
+
+<Rules>
+  <Do><p><code>元件/分類/名稱</code>，無空格，中文名在前、英文元件名在後（<code>資料表 DataTable</code>）。</p></Do>
+  <Dont><p>不要混用 <code>元件 / 分類</code>。這種錯誤不會壞掉，只會讓側邊欄慢慢變醜，
+  然後沒有人想承擔重新命名全部 story 的責任。</p></Dont>
+</Rules>
+
+## 為什麼 Storybook 值得列進治理章節
+
+它不只是預覽工具，是**元件庫唯一能獨立於應用執行的地方**。
+
+- 如果一個元件在 Storybook 裡跑不起來，它就是耦合了應用層——這是最快的邊界檢查
+- 文件站的活範例與 Storybook 指向**同一份原始碼**，兩邊不可能不一致
+- 發佈出來的 Storybook 是取用端的參照：不必安裝任何東西就能看到「正確的樣子」
+
+搭配[漂移防護](/governance/drift-guards)的〈讓文件站直接吃元件原始碼〉：
+**沒有副本，就不會有過期的副本。**

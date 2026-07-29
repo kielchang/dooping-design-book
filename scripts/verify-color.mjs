@@ -253,6 +253,82 @@ export function runChecks() {
     }
   }
 
+  // ── 4. 互動狀態層 ──────────────────────────────────────────
+  //
+  // 狀態層是**疊加**不是換色，所以不能只對一種底色驗——它的全部意義就在於
+  // 「深了一階」這件事要在每一種表面上都成立。改版前的 hover 是 `bg-muted/50`，
+  // 對白底看得見、對斑馬列（本來就是 muted）等於沒變，一種底色驗不出這件事。
+  //
+  // 疊加色取該表面自己的內容色（元件上的 currentColor），不是統一的 `foreground`：
+  // 深色模式下 `foreground` 與 `primary` 是同一個近白，拿它疊實色按鈕會得到 ΔE00 0.0。
+  const alpha = (n) => parseFloat(tokens.state[n].value) / 100;
+  const A = { hover: alpha("hover-alpha"), pressed: alpha("pressed-alpha"), selected: alpha("selected-alpha") };
+  /** src-over：不透明的疊加色以 alpha 疊在不透明底色上 */
+  const mix = (paint, base, a) => paint.map((c, i) => Math.round(c * a + base[i] * (1 - a)));
+
+  const STATE_HOVER_MIN = 2.5;    // 低於此看不出「這個可以互動」
+  const STATE_PRESSED_MIN = 2.5;  // 按下要能與 hover 分開
+  const STATE_SELECTED_MIN = 4;   // 已選要能與 hover 分開——舊值實測只有 1.6
+  const STATE_SELECTED_MAX = 16;  // 上限，防「太刻意」
+
+  // 表面 → 那個表面上的內容色。這四個是狀態層**實際會落在**的底色：
+  // 資料表列（頁面底／卡片／斑馬列的 muted）、下拉與篩選選單（popover）。
+  // muted 當斑馬列用時字是 `foreground`，不是 `muted-foreground`（後者是同一列裡的次要文字）。
+  //
+  // 不驗 `field-editable`／`field-readonly`：那兩個是**輸入框**的底色（見 number-input、
+  // coachmark 的 textarea），沒有任何帶狀態層的元件坐在上面。欄位的回饋走聚焦環與邊框，
+  // 不走狀態層——驗一組不存在的組合只會製造假警報。
+  const SURFACES = [
+    ["background", "foreground"],
+    ["card", "card-foreground"],
+    ["muted", "foreground"],
+    ["popover", "popover-foreground"],
+  ];
+  for (const mode of MODES) {
+    const s = { hover: Infinity, pressed: Infinity, selected: Infinity, loudest: 0, text: Infinity, sec: Infinity };
+    for (const [surface, onColor] of SURFACES) {
+      const base = px(mode, surface);
+      const paint = px(mode, onColor);
+      const hov = mix(paint, base, A.hover);
+      const prs = mix(paint, base, A.pressed);
+      const sel = mix(paint, base, A.selected);
+      const d = (a, b) => deltaE00(lab(a), lab(b));
+      const [dh, dp, ds, dmax] = [d(base, hov), d(hov, prs), d(hov, sel), d(base, sel)];
+      const tag = `${surface}/${mode}`;
+      if (dh < STATE_HOVER_MIN) fail.push(`hover 對 ${tag} 只差 ΔE00 ${dh.toFixed(1)}（需 ${STATE_HOVER_MIN}）`);
+      if (dp < STATE_PRESSED_MIN) fail.push(`pressed 對 hover 在 ${tag} 只差 ΔE00 ${dp.toFixed(1)}（需 ${STATE_PRESSED_MIN}）`);
+      if (ds < STATE_SELECTED_MIN) fail.push(`已選對 hover 在 ${tag} 只差 ΔE00 ${ds.toFixed(1)}（需 ${STATE_SELECTED_MIN}）`);
+      if (dmax > STATE_SELECTED_MAX) fail.push(`已選對 ${tag} 差到 ΔE00 ${dmax.toFixed(1)}（上限 ${STATE_SELECTED_MAX}，過於刻意）`);
+      // 最壞情況的文字對比：最深的疊加層（已選）之上，正文仍須合格。
+      const ct = contrast(paint, sel);
+      if (ct < TEXT) fail.push(`已選的 ${tag} 上正文只有 ${ct.toFixed(2)}:1（需 ${TEXT}）`);
+      s.hover = Math.min(s.hover, dh); s.pressed = Math.min(s.pressed, dp);
+      s.selected = Math.min(s.selected, ds); s.loudest = Math.max(s.loudest, dmax);
+      s.text = Math.min(s.text, ct);
+      s.sec = Math.min(s.sec, contrast(px(mode, "muted-foreground"), sel));
+    }
+    stats.state ??= {};
+    stats.state[mode] = s;
+  }
+
+  // 實色按鈕上的狀態層。這條擋的是「疊加色挑錯」：若改用單一的 `foreground` 當疊加色，
+  // 深色模式的 primary 按鈕會得到 ΔE00 0.0——按下去與沒按完全一樣，而四種表面那組檢查
+  // 全部照樣通過。所以填色控制項必須單獨驗。
+  const FILLS = [["primary", "primary-foreground"], ["brand", "brand-foreground"],
+                 ["destructive", "destructive-foreground"], ["secondary", "secondary-foreground"]];
+  for (const name of Object.keys(tokens.themes ?? {})) {
+    for (const mode of MODES) {
+      for (const [surface, onColor] of FILLS) {
+        const base = resolve(name, mode, surface);
+        const paint = resolve(name, mode, onColor);
+        const dh = deltaE00(lab(base), lab(mix(paint, base, A.hover)));
+        if (dh < STATE_HOVER_MIN) {
+          fail.push(`hover 對 ${surface} 填色（${name}/${mode}）只差 ΔE00 ${dh.toFixed(1)}（需 ${STATE_HOVER_MIN}）`);
+        }
+      }
+    }
+  }
+
   return { fail, warn, stats };
 }
 
@@ -272,6 +348,15 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
     console.log(
       `  ${mode.padEnd(6)} 最差對 ${s.worstPair} ΔE00 ${s.worst.toFixed(1)}　` +
       `L* 全距 ${s.lightnessRange.toFixed(1)}　最低對比 ${s.minContrast.toFixed(2)}:1`,
+    );
+  }
+
+  console.log("\n互動狀態層（四種底色取最差；已選對底色取最大）");
+  for (const [mode, s] of Object.entries(stats.state ?? {})) {
+    console.log(
+      `  ${mode.padEnd(6)} hover-底 ${s.hover.toFixed(1)}　pressed-hover ${s.pressed.toFixed(1)}　` +
+      `已選-hover ${s.selected.toFixed(1)}　已選-底 ${s.loudest.toFixed(1)}（上限 16）　` +
+      `正文 ${s.text.toFixed(2)}:1　弱化文字 ${s.sec.toFixed(2)}:1`,
     );
   }
 

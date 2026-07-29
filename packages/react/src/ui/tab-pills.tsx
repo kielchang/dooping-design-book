@@ -32,8 +32,8 @@ export function TabPills({ tabs, value, onChange, className, label }: TabPillsPr
             data-tour={t.dataTour}
             onClick={() => onChange(t.key)}
             className={cn(
-              "tap-target-y inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors duration-fast",
-              active ? "bg-primary text-primary-foreground" : "bg-muted text-foreground hover:bg-accent",
+              "state-layer tap-target-y inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm",
+              active ? "bg-primary text-primary-foreground" : "bg-muted text-foreground",
             )}
           >
             {t.label}

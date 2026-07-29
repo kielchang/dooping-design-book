@@ -49,7 +49,21 @@ TableFooter.displayName = "TableFooter";
 
 const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTMLTableRowElement>>(
   ({ className, ...props }, ref) => (
-    <tr ref={ref} className={cn("border-b transition-colors duration-fast hover:bg-muted/50 data-[state=selected]:bg-muted", className)} {...props} />
+    // 三種列狀態全部走 `state-layer`：它疊在列**自己**的底色上，因此斑馬列（`bg-muted/30`）
+    // 被指到時一樣是「深了一階」。改版前 hover 是 `bg-muted/50`、已選是 `bg-muted`——
+    // 與斑馬列同一個顏色的不同透明度，實測一般→hover 只差 ΔE00 1.6，等於看不出來。
+    // 已選的列把「弱化文字」整個重新定義成正文色：22% 疊加之後 `muted-foreground`
+    // 掉到 2.58:1（淺）／2.75:1（深），低於 4.5:1。這不是調數值能解的——已選的列在語意上
+    // 就是被強調的，它的次要文字不該繼續弱化。改 CSS 變數而不是逐個換 class，
+    // 是為了讓列裡任何吃 `--muted-foreground` 的東西（文字、圖示、分隔線）一次跟上。
+    <tr
+      ref={ref}
+      className={cn(
+        "state-layer border-b data-[state=selected]:[--muted-foreground:var(--foreground)]",
+        className,
+      )}
+      {...props}
+    />
   ),
 );
 TableRow.displayName = "TableRow";

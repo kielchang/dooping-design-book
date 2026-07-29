@@ -4,5 +4,5 @@
 // 版本策略見文件站「治理」章：token 破壞性變更＝major，元件行為變更＝minor。
 export const KIT_VERSION = {
   name: "@dooping/react",
-  version: "0.4.1",
+  version: "0.5.0",
 } as const;

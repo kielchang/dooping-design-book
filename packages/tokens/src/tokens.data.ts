@@ -3,7 +3,7 @@ export default {
   "$comment": "Dooping 設計 token 唯一來源（框架中立）。CSS 變數與 Tailwind preset 皆由此檔產生，勿直接改 dist/。色彩值以 HSL 三元組字串表示（可被 hsl(var(--x) / <alpha>) 套用透明度）；chart.* 例外為 hex（SVG fill/stroke 直接吃 var()，不經 hsl() 包裝）。",
   "meta": {
     "name": "dooping",
-    "version": "0.3.1",
+    "version": "0.4.0",
     "defaultTheme": "graphite"
   },
   "color": {
@@ -555,6 +555,21 @@ export default {
     "tap-target": {
       "value": "44px",
       "desc": "粗指標裝置的最小觸控目標（WCAG 2.5.5）"
+    }
+  },
+  "state": {
+    "$comment": "互動狀態層的強度（百分比，不是顏色）。疊加色一律取元件自己的 currentColor，因此同一組數值在任何底色、任何模式上都成立，不必為每個角色各生一組 hover 色。強度依「這個狀態持續多久」排序：瞬間的回饋輕、持久的狀態才配得上明顯的顏色。淺深兩模式共用同一組值——深色下實測比淺色強約三成（低亮度端的感知壓縮），但四道門檻都還在範圍內。",
+    "hover-alpha": {
+      "value": "6%",
+      "desc": "指標懸停：只說「這個可以互動」。實測 ΔE00 3.0（淺）／3.9（深）"
+    },
+    "pressed-alpha": {
+      "value": "14%",
+      "desc": "按住的瞬間：系統收到了。實測距 hover ΔE00 4.3（淺）／5.3（深）"
+    },
+    "selected-alpha": {
+      "value": "20%",
+      "desc": "已選（持續到改選）。實測距底色 ΔE00 10.8（淺）／14.5（深）；上限 16 卡在深色模式的頁面底色——那是全系統最深的表面，同一個 alpha 在它上面的感知落差最大，22% 會衝到 16.1"
     }
   },
   "themes": {

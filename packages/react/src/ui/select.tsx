@@ -59,7 +59,13 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      // 這裡的 `focus:` 是對的，**不要**換成 `focus-visible:`：Radix 把 DOM 焦點移到
+      // 「目前被指向的那一項」，滑鼠移動與鍵盤方向鍵走的是同一條路。換成 focus-visible
+      // 會讓滑鼠指到選項時完全沒有highlight。
+      //
+      // 但強度要拉到已選那一階：highlight 的意思是「按 Enter 會選這個」，
+      // 比「這個可以互動」強。原本的 `focus:bg-accent` 對淺色浮層只有 ΔE00 2.4。
+      "state-layer focus:[--state-layer-alpha:var(--state-selected-alpha)] relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className,
     )}
     {...props}

@@ -331,7 +331,7 @@ export function DataTable<T>({
           }).map((chip) => (
             <span key={chip.id} className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/5 py-0.5 pl-2.5 pr-1 text-xs text-primary">
               {chip.text}
-              <button type="button" aria-label={L.remove(chip.text)} onClick={chip.remove} className="tap-target inline-flex items-center justify-center rounded-full p-0.5 hover:bg-primary/15">
+              <button type="button" aria-label={L.remove(chip.text)} onClick={chip.remove} className="state-layer tap-target inline-flex items-center justify-center rounded-full p-0.5">
                 <X className="size-3" aria-hidden />
               </button>
             </span>
@@ -398,7 +398,11 @@ export function DataTable<T>({
                         onPointerDown={(e) => startResize(e, c.key, ci)}
                         onDoubleClick={() => autoFit(c.key)}
                         title={L.resizeHint}
-                        className="absolute right-0 top-0 z-20 h-full w-1.5 cursor-col-resize touch-none hover:bg-primary/40"
+                        // 全 repo 唯一保留 `hover:bg-*` 的地方，是刻意的例外：
+                        // 這條 1.5px 的把手平常**完全透明**，hover 要做的是「讓一個看不見的
+                        // 控制項現形」，不是「幫一塊既有表面加一階」。狀態層在這裡沒有東西可疊
+                        // ——6% 的 currentColor 疊在透明條上等於還是看不見。
+                        className="absolute right-0 top-0 z-20 h-full w-1.5 cursor-col-resize touch-none transition-colors duration-fast hover:bg-primary/40"
                       />
                     )}
                   </TableHead>
@@ -504,7 +508,7 @@ export function DataTable<T>({
                           {shown.map((v) => {
                             const on = f.values.includes(v);
                             return (
-                              <button key={v} type="button" role="checkbox" aria-checked={on} onClick={() => toggleValue(v)} className="flex w-full items-center gap-2 rounded px-1.5 py-1 text-left text-xs hover:bg-accent">
+                              <button key={v} type="button" role="checkbox" aria-checked={on} onClick={() => toggleValue(v)} className="state-layer flex w-full items-center gap-2 rounded px-1.5 py-1 text-left text-xs">
                                 <span className={cn("flex size-4 shrink-0 items-center justify-center rounded border", on ? "border-primary bg-primary text-primary-foreground" : "border-input")}>
                                   {on && <Check className="size-3" aria-hidden />}
                                 </span>
@@ -558,7 +562,7 @@ export function DataTable<T>({
                             {terms.map((t) => (
                               <span key={t} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
                                 {t}
-                                <button type="button" aria-label={L.remove(t)} onClick={() => setFilter(c.key, { texts: terms.filter((x) => x !== t) })} className="rounded-full hover:bg-primary/20">
+                                <button type="button" aria-label={L.remove(t)} onClick={() => setFilter(c.key, { texts: terms.filter((x) => x !== t) })} className="state-layer rounded-full">
                                   <X className="size-3" aria-hidden />
                                 </button>
                               </span>
@@ -577,7 +581,7 @@ export function DataTable<T>({
                           <div className="space-y-0.5">
                             <p className="px-1 text-tiny text-muted-foreground">{L.suggestions}</p>
                             {sugg.map((v) => (
-                              <button key={v} type="button" onClick={() => add(v)} className="flex w-full items-center gap-1.5 rounded px-1.5 py-1 text-left text-xs hover:bg-accent">
+                              <button key={v} type="button" onClick={() => add(v)} className="state-layer flex w-full items-center gap-1.5 rounded px-1.5 py-1 text-left text-xs">
                                 <Plus className="size-3 shrink-0 text-muted-foreground" aria-hidden />
                                 <span className="truncate">{v}</span>
                               </button>

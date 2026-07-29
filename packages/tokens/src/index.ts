@@ -87,6 +87,8 @@ export const shadow = flatten(raw.shadow as TokenGroup);
 export const duration = flatten(raw.duration as TokenGroup);
 export const easing = flatten(raw.easing as TokenGroup);
 export const size = flatten(raw.size as TokenGroup);
+/** 互動狀態層強度（百分比字串）。疊加色取元件自己的 `currentColor`，故不分淺深。 */
+export const state = flatten((raw as unknown as { state: TokenGroup }).state);
 
 /** token 版本（破壞性變更＝major，見治理章）。 */
 export const TOKENS_VERSION: string = raw.meta.version;

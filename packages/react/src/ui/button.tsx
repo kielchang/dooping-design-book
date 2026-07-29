@@ -4,17 +4,23 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  // 沒有 transition-colors：`state-layer` 自己的 transition 已經涵蓋顏色類屬性，
+  // 而 Tailwind 的 utility 排在 tokens.css 之後，兩者並存會讓狀態層失去淡入。
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
+      // hover／pressed 一律走 `state-layer`：疊一層 currentColor，而不是每個 variant
+      // 各挑一個透明度。改版前這裡有 /90 /80 兩種、全 repo 共七種，實測可見度從
+      // ΔE00 0.7（secondary，等於沒變）到 7.4（default，過於刻意）差了十倍。
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        brand: "bg-brand text-brand-foreground hover:bg-brand/90",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+        default: "state-layer bg-primary text-primary-foreground",
+        brand: "state-layer bg-brand text-brand-foreground",
+        destructive: "state-layer bg-destructive text-destructive-foreground",
+        outline: "state-layer border border-input bg-background",
+        secondary: "state-layer bg-secondary text-secondary-foreground",
+        ghost: "state-layer",
+        // link 刻意不加狀態層：它是一段文字不是一塊表面，疊上去會在字後面浮出一個色塊。
+        link: "text-primary underline-offset-4 transition-colors duration-fast hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2",

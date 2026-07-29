@@ -81,8 +81,8 @@ export function SegGroup({
             onClick={() => !disabled && onPick(o.value)}
             onKeyDown={(e) => onKey(e, idx)}
             className={cn(
-              "tap-target-y inline-flex items-center justify-center gap-1 rounded px-3 py-1 text-sm transition-colors duration-fast",
-              active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent",
+              "state-layer tap-target-y inline-flex items-center justify-center gap-1 rounded px-3 py-1 text-sm",
+              active ? "bg-primary text-primary-foreground" : "text-muted-foreground",
             )}
           >
             {active && <Check aria-hidden className="size-3.5 shrink-0" />}

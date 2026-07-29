@@ -85,15 +85,37 @@ chartColors("dark");  // 另外 8 色，L* 落在 49–86 —— 沒有任何一
 - `data-theme` / `.dark` —— 明暗，既有機制不變
 - `data-color-theme` —— 色相，**不設就是預設主題（石墨）**，輸出與沒有這個功能時完全一樣
 
-### 主題只影響 5 個 token
+### 主題影響哪些 token
 
-| 受主題影響 | 與主題無關 |
-| --- | --- |
-| `--brand` / `--brand-foreground` | `--background`、`--card`、`--border` |
-| `--brand-subtle` / `--brand-subtle-foreground` | `--primary`、`--secondary` |
-| `--ring` | 全部狀態色與圖表色票 |
+每組主題每個模式共 17 個，分兩類：
 
-這是刻意的取捨：換主題**不會**讓介面重心整個變吵，也不會讓同一筆資料在不同主題下換色。
+| 類別 | Token | 怎麼變 |
+| --- | --- | --- |
+| **主題色**（5） | `--brand`、`--brand-foreground`、`--brand-subtle`、`--brand-subtle-foreground`、`--ring` | 完整重新生成（對比反解） |
+| **帶色調的中性色**（12） | `--background`、`--card`、`--popover`、`--muted`、`--secondary`、`--accent`、`--border`、`--input`、`--field-border`、`--field-editable`、`--field-readonly`、`--muted-foreground` | **只轉色相**，L 與 chroma 不動 |
+
+**與主題無關的**：`--primary`（中性近黑，承擔多數控制項）、全部狀態色、
+全部圖表色票、提醒視窗的 `--{狀態}-subtle`。
+
+### 中性色為什麼要帶主題色相
+
+這些 token 的 chroma 只有 0.007–0.023——單看一格分不出來，但它們是畫面上面積最大的那 60%。
+
+中性色如果固定在冷藍（248–267°）而主色是青玉或苔綠，介面會有一種說不上來的
+「兩套系統拼裝」感：主色是暖綠，它坐的表面卻是冷藍。
+
+```
+青玉  muted #f0f6f6   border #deeaea
+苔綠  muted #f3f6f1   border #e4e9e1
+紫晶  muted #f5f3f8   border #e9e5ee
+```
+
+**只轉色相、L 與 chroma 一律不動**，所以明暗層次、表面抬升階、對比關係全部原封不動。
+唯一的例外是 `--muted-foreground`：它會落在 `--muted` 上，轉完色相後對比會位移
+（實測最差掉到 4.25:1），因此那一格是對「該主題的 muted」反解到 4.5:1 產生的，
+不是單純轉色相。
+
+這也是提醒視窗能自動繼承主題的前提——淡底疊在這些表面上，一度色相都不用彎。
 
 ### 六組預設主題
 

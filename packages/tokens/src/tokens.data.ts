@@ -3,7 +3,7 @@ export default {
   "$comment": "Dooping 設計 token 唯一來源（框架中立）。CSS 變數與 Tailwind preset 皆由此檔產生，勿直接改 dist/。色彩值以 HSL 三元組字串表示（可被 hsl(var(--x) / <alpha>) 套用透明度）；chart.* 例外為 hex（SVG fill/stroke 直接吃 var()，不經 hsl() 包裝）。",
   "meta": {
     "name": "dooping",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "defaultTheme": "graphite"
   },
   "color": {
@@ -148,6 +148,38 @@ export default {
       "field-border": {
         "value": "214 30% 80%",
         "desc": "可編輯欄位邊框（冷灰藍，刻意不像狀態色）"
+      },
+      "info-subtle": {
+        "value": "204.3 100% 91.8%",
+        "desc": "info 低強度提示的底色（Carbon 雙強度的低強度層）"
+      },
+      "info-subtle-foreground": {
+        "value": "201.8 63.4% 37.5%",
+        "desc": "info-subtle 上的文字"
+      },
+      "warning-subtle": {
+        "value": "32 100% 89%",
+        "desc": "warning 低強度提示的底色（Carbon 雙強度的低強度層）"
+      },
+      "warning-subtle-foreground": {
+        "value": "34.5 65.3% 33.9%",
+        "desc": "warning-subtle 上的文字"
+      },
+      "danger-subtle": {
+        "value": "0 100% 94.1%",
+        "desc": "danger 低強度提示的底色（Carbon 雙強度的低強度層）"
+      },
+      "danger-subtle-foreground": {
+        "value": "356.8 31.7% 47.1%",
+        "desc": "danger-subtle 上的文字"
+      },
+      "success-subtle": {
+        "value": "148.8 75% 87.5%",
+        "desc": "success 低強度提示的底色（Carbon 雙強度的低強度層）"
+      },
+      "success-subtle-foreground": {
+        "value": "156.1 57.1% 30.2%",
+        "desc": "success-subtle 上的文字"
       }
     },
     "dark": {
@@ -256,6 +288,38 @@ export default {
       },
       "field-border": {
         "value": "215 18% 34%"
+      },
+      "info-subtle": {
+        "value": "199.4 100% 12.2%",
+        "desc": "info 低強度提示的底色（Carbon 雙強度的低強度層）"
+      },
+      "info-subtle-foreground": {
+        "value": "200.8 48.6% 51.2%",
+        "desc": "info-subtle 上的文字"
+      },
+      "warning-subtle": {
+        "value": "36 100% 10.8%",
+        "desc": "warning 低強度提示的底色（Carbon 雙強度的低強度層）"
+      },
+      "warning-subtle-foreground": {
+        "value": "34.8 45.9% 47.8%",
+        "desc": "warning-subtle 上的文字"
+      },
+      "danger-subtle": {
+        "value": "351 47% 17%",
+        "desc": "danger 低強度提示的底色（Carbon 雙強度的低強度層）"
+      },
+      "danger-subtle-foreground": {
+        "value": "353 40% 61%",
+        "desc": "danger-subtle 上的文字"
+      },
+      "success-subtle": {
+        "value": "160.9 100% 9.2%",
+        "desc": "success 低強度提示的底色（Carbon 雙強度的低強度層）"
+      },
+      "success-subtle-foreground": {
+        "value": "157.1 39.2% 44.5%",
+        "desc": "success-subtle 上的文字"
       }
     }
   },
@@ -498,6 +562,54 @@ export default {
       "$label": "石墨",
       "$hue": 265,
       "light": {
+        "background": {
+          "value": "0 0% 100%",
+          "desc": "頁面底色"
+        },
+        "card": {
+          "value": "0 0% 100%",
+          "desc": "卡片表面"
+        },
+        "popover": {
+          "value": "0 0% 100%",
+          "desc": "浮層表面（下拉／泡泡／篩選面板）"
+        },
+        "muted": {
+          "value": "214.3 36.8% 96.3%",
+          "desc": "弱化表面（唯讀區、斑馬列）"
+        },
+        "secondary": {
+          "value": "214.3 36.8% 96.3%",
+          "desc": "次要動作表面"
+        },
+        "accent": {
+          "value": "214.3 36.8% 96.3%",
+          "desc": "hover／被指向的表面"
+        },
+        "border": {
+          "value": "221.5 30.2% 91.6%",
+          "desc": "一般分隔線／邊框"
+        },
+        "input": {
+          "value": "221.5 30.2% 91.6%",
+          "desc": "表單控制項邊框"
+        },
+        "field-border": {
+          "value": "220 27.3% 80.6%",
+          "desc": "可編輯欄位邊框（冷灰藍，刻意不像狀態色）"
+        },
+        "muted-foreground": {
+          "value": "221.7 15.1% 46.7%",
+          "desc": "次要／說明文字"
+        },
+        "field-editable": {
+          "value": "220 100% 98.2%",
+          "desc": "欄位語意：可編輯（極淡冷底）"
+        },
+        "field-readonly": {
+          "value": "220 12% 95%",
+          "desc": "欄位語意：唯讀／計算值"
+        },
         "brand": {
           "value": "220 10.9% 48.4%",
           "desc": "主題色：關鍵動作填色／品牌強調"
@@ -520,6 +632,42 @@ export default {
         }
       },
       "dark": {
+        "background": {
+          "value": "220 22% 8%"
+        },
+        "card": {
+          "value": "222 21% 12%"
+        },
+        "popover": {
+          "value": "221 21% 15%"
+        },
+        "muted": {
+          "value": "221 17% 18%"
+        },
+        "secondary": {
+          "value": "221 17% 18%"
+        },
+        "accent": {
+          "value": "221 17% 18%"
+        },
+        "border": {
+          "value": "220 16% 22%"
+        },
+        "input": {
+          "value": "220 16% 22%"
+        },
+        "field-border": {
+          "value": "220.7 15.9% 34.5%"
+        },
+        "muted-foreground": {
+          "value": "220 15.9% 59.4%"
+        },
+        "field-editable": {
+          "value": "220 20.5% 17.3%"
+        },
+        "field-readonly": {
+          "value": "220 16% 15%"
+        },
         "brand": {
           "value": "220 8.6% 48%",
           "desc": "主題色：關鍵動作填色／品牌強調"
@@ -546,6 +694,54 @@ export default {
       "$label": "靛藍",
       "$hue": 272,
       "light": {
+        "background": {
+          "value": "0 0% 100%",
+          "desc": "頁面底色"
+        },
+        "card": {
+          "value": "0 0% 100%",
+          "desc": "卡片表面"
+        },
+        "popover": {
+          "value": "0 0% 100%",
+          "desc": "浮層表面（下拉／泡泡／篩選面板）"
+        },
+        "muted": {
+          "value": "230 33.3% 96.5%",
+          "desc": "弱化表面（唯讀區、斑馬列）"
+        },
+        "secondary": {
+          "value": "230 33.3% 96.5%",
+          "desc": "次要動作表面"
+        },
+        "accent": {
+          "value": "230 33.3% 96.5%",
+          "desc": "hover／被指向的表面"
+        },
+        "border": {
+          "value": "225 28.6% 91.8%",
+          "desc": "一般分隔線／邊框"
+        },
+        "input": {
+          "value": "225 28.6% 91.8%",
+          "desc": "表單控制項邊框"
+        },
+        "field-border": {
+          "value": "226 26% 81%",
+          "desc": "可編輯欄位邊框（冷灰藍，刻意不像狀態色）"
+        },
+        "muted-foreground": {
+          "value": "227.3 13.7% 47.3%",
+          "desc": "次要／說明文字"
+        },
+        "field-editable": {
+          "value": "226.7 100% 98.2%",
+          "desc": "欄位語意：可編輯（極淡冷底）"
+        },
+        "field-readonly": {
+          "value": "220 12% 95%",
+          "desc": "欄位語意：唯讀／計算值"
+        },
         "brand": {
           "value": "229.7 55.5% 58.6%",
           "desc": "主題色：關鍵動作填色／品牌強調"
@@ -568,6 +764,42 @@ export default {
         }
       },
       "dark": {
+        "background": {
+          "value": "225 19% 8.2%"
+        },
+        "card": {
+          "value": "225 19.4% 12.2%"
+        },
+        "popover": {
+          "value": "227.1 17.9% 15.3%"
+        },
+        "muted": {
+          "value": "224 16.1% 18.2%"
+        },
+        "secondary": {
+          "value": "224 16.1% 18.2%"
+        },
+        "accent": {
+          "value": "224 16.1% 18.2%"
+        },
+        "border": {
+          "value": "228.8 14% 22.4%"
+        },
+        "input": {
+          "value": "228.8 14% 22.4%"
+        },
+        "field-border": {
+          "value": "226.2 14.6% 34.9%"
+        },
+        "muted-foreground": {
+          "value": "226 15% 60%"
+        },
+        "field-editable": {
+          "value": "225.9 19.1% 17.5%"
+        },
+        "field-readonly": {
+          "value": "224 14% 15%"
+        },
         "brand": {
           "value": "228.5 39.2% 55.5%",
           "desc": "主題色：關鍵動作填色／品牌強調"
@@ -594,6 +826,54 @@ export default {
       "$label": "藍紫",
       "$hue": 292,
       "light": {
+        "background": {
+          "value": "0 0% 100%",
+          "desc": "頁面底色"
+        },
+        "card": {
+          "value": "0 0% 100%",
+          "desc": "卡片表面"
+        },
+        "popover": {
+          "value": "0 0% 100%",
+          "desc": "浮層表面（下拉／泡泡／篩選面板）"
+        },
+        "muted": {
+          "value": "240 29.4% 96.7%",
+          "desc": "弱化表面（唯讀區、斑馬列）"
+        },
+        "secondary": {
+          "value": "240 29.4% 96.7%",
+          "desc": "次要動作表面"
+        },
+        "accent": {
+          "value": "240 29.4% 96.7%",
+          "desc": "hover／被指向的表面"
+        },
+        "border": {
+          "value": "247 22% 92%",
+          "desc": "一般分隔線／邊框"
+        },
+        "input": {
+          "value": "247 22% 92%",
+          "desc": "表單控制項邊框"
+        },
+        "field-border": {
+          "value": "249 21.3% 81.6%",
+          "desc": "可編輯欄位邊框（冷灰藍，刻意不像狀態色）"
+        },
+        "muted-foreground": {
+          "value": "249 11% 48%",
+          "desc": "次要／說明文字"
+        },
+        "field-editable": {
+          "value": "248.6 100% 98.6%",
+          "desc": "欄位語意：可編輯（極淡冷底）"
+        },
+        "field-readonly": {
+          "value": "260 12% 95%",
+          "desc": "欄位語意：唯讀／計算值"
+        },
         "brand": {
           "value": "254.3 49.3% 59.8%",
           "desc": "主題色：關鍵動作填色／品牌強調"
@@ -603,11 +883,11 @@ export default {
           "desc": "brand 上的文字"
         },
         "brand-subtle": {
-          "value": "248.6 100% 95.9%",
+          "value": "247.5 100% 95.3%",
           "desc": "主題色淡底：選中的導覽項、分頁底線區"
         },
         "brand-subtle-foreground": {
-          "value": "255 43.5% 54.9%",
+          "value": "254.5 42.5% 54.3%",
           "desc": "brand-subtle 上的文字"
         },
         "ring": {
@@ -616,6 +896,42 @@ export default {
         }
       },
       "dark": {
+        "background": {
+          "value": "250 14.3% 8.2%"
+        },
+        "card": {
+          "value": "246.7 14.3% 12.4%"
+        },
+        "popover": {
+          "value": "245.5 13.9% 15.5%"
+        },
+        "muted": {
+          "value": "250 12.8% 18.4%"
+        },
+        "secondary": {
+          "value": "250 12.8% 18.4%"
+        },
+        "accent": {
+          "value": "250 12.8% 18.4%"
+        },
+        "border": {
+          "value": "249.2 11.3% 22.5%"
+        },
+        "input": {
+          "value": "249.2 11.3% 22.5%"
+        },
+        "field-border": {
+          "value": "248.6 11.6% 35.5%"
+        },
+        "muted-foreground": {
+          "value": "247.5 11.9% 60.4%"
+        },
+        "field-editable": {
+          "value": "249 14% 18%"
+        },
+        "field-readonly": {
+          "value": "247.5 10.3% 15.3%"
+        },
         "brand": {
           "value": "252.2 33.6% 56.9%",
           "desc": "主題色：關鍵動作填色／品牌強調"
@@ -633,7 +949,7 @@ export default {
           "desc": "brand-subtle 上的文字"
         },
         "ring": {
-          "value": "252.2 32.7% 55.7%",
+          "value": "253 32.5% 55.3%",
           "desc": "鍵盤聚焦環（吃主題色相）"
         }
       }
@@ -642,6 +958,54 @@ export default {
       "$label": "紫晶",
       "$hue": 305,
       "light": {
+        "background": {
+          "value": "0 0% 100%",
+          "desc": "頁面底色"
+        },
+        "card": {
+          "value": "0 0% 100%",
+          "desc": "卡片表面"
+        },
+        "popover": {
+          "value": "0 0% 100%",
+          "desc": "浮層表面（下拉／泡泡／篩選面板）"
+        },
+        "muted": {
+          "value": "264 26.3% 96.3%",
+          "desc": "弱化表面（唯讀區、斑馬列）"
+        },
+        "secondary": {
+          "value": "264 26.3% 96.3%",
+          "desc": "次要動作表面"
+        },
+        "accent": {
+          "value": "264 26.3% 96.3%",
+          "desc": "hover／被指向的表面"
+        },
+        "border": {
+          "value": "266.7 20.9% 91.6%",
+          "desc": "一般分隔線／邊框"
+        },
+        "input": {
+          "value": "266.7 20.9% 91.6%",
+          "desc": "表單控制項邊框"
+        },
+        "field-border": {
+          "value": "265 20% 81%",
+          "desc": "可編輯欄位邊框（冷灰藍，刻意不像狀態色）"
+        },
+        "muted-foreground": {
+          "value": "268 11% 47%",
+          "desc": "次要／說明文字"
+        },
+        "field-editable": {
+          "value": "265.7 77.8% 98.2%",
+          "desc": "欄位語意：可編輯（極淡冷底）"
+        },
+        "field-readonly": {
+          "value": "260 12% 95%",
+          "desc": "欄位語意：唯讀／計算值"
+        },
         "brand": {
           "value": "269.4 44.5% 56.9%",
           "desc": "主題色：關鍵動作填色／品牌強調"
@@ -651,11 +1015,11 @@ export default {
           "desc": "brand 上的文字"
         },
         "brand-subtle": {
-          "value": "266.3 100% 96.9%",
+          "value": "266.1 100% 95.5%",
           "desc": "主題色淡底：選中的導覽項、分頁底線區"
         },
         "brand-subtle-foreground": {
-          "value": "269.7 40.9% 53.5%",
+          "value": "269.7 39.6% 52%",
           "desc": "brand-subtle 上的文字"
         },
         "ring": {
@@ -664,6 +1028,42 @@ export default {
         }
       },
       "dark": {
+        "background": {
+          "value": "260 14.3% 8.2%"
+        },
+        "card": {
+          "value": "267 15% 12%"
+        },
+        "popover": {
+          "value": "267 14% 15%"
+        },
+        "muted": {
+          "value": "265 13% 18%"
+        },
+        "secondary": {
+          "value": "265 13% 18%"
+        },
+        "accent": {
+          "value": "265 13% 18%"
+        },
+        "border": {
+          "value": "267.7 11.5% 22.2%"
+        },
+        "input": {
+          "value": "267.7 11.5% 22.2%"
+        },
+        "field-border": {
+          "value": "267 11.4% 34.5%"
+        },
+        "muted-foreground": {
+          "value": "264.5 10.7% 59.6%"
+        },
+        "field-editable": {
+          "value": "263.1 14.6% 17.5%"
+        },
+        "field-readonly": {
+          "value": "270 11% 15%"
+        },
         "brand": {
           "value": "268.3 31% 54.5%",
           "desc": "主題色：關鍵動作填色／品牌強調"
@@ -681,7 +1081,7 @@ export default {
           "desc": "brand-subtle 上的文字"
         },
         "ring": {
-          "value": "268.7 30% 53.5%",
+          "value": "267.9 29.7% 53.1%",
           "desc": "鍵盤聚焦環（吃主題色相）"
         }
       }
@@ -690,6 +1090,54 @@ export default {
       "$label": "青玉",
       "$hue": 195,
       "light": {
+        "background": {
+          "value": "0 0% 100%",
+          "desc": "頁面底色"
+        },
+        "card": {
+          "value": "0 0% 100%",
+          "desc": "卡片表面"
+        },
+        "popover": {
+          "value": "0 0% 100%",
+          "desc": "浮層表面（下拉／泡泡／篩選面板）"
+        },
+        "muted": {
+          "value": "180 25% 95.3%",
+          "desc": "弱化表面（唯讀區、斑馬列）"
+        },
+        "secondary": {
+          "value": "180 25% 95.3%",
+          "desc": "次要動作表面"
+        },
+        "accent": {
+          "value": "180 25% 95.3%",
+          "desc": "hover／被指向的表面"
+        },
+        "border": {
+          "value": "180 22.2% 89.4%",
+          "desc": "一般分隔線／邊框"
+        },
+        "input": {
+          "value": "180 22.2% 89.4%",
+          "desc": "表單控制項邊框"
+        },
+        "field-border": {
+          "value": "178 21% 76%",
+          "desc": "可編輯欄位邊框（冷灰藍，刻意不像狀態色）"
+        },
+        "muted-foreground": {
+          "value": "178.3 17.8% 39.6%",
+          "desc": "次要／說明文字"
+        },
+        "field-editable": {
+          "value": "173.3 52.9% 96.7%",
+          "desc": "欄位語意：可編輯（極淡冷底）"
+        },
+        "field-readonly": {
+          "value": "165 14.3% 94.5%",
+          "desc": "欄位語意：唯讀／計算值"
+        },
         "brand": {
           "value": "180.5 100% 26.1%",
           "desc": "主題色：關鍵動作填色／品牌強調"
@@ -712,6 +1160,42 @@ export default {
         }
       },
       "dark": {
+        "background": {
+          "value": "180 27.3% 6.5%"
+        },
+        "card": {
+          "value": "180 26.5% 9.6%"
+        },
+        "popover": {
+          "value": "176.3 25.8% 12.2%"
+        },
+        "muted": {
+          "value": "176 22% 15%"
+        },
+        "secondary": {
+          "value": "176 22% 15%"
+        },
+        "accent": {
+          "value": "176 22% 15%"
+        },
+        "border": {
+          "value": "180 18.8% 18.8%"
+        },
+        "input": {
+          "value": "180 18.8% 18.8%"
+        },
+        "field-border": {
+          "value": "180 18.7% 29.4%"
+        },
+        "muted-foreground": {
+          "value": "180 13.1% 53.5%"
+        },
+        "field-editable": {
+          "value": "177 27% 14%"
+        },
+        "field-readonly": {
+          "value": "175 18% 13%"
+        },
         "brand": {
           "value": "180.5 100% 26.1%",
           "desc": "主題色：關鍵動作填色／品牌強調"
@@ -721,15 +1205,15 @@ export default {
           "desc": "brand 上的文字"
         },
         "brand-subtle": {
-          "value": "180 100% 6.9%",
+          "value": "180 100% 11.4%",
           "desc": "主題色淡底：選中的導覽項、分頁底線區"
         },
         "brand-subtle-foreground": {
-          "value": "180 68.2% 34.5%",
+          "value": "179.5 47.8% 45.1%",
           "desc": "brand-subtle 上的文字"
         },
         "ring": {
-          "value": "180 100% 25.3%",
+          "value": "180 100% 25.5%",
           "desc": "鍵盤聚焦環（吃主題色相）"
         }
       }
@@ -738,6 +1222,54 @@ export default {
       "$label": "苔綠",
       "$hue": 135,
       "light": {
+        "background": {
+          "value": "0 0% 100%",
+          "desc": "頁面底色"
+        },
+        "card": {
+          "value": "0 0% 100%",
+          "desc": "卡片表面"
+        },
+        "popover": {
+          "value": "0 0% 100%",
+          "desc": "浮層表面（下拉／泡泡／篩選面板）"
+        },
+        "muted": {
+          "value": "96 21.7% 95.5%",
+          "desc": "弱化表面（唯讀區、斑馬列）"
+        },
+        "secondary": {
+          "value": "96 21.7% 95.5%",
+          "desc": "次要動作表面"
+        },
+        "accent": {
+          "value": "96 21.7% 95.5%",
+          "desc": "hover／被指向的表面"
+        },
+        "border": {
+          "value": "97.5 15.4% 89.8%",
+          "desc": "一般分隔線／邊框"
+        },
+        "input": {
+          "value": "97.5 15.4% 89.8%",
+          "desc": "表單控制項邊框"
+        },
+        "field-border": {
+          "value": "100 15.3% 76.9%",
+          "desc": "可編輯欄位邊框（冷灰藍，刻意不像狀態色）"
+        },
+        "muted-foreground": {
+          "value": "99.1 10.9% 41.4%",
+          "desc": "次要／說明文字"
+        },
+        "field-editable": {
+          "value": "100 37.5% 96.9%",
+          "desc": "欄位語意：可編輯（極淡冷底）"
+        },
+        "field-readonly": {
+          "value": "90 7.1% 94.5%",
+          "desc": "欄位語意：唯讀／計算值"
+        },
         "brand": {
           "value": "96 48% 34.7%",
           "desc": "主題色：關鍵動作填色／品牌強調"
@@ -760,6 +1292,42 @@ export default {
         }
       },
       "dark": {
+        "background": {
+          "value": "100 17.6% 6.7%"
+        },
+        "card": {
+          "value": "100 18% 10%"
+        },
+        "popover": {
+          "value": "98.2 16.9% 12.7%"
+        },
+        "muted": {
+          "value": "98.2 13.6% 15.9%"
+        },
+        "secondary": {
+          "value": "98.2 13.6% 15.9%"
+        },
+        "accent": {
+          "value": "98.2 13.6% 15.9%"
+        },
+        "border": {
+          "value": "100 12% 19.6%"
+        },
+        "input": {
+          "value": "100 12% 19.6%"
+        },
+        "field-border": {
+          "value": "100 11.5% 30.6%"
+        },
+        "muted-foreground": {
+          "value": "100.9 9.6% 54.9%"
+        },
+        "field-editable": {
+          "value": "96.9 17.3% 14.7%"
+        },
+        "field-readonly": {
+          "value": "97.5 11.8% 13.3%"
+        },
         "brand": {
           "value": "98.4 31% 38.6%",
           "desc": "主題色：關鍵動作填色／品牌強調"
@@ -777,7 +1345,7 @@ export default {
           "desc": "brand-subtle 上的文字"
         },
         "ring": {
-          "value": "97.4 31.9% 37.5%",
+          "value": "98.4 31.6% 37.8%",
           "desc": "鍵盤聚焦環（吃主題色相）"
         }
       }

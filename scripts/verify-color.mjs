@@ -36,9 +36,25 @@ export function runChecks() {
   const stats = { themes: {}, chart: {} };
 
   const px = (mode, name) => hslToRgb8(tokens.color[mode][name].value);
-  // 每個模式裡最亮的表面——聚焦環要在最不利的表面上仍成立，只驗頁面底色會漏掉卡片與浮層
-  const hardest = { light: px("light", "background"), dark: px("dark", "muted") };
-  const pageBg = { light: px("light", "background"), dark: px("dark", "background") };
+
+  /**
+   * 解出「在主題 X 之下，這個 token 實際是什麼顏色」。
+   *
+   * 中性色（背景、邊框、muted…）現在會被主題層覆蓋，所以拿 `tokens.color` 的基準值去驗
+   * 是驗到後備值、不是驗到畫面上的顏色。這正是這支腳本存在的理由，自己更不能犯：
+   * 生成器一度就是拿沒轉過色相的 muted 去報告 ring 的對比，數字才會看起來低於門檻。
+   */
+  const resolve = (themeName, mode, name) => {
+    const t = tokens.themes?.[themeName]?.[mode]?.[name];
+    return hslToRgb8((t ?? tokens.color[mode][name]).value);
+  };
+  const hardestOf = (themeName, mode) =>
+    mode === "light" ? resolve(themeName, "light", "background") : resolve(themeName, "dark", "muted");
+  const pageBgOf = (themeName, mode) => resolve(themeName, mode, "background");
+
+  // 預設主題的表面——圖表與狀態色不隨主題變，用預設主題的表面驗即可
+  const DEF = tokens.meta.defaultTheme;
+  const pageBg = { light: pageBgOf(DEF, "light"), dark: pageBgOf(DEF, "dark") };
 
   // ── 1. 色相主題 ────────────────────────────────────────────
   for (const [name, theme] of Object.entries(tokens.themes ?? {})) {
@@ -55,15 +71,15 @@ export function runChecks() {
       const cSubtle = contrast(at("brand-subtle"), at("brand-subtle-foreground"));
       push(cSubtle >= TEXT, `${tag} brand-subtle 上的文字只有 ${cSubtle.toFixed(2)}:1（需 ${TEXT}）`);
 
-      const cRing = contrast(at("ring"), hardest[mode]);
+      const cRing = contrast(at("ring"), hardestOf(name, mode));
       push(cRing >= NONTEXT, `${tag} ring 對最亮表面只有 ${cRing.toFixed(2)}:1（需 ${NONTEXT}）`);
 
       // brand 色塊本身也要看得見，否則按鈕在頁面上「浮不出來」
-      const cFill = contrast(brand, pageBg[mode]);
+      const cFill = contrast(brand, pageBgOf(name, mode));
       push(cFill >= NONTEXT, `${tag} brand 色塊對頁面底只有 ${cFill.toFixed(2)}:1（需 ${NONTEXT}）`);
 
       // brand-subtle 必須與 muted 分得開
-      const dMuted = deltaE00(lab(at("brand-subtle")), lab(px(mode, "muted")));
+      const dMuted = deltaE00(lab(at("brand-subtle")), lab(resolve(name, mode, "muted")));
       push(dMuted >= SUBTLE_MIN, `${tag} brand-subtle 與 muted 只差 ΔE00 ${dMuted.toFixed(1)}（需 ${SUBTLE_MIN}）`);
 
       // brand 與狀態色的感知距離。主色如果看起來像「成功」，使用者會停止把綠色讀成狀態。
@@ -77,10 +93,48 @@ export function runChecks() {
       push(nearest.d >= BRAND_STATUS_MIN,
         `${tag} brand 與 ${nearest.s} 只差 ΔE00 ${nearest.d.toFixed(1)}（需 ${BRAND_STATUS_MIN}）`);
 
+      // 中性色跟著主題轉色相之後，這些配對要逐主題重驗——L 與 chroma 沒動，
+      // 但 WCAG 的相對亮度跟色相有關，轉一圈下來會有零點幾的位移。
+      for (const [fg, bg] of [["muted-foreground", "muted"], ["muted-foreground", "background"]]) {
+        const c = contrast(resolve(name, mode, fg), resolve(name, mode, bg));
+        if (c < TEXT) warn.push(`${tag} ${fg} 在 ${bg} 上 ${c.toFixed(2)}:1（需 ${TEXT}）`);
+      }
+      // 刻意不驗 border 對背景。分隔線是裝飾性的細線，WCAG 1.4.11 不涵蓋；
+      // 訂一個自己發明的門檻只會產生六組主題各一則的雜訊，而假警報會訓練人忽略真警報。
+
       stats.themes[tag] = {
         brandText: cBrand, subtleText: cSubtle, ring: cRing, fill: cFill,
         nearestStatus: nearest.s, nearestStatusD: nearest.d,
       };
+    }
+  }
+
+  // ── 1b. 提醒視窗的低強度層 ─────────────────────────────────
+  //
+  // 這一層取代了原本的 `bg-{狀態}/10`。舊做法是把實色壓 10% 疊在表面上，
+  // 對比完全不可控——實測四種變體在淺色模式的文字只有 1.97–3.98:1。
+  const ALERT = ["info", "warning", "danger", "success"];
+  for (const mode of MODES) {
+    const tints = [];
+    for (const s of ALERT) {
+      const tint = px(mode, `${s}-subtle`);
+      const ink = px(mode, `${s}-subtle-foreground`);
+      tints.push(tint);
+      const c = contrast(tint, ink);
+      if (c < TEXT) fail.push(`${s}-subtle/${mode} 上的文字只有 ${c.toFixed(2)}:1（需 ${TEXT}）`);
+      // 低強度用的左粗邊是實色狀態色，要在淡底上看得出來
+      const cb = contrast(px(mode, s), tint);
+      if (cb < NONTEXT) warn.push(`${s}/${mode} 左邊框對自己的淡底只有 ${cb.toFixed(2)}:1`);
+    }
+    // 四種淡底必須彼此分得開，否則「注意」和「錯誤」看起來是同一種。
+    // 這條擋過事：淡底的 L 拉到 0.955 時 warning↔danger 只差 8.1–9.3——
+    // 越接近純白，可用的 chroma 越少，四種 tint 就一起往白色收斂。
+    for (let i = 0; i < ALERT.length; i++) {
+      for (let j = i + 1; j < ALERT.length; j++) {
+        const d = deltaE00(lab(tints[i]), lab(tints[j]));
+        if (d < 10) fail.push(`${ALERT[i]}-subtle↔${ALERT[j]}-subtle/${mode} 只差 ΔE00 ${d.toFixed(1)}（需 10）`);
+        else if (d < 13) warn.push(`${ALERT[i]}-subtle↔${ALERT[j]}-subtle/${mode} ΔE00 ${d.toFixed(1)}，勉強`);
+      }
     }
   }
 

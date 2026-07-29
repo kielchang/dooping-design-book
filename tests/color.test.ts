@@ -8,6 +8,9 @@
 // 這一版就是這樣抓到已釋出版本裡的 WCAG AA 違規：Badge 的 warning 變體在深色模式下
 // 白字只有 1.99:1，而它已經這樣釋出了。
 import { describe, it, expect } from "vitest";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 // @ts-expect-error -- 純 JS 驗收腳本，與 CLI 共用同一份檢查邏輯
 import { runChecks } from "../scripts/verify-color.mjs";
 
@@ -74,5 +77,20 @@ describe("色彩", () => {
   // 警告不擋 PR，但數量爆增通常代表有人動了背景或加了主題卻沒重新生成。
   it("警告數量沒有失控", () => {
     expect(warn.length, `\n${warn.join("\n")}\n`).toBeLessThanOrEqual(15);
+  });
+
+  // 這一條擋的不是顏色，是**畫法**：`ring-offset` 決定聚焦環貼在誰身上。
+  //
+  // 沒有 offset 時環直接畫在元件邊框外緣，於是它的對比要對「邊框」算。
+  // 實測環對 danger 邊框在深色下只有 1.04:1——不合格欄位一變紅框，聚焦環當場隱形。
+  // 有 offset 時中間隔一圈背景色，環是對「背景」算，也就是上面那些 3:1 的數字才算數。
+  it("用了 ring-ring 的元件都必須有 ring-offset（否則環會貼在邊框上）", () => {
+    const dir = fileURLToPath(new URL("../packages/react/src/ui", import.meta.url));
+    const offenders: string[] = [];
+    for (const f of readdirSync(dir).filter((n) => n.endsWith(".tsx") && !n.includes(".stories."))) {
+      const src = readFileSync(join(dir, f), "utf8");
+      if (src.includes("ring-ring") && !src.includes("ring-offset")) offenders.push(f);
+    }
+    expect(offenders, `這些元件的聚焦環沒有 offset：${offenders.join(", ")}`).toEqual([]);
   });
 });

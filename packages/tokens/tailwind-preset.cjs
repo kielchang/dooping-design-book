@@ -43,6 +43,8 @@ colors.brand = {
   subtle: hsl("brand-subtle"),
   "subtle-foreground": hsl("brand-subtle-foreground"),
 };
+// 提醒視窗的低強度層：`bg-danger-subtle text-danger-subtle-foreground`
+// colorScale() 已經自動把 `X-subtle` 與 `X-subtle-foreground` 配成一組，這裡不用再手動列。
 // 圖表色票是 hex（SVG 直接吃），不包 hsl()
 colors.chart = Object.fromEntries(keys(tokens.chart.light).map((k) => [k.replace(/^chart-/, ""), `var(--${k})`]));
 

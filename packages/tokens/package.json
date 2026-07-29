@@ -1,6 +1,6 @@
 {
   "name": "@dooping/tokens",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Dooping 設計 token — 框架中立的語意化設計變數（JSON 來源 → CSS 變數 + Tailwind preset）",
   "license": "MIT",
   "keywords": [

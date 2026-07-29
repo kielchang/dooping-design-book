@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "badge",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "registry:ui",
   "title": "Badge 狀態徽章",
   "description": "帶文字的狀態標記，不只靠顏色傳達語意。",

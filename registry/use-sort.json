@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "use-sort",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "registry:lib",
   "title": "useSort 排序 hook",
   "description": "無→大到小→小到大 的三態排序。",

@@ -56,11 +56,60 @@ const DARK_CHROMA_FACTOR = 0.75;
 /** brand-subtle 與 muted 的最小感知距離——低於此，「被選中」看起來只是「有點灰」。 */
 const SUBTLE_MIN = 8;
 
+// 帶主題色相的中性色。
+//
+// 這些 token 的 chroma 只有 0.007–0.023——單看一格幾乎分不出來，但它們是畫面上
+// 面積最大的那 60%。中性色固定在冷藍（248–267°）而主色是青玉或苔綠時，
+// 介面會有一種說不上來的「兩套系統拼裝」感：主色是暖綠，它坐的表面卻是冷藍。
+//
+// 做法是**只轉色相，L 與 chroma 一律不動**。因此明暗層次、表面抬升階、
+// 對比關係全部原封不動，只有色偏跟著主題走。這也是提醒視窗能自動繼承主題的前提：
+// tint 疊在這些表面上，一度色相都不用彎。
+const NEUTRAL_TINT = [
+  "background", "card", "popover",          // 表面（淺色下是純白，chroma 0，轉了也不變）
+  "muted", "secondary", "accent",           // 弱化與次要表面
+  "border", "input", "field-border",        // 線
+  "muted-foreground",                       // 次要文字
+  "field-editable", "field-readonly",       // 欄位底
+];
+
+function tintNeutral(mode, hue) {
+  const out = {};
+  for (const name of NEUTRAL_TINT) {
+    const base = tokens.color[mode][name];
+    if (!base) continue;
+    const [L, C] = rgb8ToOklch(hslToRgb8(base.value));
+    const rgb = oklchToRgb8(L, Math.min(C, maxChroma(L, hue)), hue);
+    out[name] = { value: rgb8ToHsl(rgb), desc: base.desc };
+  }
+
+  // muted-foreground 是次要文字，會落在 muted 這種弱化表面上。
+  // 基準值對 muted 只有 4.34:1（本來就低於門檻），轉色相後最差掉到 4.25:1。
+  // 既然這一格是生成的，就解對而不是留一條警告：對「這個主題的 muted」反解到 4.5:1。
+  // 只往暗解，不動色相與 chroma——次要文字變太深會搶掉正文的層次。
+  const mutedRgb = hslToRgb8(out.muted.value);
+  const [, mfC] = rgb8ToOklch(hslToRgb8(tokens.color[mode]["muted-foreground"].value));
+  const solved = mode === "light"
+    ? solveLightness(hue, mfC, mutedRgb, 4.5, { from: 0.30, to: 0.62, prefer: "max" })
+    : solveLightness(hue, mfC, mutedRgb, 4.5, { from: 0.60, to: 0.90, prefer: "min" });
+  if (!solved) throw new Error(`${mode} muted-foreground 對 muted 無解（hue ${hue}）`);
+  out["muted-foreground"] = {
+    value: rgb8ToHsl(solved.rgb),
+    desc: tokens.color[mode]["muted-foreground"].desc,
+  };
+  return out;
+}
+
 function buildTheme({ hue, cap }) {
   const out = { light: {}, dark: {} };
 
   for (const mode of ["light", "dark"]) {
     const c = mode === "dark" ? cap * DARK_CHROMA_FACTOR : cap;
+
+    // 中性色先算——brand-subtle 要與「這個主題的 muted」拉開距離，
+    // ring 要對「這個主題最亮的表面」達 3:1，兩者都得用轉過色相之後的值。
+    const neutral = tintNeutral(mode, hue);
+    const nx = (name) => hslToRgb8((neutral[name] ?? tokens.color[mode][name]).value);
 
     // brand：關鍵 CTA 的填色。解 L 使白字達 4.5:1，取最亮的合格解——
     // 最亮＝色彩最鮮明而不過於沉重，且仍留在文字對比門檻內。
@@ -73,7 +122,7 @@ function buildTheme({ hue, cap }) {
     // 藍紫系主題用固定值產出的淡底會與 muted 幾乎同色（實測石墨只差 ΔE00 3.2），
     // 於是「這一項被選中」看起來只是「這一項有點灰」。
     // 改成解出來：從最淡開始往下探，找第一個與 muted 拉開 SUBTLE_MIN 的值。
-    const muted = px({ mode, name: "muted" });
+    const muted = nx("muted");
     const subtle = (() => {
       const from = mode === "light" ? 0.970 : 0.230;
       const dir = mode === "light" ? -1 : 1;      // 淺色往下探、深色往上探
@@ -94,13 +143,14 @@ function buildTheme({ hue, cap }) {
 
     // ring：聚焦環是非文字 UI 元件，門檻 3:1（WCAG 1.4.11），
     // 且要對該模式**最亮的表面**成立，不是只對頁面底色。
-    const surface = HARDEST_SURFACE[mode];
+    const surface = mode === "light" ? nx("background") : nx("muted");
     const ring = mode === "light"
       ? solveLightness(hue, c, surface, 3.0, { from: 0.35, to: 0.75, prefer: "max" })
       : solveLightness(hue, c, surface, 3.0, { from: 0.50, to: 0.92, prefer: "min" });
     if (!ring) throw new Error(`${mode} ring 無解（hue ${hue}）`);
 
     out[mode] = {
+      ...neutral,
       brand: { value: rgb8ToHsl(brand.rgb), desc: "主題色：關鍵動作填色／品牌強調" },
       "brand-foreground": { value: "0 0% 100%", desc: "brand 上的文字" },
       "brand-subtle": { value: rgb8ToHsl(subtle), desc: "主題色淡底：選中的導覽項、分頁底線區" },
@@ -166,6 +216,62 @@ function fixStatusContrast() {
 
 // 狀態色要先修好，圖表色票才有正確的 danger 可以拉開距離。
 const statusLog = fixStatusContrast();
+
+// ── 提醒視窗的低強度層 ─────────────────────────────────────
+//
+// Carbon 的雙強度模型：低強度＝淡底＋左邊框＋圖示＋同色系深字（日常提示，
+// 大量出現不刺眼）；高強度＝實色滿版＋反白字（阻斷式，出現頻率低才不累積疲勞）。
+// 高強度直接用上面修好的 `--{status}` + `--{status}-foreground`，這裡只生低強度那層。
+//
+// 為什麼不能沿用 `bg-danger/10`：那是把實色壓 10% 疊在表面上，**contrast 不可控**——
+// 實測 Callout 現況的文字對比是 1.97–3.98:1，四種變體在淺色下全部不合格。
+// 改成生成的實色 token，對比就能在生成時反解保證。
+//
+// 為什麼四種 tint 不做 harmonization（不往主題色相偏）：實測往主題拉 12°，
+// 藍紫系主題的 warning↔danger 兩種 tint 會收斂到 ΔE00 8.8——琥珀和紅都被拉成粉橘，
+// 「注意」和「錯誤」看起來變成同一種。提醒視窗的整體感要靠**四種共用同一條構成規則**
+// 加上它們坐在帶主題色相的中性表面上，不靠彎色相。
+const ALERT_STATUSES = ["info", "warning", "danger", "success"];
+// L 不能再高：淡底越接近純白，可用的 chroma 越少，四種 tint 就往白色收斂。
+// 實測 L=0.965 時 warning↔danger 只差 ΔE00 8.1、0.955 時 9.3，都低於 10——
+// 「注意」和「錯誤」會看起來像同一種。0.935 拉到 13.8，仍然是明確的淡底。
+const SUBTLE_L = { light: 0.935, dark: 0.270 };
+const SUBTLE_C = { light: 0.060, dark: 0.065 };
+
+function buildAlertSubtle() {
+  const log = [];
+  for (const mode of ["light", "dark"]) {
+    for (const name of ALERT_STATUSES) {
+      const hue = rgb8ToOklch(px({ mode, name }))[2];
+      const L = SUBTLE_L[mode];
+      const tint = oklchToRgb8(L, Math.min(maxChroma(L, hue), SUBTLE_C[mode]), hue);
+
+      // 同色相的文字，對這個淡底反解到 4.5:1。淺色往暗解、深色往亮解。
+      const ink = mode === "light"
+        ? solveLightness(hue, 0.10, tint, STATUS_TEXT, { from: 0.15, to: 0.60, prefer: "max" })
+        : solveLightness(hue, 0.10, tint, STATUS_TEXT, { from: 0.55, to: 0.97, prefer: "min" });
+      if (!ink) throw new Error(`${mode} ${name}-subtle-foreground 無解`);
+
+      tokens.color[mode][`${name}-subtle`] = {
+        value: rgb8ToHsl(tint), desc: `${name} 低強度提示的底色（Carbon 雙強度的低強度層）`,
+      };
+      tokens.color[mode][`${name}-subtle-foreground`] = {
+        value: rgb8ToHsl(ink.rgb), desc: `${name}-subtle 上的文字`,
+      };
+      log.push(`  ${name}-subtle/${mode}  ${rgb8ToHex(tint)} → 文字 ${rgb8ToHex(ink.rgb)} ${contrast(ink.rgb, tint).toFixed(2)}:1`);
+    }
+    // 四種 tint 必須彼此分得開，否則「注意」和「錯誤」看起來一樣
+    const tints = ALERT_STATUSES.map((n) => px({ mode, name: `${n}-subtle` }));
+    for (let i = 0; i < tints.length; i++) {
+      for (let j = i + 1; j < tints.length; j++) {
+        const d = deltaE00(lab(tints[i]), lab(tints[j]));
+        if (d < 10) throw new Error(`${mode} ${ALERT_STATUSES[i]}↔${ALERT_STATUSES[j]} 的 tint 只差 ΔE00 ${d.toFixed(1)}`);
+      }
+    }
+  }
+  return log;
+}
+const alertLog = buildAlertSubtle();
 
 // ── 圖表分類色票 ───────────────────────────────────────────
 //
@@ -275,6 +381,11 @@ writeFileSync(SRC, JSON.stringify(tokens, null, 2) + "\n", "utf8");
 
 // ── 報告 ───────────────────────────────────────────────────
 console.log(`[generate-theme] 已寫回 ${SRC}\n`);
+if (alertLog.length) {
+  console.log("提醒視窗低強度層（四種同一條規則生成，文字反解到 4.5:1）");
+  for (const l of alertLog) console.log(l);
+  console.log("");
+}
 if (statusLog.length) {
   console.log("既有狀態色的 WCAG AA 修正（已釋出的 Badge／Stepper／Button 有實際違規）");
   for (const l of statusLog) console.log(l);

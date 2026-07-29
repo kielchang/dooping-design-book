@@ -64,3 +64,29 @@ jobs:
       - name: 發佈到 gh-pages 根目錄（保留 preview/）
         run: |
           bash scripts/deploy-gh-pages.sh book/build . "deploy(main) ${{ github.sha }}"
+
+      # 規範版號 tag（vX.Y.Z）——給取用端的訊號，不是部署紀錄。
+      #
+      # 版號正本是根目錄 package.json 的 version：工程師在 dev 依大中小判準 bump
+      # 並寫 CHANGELOG（提議），使用者在 dev → main 的 PR 上確認（合併＝確認），
+      # 這裡只負責把已確認的版號蓋成 tag。版號沒動的進版（純文件）不產生新 tag——
+      # 取用端看不到新版號，就代表不需要動作。日期在 tag 描述裡，不佔名稱。
+      #
+      # 這個 tag 不觸發任何東西：v* 不符合 publish-tokens.yml 的 tokens-v* 比對，
+      # 而且 GITHUB_TOKEN 建立的 ref 依 GitHub 防遞迴機制不會觸發其他 workflow。
+      # npm 發佈仍然只有人工的 tokens-v* 或 workflow_dispatch 那兩條路。
+      - name: 蓋上規範版號 tag（vX.Y.Z）
+        run: |
+          git fetch --tags -q origin
+          TAG="v$(node -p "require('./package.json').version")"
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "tag $TAG 已存在——版號未變的進版（純文件）或重跑，都不另打 tag"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "進版 $TAG（$(TZ=Asia/Taipei date +%F)）" \
+            -m "commit ${{ github.sha }}" \
+            -m "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          git push origin "$TAG"
+          echo "### 🏷 $TAG" >> "$GITHUB_STEP_SUMMARY"

@@ -109,15 +109,16 @@ const TITLES = {
 };
 
 /**
- * 每個 item 都戳上產生它的元件庫版號。
+ * 每個 item 都戳上產生它的「規範版號」。
  *
  * 元件是複製走的（ADR-0004），複製完就與上游脫鉤——所以取用端要問的不是
  * 「該鎖哪一版」，而是「我抄的是哪一版」，這樣上游修 bug 時才知道要不要同步。
- * 版號的正本是 packages/react/package.json；version.ts 的 KIT_VERSION 是它的
- * 執行期複本，兩者一致由 tests/tokens.test.ts 把關。
+ * 版號正本是根目錄 package.json 的 version（＝進版時部署自動蓋的 vX.Y.Z tag），
+ * 戳記因此能直接對回 GitHub 上的 tag；packages/react 與 version.ts 跟隨此版號，
+ * 三者一致由 tests/tokens.test.ts 把關。
  */
-const KIT_VERSION = JSON.parse(
-  readFileSync(join(ROOT, "packages/react/package.json"), "utf8"),
+const SPEC_VERSION = JSON.parse(
+  readFileSync(join(ROOT, "package.json"), "utf8"),
 ).version;
 
 rmSync(OUT, { recursive: true, force: true });
@@ -138,7 +139,7 @@ for (const abs of walk(SRC)) {
   const item = {
     $schema: "https://ui.shadcn.com/schema/registry-item.json",
     name,
-    version: KIT_VERSION,
+    version: SPEC_VERSION,
     type: isLib ? "registry:lib" : rel.startsWith("form/") ? "registry:component" : "registry:ui",
     title,
     description,
@@ -154,7 +155,7 @@ for (const abs of walk(SRC)) {
     ],
   };
   writeFileSync(join(OUT, `${name}.json`), `${JSON.stringify(item, null, 2)}\n`, "utf8");
-  items.push({ name, version: KIT_VERSION, type: item.type, title, description });
+  items.push({ name, version: SPEC_VERSION, type: item.type, title, description });
 }
 
 // registry 索引（給人看、也給工具列舉用）。
@@ -163,7 +164,7 @@ for (const abs of walk(SRC)) {
 const index = {
   $schema: "https://ui.shadcn.com/schema/registry.json",
   name: "dooping",
-  version: KIT_VERSION,
+  version: SPEC_VERSION,
   homepage: BASE,
   items: items
     .sort((a, b) => a.name.localeCompare(b.name))

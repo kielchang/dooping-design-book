@@ -64,6 +64,21 @@ jobs:
             exit 1
           fi
 
+      # 規範版號（root package.json → vX.Y.Z tag ＋ registry 戳記）是給取用端的訊號：
+      # 元件或 token 有消費端可感知的變更，就必須伴隨版號 bump，否則取用端看不到訊號。
+      # 純文件變更不強制——那本來就不該 bump。大中小的判準見治理章「版本策略」。
+      - name: 規範內容變更必須伴隨規範版號 bump
+        run: |
+          git fetch --depth=1 origin main || exit 0
+          git rev-parse -q --verify origin/main >/dev/null || exit 0
+          OLD_VER=$(git show origin/main:package.json | jq -r .version)
+          NEW_VER=$(jq -r .version package.json)
+          CHANGED=$(git diff --name-only origin/main HEAD -- packages/react/src packages/tokens/src/tokens.json)
+          if [ -n "$CHANGED" ] && [ "$OLD_VER" = "$NEW_VER" ]; then
+            echo "::error::元件或 token 相對 main 有變，但規範版號還停在 $NEW_VER。請依大中小判準 bump 根目錄 package.json 的 version（並同步 react/package.json 與 version.ts、重跑 npm run build:registry），在 CHANGELOG 寫明理由。變更檔案：$(echo "$CHANGED" | tr '\n' ' ')"
+            exit 1
+          fi
+
       - name: 產生 registry JSON（base 指向正式站，預覽站不供安裝）
         run: node scripts/build-registry.mjs
         env:

@@ -33,22 +33,26 @@ describe("設計 token", () => {
     expect(TOKENS_VERSION, "請重新執行 npm run build:tokens").toBe(pkg);
   });
 
-  // 元件庫版號同樣有兩份：packages/react/package.json 是正本，version.ts 的
-  // KIT_VERSION 是給執行期讀的複本，而 registry 產生器會把正本戳進每個 item。
-  // 戳記的用途是讓取用端答得出「我抄的是哪一版」——複本一旦漂移，戳記就會說謊。
-  it("元件庫版號一致（react package.json／version.ts／registry 戳記）", () => {
+  // 規範版號的正本是根目錄 package.json 的 version——進版時部署照它蓋 vX.Y.Z tag，
+  // registry 產生器也把它戳進每個 item。packages/react 與 version.ts 的 KIT_VERSION
+  // 是跟隨它的複本。任何一處漂移，取用端看到的「我抄的是哪一版」就會說謊，
+  // 或者 tag 蓋出來跟戳記對不上。
+  it("規範版號一致（root package.json／react package.json／version.ts／registry 戳記）", () => {
     const read = (p: string) => JSON.parse(readFileSync(join(ROOT, p), "utf8"));
-    const pkg = read("packages/react/package.json").version;
+    const spec = read("package.json").version;
+
+    expect(read("packages/react/package.json").version,
+      "react/package.json 未跟隨根目錄的規範版號").toBe(spec);
 
     const src = readFileSync(join(ROOT, "packages/react/src/version.ts"), "utf8");
     const kit = src.match(/version:\s*"([^"]+)"/)?.[1];
-    expect(kit, "version.ts 的 KIT_VERSION 與 react/package.json 不一致").toBe(pkg);
+    expect(kit, "version.ts 的 KIT_VERSION 未跟隨規範版號").toBe(spec);
 
     const indexPath = join(ROOT, "registry/index.json");
     if (existsSync(indexPath)) {
       const index = read("registry/index.json");
-      expect(index.version, "registry/index.json 的戳記過期，請重跑 npm run build:registry").toBe(pkg);
-      expect(read("registry/button.json").version, "registry item 的戳記過期").toBe(pkg);
+      expect(index.version, "registry/index.json 的戳記過期，請重跑 npm run build:registry").toBe(spec);
+      expect(read("registry/button.json").version, "registry item 的戳記過期").toBe(spec);
     }
   });
 

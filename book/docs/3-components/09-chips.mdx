@@ -31,6 +31,60 @@ title: Chips 多選標籤片
   </div>
 </Demo>
 
+## 四種狀態要一次看完
+
+Chips 有四種狀態，而它們的差別**只有並排時才看得出來**。
+分開展示時，每一種看起來都「就是個標籤片」。
+
+<Demo title="四態並列">
+  <div className="max-w-md space-y-4">
+    <div>
+      <p className="mb-1 text-xs text-muted-foreground">預設</p>
+      <Chips label="下單管道" selected={["web", "phone"]} onToggle={() => {}} options={[
+        { value: "web", label: "線上下單" }, { value: "phone", label: "電話" },
+        { value: "email", label: "電子郵件" }, { value: "onsite", label: "業務到府" },
+      ]} />
+    </div>
+    <div>
+      <p className="mb-1 text-xs text-muted-foreground">已改動未送出（琥珀）</p>
+      <Chips label="下單管道" selected={["email"]} onToggle={() => {}} changed options={[
+        { value: "web", label: "線上下單" }, { value: "phone", label: "電話" },
+        { value: "email", label: "電子郵件" }, { value: "onsite", label: "業務到府" },
+      ]} />
+    </div>
+    <div>
+      <p className="mb-1 text-xs text-muted-foreground">鎖定（可聚焦，hover 有原因）</p>
+      <Chips label="下單管道" selected={["web"]} onToggle={() => {}} disabled
+        lockHint="此筆已結案，需先解除鎖定" options={[
+        { value: "web", label: "線上下單" }, { value: "phone", label: "電話" },
+      ]} />
+    </div>
+    <div>
+      <p className="mb-1 text-xs text-muted-foreground">沒有選項可選</p>
+      <Chips label="下單管道" selected={[]} onToggle={() => {}} options={[]}
+        emptyHint="尚未建立任何管道選項" />
+    </div>
+  </div>
+</Demo>
+
+**這是文件本身的規格，不是排版偏好。** 四態分開展示時，
+沒有人會發現「鎖定」和「已改動」在深色模式下的邊框亮度只差一階——並排就會立刻看到。
+[SegGroup](/components/seg-group) 已經這樣做了，Chips 應該一致。
+
+## 沒有選項時要說話，不是消失
+
+`options` 為空陣列時，元件顯示 `emptyHint` 文字，而不是整塊不見。
+
+<Rules>
+  <Do><p><code>emptyHint</code> 寫出<strong>為什麼</strong>沒有選項，能引導就引導：
+  「尚未建立任何管道選項」。</p></Do>
+  <Dont><p>不要讓整個欄位消失。使用者會以為表單壞了，或以為自己沒有權限——
+  兩種猜測都會變成一通求助電話。</p></Dont>
+</Rules>
+
+這和 [EmptyState](/components/empty-state) 是同一條原則的小尺寸版本：
+**空的東西也要說明自己為什麼空。**
+
 ## 無障礙
 
 - `role="group"` 裡放一組 `role="checkbox"`（**不是** radiogroup——可複選）

@@ -41,6 +41,29 @@ title: Mockup 文件示意積木
   只是畫得比較醜。</p></Dont>
 </Rules>
 
+## 初始畫面不能取決於瀏覽器環境
+
+文件站是靜態產生的，**第一次渲染永遠發生在沒有瀏覽器的地方**。
+任何「初始狀態要讀瀏覽器」的元件都會踩到同一個坑：
+
+```tsx
+// ✗ 伺服器端沒有 matchMedia；就算加了防呆，
+//   伺服器算出 false、瀏覽器算出 true → hydration mismatch
+const [expanded, setExpanded] = useState(
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches
+);
+
+// ✓ 初始值固定，掛載後才套用使用者偏好
+const [expanded, setExpanded] = useState(false);
+useEffect(() => {
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) setExpanded(true);
+}, []);
+```
+
+這條適用於**所有**取決於瀏覽器環境的初始狀態：主題偏好、視窗寬度、觸控能力、
+減少動態偏好。症狀是畫面閃一下或 React 在主控台抱怨 hydration 不一致，
+而它只在正式建置後才看得到——`npm start` 的開發模式不會重現。
+
 ## 聚光用的是同一套視覺語言
 
 `<Spotlight>` 用的 `.spotlight-ring` 與 [Coachmark](/components/coachmark) 完全相同。

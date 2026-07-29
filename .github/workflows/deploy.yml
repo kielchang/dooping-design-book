@@ -65,29 +65,28 @@ jobs:
         run: |
           bash scripts/deploy-gh-pages.sh book/build . "deploy(main) ${{ github.sha }}"
 
-      # 進版 tag 是部署的「紀錄」，不是閘門——真正的閘門是 dev → main 的合併。
-      # 放在發佈之後：部署失敗就不會有 tag，tag 永遠代表「真的上線過」。
+      # 規範版號 tag（vX.Y.Z）——給取用端的訊號，不是部署紀錄。
       #
-      # 這個 tag 不觸發任何東西：release-* 不符合 publish-tokens.yml 的 tokens-v*
-      # glob，而且 GITHUB_TOKEN 建立的 ref 依 GitHub 防遞迴機制不會觸發其他
-      # workflow——雙重保險。npm 發佈仍然只有人工的 tokens-v* 或 workflow_dispatch。
-      - name: 蓋上進版 tag（release-YYYY-MM-DD）
+      # 版號正本是根目錄 package.json 的 version：工程師在 dev 依大中小判準 bump
+      # 並寫 CHANGELOG（提議），使用者在 dev → main 的 PR 上確認（合併＝確認），
+      # 這裡只負責把已確認的版號蓋成 tag。版號沒動的進版（純文件）不產生新 tag——
+      # 取用端看不到新版號，就代表不需要動作。日期在 tag 描述裡，不佔名稱。
+      #
+      # 這個 tag 不觸發任何東西：v* 不符合 publish-tokens.yml 的 tokens-v* 比對，
+      # 而且 GITHUB_TOKEN 建立的 ref 依 GitHub 防遞迴機制不會觸發其他 workflow。
+      # npm 發佈仍然只有人工的 tokens-v* 或 workflow_dispatch 那兩條路。
+      - name: 蓋上規範版號 tag（vX.Y.Z）
         run: |
           git fetch --tags -q origin
-          # 不用 grep -q：pipefail 下 -q 提早退出可能讓 git tag 吃 SIGPIPE，
-          # 把「已有 tag」誤判成「沒有」。不加 -q 會讀完整個輸出，順便印出既有 tag。
-          if git tag --points-at HEAD | grep '^release-'; then
-            echo "此 commit 已有進版 tag，跳過（重跑不重複打）"
+          TAG="v$(node -p "require('./package.json').version")"
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "tag $TAG 已存在——版號未變的進版（純文件）或重跑，都不另打 tag"
             exit 0
           fi
-          BASE="release-$(TZ=Asia/Taipei date +%F)"
-          TAG="$BASE"; N=2
-          while git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; do
-            TAG="$BASE-$N"; N=$((N+1))
-          done
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -a "$TAG" -m "進版 $TAG" -m "commit ${{ github.sha }}" \
+          git tag -a "$TAG" -m "進版 $TAG（$(TZ=Asia/Taipei date +%F)）" \
+            -m "commit ${{ github.sha }}" \
             -m "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           git push origin "$TAG"
           echo "### 🏷 $TAG" >> "$GITHUB_STEP_SUMMARY"

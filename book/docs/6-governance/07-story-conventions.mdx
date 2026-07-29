@@ -1,0 +1,134 @@
+---
+title: Story 撰寫慣例
+---
+
+# Story 撰寫慣例
+
+## 每個元件至少三種 story
+
+| 類型 | 回答什麼 | 一定要有嗎 |
+| --- | --- | --- |
+| **典型用法** | 這個元件正常長什麼樣 | 必要 |
+| **狀態並列** | 它的每一種狀態長什麼樣、彼此差在哪 | 必要（見下） |
+| **互動 playground** | 換各種參數會怎樣 | 建議 |
+| **壓力測試** | 塞極端值會不會壞 | 見[壓力測試 Story](/governance/stress-stories) |
+
+## 狀態要並列，不要分開
+
+這是最重要的一條，也是最常被做反的一條。
+
+一個元件有四種狀態時，直覺是寫四支 story。但**分開之後每一種看起來都很正常**——
+你沒有辦法發現「已改動」與「鎖定」在深色模式下的邊框只差一階亮度，
+或是「空選項」的高度比其他三種矮了 4px，讓表單裡的一整列跳動。
+
+```tsx
+export const 四態並列: Story = {
+  render: () => (
+    <div className="flex flex-col gap-3">
+      <Chips label="預設"         … />
+      <Chips label="已改動未送出" … changed />
+      <Chips label="鎖定"         … disabled lockHint="此筆已結案，需先解除鎖定" />
+      <Chips label="沒有選項"     … options={[]} emptyHint="尚未建立任何選項" />
+    </div>
+  ),
+};
+```
+
+<Rules>
+  <Do><p>把同一個元件的所有狀態放在<strong>一支</strong> story 裡垂直排列，每一列標上狀態名。</p></Do>
+  <Dont><p>不要一個狀態一支 story。它們單獨看都對，並排才看得出不對。</p></Dont>
+</Rules>
+
+**驗收時的用法**：把這一支切到深色模式再看一次，然後灰階列印一次。
+三種模式都能分辨四種狀態，才算過。
+
+## 互動 playground：用中文 arg
+
+Storybook 的 Controls 面板可以讓非工程師直接調參數。前提是**參數名看得懂**。
+
+```tsx
+export const 互動: StoryObj<{ 資料筆數: number; 每頁筆數: number; 斑馬紋: boolean }> = {
+  args: { 資料筆數: 42, 每頁筆數: 15, 斑馬紋: true },
+  argTypes: {
+    資料筆數: { control: { type: "range", min: 0, max: 200, step: 1 } },
+    每頁筆數: { control: "inline-radio", options: [5, 15, 30, 50] },
+    斑馬紋:   { control: "boolean" },
+  },
+  render: (a) => (
+    <DataTable rows={makeRows(a.資料筆數)} pageSize={a.每頁筆數} zebra={a.斑馬紋} … />
+  ),
+};
+```
+
+三個部分：**中文 args 型別 → argTypes 指定控制項 → render 映射回真實 props**。
+
+### 為什麼值得多這一層映射
+
+| | 直接用 props 當 args | 中文 arg ＋ render 映射 |
+| --- | --- | --- |
+| 面板可讀性 | `pageSize` `zebra` `crosshair` | 每頁筆數、斑馬紋、十字對準 |
+| 誰能用 | 讀得懂 props 的人 | 設計、驗收的人 |
+| 能不能組合出真實情境 | 只能一個個調 | 可以做「資料筆數 = 0」這種**跨 prop 的情境** |
+| 代價 | 無 | 多一層 render 映射（約 5 行） |
+
+實際效益是驗收：**「把資料筆數拉到 0 看看空狀態」這句話，對方可以自己做**，
+不必回頭找工程師改程式碼。
+
+<Rules>
+  <Do><p>對外展示用的元件（DataTable、EditableField）都配一支中文 playground。</p></Do>
+  <Dont><p>不要每支 story 都做。playground 是給「參數很多、組合很多」的元件用的；
+  一個只有兩種變體的元件，並列展示比 playground 有用。</p></Dont>
+</Rules>
+
+### 陷阱：playground 裡需要 hook 時
+
+`render` 是一個函式，不是元件——**直接在裡面呼叫 `useState` 會違反 Hook 規則**。
+（有時候它「看起來能動」，然後在切換 args 時炸掉，症狀非常難解讀。）
+
+正解是在 `render` 內宣告一個內部元件：
+
+```tsx
+render: (a) => {
+  const Demo = () => {
+    const [v, setV] = useState("0");
+    return <TabPills tabs={makeTabs(a.分頁數)} value={v} onChange={setV} />;
+  };
+  return <Demo key={a.分頁數} />;   // ← key 是關鍵
+},
+```
+
+**`key` 為什麼必要**：改 args 時 React 會沿用同一個元件實例，內部 state 不會重置。
+於是「分頁數」從 5 調到 2 之後，`value` 還停在已經不存在的第 4 個分頁上，
+畫面看起來像 bug——但那是 story 的問題，不是元件的問題。
+把會影響結構的 arg 放進 `key`，強制 remount。
+
+更簡單的替代做法：用 `render: function Render() { … }` 具名函式元件。
+兩種都可以，但**同一個 repo 只選一種**。
+
+## 命名慣例
+
+| 場景 | 命名 | 例 |
+| --- | --- | --- |
+| 一般 story | 中文語意 | `完整功能`、`三種空狀態` |
+| 互動 playground | `互動` 或 `⟨元件⟩_互動` | `互動`、`按鈕_互動` |
+| 狀態並列 | `⟨N⟩態並列` | `三態並列`、`四態並列` |
+| 元件名需要對照 | 中文在前、英文在後 | `資料表 DataTable` |
+
+<Rules>
+  <Do><p>一個 repo 一種慣例，寫在這一頁上。</p></Do>
+  <Dont><p>不要混用 <code>按鈕_互動</code> 和 <code>互動_按鈕</code>。側邊欄是按字母排序的，
+  兩種寫法會讓同類 story 散落在不同位置。</p></Dont>
+</Rules>
+
+## story 就是規格的證據
+
+文件頁說「鎖定態仍然可以聚焦」，那就必須有一支 story 能讓人**當場用 Tab 鍵驗證**。
+
+<Rules>
+  <Do><p>文件頁寫下的每一條行為規範，都要有一支 story 對得上。</p></Do>
+  <Dont><p>不要寫「元件會處理這個情況」卻沒有任何 story 展示它。
+  沒有 story 的規範，三個月後沒有人知道它到底還成不成立。</p></Dont>
+</Rules>
+
+這是 story 與文件的分工：
+**文件講「為什麼」，story 證明「真的是這樣」。**

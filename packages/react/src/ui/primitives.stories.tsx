@@ -18,7 +18,7 @@ export const 按鈕: Story = {
         <Button variant="outline">外框</Button>
         <Button variant="ghost">淡化</Button>
         <Button variant="link">連結樣式</Button>
-        <Button variant="destructive"><Trash2 /> 刪除訂單</Button>
+        <Button variant="destructive"><Trash2 /> 刪除這筆</Button>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <Button size="sm">小</Button>
@@ -47,7 +47,7 @@ export const 徽章: Story = {
         <Badge variant="outline">外框</Badge>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Badge variant="success">已出貨</Badge>
+        <Badge variant="success">已完成</Badge>
         <Badge variant="warning">待補件</Badge>
         <Badge variant="info">審核中</Badge>
         <Badge variant="danger">已退回</Badge>
@@ -61,10 +61,10 @@ export const 徽章: Story = {
 export const 提示框: Story = {
   render: () => (
     <div className="max-w-xl space-y-2">
-      <Callout variant="success" title="這批訂單已全部出貨">共 12 筆，最後一筆於 2024-02-05 完成。</Callout>
-      <Callout variant="info" title="小提醒" tag="TIP">可以用欄位篩選一次比對多個客戶。</Callout>
-      <Callout variant="warning" title="有 3 筆訂單缺少收件資訊">未填寫前無法排程出貨。</Callout>
-      <Callout variant="danger" title="庫存不足，無法確認訂單" tag="E-104">品項「伺服馬達 750W」可用量 2，需求 6。</Callout>
+      <Callout variant="success" title="這批資料已全部完成">共 12 筆，最後一筆於 2024-02-05 完成。</Callout>
+      <Callout variant="info" title="小提醒" tag="TIP">可以用欄位篩選一次比對多個單位。</Callout>
+      <Callout variant="warning" title="有 3 筆缺少必要資訊">未填寫前無法進入下一步。</Callout>
+      <Callout variant="danger" title="配額不足，無法確認" tag="E-104">項目「丙案 初版」可用量 2，需求 6。</Callout>
     </div>
   ),
 };
@@ -73,7 +73,7 @@ export const 卡片: Story = {
   render: () => (
     <Card className="max-w-sm">
       <CardHeader>
-        <CardTitle>本月訂單</CardTitle>
+        <CardTitle>本月資料</CardTitle>
         <CardDescription>2024 年 2 月，截至今日</CardDescription>
       </CardHeader>
       <CardContent className="text-3xl font-semibold tabular-nums">1,284</CardContent>

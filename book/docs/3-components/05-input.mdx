@@ -17,8 +17,8 @@ title: Input 輸入框
 
 <Demo title="狀態">
   <div className="max-w-sm space-y-3">
-    <div><Label htmlFor="d1">客戶名稱</Label><Input id="d1" defaultValue="遠東貿易股份有限公司" /></div>
-    <div><Label htmlFor="d2">客戶代號</Label><Input id="d2" placeholder="例：C-1042" /></div>
+    <div><Label htmlFor="d1">單位名稱</Label><Input id="d1" defaultValue="甲單位（示範用抽象名稱）" /></div>
+    <div><Label htmlFor="d2">單位代號</Label><Input id="d2" placeholder="例：U-1042" /></div>
     <div><Label htmlFor="d3">建立日期（停用）</Label><Input id="d3" defaultValue="2019-04-01" disabled /></div>
     <div><Label htmlFor="d4">可編輯欄位語意</Label><Input id="d4" className="field-editable" defaultValue="可以改我" /></div>
   </div>
@@ -32,7 +32,7 @@ Input、Select、EditableField 全部 36px（`--size-control`）。
 ## placeholder 不是 label
 
 <Rules>
-  <Do><p>永遠有 <code>&lt;Label&gt;</code>。placeholder 放<strong>格式範例</strong>（「例：C-1042」）。</p></Do>
+  <Do><p>永遠有 <code>&lt;Label&gt;</code>。placeholder 放<strong>格式範例</strong>（「例：U-1042」）。</p></Do>
   <Dont><p>不要用 placeholder 當 label。使用者一開始打字它就消失了，
   然後他忘記這格要填什麼——這是無障礙與可用性雙輸的做法。</p></Dont>
 </Rules>

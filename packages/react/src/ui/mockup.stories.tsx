@@ -32,7 +32,7 @@ export const 一步操作示意: Story = {
           <span className="ml-auto"><Spotlight label="① 先切到「已確認」"><Badge variant="info">7 筆</Badge></Spotlight></span>
         </div>
         <MockRow />
-        <MockRow focus={<Spotlight><Button size="sm" variant="outline">安排出貨</Button></Spotlight>} />
+        <MockRow focus={<Spotlight><Button size="sm" variant="outline">排程處理</Button></Spotlight>} />
         <MockRow />
       </MockScreenFrame>
     </div>

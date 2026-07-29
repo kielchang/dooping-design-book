@@ -30,7 +30,7 @@ export interface BadgeProps
  * 狀態徽章。
  *
  * 規約：徽章上永遠要有**文字**，顏色只是加速辨識。純色點／純色塊在灰階列印與色覺障礙下等於消失，
- * 而後台系統的表格幾乎一定會被印出來簽核。
+ * 而後台系統的表格幾乎一定會被印出來存檔。
  */
 function Badge({ className, variant, ...props }: BadgeProps) {
   return <span className={cn(badgeVariants({ variant }), className)} {...props} />;

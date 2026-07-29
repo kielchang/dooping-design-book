@@ -19,11 +19,11 @@ export const 文字與數值: Story = {
     return (
       <div className="max-w-sm space-y-4">
         <div className="space-y-1">
-          <Label htmlFor="s-name">客戶名稱</Label>
+          <Label htmlFor="s-name">單位名稱</Label>
           <Input id="s-name" defaultValue="遠東貿易股份有限公司" />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="s-code">客戶代號</Label>
+          <Label htmlFor="s-code">單位代號</Label>
           <Input id="s-code" placeholder="例：C-1042" />
         </div>
         <div className="space-y-1">
@@ -47,10 +47,10 @@ export const 勾選與下拉: Story = {
       <div className="max-w-sm space-y-4">
         <div className="flex items-center gap-2">
           <Checkbox id="s-active" checked={checked} onCheckedChange={(v) => setChecked(v === true)} />
-          <Label htmlFor="s-active">啟用此客戶</Label>
+          <Label htmlFor="s-active">啟用此單位</Label>
         </div>
         <div className="space-y-1">
-          <Label>客戶等級</Label>
+          <Label>等級</Label>
           <Select defaultValue="gold">
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
@@ -71,15 +71,15 @@ export const 分段選擇: Story = {
       <div className="space-y-4">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">選項少、標籤短、要一眼看完 → 分段選擇</p>
-          <SegGroup label="客戶等級" options={TIER_OPTIONS} value={v} onPick={setV} />
+          <SegGroup label="等級" options={TIER_OPTIONS} value={v} onPick={setV} />
         </div>
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">已改動未送出（琥珀）</p>
-          <SegGroup label="客戶等級（已改動）" options={TIER_OPTIONS} value={v} onPick={setV} changed />
+          <SegGroup label="等級（已改動）" options={TIER_OPTIONS} value={v} onPick={setV} changed />
         </div>
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">鎖定：可聚焦、有鎖頭、hover 有原因</p>
-          <SegGroup label="客戶等級（鎖定）" options={TIER_OPTIONS} value={locked} onPick={() => {}} disabled lockHint="此筆已結案，需先解除鎖定" />
+          <SegGroup label="等級（鎖定）" options={TIER_OPTIONS} value={locked} onPick={() => {}} disabled lockHint="此筆已結案，需先解除鎖定" />
         </div>
         <p className="text-tiny text-muted-foreground">鍵盤：方向鍵移動、Space/Enter 選定、Esc 取消。整組只佔一個 Tab 停留點。</p>
       </div>

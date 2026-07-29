@@ -75,12 +75,21 @@ jobs:
           NEW_VER=$(jq -r .version package.json)
           # 監看清單＝取用端踩得到的介面。tailwind-preset 與 templates/ 同樣是
           # 取用端會複製或 require 的東西，漏掉它們等於版號訊號有破口。
+          #
+          # 反過來，下面這四類被 scripts/build-registry.mjs 明確跳過，不會進 registry——
+          # 它們改了，取用端拿到的東西一個位元都沒變。監看範圍因此要**逐字等於**
+          # 「會進 registry 的集合」：多一個是假警報，少一個是漏訊號。
+          # 對照 scripts/build-registry.mjs 的 walk() 與 index.ts/version.ts/demo/ 跳過條件。
           CHANGED=$(git diff --name-only origin/main HEAD -- \
             packages/react/src \
             packages/tokens/src/tokens.json \
             packages/tokens/tailwind-preset.cjs \
             packages/tokens/scripts \
-            templates)
+            templates \
+            ':(exclude)packages/react/src/demo' \
+            ':(exclude)packages/react/src/index.ts' \
+            ':(exclude)packages/react/src/version.ts' \
+            ':(exclude)*.stories.tsx')
           if [ -n "$CHANGED" ] && [ "$OLD_VER" = "$NEW_VER" ]; then
             echo "::error::元件或 token 相對 main 有變，但規範版號還停在 $NEW_VER。請依大中小判準 bump 根目錄 package.json 的 version（並同步 react/package.json 與 version.ts、重跑 npm run build:registry），在 CHANGELOG 寫明理由。變更檔案：$(echo "$CHANGED" | tr '\n' ' ')"
             exit 1

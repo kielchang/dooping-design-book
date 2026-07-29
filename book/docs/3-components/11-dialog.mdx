@@ -46,10 +46,122 @@ title: Dialog 對話框
 
 按鈕文字要能**單獨讀懂**——很多人只看按鈕不看標題。
 
+## 破壞性動作分三級
+
+「破壞性動作要二次確認」講得太粗。**每一個刪除都跳確認，使用者三天後就會閉著眼睛按確定**——
+確認框變成儀式，就不再有保護作用了。
+
+分三級，依「後果能不能復原」決定：
+
+| 級別 | 判準 | 做法 |
+| --- | --- | --- |
+| 低 | 可復原、影響單筆 | **直接執行** ＋ 就地提供「復原」。不要跳對話框 |
+| 中 | 不可復原、影響單筆 | 對話框確認。標題寫出對象與後果 |
+| 高 | 不可復原、影響多筆或他人 | 對話框 ＋ **要求輸入辨識碼**（編號、代號）才啟用確認鈕 |
+
+<Rules>
+  <Do><p>高風險才用「輸入名稱以確認」。它的作用是<strong>強迫閱讀</strong>——
+  使用者為了打對那串字，一定得先看清楚自己在刪什麼。</p></Do>
+  <Dont><p>不要對所有刪除都用這招。全部都要打字＝使用者去背下那串字的規律，
+  保護作用歸零，只剩下惹人厭。</p></Dont>
+</Rules>
+
+高風險對話框應同時列出**受影響範圍**（「將取消 12 筆已確認項目」），
+而不是只說「此動作無法復原」。使用者需要的是「我會失去什麼」，不是恐嚇。
+
+<Demo title="高風險：輸入編號才能確認">
+  <Dialog>
+    <DialogTrigger asChild><Button variant="destructive">批次取消</Button></DialogTrigger>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>確定要取消這個批次？</DialogTitle>
+        <DialogDescription>
+          將取消 12 筆已確認項目、釋放對應的保留額度，並寫入異動紀錄。此動作無法復原。
+        </DialogDescription>
+      </DialogHeader>
+      <div className="space-y-1">
+        <Label htmlFor="confirm-batch">請輸入批次編號 <code>B-2403</code> 以確認</Label>
+        <Input id="confirm-batch" placeholder="B-2403" />
+      </div>
+      <DialogFooter>
+        <DialogClose asChild><Button variant="outline">返回</Button></DialogClose>
+        <Button variant="destructive" disabled>確定取消 12 筆</Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+</Demo>
+
 ## 行動版是置中卡片，不是全螢幕
 
 後台對話框通常是「確認一件事」，全螢幕會讓使用者失去背景脈絡
 （他正在看的那一列到底是誰）。所以留邊距、維持置中。
+
+## 長內容要在內容區捲動，標題與按鈕不動
+
+對話框沒有高度上限時，內容一長就會**往上下兩端撐出視窗**（因為它是垂直置中的）。
+結果是標題和按鈕同時被推出畫面外：使用者既看不到自己在確認什麼，也按不到確認鈕，
+只剩下 Esc 一條路——而他多半不知道可以按 Esc。
+
+<Rules>
+  <Do><p>限制整體高度，讓<strong>只有內容區</strong>捲動。標題與按鈕固定可見。</p></Do>
+  <Dont><p>不要讓整個對話框跟著頁面捲。使用者捲到底才發現按鈕在那裡，
+  而捲的過程中標題已經看不見了。</p></Dont>
+</Rules>
+
+```tsx
+<DialogContent className="max-h-[85dvh] grid-rows-[auto_minmax(0,1fr)_auto]">
+  <DialogHeader>
+    <DialogTitle>調整 B-2403 的項目</DialogTitle>
+  </DialogHeader>
+
+  {/* 只有這一段捲動 */}
+  <div className="min-h-0 overflow-y-auto pr-1">
+    …長內容…
+  </div>
+
+  <DialogFooter>…</DialogFooter>
+</DialogContent>
+```
+
+三個細節，缺一個就會出問題：
+
+| 細節 | 為什麼 |
+| --- | --- |
+| `dvh` 而非 `vh` | 行動瀏覽器的網址列會伸縮。用 `vh` 會讓按鈕躲在網址列後面，怎麼點都點不到 |
+| `min-h-0` | grid／flex 子項的預設最小高度是內容高度，**不加這行 `overflow` 完全不會生效**。這是最常見的「我明明寫了 overflow-y-auto」原因 |
+| 85% 而非 100% | 留一點背景可見，使用者才知道自己在浮層裡、關掉會回到哪裡 |
+
+<Rules>
+  <Do><p>內容捲動時，在捲動區上下緣<strong>留出視覺線索</strong>（陰影或分隔線），
+  讓使用者知道下面還有東西。</p></Do>
+  <Dont><p>不要讓內容剛好在邊界處切齊。切齊看起來就是結束了，
+  使用者不會想去捲——然後就漏看下半段。</p></Dont>
+</Rules>
+
+### 需要捲很久，就不該是對話框了
+
+這條規範的目的是處理「小表單長了一點」，不是讓對話框變成頁面。
+
+<Rules>
+  <Do><p>捲動內容超過約兩個畫面高 → 改成獨立頁面。</p></Do>
+  <Dont><p>不要把多步驟流程塞進捲動的對話框。裡面沒有麵包屑、不能深連結、
+  中途離開就全部重來。</p></Dont>
+</Rules>
+
+## 不要巢狀對話框
+
+從對話框裡開另一個對話框，會有三個問題同時發生：
+
+1. **Esc 語意不明**——關掉哪一層？使用者按下去之前不知道，按下去之後也常常沒發現關錯了
+2. **焦點鎖定互相打架**——兩層 focus trap 疊在一起，鍵盤使用者可能被困在中間層
+3. **背景疊兩層遮罩**——畫面幾乎全黑，失去「我原本在看哪一列」的脈絡
+
+<Rules>
+  <Do><p>需要二次確認時，<strong>換掉同一個對話框的內容</strong>
+  （同一層走兩個步驟），或先關閉第一層再開第二層。</p></Do>
+  <Dont><p>不要疊。唯一可接受的例外是 Select／Tooltip 這類浮層，
+  它們不是模態、不搶焦點鎖定。</p></Dont>
+</Rules>
 
 ## 無障礙
 

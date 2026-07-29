@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">硬鎖定與明確解鎖 | Dooping Design Book</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://kielchang.github.io/dooping-design-book/patterns/hard-lock/"><meta data-rh="true" property="og:locale" content="zh_Hant"><meta data-rh="true" name="docusaurus_locale" content="zh-Hant"><meta data-rh="true" name="docsearch:language" content="zh-Hant"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="硬鎖定與明確解鎖 | Dooping Design Book"><meta data-rh="true" name="description" content="問題"><meta data-rh="true" property="og:description" content="問題"><link data-rh="true" rel="icon" href="/dooping-design-book/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://kielchang.github.io/dooping-design-book/patterns/hard-lock/"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/patterns/hard-lock/" hreflang="zh-Hant"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/patterns/hard-lock/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"模式 Patterns","item":"https://kielchang.github.io/dooping-design-book/patterns"},{"@type":"ListItem","position":2,"name":"硬鎖定與明確解鎖","item":"https://kielchang.github.io/dooping-design-book/patterns/hard-lock"}]}</script><link rel="stylesheet" href="/dooping-design-book/assets/css/styles.dca17ef7.css">
-<script src="/dooping-design-book/assets/js/runtime~main.cfca0d0a.js" defer="defer"></script>
+<script src="/dooping-design-book/assets/js/runtime~main.bf2e926f.js" defer="defer"></script>
 <script src="/dooping-design-book/assets/js/main.807bd399.js" defer="defer"></script>
 </head>
 <body>
@@ -35,7 +35,7 @@
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="反例">反例<a href="#反例" class="hash-link" aria-label="反例的直接連結" title="反例的直接連結" translate="no">​</a></h2>
 <div class="rule-grid"><div class="rule-do"><strong>✅ 這樣做</strong><p><strong>解鎖是一個明確動作</strong>，而且會被記錄下來（誰、何時、為什麼解鎖）。</p></div><div class="rule-dont"><strong>🚫 不要這樣</strong><p><strong>「編輯自動解除確認」</strong>。使用者只是想看看能不能改，
 點了一下，整筆單據就退回未確認狀態——而且沒有任何提示。
-下游流程（出貨、請款）跟著全部回捲。</p></div></div>
+下游流程（結案、請款）跟著全部回捲。</p></div></div>
 <div class="rule-grid"><div class="rule-do"><strong>✅ 這樣做</strong><p>解除確認時<strong>連帶處理衍生資料</strong>（例如刪掉當期的凍結快照），
 重新確認時再重建。</p></div><div class="rule-dont"><strong>🚫 不要這樣</strong><p>不要只改狀態旗標。留著舊快照的話，會出現「狀態是未確認、
 但報表還是舊數字」的鬼故事。</p></div></div>

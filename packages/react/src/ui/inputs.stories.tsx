@@ -40,6 +40,63 @@ export const 文字與數值: Story = {
   },
 };
 
+export const 欄位狀態: Story = {
+  render: function Render() {
+    const [invalid, setInvalid] = useState(true);
+    return (
+      <div className="max-w-xl space-y-5">
+        <p className="text-sm text-muted-foreground">
+          一格欄位可以<strong>同時</strong>是「被聚焦」「改過沒送」「不合格」。三件事走三個不同的通道，
+          疊起來互不干涉——<strong>聚焦環永遠是同一個顏色</strong>，邊框與底色管狀態。
+        </p>
+
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <Label htmlFor="f-ro">唯讀／計算值</Label>
+            <div className="field-readonly rounded-md border border-transparent px-3 py-2 text-sm">1,380,000</div>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="f-ok">可編輯（優先序 0）</Label>
+            <Input id="f-ok" defaultValue="1,500,000" />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="f-edit">已改動未送出（優先序 1）</Label>
+            <div className="rounded-md border border-edit bg-edit-bg px-3 py-2 text-sm text-edit-foreground">
+              1,650,000
+            </div>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="f-bad">不合格（優先序 2，最高）</Label>
+            <Input
+              id="f-bad"
+              defaultValue="0"
+              aria-invalid={invalid}
+              aria-describedby="f-bad-err"
+              onChange={(e) => setInvalid(e.target.value === "0")}
+            />
+            {invalid && (
+              <p id="f-bad-err" className="text-tiny text-danger">
+                數值必須大於 0。改成別的值就會恢復。
+              </p>
+            )}
+          </div>
+        </div>
+
+        <p className="text-xs text-muted-foreground">
+          用 Tab 鍵走過上面四格，注意<strong>聚焦環不隨狀態變色</strong>。
+          若環會跟著變紅，Tab 過三個必填空欄時每一格都會閃紅——那會訓練使用者忽略紅色。
+          環與邊框之間有一圈背景色（<code>ring-offset</code>）：少了它，環會直接畫在紅框上，
+          實測深色模式下兩者對比只有 <strong>1.04:1</strong>，聚焦環等於隱形。
+        </p>
+        <p className="text-xs text-muted-foreground">
+          「<strong>必填未填</strong>」是不合格的一種，但它的問題是<strong>時機</strong>不是顏色——
+          不該在使用者還沒碰過欄位時就標紅。慣例是 blur 或送出之後才標。
+        </p>
+      </div>
+    );
+  },
+};
+
 export const 勾選與下拉: Story = {
   render: function Render() {
     const [checked, setChecked] = useState(true);

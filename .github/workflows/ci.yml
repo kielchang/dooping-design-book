@@ -20,8 +20,25 @@ on:
 permissions:
   contents: write # 推 gh-pages 分支的 preview/
 
+# 這個 group 的用途是**序列化 gh-pages 的寫入**：deploy.yml（寫根目錄）與本檔的
+# dev push（寫 preview/）寫的是同一個分支的不同子目錄，共用一個 group 才不會互相覆蓋。
+#
+# 但 PR 的那一輪**不寫 gh-pages**（下方部署步驟的 if 已經排除它）。
+# 把不寫入的 run 放進寫入者的佇列，會踩到 GitHub 的一條行為：
+# 同一個 group 只保留一個 pending run，新的排進來就把舊的取消掉。
+#
+# 實際發生過（合併 main、推 dev、開 PR 擠在一分鐘內）：
+#
+#   08:53 deploy.yml(main) 開始 ── 佔住 group
+#   08:54 ci.yml(push dev)  排隊
+#   08:55 ci.yml(PR)        排隊 ── 把排隊中的 push 那輪取消掉
+#
+# push 那輪是唯一會部署預覽站的，於是預覽站安靜地停在上一版：
+# 沒有失敗、沒有紅燈，只是維護者在手機上看到的還是舊的。
+#
+# 所以 PR 用自己的 group——它不寫 gh-pages，本來就不該排在寫入佇列裡。
 concurrency:
-  group: gh-pages-write
+  group: ${{ github.event_name == 'pull_request' && format('ci-pr-{0}', github.ref) || 'gh-pages-write' }}
   cancel-in-progress: false
 
 jobs:

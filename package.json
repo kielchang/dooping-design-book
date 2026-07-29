@@ -1,6 +1,6 @@
 {
   "name": "dooping-design-book",
-  "version": "0.2.1",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
   "description": "Dooping Design Book — 跨專案設計語言、模式手冊與 React 參考實作",
@@ -9,7 +9,9 @@
   ],
   "scripts": {
     "build:tokens": "npm run build --workspace @dooping/tokens",
+    "build:theme": "node packages/tokens/scripts/generate-theme.mjs",
     "build:registry": "node scripts/build-registry.mjs",
+    "verify:color": "node scripts/verify-color.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "storybook": "storybook dev -p 6006",

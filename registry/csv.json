@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "csv",
-  "version": "0.2.1",
+  "version": "0.4.0",
   "type": "registry:lib",
   "title": "csv 序列化",
   "description": "含 UTF-8 BOM 的 CSV 產出與解析。",

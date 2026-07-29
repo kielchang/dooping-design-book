@@ -28,10 +28,25 @@ lines.push(` * 版本 ${tokens.meta.version}`);
 lines.push(" */");
 lines.push("");
 
+// ── 多色相主題 ────────────────────────────────────────────────
+// 主題只影響 5 個 token（brand 三件組 + ring），其餘語意色與主題無關——
+// 背景、邊框、狀態色在所有主題之間完全相同。因此主題層很薄，
+// 而且**取用端不設定 data-color-theme 時，輸出與沒有主題功能之前一模一樣**。
+//
+// --ring 是唯一被主題覆蓋的既有 token：它在 color.* 裡仍保有中性值當後備，
+// 主題層宣告在後面把它蓋掉。宿主若只引 tokens.css 而不設任何主題屬性，
+// 拿到的就是預設主題（石墨）——觀感與原本的中性殼一致。
+const THEMES = tokens.themes ?? {};
+const DEFAULT_THEME = tokens.meta.defaultTheme;
+const themeVars = (name, mode) => vars(THEMES[name]?.[mode] ?? {});
+
 // ── :root（淺色 + 全部非色彩 token） ───────────────────────────
 lines.push(":root {");
 lines.push("  /* 色彩：語意（淺色） */");
 lines.push(...vars(tokens.color.light));
+lines.push("");
+lines.push(`  /* 主題色（預設：${THEMES[DEFAULT_THEME]?.$label ?? DEFAULT_THEME}，淺色） */`);
+lines.push(...themeVars(DEFAULT_THEME, "light"));
 lines.push("");
 lines.push("  /* 圖表分類色票（淺色） */");
 lines.push(...vars(tokens.chart.light));
@@ -69,10 +84,33 @@ lines.push('.dark,\n[data-theme="dark"] {');
 lines.push("  /* 色彩：語意（深色） */");
 lines.push(...vars(tokens.color.dark));
 lines.push("");
+lines.push(`  /* 主題色（預設：${THEMES[DEFAULT_THEME]?.$label ?? DEFAULT_THEME}，深色） */`);
+lines.push(...themeVars(DEFAULT_THEME, "dark"));
+lines.push("");
 lines.push("  /* 圖表分類色票（深色） */");
 lines.push(...vars(tokens.chart.dark));
 lines.push("}");
 lines.push("");
+
+// ── 非預設主題 ────────────────────────────────────────────────
+// 順序即是 cascade：淺色區塊全部排在深色區塊之後，深色區塊靠
+// `[data-color-theme=X].dark`（0,2,0）的較高權重蓋回來。少了這層權重差，
+// 「深色 + 非預設主題」會拿到淺色的 brand。
+const OTHERS = Object.keys(THEMES).filter((n) => n !== DEFAULT_THEME);
+if (OTHERS.length) {
+  lines.push("/* 其餘色相主題：宿主在 <html> 上設 data-color-theme=\"<name>\" 切換。 */");
+  for (const name of OTHERS) {
+    lines.push(`[data-color-theme="${name}"] { /* ${THEMES[name].$label} */`);
+    lines.push(...themeVars(name, "light"));
+    lines.push("}");
+  }
+  for (const name of OTHERS) {
+    lines.push(`[data-color-theme="${name}"].dark,\n[data-color-theme="${name}"][data-theme="dark"] {`);
+    lines.push(...themeVars(name, "dark"));
+    lines.push("}");
+  }
+  lines.push("");
+}
 
 // ── 語意 utility：欄位「可編輯 vs 唯讀」 ──────────────────────
 lines.push(`/* 欄位語意（單一二分法）：可編輯＝淡冷底＋清楚邊框；唯讀／計算值＝muted。

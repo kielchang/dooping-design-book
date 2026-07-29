@@ -12,7 +12,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import {
-  contrast, hslToRgb8, hexToRgb8, minSeparation, deltaE00, lab,
+  contrast, hslToRgb8, hexToRgb8, rgb8ToOklch, minSeparation, deltaE00, lab,
 } from "../packages/tokens/scripts/lib/color.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -24,7 +24,8 @@ const NONTEXT = 3.0;       // 色塊、邊框、聚焦環等非文字 UI 元件�
 const CHART_FAIL = 10;     // 分類色兩兩感知距離：低於此在紅綠色盲下實務上分不開
 const CHART_WARN = 15;     // 低於此算勉強，記為警告不擋
 const DANGER_MIN = 18;     // 分類色與 danger 的距離：紅線會被讀成警告
-const BRAND_STATUS_MIN = 12; // 主題色與狀態色的距離：主色像成功色會讓「綠色＝通過」失效
+const BRAND_STATUS_MIN = 12; // 主題色與狀態色的感知距離：主色像成功色會讓「綠色＝通過」失效
+const BRAND_HUE_GAP = 25;  // 主題色與狀態色的**色相**距離：警報色域（0–95°）是保留區
 const SUBTLE_MIN = 6;      // brand-subtle 與 muted 的距離：否則「被選中」看起來只是「有點灰」
 
 const MODES = ["light", "dark"];
@@ -92,6 +93,34 @@ export function runChecks() {
       }
       push(nearest.d >= BRAND_STATUS_MIN,
         `${tag} brand 與 ${nearest.s} 只差 ΔE00 ${nearest.d.toFixed(1)}（需 ${BRAND_STATUS_MIN}）`);
+
+      // ── 讓紅黃保持「一眼就反應」的兩條結構性規則 ──────────
+      //
+      // 紅色能讓人瞬間停手，靠的不只是色相，還有「它在畫面上很稀有、而且最搶眼」。
+      // 主題色不需要閃避紅色的長相，需要閃避的是**它的位置與份量**。
+
+      // 1. 色相層：警報色域是保留區。
+      //    danger 18°／destructive 25°／warning 71°／edit 83° 把 0–95° 整段吃滿。
+      //    主題落在那裡就算個別色票分得開（明度差會把 ΔE00 拉大），
+      //    也等於把「瞬間反應」這個通道花在品牌上——畫面上到處是暖色，紅色就不再突出。
+      const hueGap = (a, b) => { const d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; };
+      const bh = rgb8ToOklch(brand)[2];
+      let nearH = { g: 360, s: "" };
+      for (const s of STATUS) {
+        const g = hueGap(bh, rgb8ToOklch(px(mode, s))[2]);
+        if (g < nearH.g) nearH = { g, s };
+      }
+      push(nearH.g >= BRAND_HUE_GAP,
+        `${tag} brand 色相距 ${nearH.s} 只有 ${nearH.g.toFixed(0)}°（需 ${BRAND_HUE_GAP}°）` +
+        `——主題不該住進警報色域`);
+
+      // 2. 飽和度層：警報必須是畫面上最飽和的東西。
+      //    danger 的 chroma 若被主題超過，紅色就從「最搶眼」降級成「其中一個彩色」。
+      const cBrandChroma = rgb8ToOklch(brand)[1];
+      const cDanger = rgb8ToOklch(px(mode, "danger"))[1];
+      push(cBrandChroma < cDanger,
+        `${tag} brand 的 chroma ${cBrandChroma.toFixed(3)} 不低於 danger 的 ${cDanger.toFixed(3)}` +
+        `——飽和度階序反過來，紅色會失去優先權`);
 
       // 中性色跟著主題轉色相之後，這些配對要逐主題重驗——L 與 chroma 沒動，
       // 但 WCAG 的相對亮度跟色相有關，轉一圈下來會有零點幾的位移。

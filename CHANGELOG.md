@@ -27,6 +27,34 @@
 
 **改了什麼**
 
+- **編譯層防線生效**：`@dooping/tokens` 的 Tailwind preset 從 `theme.extend.colors`
+  改為**覆蓋 `theme.colors`**，套用 preset 後 Tailwind 預設色盤整個消失
+- **新增 `templates/eslint.dooping.cjs`**：擋掉繞過編譯層的逃逸路徑——
+  Tailwind arbitrary color（`bg-[#fff]`）、inline style 硬編色、深入上游內部路徑
+- 治理章「漂移防護」改寫為三道防線（編譯層／lint／測試），並指向可直接複製的產物
+- CI 的版號守衛擴大監看範圍，納入 `tailwind-preset.cjs`、`packages/tokens/scripts`、`templates`
+
+**我需要做什麼**：
+
+⚠️ **這是 breaking change。** 若你的專案已套用 `@dooping/tokens/tailwind-preset`
+且用到 Tailwind 預設色盤（`bg-red-500`、`text-slate-600`…），升到 `v0.2.0` 後那些 class
+會**不再產生樣式**。兩條路：
+
+1. **建議**：改用語意色（`bg-danger/10`、`text-muted-foreground`…）
+2. 真的需要額外色階：在自己的 `tailwind.config.js` 用 `theme.extend.colors` 加回去——
+   那是明示的例外，會出現在 diff 裡
+
+保留的結構性色值：`transparent`、`current`、`inherit`、`white`、`black`。
+間距、圓角、字級刻度**完全不受影響**。
+
+**為什麼改**：先前的守衛全部在保護規範 repo 自己，**沒有一個保護取用端**——
+而跨系統一致正是這個 repo 存在的理由。取用端抄走元件後，沒有東西阻止他們硬編顏色。
+編譯層是三道防線裡最便宜的一道：違規寫不出來，不必靠 review 或自律。
+
+現在做的成本最低——還沒有任何取用端。
+
+---
+
 - **建立統一的規範版號 `vX.Y.Z`**：正本是根目錄 `package.json` 的 `version`，
   `main` 部署成功後自動蓋成 GitHub tag（版號沒動就不打、重跑不重複打、日期在 tag 描述）；
   registry 戳記改由規範版號產生，`packages/react` 與 `version.ts` 跟隨（守衛強制四處一致）

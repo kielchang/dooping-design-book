@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "mockup",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "registry:ui",
   "title": "Mockup 文件示意積木",
   "description": "Placeholder／Spotlight／MockScreenFrame：零截圖文件示意。",

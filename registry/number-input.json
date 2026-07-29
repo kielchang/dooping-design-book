@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "number-input",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "registry:ui",
   "title": "NumberInput 數值輸入",
   "description": "右對齊等寬數字，行動裝置出數字鍵盤。",

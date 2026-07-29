@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "empty-state",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "registry:ui",
   "title": "EmptyState 空狀態",
   "description": "圖示＋標題＋說明＋行動呼籲。",

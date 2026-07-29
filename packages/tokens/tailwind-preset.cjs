@@ -46,8 +46,22 @@ module.exports = {
   // 深色兩種鉤子：.dark（Tailwind/shadcn 慣例）＋ [data-theme="dark"]（文件站／後台框架慣例）
   darkMode: ["class", '[data-theme="dark"]'],
   theme: {
+    // 色彩用「覆蓋」而不是 extend——清掉 Tailwind 的預設色盤，讓 bg-red-500 這類
+    // 硬編色在取用端的**編譯期就不存在**。這是三道防漂移防線裡最便宜的一道：
+    // 違規寫不出來，不必靠 code review 或自律去抓。
+    //
+    // 只留這五個結構性色值：它們不承載任何品牌語意，拿掉只會讓人改用 hex 繞路。
+    // 需要額外色階的宿主可以在自己的 config 用 theme.extend.colors 加回去——
+    // 那是明示的例外，會出現在 diff 裡，比默默用預設色盤好。
+    colors: {
+      transparent: "transparent",
+      current: "currentColor",
+      inherit: "inherit",
+      white: "#fff",
+      black: "#000",
+      ...colors,
+    },
     extend: {
-      colors,
       fontFamily: {
         sans: [`var(--font-family-sans)`],
         mono: [`var(--font-family-mono)`],

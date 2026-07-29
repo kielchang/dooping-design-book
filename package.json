@@ -1,6 +1,6 @@
 {
   "name": "dooping-design-book",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Dooping Design Book — 跨專案設計語言、模式手冊與 React 參考實作",

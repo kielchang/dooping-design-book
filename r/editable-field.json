@@ -1,11 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "editable-field",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "type": "registry:component",
   "title": "EditableField 唯讀逐欄編輯",
   "description": "點擊才進編輯、改動標色、undo/redo 先確認。",
   "dependencies": [
+    "@dooping/tokens@^0.5.0",
     "lucide-react"
   ],
   "registryDependencies": [

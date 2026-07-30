@@ -1,11 +1,13 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "tab-pills",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "type": "registry:ui",
   "title": "TabPills 分頁膠囊",
   "description": "分頁切換的統一元件，含 tablist 語意。",
-  "dependencies": [],
+  "dependencies": [
+    "@dooping/tokens@^0.5.0"
+  ],
   "registryDependencies": [
     "https://kielchang.github.io/dooping-design-book/r/utils.json"
   ],

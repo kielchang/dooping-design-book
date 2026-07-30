@@ -32,6 +32,11 @@ npm run storybook          # http://localhost:6006
 npm --prefix book start    # 文件站 http://localhost:3000
 ```
 
+> **第二行不能跳過。** `dist/` 不進版控，而 `packages/tokens/dist/tokens.css` 是
+> 測試（`tests/tokens.test.ts` 直接讀它）、Storybook 與文件站三者的硬相依——
+> 乾淨 clone 之後不先產生它，這三樣都會失敗。
+> Claude Code 的 `.claude/hooks/session-start.sh` 會自動處理；Node 版本見 `.nvmrc`。
+
 ## 目錄
 
 ```
@@ -50,11 +55,15 @@ tests/             守衛測試：元件庫邊界、token 一致性、去領域�
 ```bash
 npm run build:tokens       # token 產物（其他步驟的前提）
 npm run typecheck          # TypeScript
-npm test                   # 守衛測試（3 檔 74 項）
+npm test                   # 守衛測試（5 檔 96 項）
+npm run verify:color       # 六主題 × 兩模式的對比／色覺／互動狀態層門檻
 npm run build-storybook    # Storybook
 npm run build:registry     # registry JSON
 npm --prefix book run build  # 文件站（onBrokenLinks: throw）
 ```
+
+在這個 repo 裡開發的完整約定（色彩值是生成的、版號要同步三處、去領域化閘門、
+截圖驗證的方法論）見 [`CLAUDE.md`](CLAUDE.md)。
 
 ## 為什麼用 npm workspaces（而不是 pnpm）
 

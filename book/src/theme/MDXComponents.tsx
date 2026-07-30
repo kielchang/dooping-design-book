@@ -2,6 +2,7 @@
 // 這些是**真的元件庫元件**（webpack alias 指到 packages/react/src），不是複製品。
 import MDXComponents from "@theme-original/MDXComponents";
 import { Demo, Rules, Do, Dont } from "@site/src/components/Demo";
+import { StoryFrame } from "@site/src/components/StoryFrame";
 import {
   Button, Badge, Callout, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter,
   Input, Label, Checkbox, NumberInput,
@@ -17,7 +18,7 @@ import {
 
 export default {
   ...MDXComponents,
-  Demo, Rules, Do, Dont,
+  Demo, Rules, Do, Dont, StoryFrame,
   Button, Badge, Callout, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter,
   Input, Label, Checkbox, NumberInput,
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,

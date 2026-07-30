@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "badge",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "type": "registry:ui",
   "title": "Badge 狀態徽章",
   "description": "帶文字的狀態標記，不只靠顏色傳達語意。",
   "dependencies": [
-    "@dooping/tokens@^0.5.0",
+    "@dooping/tokens@^0.6.0",
     "class-variance-authority"
   ],
   "registryDependencies": [

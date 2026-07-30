@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "number-input",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "type": "registry:ui",
   "title": "NumberInput 數值輸入",
   "description": "右對齊等寬數字，行動裝置出數字鍵盤。",
   "dependencies": [
-    "@dooping/tokens@^0.5.0"
+    "@dooping/tokens@^0.6.0"
   ],
   "registryDependencies": [
     "https://kielchang.github.io/dooping-design-book/r/input.json",

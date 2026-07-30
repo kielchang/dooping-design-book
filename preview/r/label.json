@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "label",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "type": "registry:ui",
   "title": "Label 標籤",
   "description": "表單標籤（Radix Label）。",
   "dependencies": [
-    "@dooping/tokens@^0.5.0",
+    "@dooping/tokens@^0.6.0",
     "@radix-ui/react-label"
   ],
   "registryDependencies": [

@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "callout",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "type": "registry:ui",
   "title": "Callout 提示框",
   "description": "良好／警示／提醒／危險四種語意提示。",
   "dependencies": [
-    "@dooping/tokens@^0.5.0",
+    "@dooping/tokens@^0.6.0",
     "lucide-react"
   ],
   "registryDependencies": [

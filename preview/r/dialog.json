@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "dialog",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "type": "registry:ui",
   "title": "Dialog 對話框",
   "description": "模態對話框（Radix Dialog）。",
   "dependencies": [
-    "@dooping/tokens@^0.5.0",
+    "@dooping/tokens@^0.6.0",
     "@radix-ui/react-dialog",
     "lucide-react"
   ],

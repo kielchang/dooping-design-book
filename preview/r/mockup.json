@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "mockup",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "type": "registry:ui",
   "title": "Mockup 文件示意積木",
   "description": "Placeholder／Spotlight／MockScreenFrame：零截圖文件示意。",
   "dependencies": [
-    "@dooping/tokens@^0.5.0"
+    "@dooping/tokens@^0.6.0"
   ],
   "registryDependencies": [
     "https://kielchang.github.io/dooping-design-book/r/utils.json"

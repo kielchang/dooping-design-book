@@ -47,6 +47,36 @@ html[data-theme="dark"] {
 }
 .demo-body { padding: 16px; overflow-x: auto; }
 
+/* 嵌入的 Storybook story。沿用 .demo 的外框語彙，但標籤不同——
+   讀者要能分辨「這是頁內渲染的元件」與「這是另一個站台的 iframe」，
+   因為後者在本機 dev server 上是空的。 */
+.story-frame {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 10px;
+  margin: 1rem 0 1.5rem;
+  overflow: hidden;
+}
+.story-frame-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  background: var(--ifm-color-emphasis-100);
+  font-size: 12px;
+  color: var(--ifm-color-emphasis-700);
+}
+.story-frame-title::before {
+  content: "可操作範例";
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--ifm-color-emphasis-200);
+  font-size: 10px;
+}
+/* 連結推到最右邊 */
+.story-frame-title > a { margin-left: auto; font-size: 11px; }
+.story-frame > iframe { display: block; width: 100%; border: 0; }
+
 /* 規範條目：做 / 不做 */
 .rule-grid { display: grid; gap: 12px; grid-template-columns: 1fr; }
 @media (min-width: 720px) { .rule-grid { grid-template-columns: 1fr 1fr; } }

@@ -121,6 +121,32 @@ const SPEC_VERSION = JSON.parse(
   readFileSync(join(ROOT, "package.json"), "utf8"),
 ).version;
 
+/**
+ * 每個 item 都明確相依 `@dooping/tokens`。
+ *
+ * 元件抄走之後就與上游脫鉤，唯一還硬相依的一層是 token（ADR-0004）——
+ * 但 registry item 先前沒有把這件事寫出來，於是 `npx shadcn add` 只複製原始碼、
+ * 不會裝 token。取用端要自己知道「還得去裝一個套件、而且要對版本」，
+ * 沒人知道的結果就是 npm 上的 token 落後四個版本都沒有人發現：
+ * 元件吃 `var(--brand)`、`.state-layer`，宿主的 token 裡卻沒有那些東西，
+ * 畫面壞掉而且**不會報錯**。
+ *
+ * 版號正本取 `packages/react/package.json` 宣告的相依，不在這裡寫第二份真相；
+ * 那個值本身又由 tests/tokens.test.ts 綁在 tokens/package.json 上。
+ *
+ * 用 `^` 而不是釘死：npm 對 0.x 的 `^0.5.0` 解讀是 `>=0.5.0 <0.6.0`，
+ * 剛好就是這一層的相容性語意——同 minor 的修補自動吃，跨 minor 要重抄元件。
+ */
+const TOKENS_DEP = (() => {
+  const declared = JSON.parse(
+    readFileSync(join(ROOT, "packages/react/package.json"), "utf8"),
+  ).dependencies?.["@dooping/tokens"];
+  if (!declared) {
+    throw new Error("packages/react/package.json 未宣告 @dooping/tokens 相依");
+  }
+  return `@dooping/tokens@^${declared.replace(/^[\^~>=<\s]+/, "")}`;
+})();
+
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 
@@ -132,7 +158,11 @@ for (const abs of walk(SRC)) {
   const modKey = rel.replace(/\.tsx?$/, "");
   const isLib = modKey in LIB_MODULES;
   const name = isLib ? LIB_MODULES[modKey] : basename(modKey);
-  const content = rewrite(readFileSync(abs, "utf8"));
+  // 換行一律正規化成 LF。registry JSON 是**散佈產物**——內容是字串，
+  // 換行會被逐字寫進 JSON 裡送給取用端。Windows 上 git 以 CRLF 簽出原始碼，
+  // 不正規化的話這裡會產出帶 `\r\n` 的 item：取用端 `npx shadcn add` 抄到 CRLF，
+  // 而且 CI（Linux，LF）與本機（Windows，CRLF）會永遠互相判定「registry 不同步」。
+  const content = rewrite(readFileSync(abs, "utf8").replace(/\r\n/g, "\n"));
   const { deps, registryDeps } = analyse(content);
   const [title, description] = TITLES[name] ?? [name, ""];
 
@@ -143,7 +173,7 @@ for (const abs of walk(SRC)) {
     type: isLib ? "registry:lib" : rel.startsWith("form/") ? "registry:component" : "registry:ui",
     title,
     description,
-    dependencies: deps,
+    dependencies: [TOKENS_DEP, ...deps],
     registryDependencies: registryDeps.map((d) => `${BASE}/r/${d}.json`),
     files: [
       {

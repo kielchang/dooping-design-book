@@ -56,6 +56,26 @@ describe("設計 token", () => {
     }
   });
 
+  // 這一條是「npm 上的 token 落後四個版本都沒人發現」的直接補丁。
+  // registry item 要是不寫出 token 相依，`npx shadcn add` 就只複製原始碼、不裝 token，
+  // 取用端拿到吃 `var(--brand)` 與 `.state-layer` 的元件卻沒有對應的 token——
+  // 畫面壞掉而且不會報錯。相依寫出來之後，這裡再確認它沒有跟宣告值漂移。
+  it("每個 registry item 都相依當前宣告的 @dooping/tokens 版本", () => {
+    const read = (p: string) => JSON.parse(readFileSync(join(ROOT, p), "utf8"));
+    const indexPath = join(ROOT, "registry/index.json");
+    if (!existsSync(indexPath)) return;
+
+    const declared = read("packages/react/package.json").dependencies["@dooping/tokens"];
+    const expected = `@dooping/tokens@^${declared.replace(/^[\^~>=<\s]+/, "")}`;
+
+    const stale = read("registry/index.json")
+      .items.map((i: { name: string }) => i.name)
+      .filter((name: string) => !read(`registry/${name}.json`).dependencies?.includes(expected));
+
+    expect(stale, `這些 item 沒有相依 ${expected}，請重跑 npm run build:registry：${stale.join(", ")}`)
+      .toEqual([]);
+  });
+
   it("每個淺色語意 token 都有對應的深色值", () => {
     const light = Object.keys(semanticColors("light"));
     const dark = new Set(Object.keys(semanticColors("dark")));

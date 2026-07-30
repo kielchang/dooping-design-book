@@ -47,8 +47,11 @@ function walk(dir: string): string[] {
   return out;
 }
 
-/** 隨套件發佈的檔案（stories 與 demo 資料不發佈，可用示範資料）。 */
-const shipped = (abs: string) => !/\.stories\.tsx$/.test(abs) && !abs.includes(`${"demo"}/`);
+/** 隨套件發佈的檔案（stories 與 demo 資料不發佈，可用示範資料）。
+ *  路徑先正規化成 `/`——`join()` 在 Windows 給的是 `\`，不正規化的話
+ *  示範資料不會被排除，於是多出兩則測試、barrel 覆蓋率也會假性失敗。 */
+const shipped = (abs: string) =>
+  !/\.stories\.tsx$/.test(abs) && !abs.replace(/\\/g, "/").includes(`${"demo"}/`);
 
 function imports(src: string): string[] {
   const out: string[] = [];

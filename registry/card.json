@@ -1,11 +1,13 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "card",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "type": "registry:ui",
   "title": "Card 卡片",
   "description": "內容容器：標題／描述／內容／頁尾。",
-  "dependencies": [],
+  "dependencies": [
+    "@dooping/tokens@^0.5.0"
+  ],
   "registryDependencies": [
     "https://kielchang.github.io/dooping-design-book/r/utils.json"
   ],

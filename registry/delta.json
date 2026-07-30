@@ -1,11 +1,13 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "delta",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "type": "registry:ui",
   "title": "Delta 變異顯示",
   "description": "箭頭＋文字＋顏色三重編碼的差異呈現。",
-  "dependencies": [],
+  "dependencies": [
+    "@dooping/tokens@^0.5.0"
+  ],
   "registryDependencies": [
     "https://kielchang.github.io/dooping-design-book/r/utils.json"
   ],

@@ -112,6 +112,63 @@ jobs:
             exit 1
           fi
 
+      # npm 上的 @dooping/tokens 落後 repo 宣告的版本時出聲。
+      #
+      # 這是 v0.6.0 那次的根因：元件開始吃 `--brand` 與 `.state-layer`，npm 上的 token
+      # 卻還停在 0.1.2。取用端 `npx shadcn add` 抄完元件、裝到舊 token，畫面壞掉
+      # 而且**不會報錯**——中間漂移了四個版本，沒有任何一道自動檢查提起過這件事。
+      #
+      # 刻意**只警告、不擋 PR**：正確的順序是「先把元件與版號合併進 main，
+      # 再對 main 推 tokens-v* 觸發發佈」——publish-tokens.yml 吃的是 tag。
+      # 擋下來會讓那個順序變成死結：PR 過不了就進不了 main，進不了 main 就發不了版。
+      # 所以這一步只留 warning 與一段摘要，讓人看得到，而不是攔路。
+      - name: "npm 上的 tokens 版本是否落後（僅警告，不擋 PR）"
+        continue-on-error: true
+        run: |
+          DECLARED=$(jq -r '.dependencies["@dooping/tokens"] // empty' packages/react/package.json | sed 's/^[~^>=< ]*//')
+          PUBLISHED=$(npm view @dooping/tokens version 2>/dev/null || true)
+
+          {
+            echo "### @dooping/tokens 散佈狀態"
+            echo ""
+            echo "| 來源 | 版本 |"
+            echo "| --- | --- |"
+            echo "| repo 宣告（packages/react） | \`${DECLARED:-查不到}\` |"
+            echo "| npm 上的 latest | \`${PUBLISHED:-查不到}\` |"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -z "$DECLARED" ] || [ -z "$PUBLISHED" ]; then
+            echo "兩邊有一邊查不到版本，略過比對（不視為失敗）。" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if [ "$DECLARED" = "$PUBLISHED" ]; then
+            echo "✅ 一致——取用端照 registry 裝得到對的 token。" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          NEWER=$(printf '%s\n%s\n' "$DECLARED" "$PUBLISHED" | sort -V | tail -1)
+          if [ "$NEWER" = "$DECLARED" ]; then
+            echo "::warning::npm 上的 @dooping/tokens 是 $PUBLISHED，但 repo 宣告 $DECLARED。合併進 main 之後要推 tokens-v$DECLARED 這個 tag 才會發佈。"
+            {
+              echo "⚠️ **npm 落後。** 取用端照 registry 會裝到 \`$PUBLISHED\`，"
+              echo "缺少 \`$DECLARED\` 才有的 token——元件會安靜地壞掉，不會報錯。"
+              echo ""
+              echo "合併進 \`main\` 之後發佈："
+              echo ""
+              echo '```bash'
+              echo "git tag -a tokens-v$DECLARED -m \"tokens $DECLARED\" && git push origin tokens-v$DECLARED"
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::npm 上是 $PUBLISHED，比 repo 宣告的 $DECLARED 新——repo 這邊落後了。"
+            {
+              echo "⚠️ **repo 落後 npm**（npm \`$PUBLISHED\` 比宣告的 \`$DECLARED\` 新）。"
+              echo "確認是不是有人繞過流水線手動發過版。"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: 產生 registry JSON（base 指向正式站，預覽站不供安裝）
         run: node scripts/build-registry.mjs
         env:

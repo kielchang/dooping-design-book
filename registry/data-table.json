@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "data-table",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "type": "registry:ui",
   "title": "DataTable 資料表",
   "description": "搜尋・單欄篩選・排序・分頁・合計・凍結首欄・CSV 匯出。",
   "dependencies": [
-    "@dooping/tokens@^0.5.0",
+    "@dooping/tokens@^0.6.0",
     "lucide-react"
   ],
   "registryDependencies": [

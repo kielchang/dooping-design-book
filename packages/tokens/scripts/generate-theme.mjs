@@ -113,7 +113,7 @@ function buildTheme({ hue, cap, neutralBrand = false }) {
     const c = mode === "dark" ? cap * DARK_CHROMA_FACTOR : cap;
 
     // 中性色先算——brand-subtle 要與「這個主題的 muted」拉開距離，
-    // ring 要對「這個主題最亮的表面」達 3:1，兩者都得用轉過色相之後的值。
+    // 得用轉過色相之後的值。
     const neutral = tintNeutral(mode, hue);
     const nx = (name) => hslToRgb8((neutral[name] ?? tokens.color[mode][name]).value);
 
@@ -156,13 +156,11 @@ function buildTheme({ hue, cap, neutralBrand = false }) {
       : solveLightness(hue, c, subtle, 4.5, { from: 0.60, to: 0.97, prefer: "min" });
     if (!onSubtle) throw new Error(`${mode} brand-subtle-foreground 無解（hue ${hue}）`);
 
-    // ring：聚焦環是非文字 UI 元件，門檻 3:1（WCAG 1.4.11），
-    // 且要對該模式**最亮的表面**成立，不是只對頁面底色。
-    const surface = mode === "light" ? nx("background") : nx("muted");
-    const ring = mode === "light"
-      ? solveLightness(hue, c, surface, 3.0, { from: 0.35, to: 0.75, prefer: "max" })
-      : solveLightness(hue, c, surface, 3.0, { from: 0.50, to: 0.92, prefer: "min" });
-    if (!ring) throw new Error(`${mode} ring 無解（hue ${hue}）`);
+    // ring 刻意**不**進主題（ADR-0007）：聚焦環回落 :root 的中性基礎值。
+    // v0.4.0 曾把它做成吃主題色相，實際使用發現它會與欄位提醒色
+    // （edit 琥珀、danger）在同一個輸入框上撞成兩套強調——
+    // 提醒色管語意、ring 管焦點，色相分家之後切主題也不會誤讀 ring 的用意。
+    // 中性 ring 對各主題表面的 3:1（WCAG 1.4.11）改由 verify-color 驗有效值。
 
     out[mode] = {
       ...neutral,
@@ -175,7 +173,6 @@ function buildTheme({ hue, cap, neutralBrand = false }) {
       "brand-foreground": { value: brandFg, desc: "brand 上的文字" },
       "brand-subtle": { value: rgb8ToHsl(subtle), desc: "主題色淡底：選中的導覽項、分頁底線區" },
       "brand-subtle-foreground": { value: rgb8ToHsl(onSubtle.rgb), desc: "brand-subtle 上的文字" },
-      ring: { value: rgb8ToHsl(ring.rgb), desc: "鍵盤聚焦環（吃主題色相）" },
     };
   }
   return out;
@@ -534,23 +531,25 @@ if (statusLog.length) {
   for (const l of statusLog) console.log(l);
   console.log("");
 }
-console.log("主題色（brand 對其前景 4.5:1／ring 對該模式最亮表面 3:1）");
+console.log("主題色（brand 對其前景 4.5:1／中性 ring 對各主題最亮表面 3:1）");
 for (const t of THEMES) {
   const th = themes[t.name];
   // 一律拿**該主題自己的**前景與表面去量，不要拿理想白或未轉色相的基準值——
   // 這支報告先前兩次都犯過：ring 拿沒轉色相的 muted 去比，brand 拿純白去比，
   // 於是印出低於門檻的假數字。報告算錯對象比不印還糟，它會讓人去修沒壞的東西。
+  //
+  // ring 是全主題共用的中性基礎值（ADR-0007），但表面是各主題帶色相的——
+  // 所以每個主題仍要各驗一次：同一個 ring，對象不同。
   const cB = (m) => contrast(hslToRgb8(th[m].brand.value), hslToRgb8(th[m]["brand-foreground"].value));
   const cR = (m) => contrast(
-    hslToRgb8(th[m].ring.value),
+    hslToRgb8(tokens.color[m].ring.value),
     hslToRgb8((th[m][m === "light" ? "background" : "muted"] ?? tokens.color[m][m === "light" ? "background" : "muted"]).value),
   );
   const b = { l: hslToRgb8(th.light.brand.value), d: hslToRgb8(th.dark.brand.value) };
-  const r = { l: hslToRgb8(th.light.ring.value), d: hslToRgb8(th.dark.ring.value) };
   console.log(
     `  ${t.label} ${t.name.padEnd(9)} H=${String(t.hue).padStart(3)}  ` +
     `brand ${rgb8ToHex(b.l)}/${rgb8ToHex(b.d)} 前景 ${cB("light").toFixed(2)}/${cB("dark").toFixed(2)}  ` +
-    `ring ${rgb8ToHex(r.l)}/${rgb8ToHex(r.d)} ${cR("light").toFixed(2)}/${cR("dark").toFixed(2)}`,
+    `ring(基礎) ${cR("light").toFixed(2)}/${cR("dark").toFixed(2)}`,
   );
 }
 console.log("\n圖表色票");

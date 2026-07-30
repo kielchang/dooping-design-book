@@ -78,7 +78,27 @@ export const 徽章: Story = {
         <Badge variant="danger">已退回</Badge>
         <Badge variant="edit">已改動未送出</Badge>
       </div>
-      <p className="text-xs text-muted-foreground">徽章一定要有文字。純色點在灰階列印與色覺障礙下等於消失。</p>
+      <p className="max-w-2xl text-xs text-muted-foreground">
+        徽章一定要有文字。純色點在灰階列印與色覺障礙下等於消失。
+        四種狀態走<strong>淡底層</strong>，與提示框的低強度同一組 token——所以整排的構造與極性一致
+        （全部是「淡底＋同色相深墨」）。改版前 success／warning／info 是中明度實色配深字、
+        danger 是深實色配反白，<strong>一排裡有兩種極性</strong>、底色 L* 全距 23.5；
+        眼睛會把極性反轉讀成「不同種類」而不是「不同嚴重度」。現在全距收到 10。
+      </p>
+      <div className="space-y-2 border-t pt-3">
+        <p className="text-xs font-semibold">intensity=&quot;high&quot; · 實色，只給必須喊的場合</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="success" intensity="high">已完成</Badge>
+          <Badge variant="warning" intensity="high">待補件</Badge>
+          <Badge variant="info" intensity="high">審核中</Badge>
+          <Badge variant="danger" intensity="high">已退回</Badge>
+        </div>
+        <p className="max-w-2xl text-xs text-muted-foreground">
+          <strong>資料表裡不要用這一排。</strong>一頁上百個徽章全用實色，高飽和色的出現面積會失控
+          ——色彩疲勞管的是面積 × 頻率，不是色相種類數。這一排也正好是舊版的長相：
+          注意 danger 那顆的極性與左邊三顆相反。
+        </p>
+      </div>
     </div>
   ),
 };

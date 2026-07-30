@@ -23,7 +23,13 @@ const TEXT = 4.5;          // 一般文字
 const NONTEXT = 3.0;       // 色塊、邊框、聚焦環等非文字 UI 元件（1.4.11）
 const CHART_FAIL = 10;     // 分類色兩兩感知距離：低於此在紅綠色盲下實務上分不開
 const CHART_WARN = 15;     // 低於此算勉強，記為警告不擋
-const DANGER_MIN = 18;     // 分類色與 danger 的距離：紅線會被讀成警告
+// 分類色與**狀態色**的距離。上一版只驗 danger，於是深色模式下 chart-5↔warning 只差
+// ΔE00 7.3、chart-1↔info 7.9——都低於色票自己的「分不開」門檻 10，而守衛全綠。
+// 雙條件（滿足其一即可）：色相拉得夠開，或者感知距離拉得夠開。
+// 只驗 ΔE00 不夠：同色相但一深一淺的兩色 ΔE00 可以很大，讀者仍會覺得「這條線是紅色的＝有問題」。
+const STATUS_HUE_GAP = 20;
+const STATUS_DE_MIN = 18;
+const SUBTLE_TINT_RATIO = 1.3; // 四種淡底的染色量比值上限：不等量會讓嚴重度階序失效
 const BRAND_STATUS_MIN = 12; // 主題色與狀態色的感知距離：主色像成功色會讓「綠色＝通過」失效
 const BRAND_HUE_GAP = 25;  // 主題色與狀態色的**色相**距離：警報色域（0–95°）是保留區
 const SUBTLE_MIN = 6;      // brand-subtle 與 muted 的距離：否則「被選中」看起來只是「有點灰」
@@ -173,10 +179,25 @@ export function runChecks() {
       tints.push(tint);
       const c = contrast(tint, ink);
       if (c < TEXT) fail.push(`${s}-subtle/${mode} 上的文字只有 ${c.toFixed(2)}:1（需 ${TEXT}）`);
-      // 低強度用的左粗邊是實色狀態色，要在淡底上看得出來
-      const cb = contrast(px(mode, s), tint);
-      if (cb < NONTEXT) warn.push(`${s}/${mode} 左邊框對自己的淡底只有 ${cb.toFixed(2)}:1`);
+      // 左粗邊現在用 `border-l-current`＝與文字同色，所以它的對比就是上面那個值。
+      // 改版前用實色狀態色，實測 1.60–5.43:1，八組裡有四組低於 3:1 的非文字門檻。
+      if (c < NONTEXT) fail.push(`${s}/${mode} 左粗邊（＝文字色）對淡底只有 ${c.toFixed(2)}:1`);
     }
+    // 四種淡底的「染色量」要相等——這一條擋的是嚴重度階序在淡底層失效。
+    // 改版前是「固定 L ＋ 固定 chroma」，但 sRGB 色域不是色相對稱的，於是 info／danger
+    // 被色域裁切、success 沒有：實測 ΔE00(subtle, card) 是 11.0/12.6/14.1/18.5，
+    // 差 1.69 倍（深色 2.13 倍），而且**綠色比紅色搶眼**。
+    const cardSurface = px(mode, "card");
+    const amounts = tints.map((t) => deltaE00(lab(t), lab(cardSurface)));
+    const ratio = Math.max(...amounts) / Math.min(...amounts);
+    if (ratio > SUBTLE_TINT_RATIO) {
+      fail.push(
+        `${mode} 四種淡底的染色量差 ${ratio.toFixed(2)}×（上限 ${SUBTLE_TINT_RATIO}）：` +
+        ALERT.map((s, i) => `${s} Δ${amounts[i].toFixed(1)}`).join("、"),
+      );
+    }
+    stats.subtle ??= {};
+    stats.subtle[mode] = { ratio, amounts };
     // 四種淡底必須彼此分得開，否則「注意」和「錯誤」看起來是同一種。
     // 這條擋過事：淡底的 L 拉到 0.955 時 warning↔danger 只差 8.1–9.3——
     // 越接近純白，可用的 chroma 越少，四種 tint 就一起往白色收斂。
@@ -196,13 +217,28 @@ export function runChecks() {
   for (const mode of MODES) {
     const p = paletteOf(mode);
     const bg = pageBg[mode];
-    const danger = px(mode, "danger");
 
     p.forEach((c, i) => {
       const cc = contrast(c, bg);
       if (cc < NONTEXT) fail.push(`chart-${i + 1}/${mode} 對頁面底只有 ${cc.toFixed(2)}:1（需 ${NONTEXT}）`);
-      const dd = deltaE00(lab(c), lab(danger));
-      if (dd < DANGER_MIN) fail.push(`chart-${i + 1}/${mode} 與 danger 只差 ΔE00 ${dd.toFixed(1)}（需 ${DANGER_MIN}）`);
+      // 對六個狀態色全驗，不是只驗 danger
+      const [, cChroma, cHue] = rgb8ToOklch(c);
+      for (const s of STATUS) {
+        const sc = px(mode, s);
+        const [, sChroma, sHue] = rgb8ToOklch(sc);
+        // 近中性色的色相角度沒有感知意義，這種情況只看 ΔE00
+        const hueMeaningful = cChroma >= CHROMATIC_MIN && sChroma >= CHROMATIC_MIN;
+        let hueGap = Math.abs(cHue - sHue);
+        if (hueGap > 180) hueGap = 360 - hueGap;
+        const de = deltaE00(lab(c), lab(sc));
+        const ok = de >= STATUS_DE_MIN || (hueMeaningful && hueGap >= STATUS_HUE_GAP);
+        if (!ok) {
+          fail.push(
+            `chart-${i + 1}/${mode} 與 ${s} 太近：色相差 ${hueGap.toFixed(0)}°（需 ${STATUS_HUE_GAP}）` +
+            `且 ΔE00 ${de.toFixed(1)}（需 ${STATUS_DE_MIN}）`,
+          );
+        }
+      }
     });
 
     let worst = { d: Infinity, a: 0, b: 0 };

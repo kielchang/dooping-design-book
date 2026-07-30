@@ -26,11 +26,22 @@ const ICON: Record<CalloutVariant, LucideIcon> = {
 // 低強度不再用 `bg-{狀態}/10`：那是把實色壓 10% 疊上去，對比不可控——
 // 實測四種變體在淺色模式的文字對比只有 1.97–3.98:1，全部低於 4.5。
 // 改吃生成的 `--{狀態}-subtle` 三件組，對比在生成時就反解保證。
+// 左粗邊用 `border-l-current`——也就是**與文字同色**（`-subtle-foreground`），
+// 不是全飽和的狀態色。兩個理由，都是量出來的：
+//
+// 一、全飽和邊對自己的淡底，對比是 1.60–5.43:1，**八組裡有四組低於 3:1**
+//     （WCAG 1.4.11 的非文字門檻）。改用文字色之後全部是 4.50–4.54:1——
+//     因為那個色本來就是對淡底反解到 4.5:1 的，所以「相等」是構造上保證的，不是調出來的。
+// 二、淡底的 chroma 約 0.03–0.08，全飽和邊卻是 0.134–0.223（3–6 倍）。
+//     一個元件內部跳這麼大就是使用者說的「突兀」。文字色的 chroma 約 0.100，跳幅收到 2 倍以內。
+//
+// 三邊的細邊框統一成同一個透明度（原本 success/info/danger 是 /30、warning 是 /40，
+// 沒有理由不同）。細邊框只是形狀提示，不承載語意，所以用透明度是可以的。
 const LOW: Record<CalloutVariant, string> = {
-  success: "border-success/30 border-l-success bg-success-subtle text-success-subtle-foreground",
-  warning: "border-warning/40 border-l-warning bg-warning-subtle text-warning-subtle-foreground",
-  info: "border-info/30 border-l-info bg-info-subtle text-info-subtle-foreground",
-  danger: "border-danger/30 border-l-danger bg-danger-subtle text-danger-subtle-foreground",
+  success: "border-success/30 bg-success-subtle text-success-subtle-foreground",
+  warning: "border-warning/30 bg-warning-subtle text-warning-subtle-foreground",
+  info: "border-info/30 bg-info-subtle text-info-subtle-foreground",
+  danger: "border-danger/30 bg-danger-subtle text-danger-subtle-foreground",
 };
 
 const HIGH: Record<CalloutVariant, string> = {
@@ -84,7 +95,7 @@ export function Callout({
         "flex items-start gap-2.5 rounded-md border p-3",
         // 左邊框加粗是低強度的識別特徵：不靠顏色也看得出這是一則提示，
         // 而且在灰階列印下仍然成立。
-        high ? HIGH[variant] : cn(LOW[variant], "border-l-4"),
+        high ? HIGH[variant] : cn(LOW[variant], "border-l-4 border-l-current"),
         className,
       )}
       // 預設是 `note`（旁註），**不是** live region。提示框大多是靜態內容，

@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "stepper",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "type": "registry:ui",
   "title": "Stepper 步驟指示",
   "description": "多步驟流程進度，完成態同時用勾選與顏色。",

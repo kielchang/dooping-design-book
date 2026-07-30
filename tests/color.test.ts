@@ -116,6 +116,22 @@ describe("色彩", () => {
     expect(offenders, `改走 state-layer：${offenders.join("、")}`).toEqual([]);
   });
 
+  it("狀態徽章的預設變體必須走淡底層，不得用實色填底", () => {
+    // 實色填底會讓一排徽章有兩種極性：success／warning／info 的前景是同色相深墨、
+    // danger 的是反白，底色 L* 全距 23.5。眼睛把極性反轉讀成「不同種類」而不是
+    // 「不同嚴重度」。實色只保留給 `intensity="high"`，走 compoundVariants。
+    const src = readFileSync(
+      fileURLToPath(new URL("../packages/react/src/ui/badge.tsx", import.meta.url)),
+      "utf8",
+    );
+    // 只看 `variant:` 那一段（compoundVariants 裡的實色是刻意的）
+    const variantBlock = src.slice(src.indexOf("variant: {"), src.indexOf("intensity:"));
+    const offenders = ["success", "warning", "info", "danger"].filter((s) =>
+      new RegExp(`bg-${s}\\b(?!-subtle)`).test(variantBlock),
+    );
+    expect(offenders, `這些變體還在用實色填底：${offenders.join("、")}`).toEqual([]);
+  });
+
   it("用了 state-layer 的元件不得同時寫 transition-colors（會蓋掉狀態層的過渡）", () => {
     // Tailwind 的 utility 排在 tokens.css 之後，`transition-colors` 這個簡寫會覆寫
     // `.state-layer` 的 transition-property，狀態層就只會瞬間切換而不是淡入。

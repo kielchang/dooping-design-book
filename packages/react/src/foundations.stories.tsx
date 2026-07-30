@@ -33,6 +33,15 @@ export const 語意色: Story = {
         命名說的是「這個顏色代表什麼意思」，不是「這是什麼顏色」。因此換色票時只改值、不改任何一行使用它的程式碼。
         用 Storybook 工具列切換淺／深色，同一個 token 名稱會給出兩套值。
       </p>
+      <p className="max-w-2xl text-sm text-muted-foreground">
+        下面這一頁<strong>絕大多數是無彩色</strong>（背景 chroma 0.000、<code>muted</code> 0.007、
+        <code>border</code> 0.013），只有約十個帶彩度。這是刻意的：語意系統
+        <strong>用彩度編碼重要性</strong>（<code>danger</code> 0.223 &gt; <code>warning</code> 0.165 &gt;{" "}
+        <code>brand</code> ≤0.151 &gt; <code>primary</code> 0.040 &gt; 中性 ≤0.013）。
+        所以這一頁該讀起來像「一整頁灰，加幾個重點」——與隔壁的<strong>圖表色票</strong>觀感差很多，
+        那個落差是兩種色票目的不同的必然結果，
+        理由見<a href="/foundations/color#為什麼分類色看起來比語意色吵">為什麼分類色看起來比語意色「吵」</a>。
+      </p>
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {list(tokens.color.light as Record<string, unknown>).map(([k, v]) => <Swatch key={k} name={k} entry={v} />)}
       </div>
@@ -74,10 +83,24 @@ export const 圖表色票: Story = {
             </div>
           </div>
         ))}
+        <p className="max-w-2xl text-sm text-muted-foreground">
+          這一排看起來比<strong>語意色</strong>那一頁「吵」很多，是刻意的。語意系統用彩度編碼重要性，
+          所以那一頁絕大多數是無彩色；分類色是<strong>彼此平等的同儕</strong>，
+          等亮等飽和才對——如果第 3 條序列比第 5 條飽和，讀者會以為它比較重要。
+          兩邊都對，放在一起就會有落差，因為兩種色票回答的是不同問題：
+          語意色答「這件事有多重要」，分類色答「這是哪一類」。
+          完整說明見<a href="/foundations/color#為什麼分類色看起來比語意色吵">基礎／色彩</a>。
+        </p>
         <p className="max-w-2xl text-tiny text-muted-foreground">
           淺深是<strong>兩組獨立的值，沒有任何一色相同</strong>。共用會把 OKLCH 的 L 鎖在
           <code>[0.49, 0.67]</code>（寬度 0.17），八色必然擠在中明度——而二色覺者失去的正是色相辨別、
           保留的是明度。上一版 8 色裡共用了 6 色，最差一對在綠色盲下 ΔE00 只有 2.6。
+        </p>
+        <p className="max-w-2xl text-tiny text-muted-foreground">
+          另一條約束是<strong>分類色不得靠近任何狀態色</strong>（色相差 ≥20° 或 ΔE00 ≥18）——
+          否則一條普通序列長得像 <code>danger</code>，讀者會以為那條線有問題。
+          這條守衛上一版只擋 <code>danger</code>，於是深色下 <code>chart-5</code> 與{" "}
+          <code>warning</code> 只差 ΔE00 7.3 而沒被抓到。
         </p>
       </div>
     );

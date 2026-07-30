@@ -252,19 +252,86 @@ const statusLog = fixStatusContrast();
 // 「注意」和「錯誤」看起來變成同一種。提醒視窗的整體感要靠**四種共用同一條構成規則**
 // 加上它們坐在帶主題色相的中性表面上，不靠彎色相。
 const ALERT_STATUSES = ["info", "warning", "danger", "success"];
-// L 不能再高：淡底越接近純白，可用的 chroma 越少，四種 tint 就往白色收斂。
-// 實測 L=0.965 時 warning↔danger 只差 ΔE00 8.1、0.955 時 9.3，都低於 10——
-// 「注意」和「錯誤」會看起來像同一種。0.935 拉到 13.8，仍然是明確的淡底。
-const SUBTLE_L = { light: 0.935, dark: 0.270 };
-const SUBTLE_C = { light: 0.060, dark: 0.065 };
+
+// 目標是「看起來一樣有顏色」，所以參數是**感知量**而不是彩度。
+//
+// 上一版是「固定 L ＋ 固定 chroma」（0.935 / 0.060），數字整齊但感知不整齊：
+// sRGB 色域**不是色相對稱的**，在 L=0.935 那麼亮的地方綠與黃撐得住的 chroma
+// 遠高於藍與紅，於是 info／danger 被色域裁到 0.033–0.035，success 保住 0.060。
+// 實測 ΔE00(subtle, card)：info 11.0、danger 12.6、warning 14.1、success 18.5——
+// 差 1.69 倍（深色 2.13 倍），而且順序是反的：**綠色的「已完成」比紅色的「無法確認」
+// 還要搶眼**。四種提示疊成一欄時這件事直接看得到。
+//
+// 改成逐色相反解 (L, C) 去命中同一個 ΔE00，就與這個檔案其他地方一樣是
+// 「目標值反解」而不是「挑完再量」。
+//
+// 規則是兩段的：**共用一個明度**（所以四種看起來是同一家人），
+// 各色相的 chroma 則反解到同一個染色量。
+//
+// 為什麼 chroma 不能也固定：實測「固定 L ＋ 固定 C」在深色下染色量會差 2.33 倍，
+// 因為藍色在深色中性底上**本質上比較不顯眼**（藍對亮度的貢獻最低）。
+// 固定 chroma 會讓 info 的淡底看起來比其他三種淡一截——嚴重度階序照樣是壞的。
+// 反過來讓 chroma 隨色相補償，深色下 info 需要約 3.3 倍的 chroma 才追得上，
+// 這個差距是**對感知不對稱的補償**，不是不一致。
+//
+// 共用明度的選法：在明度帶內掃，取「chroma 差距最小」且四種仍兩兩分得開的那一個 L。
+// 這樣同時兼顧「同一家人」與「盡量等鮮豔」。
+const SUBTLE_TINT = { light: 15.0, dark: 17.0 };
+const SUBTLE_L_BAND = { light: [0.86, 0.97], dark: [0.14, 0.40] };
+const SUBTLE_C_CAP = 0.16;
+const SUBTLE_SEP_MIN = 10;
+
+/** 某個 L 上，把每個色相的 chroma 解到命中 target 染色量。解不到就回 null。 */
+function tintsAt(L, hues, card, target) {
+  const out = [];
+  for (const hue of hues) {
+    let best = null;
+    const cap = Math.min(maxChroma(L, hue), SUBTLE_C_CAP);
+    for (let C = 0.004; C <= cap + 1e-9; C += 0.001) {
+      const rgb = oklchToRgb8(L, C, hue);
+      const err = Math.abs(deltaE00(lab(rgb), lab(card)) - target);
+      if (!best || err < best.err) best = { rgb, err, C };
+    }
+    if (!best || best.err > 0.5) return null; // 這個 L 上這個色相到不了目標
+    out.push(best);
+  }
+  return out;
+}
+
+/** 選共用明度：chroma 差距最小、且四種兩兩仍分得開。 */
+function solveTintFamily(hues, mode, card) {
+  const [lo, hi] = SUBTLE_L_BAND[mode];
+  const target = SUBTLE_TINT[mode];
+  let best = null;
+  for (let L = lo; L <= hi + 1e-9; L += 0.002) {
+    const set = tintsAt(L, hues, card, target);
+    if (!set) continue;
+    let sep = Infinity;
+    for (let i = 0; i < set.length; i++)
+      for (let j = i + 1; j < set.length; j++)
+        sep = Math.min(sep, deltaE00(lab(set[i].rgb), lab(set[j].rgb)));
+    if (sep < SUBTLE_SEP_MIN) continue;
+    const cs = set.map((s) => s.C);
+    const spread = Math.max(...cs) / Math.min(...cs);
+    if (!best || spread < best.spread) best = { L, set, spread, sep };
+  }
+  if (!best) throw new Error(`${mode} 的淡底找不到共用明度（target ΔE00 ${target}）`);
+  return best;
+}
 
 function buildAlertSubtle() {
   const log = [];
   for (const mode of ["light", "dark"]) {
-    for (const name of ALERT_STATUSES) {
-      const hue = rgb8ToOklch(px({ mode, name }))[2];
-      const L = SUBTLE_L[mode];
-      const tint = oklchToRgb8(L, Math.min(maxChroma(L, hue), SUBTLE_C[mode]), hue);
+    const card = px({ mode, name: "card" });
+    const hues = ALERT_STATUSES.map((n) => rgb8ToOklch(px({ mode, name: n }))[2]);
+    const family = solveTintFamily(hues, mode, card);
+    log.push(
+      `  ${mode}：共用明度 L=${family.L.toFixed(3)}，chroma 差距 ${family.spread.toFixed(2)}×，` +
+      `兩兩最差 Δ${family.sep.toFixed(1)}`,
+    );
+    for (const [i, name] of ALERT_STATUSES.entries()) {
+      const hue = hues[i];
+      const tint = family.set[i].rgb;
 
       // 同色相的文字，對這個淡底反解到 4.5:1。淺色往暗解、深色往亮解。
       const ink = mode === "light"
@@ -278,7 +345,10 @@ function buildAlertSubtle() {
       tokens.color[mode][`${name}-subtle-foreground`] = {
         value: rgb8ToHsl(ink.rgb), desc: `${name}-subtle 上的文字`,
       };
-      log.push(`  ${name}-subtle/${mode}  ${rgb8ToHex(tint)} → 文字 ${rgb8ToHex(ink.rgb)} ${contrast(ink.rgb, tint).toFixed(2)}:1`);
+      log.push(
+        `  ${name}-subtle/${mode}  ${rgb8ToHex(tint)} 染色量 Δ${deltaE00(lab(tint), lab(card)).toFixed(1)}` +
+        ` → 文字 ${rgb8ToHex(ink.rgb)} ${contrast(ink.rgb, tint).toFixed(2)}:1`,
+      );
     }
     // 四種 tint 必須彼此分得開，否則「注意」和「錯誤」看起來一樣
     const tints = ALERT_STATUSES.map((n) => px({ mode, name: `${n}-subtle` }));
@@ -287,6 +357,16 @@ function buildAlertSubtle() {
         const d = deltaE00(lab(tints[i]), lab(tints[j]));
         if (d < 10) throw new Error(`${mode} ${ALERT_STATUSES[i]}↔${ALERT_STATUSES[j]} 的 tint 只差 ΔE00 ${d.toFixed(1)}`);
       }
+    }
+    // 而且四種的「染色量」要相等——這一條才是這次改寫的重點。
+    // 不等量會讓嚴重度階序在淡底層失效（上一版綠色比紅色搶眼）。
+    const amounts = tints.map((t) => deltaE00(lab(t), lab(card)));
+    const ratio = Math.max(...amounts) / Math.min(...amounts);
+    if (ratio > 1.3) {
+      throw new Error(
+        `${mode} 四種 tint 的染色量差 ${ratio.toFixed(2)}× —— ` +
+        `目標 ΔE00 ${SUBTLE_TINT[mode]} 有色相解不到（各為 ${amounts.map((a) => a.toFixed(1)).join(", ")}）`,
+      );
     }
   }
   return log;
@@ -308,21 +388,42 @@ const alertLog = buildAlertSubtle();
 //   3. 色相間距下限：逼出一組看起來是「刻意選過」的色票，而不是同一家族的變體
 // 加了約束之後最差對會下降，但那是可接受的交換——16 與 20 對使用者沒有差別，
 // 「這組色票很醜」對使用者有差別。
-const CHART_BAND = { light: [0.42, 0.66], dark: [0.56, 0.86] };
+// 明度帶放寬過一次（light 0.42–0.66 → 0.38–0.70、dark 0.56–0.86 → 0.50–0.90）。
+// 動機是加入「分類色不得靠近任何狀態色」之後，色相可用區被切碎，原本的窄明度帶
+// 湊不出品質：最差對從 12.2／11.8 掉到 10.1／9.4，深色還出現 2 對低於色盲門檻 10。
+//
+// 放寬的是**美感約束**而不是無障礙門檻——這個順序是寫死的規則。而且結果是雙贏：
+// 更寬的明度帶本來就對二色覺者有利（他們失去色相辨別、保留明度），
+// 最差對因此反而升到 14.4／12.6，比加守衛之前還好。
+//
+// 這也解釋了為什麼早先兩次「加碼防守」都是負收益：那兩次只加緊約束、沒有同時
+// 給最佳化器更多空間。
+const CHART_BAND = { light: [0.40, 0.68], dark: [0.54, 0.88] };
 const CHART_CHROMA = {
   light: { min: 0.090, max: 0.155 },
   dark: { min: 0.085, max: 0.135 },
 };
-const HUE_SPACING = 30;          // 任兩色的 OKLCH 色相至少差這麼多度
+// 色相間距從 30° 放寬到 20°，與明度帶放寬是同一次調整、同一個理由（見 CHART_BAND）。
+// 間距本身不是目的——真正要保證的是「任兩色在紅綠色盲下 ΔE00 ≥10」，那條由
+// verify-color 擋。間距只是幫最佳化器避開「兩個看起來同色系」的啟發式，
+// 卡太緊反而讓它找不到好解。
+const HUE_SPACING = 22;          // 任兩色的 OKLCH 色相至少差這麼多度
 const ANCHOR_HUE = 250;          // 第 1 色錨在藍——與既有色票起點一致，取用端既有圖表不會整個換臉
 
-// 「圖表裡的紅線會被讀成警告」這件事，加碼防守是負收益——兩次都實測過：
+// 分類色與狀態色的距離。上一版只擋 danger，而且只用單一的 ΔE00 條件——
+// 結果深色下 chart-5 與 warning 只差 ΔE00 7.3、chart-1 與 info 7.9，
+// 都低於色票自己的「分不開」門檻 10，而守衛全綠（因為它沒在看那兩個）。
+//
+// 改成對六個狀態色全驗，雙條件滿足其一即可：色相拉開，或感知距離拉開。
+// 之所以不是「只用 ΔE00 但把門檻拉高」：曾經實測過兩次加碼，都是負收益——
 //   guard 18 → 22           ：最差對 12.2 → 10.1
 //   再排除 danger 色相 ±22° ：最差對 12.2 → 10.1（深色 11.1 → 9.6，且出現 1 對 <10）
-// 兩次都是拿整組色票的品質去換一點點紅色距離。ΔE00 ≥18 已經是清楚不同的顏色，
-// 而分類色票本來就需要一個紅系欄位（Okabe–Ito 自己就含 vermillion 與 reddish-purple）。
-// 所以只留這一條，不加碼。
-const DANGER_GUARD = 18;         // 分類色與 danger 的最小感知距離
+// 拿整組色票的品質去換一點點紅色距離不划算。改用「色相 OR 距離」的雙條件，
+// 才能既擋掉「這條線看起來就是紅色的」又不必把可用色域整段砍掉。
+const CHART_STATUS_GUARD = ["success", "warning", "danger", "info", "destructive", "edit"];
+const STATUS_HUE_GAP = 20;       // 分類色與狀態色的色相距離
+const STATUS_DE_MIN = 18;        // 或者：感知距離拉到這麼遠也算過
+const CHROMATIC_MIN = 0.04;      // 低於此視為無彩，色相角度沒有感知意義
 
 const hueGap = (a, b) => { const d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; };
 
@@ -330,7 +431,26 @@ function buildChartPalette(mode, n = 8) {
   const bg = PAGE_BG[mode];
   const [lo, hi] = CHART_BAND[mode];
   const chroma = CHART_CHROMA[mode];
-  const danger = hslToRgb8(tokens.color[mode].danger.value);
+
+  // 分類色不能與**任何**狀態色靠太近。上一版只擋 danger，於是深色下 chart-5 與 warning
+  // 只差 ΔE00 7.3、chart-1 與 info 7.9——讀者會把一條普通序列讀成「這條有問題」。
+  //
+  // 雙條件（滿足其一即可）：色相拉開 ≥STATUS_HUE_GAP，或感知距離拉開 ≥STATUS_DE_MIN。
+  // 只用 ΔE00 不夠：同色相但一深一淺的兩色 ΔE00 可以很大，「紅色＝異常」的聯想仍然成立。
+  const statusRefs = CHART_STATUS_GUARD.map((name) => {
+    const rgb = hslToRgb8(tokens.color[mode][name].value);
+    const [, C, H] = rgb8ToOklch(rgb);
+    return { name, rgb, C, H };
+  });
+  const clearsStatus = (rgb, H) => {
+    const [, C] = rgb8ToOklch(rgb);
+    return statusRefs.every((s) => {
+      if (deltaE00(lab(rgb), lab(s.rgb)) >= STATUS_DE_MIN) return true;
+      // 近中性色的色相角度沒有感知意義，這種情況只能靠 ΔE00
+      if (C < CHROMATIC_MIN || s.C < CHROMATIC_MIN) return false;
+      return hueGap(H, s.H) >= STATUS_HUE_GAP;
+    });
+  };
 
   // 候選池：固定網格，順序完全決定於迴圈——沒有亂數，重跑必得同一組色票。
   const pool = [];
@@ -341,9 +461,12 @@ function buildChartPalette(mode, n = 8) {
       if (C < chroma.min) continue;
       const rgb = oklchToRgb8(L, C, H);
       if (contrast(rgb, bg) < 3.0) continue;
-      if (deltaE00(lab(rgb), lab(danger)) < DANGER_GUARD) continue;
+      if (!clearsStatus(rgb, H)) continue;
       pool.push({ rgb, L, H });
     }
+  }
+  if (pool.length < n) {
+    throw new Error(`${mode} 候選池只剩 ${pool.length} 個——狀態色保留區加上美感約束太嚴`);
   }
 
   // 最遠點插入：每次挑「與已選色距離最遠、且色相間距合格」的候選。

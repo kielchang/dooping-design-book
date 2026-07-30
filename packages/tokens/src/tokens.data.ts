@@ -3,7 +3,7 @@ export default {
   "$comment": "Dooping 設計 token 唯一來源（框架中立）。CSS 變數與 Tailwind preset 皆由此檔產生，勿直接改 dist/。色彩值以 HSL 三元組字串表示（可被 hsl(var(--x) / <alpha>) 套用透明度）；chart.* 例外為 hex（SVG fill/stroke 直接吃 var()，不經 hsl() 包裝）。",
   "meta": {
     "name": "dooping",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "defaultTheme": "graphite"
   },
   "color": {
@@ -150,35 +150,35 @@ export default {
         "desc": "可編輯欄位邊框（冷灰藍，刻意不像狀態色）"
       },
       "info-subtle": {
-        "value": "204.3 100% 91.8%",
+        "value": "205 100% 88%",
         "desc": "info 低強度提示的底色（Carbon 雙強度的低強度層）"
       },
       "info-subtle-foreground": {
-        "value": "201.8 63.4% 37.5%",
+        "value": "201.1 69.3% 34.5%",
         "desc": "info-subtle 上的文字"
       },
       "warning-subtle": {
-        "value": "32 100% 89%",
+        "value": "32.1 73.7% 85.1%",
         "desc": "warning 低強度提示的底色（Carbon 雙強度的低強度層）"
       },
       "warning-subtle-foreground": {
-        "value": "34.5 65.3% 33.9%",
+        "value": "35.5 73.2% 30.8%",
         "desc": "warning-subtle 上的文字"
       },
       "danger-subtle": {
-        "value": "0 100% 94.1%",
+        "value": "0 78% 91%",
         "desc": "danger 低強度提示的底色（Carbon 雙強度的低強度層）"
       },
       "danger-subtle-foreground": {
-        "value": "356.8 31.7% 47.1%",
+        "value": "356 33% 44.5%",
         "desc": "danger-subtle 上的文字"
       },
       "success-subtle": {
-        "value": "148.8 75% 87.5%",
+        "value": "146.9 38.7% 85.3%",
         "desc": "success 低強度提示的底色（Carbon 雙強度的低強度層）"
       },
       "success-subtle-foreground": {
-        "value": "156.1 57.1% 30.2%",
+        "value": "157.8 67.6% 26.7%",
         "desc": "success-subtle 上的文字"
       }
     },
@@ -290,35 +290,35 @@ export default {
         "value": "215 18% 34%"
       },
       "info-subtle": {
-        "value": "199.4 100% 12.2%",
+        "value": "198.1 100% 18.8%",
         "desc": "info 低強度提示的底色（Carbon 雙強度的低強度層）"
       },
       "info-subtle-foreground": {
-        "value": "200.8 48.6% 51.2%",
+        "value": "201.3 64% 62.9%",
         "desc": "info-subtle 上的文字"
       },
       "warning-subtle": {
-        "value": "36 100% 10.8%",
+        "value": "34 18% 23%",
         "desc": "warning 低強度提示的底色（Carbon 雙強度的低強度層）"
       },
       "warning-subtle-foreground": {
-        "value": "34.8 45.9% 47.8%",
+        "value": "34.8 53.3% 58.8%",
         "desc": "warning-subtle 上的文字"
       },
       "danger-subtle": {
-        "value": "351 47% 17%",
+        "value": "354.5 16.7% 25.9%",
         "desc": "danger 低強度提示的底色（Carbon 雙強度的低強度層）"
       },
       "danger-subtle-foreground": {
-        "value": "353 40% 61%",
+        "value": "353.3 57.4% 72.4%",
         "desc": "danger-subtle 上的文字"
       },
       "success-subtle": {
-        "value": "160.9 100% 9.2%",
+        "value": "153.8 13.8% 22.7%",
         "desc": "success 低強度提示的底色（Carbon 雙強度的低強度層）"
       },
       "success-subtle-foreground": {
-        "value": "157.1 39.2% 44.5%",
+        "value": "155.5 38.9% 55.7%",
         "desc": "success-subtle 上的文字"
       }
     }
@@ -326,28 +326,28 @@ export default {
   "chart": {
     "light": {
       "chart-1": {
-        "value": "#0071c3"
+        "value": "#006dbd"
       },
       "chart-2": {
-        "value": "#8b9e00"
+        "value": "#7aa121"
       },
       "chart-3": {
-        "value": "#8d1339"
+        "value": "#005636"
       },
       "chart-4": {
-        "value": "#00a597"
+        "value": "#00a495"
       },
       "chart-5": {
-        "value": "#955400"
+        "value": "#7b135c"
       },
       "chart-6": {
-        "value": "#7d1e6c"
+        "value": "#736a00"
       },
       "chart-7": {
-        "value": "#00a2c5"
+        "value": "#8b89f4"
       },
       "chart-8": {
-        "value": "#008f4e"
+        "value": "#00818d"
       },
       "chart-axis": {
         "value": "#cbd5e1",
@@ -364,28 +364,28 @@ export default {
     },
     "dark": {
       "chart-1": {
-        "value": "#5aa6f2"
+        "value": "#66a3f4"
       },
       "chart-2": {
-        "value": "#8b7200"
+        "value": "#7e6f00"
       },
       "chart-3": {
-        "value": "#67edc0"
+        "value": "#9fef9e"
       },
       "chart-4": {
-        "value": "#008589"
+        "value": "#a74877"
       },
       "chart-5": {
-        "value": "#f0a150"
+        "value": "#4cf4eb"
       },
       "chart-6": {
-        "value": "#6a6cc5"
+        "value": "#8faa41"
       },
       "chart-7": {
-        "value": "#ffb8e1"
+        "value": "#6c6ac3"
       },
       "chart-8": {
-        "value": "#f6888d"
+        "value": "#f88995"
       },
       "chart-axis": {
         "value": "#3a465c"

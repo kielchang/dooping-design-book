@@ -169,7 +169,10 @@ export function Coachmark({
         onKeyDown={onKeyDown}
         aria-live="polite"
         style={pos ? { top: pos.top, left: pos.left } : { opacity: 0 }}
-        className="pointer-events-auto fixed w-[min(340px,calc(100vw-24px))] rounded-lg border bg-popover p-3 text-popover-foreground shadow-lg outline-none ring-1 ring-transparent focus-visible:ring-primary"
+        // 聚焦環用 `ring-ring`（跟著色相主題）而不是 `ring-primary`——這支原本是全 repo
+        // 唯一不跟主題的聚焦環。換過來之後就受 ring-offset 那條守衛管：沒有 offset 的環
+        // 是貼著卡片邊框畫的，對比要對邊框算而不是對背景算。
+        className="pointer-events-auto fixed w-[min(340px,calc(100vw-24px))] rounded-lg border bg-popover p-3 text-popover-foreground shadow-lg outline-none ring-1 ring-transparent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <div className="mb-1 flex items-start justify-between gap-2">
           <p className="text-sm font-semibold">{title}</p>
@@ -198,11 +201,11 @@ export function Coachmark({
             <div className="flex gap-2" role="radiogroup" aria-label={L.verdictTitle}>
               <button
                 type="button" role="radio" aria-checked={verdict === "pass"} onClick={() => onVerdict?.("pass")}
-                className={cn("tap-target flex-1 rounded-md border px-2 py-1 text-xs font-medium", verdict === "pass" ? "border-success bg-success/15 text-success" : "text-muted-foreground hover:bg-accent")}
+                className={cn("state-layer tap-target flex-1 rounded-md border px-2 py-1 text-xs font-medium", verdict === "pass" ? "border-success bg-success/15 text-success" : "text-muted-foreground")}
               >{L.pass}</button>
               <button
                 type="button" role="radio" aria-checked={verdict === "issue"} onClick={() => onVerdict?.("issue")}
-                className={cn("tap-target flex-1 rounded-md border px-2 py-1 text-xs font-medium", verdict === "issue" ? "border-danger bg-danger/15 text-danger" : "text-muted-foreground hover:bg-accent")}
+                className={cn("state-layer tap-target flex-1 rounded-md border px-2 py-1 text-xs font-medium", verdict === "issue" ? "border-danger bg-danger/15 text-danger" : "text-muted-foreground")}
               >{L.issue}</button>
             </div>
             {verdict === "issue" && (

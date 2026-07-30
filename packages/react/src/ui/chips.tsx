@@ -77,8 +77,8 @@ export function Chips({
             onClick={() => !disabled && onToggle(o.value)}
             onKeyDown={(e) => onKey(e, idx)}
             className={cn(
-              "tap-target-y inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs transition-colors duration-fast",
-              on ? "border-primary bg-primary/10 font-medium text-primary" : "border-input text-muted-foreground hover:bg-accent",
+              "state-layer tap-target-y inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs",
+              on ? "border-primary bg-primary/10 font-medium text-primary" : "border-input text-muted-foreground",
             )}
           >
             {on && <Check aria-hidden className="size-3 shrink-0" />}

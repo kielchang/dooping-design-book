@@ -33,7 +33,11 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+      {/* 關閉鈕不用 opacity 當靜止態：`opacity-70` 與停用態（`opacity-50`）是同一個通道，
+          一顆常駐半透明的控制項會被讀成不能按。改成「弱化文字色 → 正文色」＋狀態層。
+          `focus:` 換成 `focus-visible:`，否則滑鼠點一下也會冒出聚焦環。
+          right-3/top-3 + p-1 讓圖示位置與原本的 right-4/top-4 一致，只是多了可疊加的面積。 */}
+      <DialogPrimitive.Close className="state-layer absolute right-3 top-3 rounded-sm p-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
         <X className="size-4" />
         <span className="sr-only">{closeLabel}</span>
       </DialogPrimitive.Close>

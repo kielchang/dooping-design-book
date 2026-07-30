@@ -76,6 +76,9 @@ lines.push(...vars(tokens.easing, "easing-"));
 lines.push("");
 lines.push("  /* 互動尺寸 */");
 lines.push(...vars(tokens.size, "size-"));
+lines.push("");
+lines.push("  /* 互動狀態層強度（不分淺深：疊加色取 currentColor，方向自動正確） */");
+lines.push(...vars(tokens.state, "state-"));
 lines.push("}");
 lines.push("");
 
@@ -123,6 +126,64 @@ lines.push(`/* 欄位語意（單一二分法）：可編輯＝淡冷底＋清�
 .field-readonly {
   background-color: hsl(var(--field-readonly));
   color: hsl(var(--field-readonly-foreground));
+}
+`);
+
+// ── 互動狀態層 ────────────────────────────────────────────────
+// 一條原則：每個顏色變化都要對應一件使用者需要知道的事，強度與那件事的**持續時間**成正比。
+//
+// 疊加而不是換色。`--accent` 那種「hover 專用底色」是**取代**：斑馬列本來就是 muted，
+// hover 換成 accent（同值）等於沒變。這裡改成在元件自己的底色上疊一層，
+// 「深了一階」這件事因此在 card／muted／field-* 任何底色上都成立。
+//
+// 疊加色取 `currentColor`——也就是該表面自己的內容色。這是刻意的：
+// 深色模式下 `--foreground` 與 `--primary` 是同一個近白，用它去疊實色按鈕會得到 ΔE00 0.0
+// （按鈕完全沒有 hover 回饋）；取 currentColor 則自動是「深底配亮疊、亮底配深疊」。
+//
+// 走 background-image 而不是 ::after 疊加層，理由是**畫在哪一層**：
+// background-image 落在背景層——在 background-color 之上、內容之下。
+// ::after 會蓋在內容上，已選列裡的徽章會被染掉（實測 #dcfce7 → #abc4b4）。
+// 附帶好處：不必給元件加 position: relative（會改變絕對定位子元素的容器），
+// 也不必 border-radius: inherit（背景本來就被圓角裁切）。
+//
+// @property 只影響**過渡**：註冊成 <percentage> 之後這個變數才能被 transition 內插。
+// 不支援的瀏覽器仍會套用狀態，只是瞬間切換而不是淡入——降級是安全的。
+//
+// ⚠️ 唯一的取用端陷阱：`background` **簡寫**會把 background-image 重設為 none，狀態層整個消失。
+// 一律用 `background-color`（Tailwind 的 `bg-*` 產的就是 background-color，因此不受影響）。
+lines.push(`/* 互動狀態層：hover／pressed／selected 三級，疊在元件自己的底色上。
+   強度來自 --state-*-alpha；顏色一律是 currentColor，因此淺深兩模式共用同一組值。 */
+@property --state-layer-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+.state-layer {
+  background-image: linear-gradient(
+    color-mix(in srgb, currentColor var(--state-layer-alpha), transparent),
+    color-mix(in srgb, currentColor var(--state-layer-alpha), transparent)
+  );
+  /* 一併涵蓋 transition-colors 管的那幾個屬性：Tailwind 的 utility 排在 tokens.css 之後，
+     元件若同時寫 transition-colors，那個簡寫會蓋掉這裡的 transition-property，
+     狀態層就只會瞬間切換。因此規則是「用了 state-layer 就不要再寫 transition-colors」，
+     由 tests/ 的守衛擋住，而這裡把顏色類屬性補進來，拿掉那個 utility 不會少東西。 */
+  transition:
+    --state-layer-alpha var(--duration-fast) var(--easing-out),
+    color var(--duration-fast) var(--easing-out),
+    background-color var(--duration-fast) var(--easing-out),
+    border-color var(--duration-fast) var(--easing-out);
+}
+.state-layer:hover { --state-layer-alpha: var(--state-hover-alpha); }
+/* 已選壓過 hover：列已經在最強的一階，再往上加會越過「太刻意」的上限。 */
+.state-layer[data-state="selected"] { --state-layer-alpha: var(--state-selected-alpha); }
+/* 按住壓過所有狀態——包含已選：22% → 14% 是往回一階，方向相反但看得見（ΔE00 4.7）。 */
+.state-layer:active { --state-layer-alpha: var(--state-pressed-alpha); }
+/* 停用是「移除可供性」，不是「加訊息」：不給狀態層，只留 opacity。 */
+.state-layer:disabled,
+.state-layer[aria-disabled="true"],
+.state-layer[data-disabled] { --state-layer-alpha: 0%; }
+@media (prefers-reduced-motion: reduce) {
+  .state-layer { transition: none; }
 }
 `);
 

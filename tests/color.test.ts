@@ -93,4 +93,57 @@ describe("色彩", () => {
     }
     expect(offenders, `這些元件的聚焦環沒有 offset：${offenders.join(", ")}`).toEqual([]);
   });
+
+  // 下面兩條與 ring-offset 那條同類：擋的是**畫法**，不是顏色值。
+  // verify-color 驗的是「狀態層的三階拉不拉得開」，但它看不到元件有沒有真的用上狀態層——
+  // 一個還寫著 `hover:bg-accent` 的元件，門檻全綠而畫面上依然是舊的 ΔE00 1.6。
+  const uiFiles = () => {
+    const dir = fileURLToPath(new URL("../packages/react/src/ui", import.meta.url));
+    return readdirSync(dir)
+      .filter((n) => n.endsWith(".tsx") && !n.includes(".stories."))
+      .map((n) => [n, readFileSync(join(dir, n), "utf8")] as const);
+  };
+
+  it("元件不得再用 hover:bg-accent／hover:bg-muted 當互動回饋", () => {
+    // `--accent`、`--muted`、`--secondary` 目前是同一個值，於是「被 hover 的列」與
+    // 「斑馬列」「唯讀區」完全同色——換色就是換不掉的那種失效。互動回饋改走狀態層。
+    // 例外：data-table 的欄寬把手用 `hover:bg-primary/40`，那是「讓透明的控制項現形」，
+    // 不是幫既有表面加一階，狀態層在它上面沒有東西可疊。
+    const offenders: string[] = [];
+    for (const [name, src] of uiFiles()) {
+      for (const m of src.matchAll(/hover:bg-(accent|muted)\b\S*/g)) offenders.push(`${name}: ${m[0]}`);
+    }
+    expect(offenders, `改走 state-layer：${offenders.join("、")}`).toEqual([]);
+  });
+
+  it("狀態徽章的預設變體必須走淡底層，不得用實色填底", () => {
+    // 實色填底會讓一排徽章有兩種極性：success／warning／info 的前景是同色相深墨、
+    // danger 的是反白，底色 L* 全距 23.5。眼睛把極性反轉讀成「不同種類」而不是
+    // 「不同嚴重度」。實色只保留給 `intensity="high"`，走 compoundVariants。
+    const src = readFileSync(
+      fileURLToPath(new URL("../packages/react/src/ui/badge.tsx", import.meta.url)),
+      "utf8",
+    );
+    // 只看 `variant:` 那一段（compoundVariants 裡的實色是刻意的）
+    const variantBlock = src.slice(src.indexOf("variant: {"), src.indexOf("intensity:"));
+    const offenders = ["success", "warning", "info", "danger"].filter((s) =>
+      new RegExp(`bg-${s}\\b(?!-subtle)`).test(variantBlock),
+    );
+    expect(offenders, `這些變體還在用實色填底：${offenders.join("、")}`).toEqual([]);
+  });
+
+  it("用了 state-layer 的元件不得同時寫 transition-colors（會蓋掉狀態層的過渡）", () => {
+    // Tailwind 的 utility 排在 tokens.css 之後，`transition-colors` 這個簡寫會覆寫
+    // `.state-layer` 的 transition-property，狀態層就只會瞬間切換而不是淡入。
+    // `.state-layer` 自己的 transition 已經涵蓋 color／background-color／border-color，
+    // 拿掉那個 utility 不會少任何東西。
+    const offenders: string[] = [];
+    for (const [name, src] of uiFiles()) {
+      for (const line of src.split("\n")) {
+        if (line.includes("//")) continue; // 註解裡提到這兩個詞不算
+        if (line.includes("state-layer") && line.includes("transition-colors")) offenders.push(`${name}: ${line.trim().slice(0, 60)}…`);
+      }
+    }
+    expect(offenders, `拿掉 transition-colors：${offenders.join("、")}`).toEqual([]);
+  });
 });

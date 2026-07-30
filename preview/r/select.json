@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "select",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "type": "registry:ui",
   "title": "Select 下拉選單",
   "description": "單選下拉（Radix Select）。",

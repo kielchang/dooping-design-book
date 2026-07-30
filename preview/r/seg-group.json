@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "seg-group",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "type": "registry:ui",
   "title": "SegGroup 分段選擇",
   "description": "少量互斥選項，radiogroup ＋ roving tabindex。",

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
-<title data-rh="true">色彩語意 | Dooping Design Book</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://kielchang.github.io/dooping-design-book/foundations/color/"><meta data-rh="true" property="og:locale" content="zh_Hant"><meta data-rh="true" name="docusaurus_locale" content="zh-Hant"><meta data-rh="true" name="docsearch:language" content="zh-Hant"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="色彩語意 | Dooping Design Book"><meta data-rh="true" name="description" content="這一章講的不是色票，是意思。"><meta data-rh="true" property="og:description" content="這一章講的不是色票，是意思。"><link data-rh="true" rel="icon" href="/dooping-design-book/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://kielchang.github.io/dooping-design-book/foundations/color/"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/foundations/color/" hreflang="zh-Hant"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/foundations/color/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"基礎 Foundations","item":"https://kielchang.github.io/dooping-design-book/foundations"},{"@type":"ListItem","position":2,"name":"色彩語意","item":"https://kielchang.github.io/dooping-design-book/foundations/color"}]}</script><link rel="stylesheet" href="/dooping-design-book/assets/css/styles.b9e2fc0d.css">
-<script src="/dooping-design-book/assets/js/runtime~main.17f055c7.js" defer="defer"></script>
+<title data-rh="true">色彩語意 | Dooping Design Book</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://kielchang.github.io/dooping-design-book/foundations/color/"><meta data-rh="true" property="og:locale" content="zh_Hant"><meta data-rh="true" name="docusaurus_locale" content="zh-Hant"><meta data-rh="true" name="docsearch:language" content="zh-Hant"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="色彩語意 | Dooping Design Book"><meta data-rh="true" name="description" content="這一章講的不是色票，是意思。"><meta data-rh="true" property="og:description" content="這一章講的不是色票，是意思。"><link data-rh="true" rel="icon" href="/dooping-design-book/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://kielchang.github.io/dooping-design-book/foundations/color/"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/foundations/color/" hreflang="zh-Hant"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/foundations/color/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"基礎 Foundations","item":"https://kielchang.github.io/dooping-design-book/foundations"},{"@type":"ListItem","position":2,"name":"色彩語意","item":"https://kielchang.github.io/dooping-design-book/foundations/color"}]}</script><link rel="stylesheet" href="/dooping-design-book/assets/css/styles.f2b1e8cc.css">
+<script src="/dooping-design-book/assets/js/runtime~main.3b2e490f.js" defer="defer"></script>
 <script src="/dooping-design-book/assets/js/main.5cc26d4f.js" defer="defer"></script>
 </head>
 <body>
@@ -40,6 +40,20 @@
 使用者掃一眼就懂。</p></div><div class="rule-dont"><strong>🚫 不要這樣</strong><p>不要做「輸入／假設／公式」三色。那是試算表的儲存格慣例，
 對網頁表單的使用者不成立——他不在乎這格背後是不是公式，他只在乎能不能改。
 （這是實際踩過的坑，見 <a href="/adr">ADR-0002</a>）</p></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="brand-的邊界不要放在確認按鈕上">brand 的邊界：不要放在確認按鈕上<a href="#brand-的邊界不要放在確認按鈕上" class="hash-link" aria-label="brand 的邊界：不要放在確認按鈕上的直接連結" title="brand 的邊界：不要放在確認按鈕上的直接連結" translate="no">​</a></h2>
+<p><code>--brand</code> 與 <code>--primary</code> 分開之後還有一個問題沒解決：<strong>brand 該出現在哪裡。</strong></p>
+<p>答案是<strong>不要出現在確認／送出／儲存</strong>這類提交性動作上。理由與 <code>destructive</code>／<code>danger</code>
+分家完全相同——兩者職責不同：</p>
+<table><thead><tr><th></th><th>職責</th></tr></thead><tbody><tr><td><code>--brand</code></td><td><strong>識別</strong>：這是誰的產品</td></tr><tr><td>確認按鈕</td><td><strong>指示可供性</strong>：按下去會提交</td></tr></tbody></table>
+<p>讓一個 token 同時做兩件事就會產生違和。而且色相帶著既成慣例：</p>
+<table><thead><tr><th>色相</th><th>慣例</th><th>放在確認按鈕上</th></tr></thead><tbody><tr><td>綠</td><td>通行、完成</td><td>對齊</td></tr><tr><td>藍</td><td>系統預設動作（macOS／Windows 的預設鈕都是藍）</td><td>對齊</td></tr><tr><td><strong>紫／洋紅</strong></td><td><strong>沒有動作慣例</strong></td><td>讀成裝飾，不像功能控制項</td></tr><tr><td>紅</td><td>停止</td><td>直接衝突（已被警報色域擋掉）</td></tr><tr><td>灰</td><td><strong>停用</strong></td><td>反慣例</td></tr></tbody></table>
+<table><thead><tr><th>用 <code>brand</code></th><th>用 <code>primary</code></th></tr></thead><tbody><tr><td>logo 區、品牌強調</td><td><strong>確認、送出、儲存、套用</strong></td></tr><tr><td>「開始新流程」這類非提交型入口</td><td>一般操作</td></tr><tr><td>選中的導覽項（走 <code>--brand-subtle</code>）、聚焦環</td><td>取消、返回</td></tr></tbody></table>
+<p><strong>提交性動作在任何主題下都用 <code>--primary</code></strong>，色相就永遠不會跟動作語意打架。
+這也是六個色相全部保留的理由——違和來自把 brand 放錯位置，不是色相不能用。</p>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>近中性色不能拿來做實色填底</div><div class="admonitionContent_BuS1"><p><code>Button</code> 的停用態是 <code>disabled:opacity-50</code>，所以「停用」的實際外觀就是
+<code>--primary</code> 以 50% 疊在背景上。一個接近中性的主題色做成填色按鈕，會正好撞進那個位置。</p><p>本書的預設主題「石墨」先前就是這樣：照公式生成一個 chroma 0.030 的灰藍，
+量出來距停用外觀只有 <strong>ΔE00 8.5</strong>（低於 10 就是實務上分不開）——按鈕看起來像停用的。</p><p>修法不是把它加彩，而是<strong>承認它沒有品牌色</strong>：石墨的 <code>--brand</code> 直接鏡射 <code>--primary</code>。
+<code>npm run verify:color</code> 有一條守衛盯著——<code>ΔE00(brand, 停用外觀) ≥ 12</code>。</p></div></div>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="紅黃要能讓人瞬間反應主題要有識別度兩者怎麼共存">紅黃要能讓人瞬間反應，主題要有識別度——兩者怎麼共存<a href="#紅黃要能讓人瞬間反應主題要有識別度兩者怎麼共存" class="hash-link" aria-label="紅黃要能讓人瞬間反應，主題要有識別度——兩者怎麼共存的直接連結" title="紅黃要能讓人瞬間反應，主題要有識別度——兩者怎麼共存的直接連結" translate="no">​</a></h2>
 <p>這是色彩系統最常見的衝突：狀態色靠「一眼認出」工作，主題色靠「到處都是」工作。</p>
 <p><strong>衝突其實不存在，只要把三件事分開處理。</strong> 紅色能讓人瞬間停手，靠的不只是色相，
@@ -72,7 +86,7 @@
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="提醒視窗用強度分級不用更多顏色">提醒視窗：用強度分級，不用更多顏色<a href="#提醒視窗用強度分級不用更多顏色" class="hash-link" aria-label="提醒視窗：用強度分級，不用更多顏色的直接連結" title="提醒視窗：用強度分級，不用更多顏色的直接連結" translate="no">​</a></h2>
 <p>四種語意封頂（<code>success</code> / <code>warning</code> / <code>info</code> / <code>danger</code>），<strong>不再擴充色相</strong>。
 豐富度的來源是「同一個語意色的兩種強度」：</p>
-<table><thead><tr><th>強度</th><th>樣式</th><th>用在哪</th></tr></thead><tbody><tr><td><code>low</code>（預設）</td><td><code>--{狀態}-subtle</code> 淡底＋實色左粗邊＋圖示＋<code>--{狀態}-subtle-foreground</code></td><td>日常與次要提示，大量出現也不刺眼</td></tr><tr><td><code>high</code></td><td><code>--{狀態}</code> 實色滿版＋<code>--{狀態}-foreground</code> 反白字</td><td><strong>阻斷式</strong>訊息，必須停下來決定的操作</td></tr></tbody></table>
+<table><thead><tr><th>強度</th><th>樣式</th><th>用在哪</th></tr></thead><tbody><tr><td><code>low</code>（預設）</td><td><code>--{狀態}-subtle</code> 淡底＋<strong>與文字同色</strong>的左粗邊＋圖示＋<code>--{狀態}-subtle-foreground</code></td><td>日常與次要提示，大量出現也不刺眼</td></tr><tr><td><code>high</code></td><td><code>--{狀態}</code> 實色滿版＋<code>--{狀態}-foreground</code> 反白字</td><td><strong>阻斷式</strong>訊息，必須停下來決定的操作</td></tr></tbody></table>
 <p><strong>有疑慮就用 <code>low</code>。</strong> 高強度出現頻率一高，色彩疲勞的預算會瞬間爆掉——
 疲勞管的是高飽和色的<strong>面積 × 頻率</strong>，不是色相的種類數。提醒視窗的關鍵色與圖表的重點色
 共用同一份預算。</p>
@@ -83,11 +97,31 @@
 <p><code>--{狀態}-subtle</code> 刻意<strong>不做 harmonization</strong>（不往主題色相偏）。實測往主題拉 12°，
 藍紫系主題的 <code>warning-subtle</code> 與 <code>danger-subtle</code> 會收斂到 ΔE00 8.8——
 琥珀和紅都被拉成粉橘，「注意」和「錯誤」看起來變成同一種。</p>
-<p>淡底的明度也不能再高：越接近純白，可用的 chroma 越少，四種一起往白色收斂
-（實測 L=0.965 時 warning↔danger 只差 8.1）。</p>
 <p><strong>提醒視窗的整體感靠兩件事，都不是彎色相</strong>：四種共用同一條構成規則
-（同一個明度、同一個 chroma 上限、文字用同一個公式反解），
-以及它們坐在<a class="" href="/dooping-design-book/foundations/theming/">帶主題色相的中性表面</a>上。</p>
+（下一節），以及它們坐在<a class="" href="/dooping-design-book/foundations/theming/">帶主題色相的中性表面</a>上。</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="同一層要等量不是等參數">「同一層」要等量，不是等參數<a href="#同一層要等量不是等參數" class="hash-link" aria-label="「同一層」要等量，不是等參數的直接連結" title="「同一層」要等量，不是等參數的直接連結" translate="no">​</a></h3>
+<p>淡底的生成參數是<strong>染色量</strong>（<code>ΔE00(淡底, 卡片表面)</code>），不是彩度。</p>
+<p>上一版是「固定明度 ＋ 固定彩度」——數字很整齊，感知不整齊。原因是
+<strong>sRGB 色域不是色相對稱的</strong>：在很亮的地方，綠與黃能撐住的彩度遠高於藍與紅，
+於是 <code>info</code> 與 <code>danger</code> 被色域裁掉、<code>success</code> 沒有。實測結果：</p>
+<table><thead><tr><th></th><th>info</th><th>danger</th><th>warning</th><th>success</th><th>最強/最弱</th></tr></thead><tbody><tr><td>舊（固定彩度）</td><td>11.0</td><td>12.6</td><td>14.1</td><td><strong>18.5</strong></td><td><strong>1.69×</strong></td></tr><tr><td>現在（固定染色量）</td><td>14.5</td><td>15.1</td><td>15.0</td><td>14.8</td><td><strong>1.04×</strong></td></tr></tbody></table>
+<p>舊的那一列<strong>順序是反的</strong>：綠色的「已全部完成」比紅色的「無法確認」還搶眼。
+四種提示疊成一欄時這件事直接看得到，而且叫不出名字——這正是「突兀」的來源之一。</p>
+<p>規則是兩段的：<strong>四種共用一個明度</strong>（所以看起來是同一家人），
+各色相的彩度則反解到同一個染色量。彩度不能也固定，因為藍色在深色中性底上
+<strong>本質上比較不顯眼</strong>，深色下 <code>info</code> 需要約 3.3 倍的彩度才追得上——
+那個差距是對感知不對稱的<strong>補償</strong>，不是不一致。</p>
+<p><code>npm run verify:color</code> 有一條門檻：四種染色量的最大／最小比值不得超過 <strong>1.3</strong>。</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="左粗邊用文字色不用實色">左粗邊用文字色，不用實色<a href="#左粗邊用文字色不用實色" class="hash-link" aria-label="左粗邊用文字色，不用實色的直接連結" title="左粗邊用文字色，不用實色的直接連結" translate="no">​</a></h3>
+<p>低強度的左粗邊是 <code>border-l-current</code>——與內文同色（<code>--{狀態}-subtle-foreground</code>），
+不是全飽和的狀態色。兩個理由都是量出來的：</p>
+<ol>
+<li class="">全飽和邊對自己的淡底只有 <strong>1.60–5.43:1</strong>，八組（四變體 × 兩模式）裡<strong>有四組低於
+3:1</strong> 的非文字門檻（1.4.11）。改用文字色之後全部是 <strong>4.50–4.54:1</strong>——
+因為那個色本來就是對淡底反解到 4.5:1 的，所以「相等」是構造上保證的。</li>
+<li class="">淡底的彩度約 0.03–0.08，全飽和邊卻是 0.134–0.223（<strong>3–6 倍</strong>）。
+一個元件內部跳這麼大，就是使用者說的「突兀」。文字色的彩度約 0.100，跳幅收到 2 倍內。</li>
+</ol>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="欄位狀態三層各司其職">欄位狀態：三層各司其職<a href="#欄位狀態三層各司其職" class="hash-link" aria-label="欄位狀態：三層各司其職的直接連結" title="欄位狀態：三層各司其職的直接連結" translate="no">​</a></h2>
 <p>一格欄位可以同時是「被聚焦」「改過沒送」「不合格」。這三件事走三個不同的通道，
 疊起來互不干涉：</p>
@@ -103,6 +137,61 @@
 <code>npm test</code> 有一條守衛：用了 <code>ring-ring</code> 卻沒有 <code>ring-offset</code> 的元件直接不過。</p></div></div>
 <p>「<strong>必填未填</strong>」是不合格的一種，但它的問題其實是<strong>時機</strong>不是顏色——
 不該在使用者還沒碰過欄位時就標紅。慣例是 blur 或送出之後才標。</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="互動狀態的顏色邏輯">互動狀態的顏色邏輯<a href="#互動狀態的顏色邏輯" class="hash-link" aria-label="互動狀態的顏色邏輯的直接連結" title="互動狀態的顏色邏輯的直接連結" translate="no">​</a></h2>
+<p>一條原則就夠：</p>
+<blockquote>
+<p><strong>每一個顏色變化都要對應一件使用者需要知道的事，
+強度與那件事的「持續多久」成正比。</strong></p>
+</blockquote>
+<p>這一條同時擋掉兩種失敗。沒有事實要傳達就不變色，所以不會「為變而變」；
+有事實就給到看得見的強度，所以不會「看不出目的」。</p>
+<p>注意強度跟著<strong>持續時間</strong>走，不是跟著重要性走。瞬間的回饋要輕——它一秒後就消失，
+用力沒有意義；持久的狀態才配得上明顯的顏色，因為使用者要一直看著它。</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="狀態階梯">狀態階梯<a href="#狀態階梯" class="hash-link" aria-label="狀態階梯的直接連結" title="狀態階梯的直接連結" translate="no">​</a></h3>
+<table><thead><tr><th>狀態</th><th>持續多久</th><th>傳達什麼</th><th>走哪個通道</th></tr></thead><tbody><tr><td>hover</td><td>指標在上面</td><td>這個可以互動</td><td>中性狀態層 <strong>6%</strong></td></tr><tr><td>pressed</td><td>按住的瞬間</td><td>系統收到了</td><td>中性狀態層 <strong>14%</strong></td></tr><tr><td>focus</td><td>直到移開焦點</td><td>鍵盤在這裡</td><td><strong>環</strong>（完全不碰底色）</td></tr><tr><td>已選</td><td>直到改選</td><td>你選了這個</td><td>中性狀態層 <strong>20%</strong></td></tr><tr><td>停用</td><td>直到條件改變</td><td>現在不能用</td><td><strong>降低</strong>，不加色（<code>opacity-50</code>）</td></tr><tr><td>已改動未送出</td><td>直到送出</td><td>還沒存</td><td>狀態色琥珀（見下一節）</td></tr><tr><td>不合格</td><td>直到修正</td><td>這個值不能用</td><td>狀態色紅</td></tr></tbody></table>
+<p>四個判斷值得單獨講：</p>
+<ol>
+<li class=""><strong>三個互動狀態全部走中性，不吃主題色。</strong> 高飽和色的出現面積是有預算的
+（見上面的面積層）。hover 是滑過就沒的瞬間回饋，替它上主題色是最貴的用法。</li>
+<li class=""><strong>focus 走「環」這條獨立通道，不碰底色。</strong> 所以它能與任何狀態疊加而不打架——
+不合格＋聚焦、已選＋聚焦都成立。</li>
+<li class=""><strong>停用是「移除可供性」，不是「增加訊息」</strong>，所以是降低而不是加色。
+反過來說，任何常駐的半透明控制項都會被讀成不能按。</li>
+<li class=""><strong>已選的列不得再用弱化文字。</strong> 20% 疊加之後 <code>--muted-foreground</code> 掉到
+<strong>2.77:1</strong>（淺）／<strong>2.96:1</strong>（深）。這不是調數值能解的——已選的列在語意上就是
+被強調的，它的次要文字不該繼續弱化。規則：已選的列把 <code>--muted-foreground</code>
+整個重新定義成 <code>--foreground</code>。</li>
+</ol>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="狀態層是疊加不是換一組底色">狀態層是「疊加」，不是「換一組底色」<a href="#狀態層是疊加不是換一組底色" class="hash-link" aria-label="狀態層是「疊加」，不是「換一組底色」的直接連結" title="狀態層是「疊加」，不是「換一組底色」的直接連結" translate="no">​</a></h3>
+<p>改版前 hover 用 <code>--accent</code>、已選用 <code>--muted</code>。問題是這三個 token
+（<code>--accent</code>、<code>--muted</code>、<code>--secondary</code>）目前<strong>是同一個值</strong>——於是被指到的列、
+斑馬列、唯讀區三者同色。實測：</p>
+<table><thead><tr><th></th><th>淺色 ΔE00</th><th>深色 ΔE00</th></tr></thead><tbody><tr><td>一般 → hover</td><td><strong>1.6</strong></td><td>2.5</td></tr><tr><td>hover → 已選</td><td><strong>1.6</strong></td><td>2.3</td></tr></tbody></table>
+<p>ΔE00 低於 2 幾乎看不見。使用者分不出自己指在哪一列，也分不出 hover 與已選。</p>
+<p>根因不是顏色選錯，是<strong>機制</strong>選錯：獨立的實色 token 是「取代」而不是「疊加」，
+所以它無法與元件已有的底色組合。斑馬列本來就是 <code>--muted</code>，hover 換成同值的
+<code>--accent</code> 等於什麼都沒做。</p>
+<p>改成疊一層之後，「深了一階」這件事在每一種底色上都成立：</p>
+<table><thead><tr><th>底色</th><th>hover Δ</th><th>已選 Δ</th></tr></thead><tbody><tr><td>頁面底</td><td>3.0</td><td>10.8</td></tr><tr><td>卡片</td><td>3.0</td><td>10.8</td></tr><tr><td><code>--muted</code>（斑馬列）</td><td>3.0</td><td>10.7</td></tr><tr><td>浮層</td><td>3.0</td><td>10.8</td></tr></tbody></table>
+<p>疊加的顏色取元件自己的 <code>currentColor</code>，不是統一的 <code>--foreground</code>。這一步是實測逼出來的：
+深色模式下 <code>--foreground</code> 與 <code>--primary</code> 是同一個近白，拿它去疊實色按鈕會得到
+<strong>ΔE00 0.0</strong>——按鈕完全沒有 hover 回饋，而四種表面的檢查照樣全綠。
+取 <code>currentColor</code> 則自動是「深底配亮疊、亮底配深疊」，方向永遠對。</p>
+<p>順帶把六種各行其是的透明度收成一組。改版前 hover 用了
+<code>/90</code>、<code>/80</code>、<code>/50</code>、<code>/40</code>、<code>/20</code>、<code>/15</code> 六種值，可見度從 <strong>ΔE00 0.6</strong>
+（次要按鈕，等於沒變）到 <strong>7.4</strong>（主按鈕，過於刻意）差了十倍；
+改用同一組強度之後全部落在 <strong>2.6–4.5</strong>。</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="為什麼上限也要驗">為什麼上限也要驗<a href="#為什麼上限也要驗" class="hash-link" aria-label="為什麼上限也要驗的直接連結" title="為什麼上限也要驗的直接連結" translate="no">​</a></h3>
+<p>四道門檻裡有一條是<strong>上限</strong>：已選對底色不得超過 ΔE00 16。
+「太刻意」跟「看不出來」一樣是缺陷，而且只有上限擋得住它。</p>
+<p>上限實際卡住的是<strong>深色模式的頁面底色</strong>——那是全系統最深的表面，
+同一個 alpha 疊在它上面的感知落差最大（低亮度端的感知壓縮）。
+已選原訂 22%，只有在深色頁面底上會衝到 16.1，因此降到 20%。</p>
+<p>四道門檻對<strong>每一種底色</strong>都驗，不是只驗卡片：疊加層的意義就在於它要在所有表面上成立。
+<code>npm test</code> 另有兩條程式碼守衛——元件不得再寫 <code>hover:bg-accent</code>／<code>hover:bg-muted</code>，
+用了 <code>state-layer</code> 的元件不得同時寫 <code>transition-colors</code>（那個簡寫會蓋掉狀態層的過渡）。</p>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>唯一的取用端陷阱</div><div class="admonitionContent_BuS1"><p><code>background</code> <strong>簡寫</strong>會把 <code>background-image</code> 重設為 <code>none</code>，狀態層整個消失。
+一律用 <code>background-color</code>——Tailwind 的 <code>bg-*</code> 產的就是 <code>background-color</code>，不受影響。</p></div></div>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="保留色琥珀已改動未送出">保留色：琥珀＝已改動未送出<a href="#保留色琥珀已改動未送出" class="hash-link" aria-label="保留色：琥珀＝已改動未送出的直接連結" title="保留色：琥珀＝已改動未送出的直接連結" translate="no">​</a></h2>
 <p><code>--edit</code> 這一組琥珀色<strong>只做一件事</strong>：標記「使用者改了，但還沒送出」。</p>
 <p>不得挪作他用——不能拿來當高亮、當「新功能」標記、當任何其他強調。
@@ -112,6 +201,35 @@
 <p>圖表的 8 色分類色票（<code>--chart-1</code> … <code>--chart-8</code>）<strong>不參與</strong>狀態語意。
 換一整套圖表色票，不會讓「紅＝異常」跟著變。分類色票也<strong>不跟著色相主題走</strong>——
 顏色跟資料實體走，同一個項目在所有圖表、所有主題下都是同一色。</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="為什麼分類色看起來比語意色吵">為什麼分類色看起來比語意色「吵」<a href="#為什麼分類色看起來比語意色吵" class="hash-link" aria-label="為什麼分類色看起來比語意色「吵」的直接連結" title="為什麼分類色看起來比語意色「吵」的直接連結" translate="no">​</a></h3>
+<p>把〈設計 Token〉的兩個色票並排看，第一個反應通常是「這兩套像不同系統」。
+這個落差是真的，而且<strong>是刻意的結果，不是缺陷</strong>。</p>
+<p>語意系統<strong>用彩度編碼重要性</strong>：</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">danger 0.223 &gt; warning 0.165 &gt; edit 0.164 &gt; success/info 0.148</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">       &gt; brand ≤0.151 &gt; primary 0.040 &gt; 中性 ≤0.013</span><br></div></code></pre></div></div>
+<p>語意色票裡絕大多數 token 是<strong>無彩的</strong>（背景 0.000、<code>muted</code> 0.007、<code>border</code> 0.013），
+只有約十個帶彩度。所以那一頁讀起來是「一整頁灰，加幾個重點」——這正是後台介面該有的樣子。</p>
+<p>分類色票<strong>沒有</strong>這個階序，八色等亮等飽和。在一個「彩度＝重要性」的系統裡，
+它看起來像八個東西同時宣稱自己最重要。</p>
+<p><strong>但等彩度對分類色是對的。</strong> 分類色是彼此平等的同儕——如果第 3 條序列比第 5 條飽和，
+讀者會以為它比較重要。不等彩度會傳達一個不存在的階序。</p>
+<p>所以兩邊都對，放在一起就會有落差：<strong>兩種色票的目的不同</strong>。
+語意色回答「這件事有多重要」，分類色回答「這是哪一類」。
+真正該管的不是拉近它們的觀感，而是<strong>確保分類色不會被誤讀成狀態色</strong>——見下一節。</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="分類色不得靠近任何狀態色">分類色不得靠近任何狀態色<a href="#分類色不得靠近任何狀態色" class="hash-link" aria-label="分類色不得靠近任何狀態色的直接連結" title="分類色不得靠近任何狀態色的直接連結" translate="no">​</a></h3>
+<p>一條普通的資料序列如果剛好長得像 <code>danger</code>，讀者會以為那條線「有問題」。</p>
+<p>這條守衛上一版只擋 <code>danger</code>，於是深色模式下 <code>chart-5</code> 與 <code>warning</code> 只差
+<strong>ΔE00 7.3</strong>、<code>chart-1</code> 與 <code>info</code> <strong>7.9</strong>——都低於色票自己的「實務上分不開」門檻 10，
+而守衛全綠，因為它沒在看那兩個。現在對六個狀態色全驗，雙條件滿足其一即可：</p>
+<ul>
+<li class="">色相拉開 <strong>≥20°</strong>，或</li>
+<li class="">感知距離拉開 <strong>ΔE00 ≥18</strong></li>
+</ul>
+<p>為什麼不是「只用 ΔE00 但把門檻拉高」：同色相但一深一淺的兩色 ΔE00 可以很大，
+「紅色＝異常」的聯想仍然成立。反過來只看色相也不夠——近中性色的色相角度沒有感知意義。</p>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>加緊約束時要同時給最佳化器空間</div><div class="admonitionContent_BuS1"><p>先前試過兩次「只加緊、不放寬」，兩次都是負收益（最差對 12.2 → 10.1）。
+這一次加入狀態色保留區之後也一樣掉了（12.2／11.8 → 10.1／9.4，深色還出現 2 對低於 10）。</p><p>修法不是放寬色盲門檻——<strong>那條不動</strong>——而是放寬<strong>美感約束</strong>：
+色相間距 30° → 22°、明度帶各放寬 0.02。結果最差對變成 <strong>13.1／11.3</strong>，
+比加守衛之前還好。更寬的明度帶本來就對二色覺者有利（他們失去色相辨別、保留明度）。</p><p>門檻的優先序是寫死的：無障礙門檻不得為了美感放寬，反過來才是對的。</p></div></div>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="順序即安全順序">順序即安全順序<a href="#順序即安全順序" class="hash-link" aria-label="順序即安全順序的直接連結" title="順序即安全順序的直接連結" translate="no">​</a></h3>
 <p>色票的排列不是色相環，是<strong>最遠點插入的順序</strong>：第 1 色錨在藍，之後每一色都是
 「與已選色感知距離最遠」的那一個。副作用正是要的性質——取用端拿
@@ -154,6 +272,6 @@ OKLCH 的 L 只能落在 <code>[0.49, 0.67]</code>——<strong>寬度 0.17</str
 <li class="">選中狀態要有<strong>打勾</strong></li>
 <li class="">提示框要有<strong>圖示</strong></li>
 </ul>
-<p>灰階列印一份試試看——如果語意消失了，就是還沒做完。</p></div></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="文件選項卡"><a class="pagination-nav__link pagination-nav__link--prev" href="/dooping-design-book/foundations/"><div class="pagination-nav__sublabel">上一頁</div><div class="pagination-nav__label">基礎 Foundations</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/dooping-design-book/foundations/typography/"><div class="pagination-nav__sublabel">下一頁</div><div class="pagination-nav__label">字級與排版</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#四組語意職責不重疊" class="table-of-contents__link toc-highlight">四組語意，職責不重疊</a><ul><li><a href="#1-表面與文字結構" class="table-of-contents__link toc-highlight">1. 表面與文字（結構）</a></li><li><a href="#2-動作控制項" class="table-of-contents__link toc-highlight">2. 動作（控制項）</a></li><li><a href="#3-狀態訊息與資料" class="table-of-contents__link toc-highlight">3. 狀態（訊息與資料）</a></li><li><a href="#4-欄位可編輯-vs-唯讀" class="table-of-contents__link toc-highlight">4. 欄位（可編輯 vs 唯讀）</a></li></ul></li><li><a href="#紅黃要能讓人瞬間反應主題要有識別度兩者怎麼共存" class="table-of-contents__link toc-highlight">紅黃要能讓人瞬間反應，主題要有識別度——兩者怎麼共存</a><ul><li><a href="#一色相層警報色域是保留區" class="table-of-contents__link toc-highlight">一、色相層：警報色域是保留區</a></li><li><a href="#二飽和度層警報必須是畫面上最飽和的東西" class="table-of-contents__link toc-highlight">二、飽和度層：警報必須是畫面上最飽和的東西</a></li><li><a href="#三面積層稀有才有力量" class="table-of-contents__link toc-highlight">三、面積層：稀有才有力量</a></li><li><a href="#這三條都由-npm-run-verifycolor-擋" class="table-of-contents__link toc-highlight">這三條都由 <code>npm run verify:color</code> 擋</a></li></ul></li><li><a href="#提醒視窗用強度分級不用更多顏色" class="table-of-contents__link toc-highlight">提醒視窗：用強度分級，不用更多顏色</a><ul><li><a href="#四種淡底必須彼此分得開" class="table-of-contents__link toc-highlight">四種淡底必須彼此分得開</a></li></ul></li><li><a href="#欄位狀態三層各司其職" class="table-of-contents__link toc-highlight">欄位狀態：三層各司其職</a></li><li><a href="#保留色琥珀已改動未送出" class="table-of-contents__link toc-highlight">保留色：琥珀＝已改動未送出</a></li><li><a href="#分類色票與狀態語意脫鉤" class="table-of-contents__link toc-highlight">分類色票與狀態語意脫鉤</a><ul><li><a href="#順序即安全順序" class="table-of-contents__link toc-highlight">順序即安全順序</a></li><li><a href="#淺色與深色是兩組獨立的值" class="table-of-contents__link toc-highlight">淺色與深色是兩組獨立的值</a></li></ul></li><li><a href="#對比要求" class="table-of-contents__link toc-highlight">對比要求</a></li><li><a href="#顏色永遠不是唯一線索" class="table-of-contents__link toc-highlight">顏色永遠不是唯一線索</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Dooping Design Book · 設計語言與模式手冊 · MIT</div></div></div></footer></div>
+<p>灰階列印一份試試看——如果語意消失了，就是還沒做完。</p></div></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="文件選項卡"><a class="pagination-nav__link pagination-nav__link--prev" href="/dooping-design-book/foundations/"><div class="pagination-nav__sublabel">上一頁</div><div class="pagination-nav__label">基礎 Foundations</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/dooping-design-book/foundations/typography/"><div class="pagination-nav__sublabel">下一頁</div><div class="pagination-nav__label">字級與排版</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#四組語意職責不重疊" class="table-of-contents__link toc-highlight">四組語意，職責不重疊</a><ul><li><a href="#1-表面與文字結構" class="table-of-contents__link toc-highlight">1. 表面與文字（結構）</a></li><li><a href="#2-動作控制項" class="table-of-contents__link toc-highlight">2. 動作（控制項）</a></li><li><a href="#3-狀態訊息與資料" class="table-of-contents__link toc-highlight">3. 狀態（訊息與資料）</a></li><li><a href="#4-欄位可編輯-vs-唯讀" class="table-of-contents__link toc-highlight">4. 欄位（可編輯 vs 唯讀）</a></li></ul></li><li><a href="#brand-的邊界不要放在確認按鈕上" class="table-of-contents__link toc-highlight">brand 的邊界：不要放在確認按鈕上</a></li><li><a href="#紅黃要能讓人瞬間反應主題要有識別度兩者怎麼共存" class="table-of-contents__link toc-highlight">紅黃要能讓人瞬間反應，主題要有識別度——兩者怎麼共存</a><ul><li><a href="#一色相層警報色域是保留區" class="table-of-contents__link toc-highlight">一、色相層：警報色域是保留區</a></li><li><a href="#二飽和度層警報必須是畫面上最飽和的東西" class="table-of-contents__link toc-highlight">二、飽和度層：警報必須是畫面上最飽和的東西</a></li><li><a href="#三面積層稀有才有力量" class="table-of-contents__link toc-highlight">三、面積層：稀有才有力量</a></li><li><a href="#這三條都由-npm-run-verifycolor-擋" class="table-of-contents__link toc-highlight">這三條都由 <code>npm run verify:color</code> 擋</a></li></ul></li><li><a href="#提醒視窗用強度分級不用更多顏色" class="table-of-contents__link toc-highlight">提醒視窗：用強度分級，不用更多顏色</a><ul><li><a href="#四種淡底必須彼此分得開" class="table-of-contents__link toc-highlight">四種淡底必須彼此分得開</a></li><li><a href="#同一層要等量不是等參數" class="table-of-contents__link toc-highlight">「同一層」要等量，不是等參數</a></li><li><a href="#左粗邊用文字色不用實色" class="table-of-contents__link toc-highlight">左粗邊用文字色，不用實色</a></li></ul></li><li><a href="#欄位狀態三層各司其職" class="table-of-contents__link toc-highlight">欄位狀態：三層各司其職</a></li><li><a href="#互動狀態的顏色邏輯" class="table-of-contents__link toc-highlight">互動狀態的顏色邏輯</a><ul><li><a href="#狀態階梯" class="table-of-contents__link toc-highlight">狀態階梯</a></li><li><a href="#狀態層是疊加不是換一組底色" class="table-of-contents__link toc-highlight">狀態層是「疊加」，不是「換一組底色」</a></li><li><a href="#為什麼上限也要驗" class="table-of-contents__link toc-highlight">為什麼上限也要驗</a></li></ul></li><li><a href="#保留色琥珀已改動未送出" class="table-of-contents__link toc-highlight">保留色：琥珀＝已改動未送出</a></li><li><a href="#分類色票與狀態語意脫鉤" class="table-of-contents__link toc-highlight">分類色票與狀態語意脫鉤</a><ul><li><a href="#為什麼分類色看起來比語意色吵" class="table-of-contents__link toc-highlight">為什麼分類色看起來比語意色「吵」</a></li><li><a href="#分類色不得靠近任何狀態色" class="table-of-contents__link toc-highlight">分類色不得靠近任何狀態色</a></li><li><a href="#順序即安全順序" class="table-of-contents__link toc-highlight">順序即安全順序</a></li><li><a href="#淺色與深色是兩組獨立的值" class="table-of-contents__link toc-highlight">淺色與深色是兩組獨立的值</a></li></ul></li><li><a href="#對比要求" class="table-of-contents__link toc-highlight">對比要求</a></li><li><a href="#顏色永遠不是唯一線索" class="table-of-contents__link toc-highlight">顏色永遠不是唯一線索</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Dooping Design Book · 設計語言與模式手冊 · MIT</div></div></div></footer></div>
 </body>
 </html>

@@ -1,11 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "coachmark",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "type": "registry:ui",
   "title": "Coachmark 聚光導引",
   "description": "純呈現的引導聚光框，可縮小、可鍵盤操作、支援驗收標記。",
   "dependencies": [
+    "@dooping/tokens@^0.5.0",
     "lucide-react"
   ],
   "registryDependencies": [

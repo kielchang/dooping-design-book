@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "checkbox",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "type": "registry:ui",
   "title": "Checkbox 勾選框",
   "description": "單一勾選（Radix Checkbox）。",

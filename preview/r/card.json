@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "card",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "type": "registry:ui",
   "title": "Card 卡片",
   "description": "內容容器：標題／描述／內容／頁尾。",

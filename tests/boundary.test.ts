@@ -25,7 +25,22 @@ const ALLOWED_EXTERNAL = [
   "tailwind-merge",
   "class-variance-authority",
   "@dooping/tokens",
+  "@xyflow/react", // 只有 graph-canvas 能碰——見下方的隔離守衛
 ];
+
+/**
+ * 相依隔離：某些套件只允許**一個檔案**碰。
+ *
+ * `@xyflow/react` 內部帶著 zustand——正是 FORBIDDEN_PATTERNS 裡「狀態管理屬於應用層」
+ * 要擋的東西。字面上我們不會 import zustand，但把它放進白名單等於默默放行它的精神。
+ * 折衷是把相依關在一個薄封裝裡：取用端與其他元件依賴 `<GraphCanvas>` 的 API，
+ * 不依賴 React Flow 本身，升級或抽換的成本永遠只在一個檔案裡。
+ *
+ * 這條守衛讓「隔離」不是口號：任何第二個檔案 import 它就紅。
+ */
+const QUARANTINED: Record<string, string[]> = {
+  "@xyflow/react": ["packages/react/src/ui/graph-canvas.tsx"],
+};
 
 /** 明確禁止的相依類型（出現即代表元件庫被應用層污染）。 */
 const FORBIDDEN_PATTERNS = [
@@ -87,6 +102,22 @@ describe("元件庫邊界", () => {
       }
     });
   }
+
+  it("被隔離的相依只有指定檔案能 import", () => {
+    const offenders: string[] = [];
+    for (const abs of shippedFiles) {
+      const rel = relative(ROOT, abs).replace(/\\/g, "/");
+      const src = readFileSync(abs, "utf8");
+      for (const spec of imports(src)) {
+        for (const [pkg, allowed] of Object.entries(QUARANTINED)) {
+          if ((spec === pkg || spec.startsWith(`${pkg}/`)) && !allowed.includes(rel)) {
+            offenders.push(`${rel} → ${spec}`);
+          }
+        }
+      }
+    }
+    expect(offenders, `隔離相依外洩：${offenders.join("、")}`).toEqual([]);
+  });
 });
 
 describe("barrel 覆蓋率", () => {

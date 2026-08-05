@@ -37,6 +37,11 @@ export * from "./ui/stepper";
 // 引導
 export * from "./ui/coachmark";
 
+// 特殊介面：時間軸與節點畫布
+export * from "./ui/gantt";
+// @xyflow/react 的薄封裝——相依被隔離守衛關在那一個檔案裡
+export * from "./ui/graph-canvas";
+
 // 文件示意積木（寫文件用，不是產品元件）
 export * from "./ui/mockup";
 

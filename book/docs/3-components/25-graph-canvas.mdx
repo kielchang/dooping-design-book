@@ -1,0 +1,85 @@
+---
+title: GraphCanvas 節點畫布
+---
+
+# GraphCanvas 節點畫布
+
+**流程圖與關聯圖的畫布**：節點、連線、拖拉、縮放、minimap。
+底層是 [React Flow](https://reactflow.dev)（`@xyflow/react`，MIT），
+但取用端依賴的是 `<GraphCanvas>` 的領域 API——這個差異是刻意的，見下。
+
+<StoryFrame id="元件-特殊介面-時間軸・節點畫布--節點畫布" title="節點畫布：拖拉、連線、選取" height={430} />
+
+## 為什麼是薄封裝，不是直接用 React Flow
+
+`@xyflow/react` 內部帶著 zustand——[元件庫邊界](/governance/drift-guards)明文禁止
+狀態管理進元件庫（「狀態管理屬於應用層」）。字面上我們沒有 import zustand，
+但把整個套件放進白名單等於默默放行它的精神。
+
+折衷是**把相依關在一個檔案裡**：只有 `graph-canvas.tsx` 能 import `@xyflow/react`，
+`tests/boundary.test.ts` 的隔離守衛保證這件事——任何第二個檔案碰它就紅。
+取用端與其他元件依賴 `<GraphCanvas>` 的節點／連線型別，升級或抽換 React Flow 的
+成本永遠只在一個檔案裡。
+
+三個 React Flow 的地雷也一併關在封裝裡，取用端不必知道：
+樣式表 import（少了它整個畫布沒樣式）、wrapper 高度（高度 0 時畫布隱形）、
+`nodeTypes` 定義在模組層（內聯會讓節點每次 render 重掛）。
+
+## 色彩：token 橋接層
+
+React Flow 自帶一整套 `--xy-*` 視覺變數（12.11.2 共 43 個可覆寫項，
+逐一從產物核對）。封裝把它們對映到本書的語意 token，
+依 [ADR-0007](/adr) 的色相預算逐層對位：
+
+| 畫布元素 | 介面層 | 吃什麼 | 主題色相 |
+| --- | --- | --- | --- |
+| 畫布底、格點 | Layout | `--background`／`--border` | ✅ 帶色調中性 |
+| 節點框、控制列、minimap | 表面 | `--card` 家族 | ✅ 帶色調中性 |
+| 連線、handle | 結構 | `--muted-foreground`／`--border` | ❌ 中性 |
+| hover／已選 | 互動 | `state-layer` 6%／20% | ❌ 中性 |
+| 鍵盤聚焦 | 聚焦 | `--ring` 外環 | ❌ 中性 |
+| 節點分類色條 | 資料 | `--chart-N` | 與主題無關，跟資料實體走 |
+
+因為全部落在既有 token 上，**深淺模式與六組色相主題自動成立**——
+不需要用 React Flow 自己的 `colorMode`（那是它的平行深淺系統，反而會蓋掉橋接）。
+
+### 已選與聚焦是兩個通道
+
+React Flow 原生把「選中」畫成節點外框陰影，而且對聚焦寫死 `outline: none`。
+封裝把這兩件事拆回本書的規則：
+
+- **已選** ＝ 節點背景疊狀態層 20%（與資料表列同一套機制）
+- **鍵盤聚焦** ＝ `--ring` 外環（offset 畫法：先一圈背景色、再一圈環）
+
+兩者可以同時存在而不打架——「不合格＋聚焦」「已選＋聚焦」都成立，
+這正是聚焦走獨立通道的用意。
+
+## 何時不要用
+
+- **資料超過幾百個節點**——逐節點 DOM 渲染，上千節點請先在資料層彙總。
+- **只是要畫一張靜態流程示意**——文件裡用[零截圖示意](/patterns/zero-screenshot-docs)
+  或一張 SVG 就好；畫布的成本是互動機制，靜態圖用不到。
+- **要當白板**（自由文字、便利貼、手繪）——那是另一種產品。
+
+## 唯讀模式
+
+<StoryFrame id="元件-特殊介面-時間軸・節點畫布--節點畫布唯讀" title="唯讀：可選取、可縮放，不能改" height={370} />
+
+`readOnly` 拿掉拖拉與連線，保留選取與縮放。文件內嵌示意、稽核檢視用這個。
+
+## 無障礙
+
+- 外層 `role="img"` ＋ `aria-label`：畫布對讀屏是一張圖，
+  **關鍵資訊不能只存在於畫布裡**——旁邊要有等價的清單或表格
+  （與[圖表的無障礙義務](/components/charts#無障礙顏色不能是唯一線索)同一條規則）。
+- 節點分類靠色條＋（宿主提供的）文字，不是只有顏色。
+
+## 取用
+
+```bash
+npx shadcn add https://kielchang.github.io/dooping-design-book/r/graph-canvas.json
+```
+
+registry item 會一併安裝 `@xyflow/react`（唯一一個帶第三方 UI 套件的元件）。
+需要 tokens ≥ 0.6.0。抄走之後**不要**在其他檔案 import `@xyflow/react`——
+把本書的隔離守衛一起抄走最好（見[漂移防護](/governance/drift-guards)）。

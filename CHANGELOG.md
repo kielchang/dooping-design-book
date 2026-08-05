@@ -36,7 +36,44 @@ commit 本身記在 tag 描述裡，不會遺失。
 
 ## 未發佈（`dev`）
 
-> 純文件變更——合併時標題只寫日期、不 bump 版號、不產生新 tag。
+> 合併進 `main` 前把這一節改名。這批動了規範版號（0.8.0，新增元件＝minor）；
+> **tokens 維持 0.6.0 不動**——圖表只消費既有的 `--chart-*` 與軸線變數，
+> token 內容一個位元都沒變，所以不發 npm、合併後也不用推 tokens tag。
+
+### Charts 圖表實作收錄（規範 v0.8.0，tokens 不變）
+
+**改了什麼**
+
+- **八種圖＋`Legend`＋共同底座進 `packages/react/src/charts/`**：
+  `BarChart`／`Pareto`／`StackedBar`／`TrendChart`／`Bullet`／`Scatter`／
+  `Heatmap`／`LineChart`，加 `PALETTE`（`var(--chart-N)` 引用）、`capItems`
+  （類別封頂彙總「其他」）、`ChartDataTable`（文字／鍵盤等價表）
+- **無障礙照規範逐條落實**：五種座標圖 `role="img"` ＋自動生成的 `aria-label`
+  摘要＋ `sr-only` 資料表；`StackedBar`／`Bullet` 數值在鄰近可見文字、圖形
+  `aria-hidden`；`Heatmap` 就是真表格（`caption`／`scope`／列標頭）
+- **鍵盤等價是收錄前提，已解**：有 `onSelect` 的圖，等價表的每一列是真按鈕、
+  Enter 觸發同一個鑽取回呼；表平常 `sr-only`，**鍵盤焦點進入時現形**（skip-link 慣例）
+- **registry 新增 `charts` 單一多檔 item**（30 個 item）：八種圖互相引用共同底座，
+  拆開會裝到一半——一個指令帶走整組，相依只有 `@dooping/tokens@^0.6.0` 與 `utils`
+- Storybook 新增五則 stories（資料全部由 `demoRecords` 彙總）；
+  文件頁補活範例與 Storybook 嵌入，〈取用〉改為真實指令；
+  總覽頁〈收錄範圍〉加入圖表列
+
+**我需要做什麼**：
+
+想用圖表的專案：`npx shadcn add …/r/charts.json` 一次帶走整組。
+已在用色票 token 自己畫圖的：**不受影響**，`--chart-*` 的值沒有任何變動；
+之後要換成參考實作時再抄。
+
+**為什麼改**：
+
+規範（v0.7.0 收錄）明列了實作收錄的四個前置條件——元件進 `packages/react`、
+註冊 MDXComponents、registry 條目、**鍵盤等價**。四項都到位了，
+其中鍵盤等價是無障礙門檻（WCAG 2.1.1，Level A），不能當已知限制帶進來，
+所以「資料表兼任鍵盤介面」跟元件一起實作，不是後續優化。
+
+單一 item 而不是十個：`npx shadcn add bar-chart` 裝到一半（漏底座）的失敗模式，
+比「多裝了幾個還沒用到的圖」糟得多——前者壞掉且要人排查，後者只是多幾個檔案。
 
 ### 交接包收尾：清查完成，收斂最後一處重疊
 

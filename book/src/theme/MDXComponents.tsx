@@ -14,6 +14,7 @@ import {
   DataTable, TabPills, Delta, EmptyState, Stepper,
   Placeholder, Spotlight, MockScreenFrame, MockRow,
   EditableField, ChangeSummary,
+  BarChart, Pareto, StackedBar, TrendChart, Bullet, Scatter, Heatmap, LineChart, Legend,
 } from "@dooping/react";
 
 export default {
@@ -29,4 +30,5 @@ export default {
   DataTable, TabPills, Delta, EmptyState, Stepper,
   Placeholder, Spotlight, MockScreenFrame, MockRow,
   EditableField, ChangeSummary,
+  BarChart, Pareto, StackedBar, TrendChart, Bullet, Scatter, Heatmap, LineChart, Legend,
 };

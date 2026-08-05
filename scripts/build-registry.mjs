@@ -137,15 +137,16 @@ const SPEC_VERSION = JSON.parse(
  * 用 `^` 而不是釘死：npm 對 0.x 的 `^0.5.0` 解讀是 `>=0.5.0 <0.6.0`，
  * 剛好就是這一層的相容性語意——同 minor 的修補自動吃，跨 minor 要重抄元件。
  */
-const TOKENS_DEP = (() => {
+const TOKENS_VERSION = (() => {
   const declared = JSON.parse(
     readFileSync(join(ROOT, "packages/react/package.json"), "utf8"),
   ).dependencies?.["@dooping/tokens"];
   if (!declared) {
     throw new Error("packages/react/package.json 未宣告 @dooping/tokens 相依");
   }
-  return `@dooping/tokens@^${declared.replace(/^[\^~>=<\s]+/, "")}`;
+  return declared.replace(/^[\^~>=<\s]+/, "");
 })();
+const TOKENS_DEP = `@dooping/tokens@^${TOKENS_VERSION}`;
 
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
@@ -195,6 +196,11 @@ const index = {
   $schema: "https://ui.shadcn.com/schema/registry.json",
   name: "dooping",
   version: SPEC_VERSION,
+  // 配對正本：這一版規範宣告的 @dooping/tokens 版本。
+  // 「規範 ↔ tokens」是多對一的配對（token 沒變時多個規範版指向同一 tokens 版），
+  // 樞紐是 packages/react/package.json 的相依那一行——這裡只是把它曝露成
+  // 機器可讀的欄位，取用端一個端點就能問到配對，不必翻 CHANGELOG。
+  tokensVersion: TOKENS_VERSION,
   homepage: BASE,
   items: items
     .sort((a, b) => a.name.localeCompare(b.name))

@@ -62,6 +62,54 @@ dev ──開發、CI 確認──▶ main ──▶ 文件站／Storybook／reg
 registry 戳記由它產生（守衛測試強制四處一致），所以 tag、戳記與
 `/r/index.json` 的 `version` 永遠是同一個號碼——「我抄的是哪一版」直接對得回 GitHub 的 tag。
 
+### 三層版號的對應關係（配對模型）
+
+兩條版號線**不同步前進**——那怎麼知道「哪一版規範配哪一版 token」？
+答案是**配對模型**：對應關係不靠同號，靠宣告。
+
+**定義**：每個規範版**恰好宣告一個** tokens 版。樞紐是
+`packages/react/package.json` 的 `"@dooping/tokens": "x.y.z"` 那一行——
+它是配對的唯一正本，其他所有體現都從它產生：
+
+| 體現處 | 形式 | 給誰用 |
+| --- | --- | --- |
+| `/r/index.json` 的 `tokensVersion` | 機器可讀配對（與 `version` 並列） | 取用端一個端點問到配對 |
+| registry item 的 `dependencies` | `@dooping/tokens@^x.y.z` | `npx shadcn add` 自動裝對 |
+| `v*` tag 的訊息 | 「tokens 配對版：x.y.z」 | 從 git 稽核，不翻 CHANGELOG |
+| CHANGELOG 標題 | 「規範 vA／tokens vB」 | 要升級的人 |
+
+**多對一合法、一對多非法**。token 沒變時，多個規範版指向同一 tokens 版
+（v0.6.0 與 v0.6.1 都配 0.5.0）；反過來，一個規範版宣告兩個 tokens 版不可能發生——
+守衛強制宣告是單一值。
+
+```
+規範  v0.1.0  v0.2.0  v0.2.1   v0.4.0   v0.6.0  v0.6.1
+        │       │       │        │        │       │
+tokens 0.1.2 ──┴───────┘       0.3.0    0.5.0 ──┘
+```
+
+**`^` 的語意就是配對的鬆緊**：0.x 之下 `^0.6.0` ＝ `>=0.6.0 <0.7.0`——
+同 minor 的 token 修補自動吃（不必重抄元件）；宣告跨了 minor，
+代表元件可能開始依賴新 token，該回 CHANGELOG 看要不要跟進。
+
+**取用端自查**（一行對照就知道自己在不在配對上）：
+
+```bash
+npm ls @dooping/tokens; curl -s https://kielchang.github.io/dooping-design-book/r/index.json | jq -r .tokensVersion
+```
+
+兩個數字的關係只有三種：相等＝配對正確；本地落後＝該升級 token；
+線上 `tokensVersion` 比 npm 能裝到的還新＝上游合併了但還沒發佈（等，或提醒維護者）。
+
+**配對由四道保證釘住**，每一道擋一種真實出過的錯：
+
+| 保證 | 擋什麼 |
+| --- | --- |
+| 測試守衛（處內一致＋index 配對） | 七處版號任何一處漂移、`tokensVersion` 與宣告不符 |
+| CI 兩硬閘（內容變了版號要跟） | 改了 token／元件卻忘記 bump——擋 PR |
+| **發佈硬閘**（tag 名＝package.json 版本、commit 在 main 上） | 推錯 tag 發出錯的版本；對未進版的 commit 發佈 |
+| 兩處軟閘（PR 與進版當下的漂移提示） | 宣告了卻忘記發佈——不擋，但一直出聲到發為止 |
+
 ### 進版流程：工程師提議，維護者在 GitHub 上確認
 
 ```

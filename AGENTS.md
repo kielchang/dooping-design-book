@@ -112,6 +112,17 @@ curl -s https://kielchang.github.io/dooping-design-book/r/index.json | jq -r .ve
 # 你抄走那一版：看安裝當下的 registry JSON，或比對上游 CHANGELOG
 ```
 
+**兩層的配對也查得到。** 每一版規範恰好宣告一個 tokens 版，
+`/r/index.json` 的 `tokensVersion` 就是配對正本：
+
+```bash
+npm ls @dooping/tokens; curl -s https://kielchang.github.io/dooping-design-book/r/index.json | jq -r .tokensVersion
+```
+
+兩個數字相等＝配對正確；本地落後＝該升級 token；
+線上比 npm 能裝到的還新＝上游合併了但還沒發佈（等一下，或提醒維護者）。
+配對模型的完整定義見上游文件站「治理 → 版本策略」。
+
 **看版號差距判斷要不要跟進**：大版差＝有會壞的變更、中版差＝有新能力、小版差＝修正微調。
 落後不代表要升——元件複製走之後就是你的程式碼，**只有在上游修了你也踩到的 bug 時才需要同步**，
 CHANGELOG 會寫清楚每一版改了什麼、你要不要動作。

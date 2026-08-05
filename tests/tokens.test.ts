@@ -76,6 +76,23 @@ describe("設計 token", () => {
       .toEqual([]);
   });
 
+  // 配對模型的守衛：registry index 的 tokensVersion 是「規範 ↔ tokens」配對的
+  // 機器可讀正本，必須恆等於 react/package.json 宣告的相依版。
+  // 它漂移的話，取用端從 /r/index.json 讀到的配對就是謊——
+  // 而那正是它存在的唯一目的。
+  it("registry index 的 tokensVersion 等於宣告的相依版", () => {
+    const read = (p: string) => JSON.parse(readFileSync(join(ROOT, p), "utf8"));
+    const indexPath = join(ROOT, "registry/index.json");
+    if (!existsSync(indexPath)) return;
+
+    const declared = read("packages/react/package.json")
+      .dependencies["@dooping/tokens"].replace(/^[\^~>=<\s]+/, "");
+    expect(
+      read("registry/index.json").tokensVersion,
+      "registry/index.json 的 tokensVersion 與宣告不符，請重跑 npm run build:registry",
+    ).toBe(declared);
+  });
+
   it("每個淺色語意 token 都有對應的深色值", () => {
     const light = Object.keys(semanticColors("light"));
     const dark = new Set(Object.keys(semanticColors("dark")));

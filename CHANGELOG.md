@@ -40,6 +40,46 @@ commit 本身記在 tag 描述裡，不會遺失。
 > 屆時標題是 `## v0.7.0 · <日期>`，部署會蓋 `v0.7.0` tag；
 > **合併後要推 `tokens-v0.6.0` 發佈 npm**（token 內容有變）。
 
+### 版號配對模型：把「規範 ↔ tokens」的對應做成硬事實（無另外版號變更）
+
+**改了什麼**
+
+- **`registry/index.json` 新增 `tokensVersion` 欄位**——配對的機器可讀正本。
+  取用端從一個端點問到「這一版規範配哪一版 token」，不必翻 CHANGELOG
+- **發佈端硬閘**（`publish-tokens.yml`）：tag 名必須等於 `packages/tokens/package.json`
+  的版本（tag 只是觸發器，npm 實際讀 package.json——推錯 tag 會發出錯的版本而沒人發現）；
+  且 tag 指向的 commit 必須在 `main` 上（「先合併再發佈」從紀律變成機器規則）
+- **進版當下的配對可見性**（`deploy.yml`）：`v*` tag 訊息帶「tokens 配對版：x.y.z」
+  （`git tag -n9` 就能稽核配對史）；deploy summary 顯示宣告版 vs npm latest，
+  落後就附上發佈指令——「該推 `tokens-v*` 了」在最該被看見的時刻出現
+- **守衛**：`tests/tokens.test.ts` 新增「index 的 `tokensVersion` 等於宣告版」
+- **[版本策略](book/docs/6-governance/01-versioning.mdx)新增〈三層版號的對應關係（配對模型）〉**；
+  `AGENTS.md` 補取用端自查指令
+
+**我需要做什麼**：不用。`tokensVersion` 是新增欄位，既有取用流程不受影響。
+想確認自己的 token 與設計書配不配：
+`npm ls @dooping/tokens` 對照 `/r/index.json` 的 `tokensVersion`。
+
+**為什麼改**：
+
+規範與 tokens 是**雙線獨立 SemVer**（token 內容變了才動，不發空版），
+對應關係靠 `packages/react/package.json` 那一行宣告。宣告式配對的弱點是
+**配對本身沒有任何硬事實**：沒有機器可讀正本、發佈端不驗 tag 與版本一致、
+進版時刻看不到配對狀態——v0.4.0 起 npm 漂移四版沒人發現，根因就在這一層。
+
+考慮過鎖步同號（tokens 版號永遠＝規範版號，對應最直觀），否決：
+token 沒變也得發空版，違反「不發空版」原則——版號一直跳，
+取用端就不再相信「token 幾乎不會被改，所以它才是契約」。
+
+改採**配對模型**：對應不靠同號，靠宣告＋四道保證
+（處內一致守衛、內容變更硬閘、發佈硬閘、兩處漂移軟閘）。
+多對一合法（v0.6.0 與 v0.6.1 都配 0.5.0），一對多被守衛排除。
+
+**反向驗證**：index 配對守衛兩種壞法（手改 `tokensVersion`／宣告版前進不重跑
+build:registry）都紅；發佈硬閘把 `run` 腳本從 YAML 原封抽出、在拋棄式 clone 裡
+餵三種情境——tag 名不符紅、commit 不在 main 紅（連 tag 觸發簽出沒有
+`origin/main` ref 的情況都驗到）、正常情境綠。
+
 ### 聚焦環改中性、主題色相預算定案（規範 v0.7.0／`@dooping/tokens` v0.6.0）
 
 **改了什麼**

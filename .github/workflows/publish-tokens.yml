@@ -46,6 +46,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # 配對檢查要驗「tag 指向的 commit 在不在 main 上」——
+          # 預設的淺層簽出（depth 1）會讓 merge-base 誤判，這個 repo 很小，抓全歷史。
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -58,6 +62,35 @@ jobs:
         run: |
           npm install -g npm@latest
           echo "npm $(npm -v) / node $(node -v)"
+
+      # 配對硬閘（只在 tag 觸發時跑；workflow_dispatch 的試跑不適用）。
+      #
+      # 兩條規則，各擋一種真實的出錯方式：
+      #
+      # 1. tag 名必須等於 packages/tokens/package.json 的 version。
+      #    tag 名只是「觸發器」，npm publish 實際讀的是 package.json——
+      #    推 tokens-v0.7.0 到一個 package.json 還是 0.6.0 的 commit，
+      #    會發出 0.6.0 而所有人以為發了 0.7.0。配對從 tag 那一刻就是錯的。
+      # 2. tag 指向的 commit 必須在 main 上。
+      #    「先合併進 main、再發佈」原本只是紀律——對著 dev 或任意分支的
+      #    commit 打 tag 一樣會觸發發佈，發出去的是沒經過進版確認的內容。
+      #    這一步把紀律變成機器規則。
+      - name: 配對檢查（tag 名＝版本、commit 在 main 上）
+        if: startsWith(github.ref, 'refs/tags/tokens-v')
+        run: |
+          TAG_VER="${GITHUB_REF#refs/tags/tokens-v}"
+          PKG_VER=$(node -p "require('./packages/tokens/package.json').version")
+          if [ "$TAG_VER" != "$PKG_VER" ]; then
+            echo "::error::tag 是 tokens-v$TAG_VER，但 packages/tokens/package.json 是 $PKG_VER——npm 會發出 $PKG_VER，配對就錯了。修法：刪掉這個 tag，對「版號已經是 $TAG_VER 的 main commit」重新打。"
+            exit 1
+          fi
+          # tag 觸發的簽出只帶那個 tag 的 ref，origin/main 不存在——明確抓下來。
+          git fetch origin +refs/heads/main:refs/remotes/origin/main --quiet
+          if ! git merge-base --is-ancestor HEAD origin/main; then
+            echo "::error::這個 tag 指向的 commit 不在 main 上。發佈只能來自進版確認過的內容——請先把變更合併進 main，再對 main 上的 commit 打 tokens-v$TAG_VER。"
+            exit 1
+          fi
+          echo "::notice::配對檢查通過：tokens-v$TAG_VER = package.json $PKG_VER，commit 在 main 上。"
 
       - run: npm ci
       - name: 建置 token（CSS 產物是後續所有步驟的前提）

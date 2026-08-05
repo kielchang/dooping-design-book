@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">Charts 圖表 | Dooping Design Book</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://kielchang.github.io/dooping-design-book/preview/components/charts/"><meta data-rh="true" property="og:locale" content="zh_Hant"><meta data-rh="true" name="docusaurus_locale" content="zh-Hant"><meta data-rh="true" name="docsearch:language" content="zh-Hant"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Charts 圖表 | Dooping Design Book"><meta data-rh="true" name="description" content="一組零相依的 SVG 圖表：不裝任何圖表庫，直接用 token 的色票畫。"><meta data-rh="true" property="og:description" content="一組零相依的 SVG 圖表：不裝任何圖表庫，直接用 token 的色票畫。"><link data-rh="true" rel="icon" href="/dooping-design-book/preview/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://kielchang.github.io/dooping-design-book/preview/components/charts/"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/preview/components/charts/" hreflang="zh-Hant"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/preview/components/charts/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"元件 Components","item":"https://kielchang.github.io/dooping-design-book/preview/components"},{"@type":"ListItem","position":2,"name":"Charts 圖表","item":"https://kielchang.github.io/dooping-design-book/preview/components/charts"}]}</script><link rel="stylesheet" href="/dooping-design-book/preview/assets/css/styles.2e9c2545.css">
-<script src="/dooping-design-book/preview/assets/js/runtime~main.adee5d84.js" defer="defer"></script>
+<script src="/dooping-design-book/preview/assets/js/runtime~main.285272fd.js" defer="defer"></script>
 <script src="/dooping-design-book/preview/assets/js/main.bc3b14a9.js" defer="defer"></script>
 </head>
 <body>
@@ -139,17 +139,12 @@ registry 也還沒有 <code>charts.json</code>。<strong>現在還不能用 <cod
 <a href="/components/data-table">DataTable</a> 或 CSV 匯出。</p></div><div class="rule-dont"><strong>🚫 不要這樣</strong><p>不要讓某個數字<strong>只存在於圖裡</strong>。那等於對鍵盤使用者、螢幕報讀器使用者、
 以及把報表印出來覆核的人說「這份資料不給你」。</p></div></div>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="文字等價roleimg-的義務">文字等價：<code>role=&quot;img&quot;</code> 的義務<a href="#文字等價roleimg-的義務" class="hash-link" aria-label="文字等價roleimg-的義務的直接連結" title="文字等價roleimg-的義務的直接連結" translate="no">​</a></h3>
-<p><code>role=&quot;img&quot;</code> <strong>不是中性標記</strong>。它同時做兩件事：把 <code>&lt;svg&gt;</code> 當成一張圖，
-並使<strong>子樹對輔助技術隱藏</strong>——圖內 <code>&lt;text&gt;</code> 畫的類別名與數值，螢幕報讀器一個都讀不到。</p>
-<p>所以掛了 <code>role=&quot;img&quot;</code> 就等於承諾「我會給你文字說明」。沒給的話，
-資訊對報讀器使用者<strong>完全消失</strong>，比不寫 <code>role</code> 更糟（不寫至少 <code>&lt;text&gt;</code> 還可能被讀到）。
-這是 WCAG 1.1.1，Level A。</p>
-<p>實作必須提供兩層文字等價，分三種處理：</p>
+<p>規則本身是<strong>通則</strong>，正本在<a class="" href="/dooping-design-book/preview/accessibility/principles/">無障礙四原則</a>：
+<code>role=&quot;img&quot;</code> 會讓子樹對輔助技術隱藏，掛了就必須用文字補回（WCAG 1.1.1，Level A）；
+文字出口用 <code>sr-only</code> 表格、不做 SVG 焦點管理；數值已在鄰近可見文字時圖形改標 <code>aria-hidden</code>。
+這裡不重講——同一條規則有兩份說明，必然會分歧。</p>
+<p>本頁只留<strong>各圖種對應到哪一種做法</strong>：</p>
 <table><thead><tr><th>圖種</th><th>做法</th></tr></thead><tbody><tr><td><code>BarChart</code>／<code>Pareto</code>／<code>TrendChart</code>／<code>LineChart</code>／<code>Scatter</code></td><td><code>aria-label</code> 摘要（由資料自動生成）＋ 一份 <code>sr-only</code> 的 <code>&lt;table&gt;</code>（<code>&lt;caption&gt;</code>＋<code>scope</code>），把原本只有 hover 拿得到的精確數值補成文字</td></tr><tr><td><code>StackedBar</code>／<code>Bullet</code></td><td>數值<strong>已在鄰近可見文字</strong>（列標籤＋合計／實際＋目標＋差額）→ 圖形標 <code>aria-hidden</code>，避免同一份資料唸兩次；<code>StackedBar</code> 的分段明細改由整體表格提供</td></tr><tr><td><code>Heatmap</code></td><td>本來就是真表格（數值是可見文字、顏色只是輔助）→ 不加額外表格，改補正表格語意（<code>caption</code>／<code>scope</code>／列標頭用 <code>&lt;th scope=&quot;row&quot;&gt;</code>）</td></tr></tbody></table>
-<div class="rule-grid"><div class="rule-do"><strong>✅ 這樣做</strong><p><strong>用表格</strong>當文字出口。SVG 內部的焦點與無障礙樹支援在
-各瀏覽器 × 各報讀器之間很不一致；<code>&lt;table&gt;</code> 的語意則是普世的
-（報讀器有專門的表格瀏覽指令）。</p></div><div class="rule-dont"><strong>🚫 不要這樣</strong><p>不要花力氣讓 SVG 可以逐點瀏覽。投入大、跨環境結果不可預期，
-而且做完還是不如一張表格好用。</p></div></div>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="鍵盤等價實作時必須一併解掉">鍵盤等價：實作時必須一併解掉<a href="#鍵盤等價實作時必須一併解掉" class="hash-link" aria-label="鍵盤等價：實作時必須一併解掉的直接連結" title="鍵盤等價：實作時必須一併解掉的直接連結" translate="no">​</a></h3>
 <p>來源專案的實作把 hover 提示與 <code>onSelect</code> 鑽取做成<strong>只有滑鼠拿得到</strong>——
 資料點的熱區沒有 <code>tabIndex</code>／<code>onFocus</code>／<code>onKeyDown</code>。

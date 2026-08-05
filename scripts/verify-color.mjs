@@ -80,7 +80,11 @@ export function runChecks() {
       const cSubtle = contrast(at("brand-subtle"), at("brand-subtle-foreground"));
       push(cSubtle >= TEXT, `${tag} brand-subtle 上的文字只有 ${cSubtle.toFixed(2)}:1（需 ${TEXT}）`);
 
-      const cRing = contrast(at("ring"), hardestOf(name, mode));
+      // ring 自 ADR-0007 起是全主題共用的中性基礎值（主題層不再覆蓋），
+      // 但表面是各主題帶色相的——所以這條**每個主題仍要各驗一次**：
+      // 同一個 ring、不同的對象。用 resolve() 拿有效值，主題有覆蓋就驗覆蓋、
+      // 沒有就驗基礎值，機制不因這次決定而特化。
+      const cRing = contrast(resolve(name, mode, "ring"), hardestOf(name, mode));
       push(cRing >= NONTEXT, `${tag} ring 對最亮表面只有 ${cRing.toFixed(2)}:1（需 ${NONTEXT}）`);
 
       // brand 色塊本身也要看得見，否則按鈕在頁面上「浮不出來」

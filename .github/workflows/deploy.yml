@@ -85,8 +85,42 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # tag 訊息帶上配對的 tokens 版本——「這一版規範配哪一版 token」從此
+          # 可以直接從 git tag 稽核（git tag -n），不必翻 CHANGELOG。
+          TOKENS_VER=$(jq -r '.dependencies["@dooping/tokens"]' packages/react/package.json | sed 's/^[~^>=< ]*//')
           git tag -a "$TAG" -m "進版 $TAG（$(TZ=Asia/Taipei date +%F)）" \
+            -m "tokens 配對版：$TOKENS_VER" \
             -m "commit ${{ github.sha }}" \
             -m "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           git push origin "$TAG"
-          echo "### 🏷 $TAG" >> "$GITHUB_STEP_SUMMARY"
+          echo "### 🏷 $TAG（tokens 配對版 $TOKENS_VER）" >> "$GITHUB_STEP_SUMMARY"
+
+      # 進版當下的配對狀態。ci.yml 的漂移警告只跑在 dev push／PR——
+      # 但「該去推 tokens-v* 了」這件事最該被看見的時刻是**進版成功的這一刻**。
+      # 永遠 exit 0：這是提示，不是閘門（發佈本來就是合併之後的下一步）。
+      - name: 配對狀態（宣告版 vs npm，僅提示）
+        continue-on-error: true
+        run: |
+          DECLARED=$(jq -r '.dependencies["@dooping/tokens"] // empty' packages/react/package.json | sed 's/^[~^>=< ]*//')
+          PUBLISHED=$(npm view @dooping/tokens version 2>/dev/null || true)
+          {
+            echo "### @dooping/tokens 配對狀態"
+            echo ""
+            echo "| 宣告（本次進版） | npm latest |"
+            echo "| --- | --- |"
+            echo "| \`${DECLARED:-查不到}\` | \`${PUBLISHED:-查不到}\` |"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$DECLARED" ] && [ -n "$PUBLISHED" ] && [ "$DECLARED" != "$PUBLISHED" ]; then
+            {
+              echo "⚠️ **npm 還沒有 \`$DECLARED\`。** 這次進版包含 token 變更的話，現在就是發佈的時刻："
+              echo ""
+              echo '```bash'
+              echo "git tag -a tokens-v$DECLARED -m \"tokens $DECLARED\" && git push origin tokens-v$DECLARED"
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning::npm 上的 @dooping/tokens 是 $PUBLISHED，本次進版宣告 $DECLARED——請推 tokens-v$DECLARED 發佈。"
+          else
+            echo "✅ 配對一致。" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit 0

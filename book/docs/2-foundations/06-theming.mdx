@@ -87,15 +87,35 @@ chartColors("dark");  // 另外 8 色，L* 落在 49–86 —— 沒有任何一
 
 ### 主題影響哪些 token
 
-每組主題每個模式共 17 個，分兩類：
+每組主題每個模式共 16 個，分兩類：
 
 | 類別 | Token | 怎麼變 |
 | --- | --- | --- |
-| **主題色**（5） | `--brand`、`--brand-foreground`、`--brand-subtle`、`--brand-subtle-foreground`、`--ring` | 完整重新生成（對比反解） |
+| **主題色**（4） | `--brand`、`--brand-foreground`、`--brand-subtle`、`--brand-subtle-foreground` | 完整重新生成（對比反解） |
 | **帶色調的中性色**（12） | `--background`、`--card`、`--popover`、`--muted`、`--secondary`、`--accent`、`--border`、`--input`、`--field-border`、`--field-editable`、`--field-readonly`、`--muted-foreground` | **只轉色相**，L 與 chroma 不動 |
 
-**與主題無關的**：`--primary`（中性近黑，承擔多數控制項）、全部狀態色、
+**與主題無關的**：`--primary`（中性近黑，承擔多數控制項）、**`--ring`（聚焦環，
+中性——曾在 v0.4.0 吃主題色相，v0.7.0 依 [ADR-0007](/adr) 改回）**、全部狀態色、
 全部圖表色票、提醒視窗的 `--{狀態}-subtle`。
+
+### 色相預算：主題色相只進識別層
+
+「主題影響哪些 token」的白名單不是湊出來的，背後是一條可以背下來的規則
+（決策正本與量測理由見 [ADR-0007](/adr)）：
+
+| 介面層 | 吃主題色相？ | 載體 |
+| --- | --- | --- |
+| Layout 大區塊背景風格色調 | ✅（只轉色相） | 12 個帶色調中性色 |
+| 選單／選中導覽項／品牌強調 | ✅ | `--brand` 家族（含 `Button` 的 `brand` variant——僅限非提交型入口） |
+| 動作（確認／送出／儲存） | ❌ | `--primary` 中性近黑 |
+| 互動（hover／pressed／已選） | ❌ | `currentColor` 疊加，機制無色相 |
+| 聚焦環 | ❌ | `--ring` 中性，全主題一致 |
+| 狀態／提醒色 | ❌ | 語意固定，見[提醒色辭典](/foundations/alert-colors) |
+| 資料（圖表 8 色） | ❌ | 全主題共用 |
+
+聚焦環改回中性的直接理由：欄位提醒色（琥珀＝已改動、紅＝有問題）與聚焦環
+會出現在**同一個輸入框**上。ring 帶主題色相時，這個組合每換一次主題就換一副長相；
+中性之後「彩色＝語意、中性＝焦點」在所有主題下恆成立，切主題不會誤讀 ring 的用意。
 
 ### 中性色為什麼要帶主題色相
 

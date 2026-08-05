@@ -169,9 +169,11 @@ export function Coachmark({
         onKeyDown={onKeyDown}
         aria-live="polite"
         style={pos ? { top: pos.top, left: pos.left } : { opacity: 0 }}
-        // 聚焦環用 `ring-ring`（跟著色相主題）而不是 `ring-primary`——這支原本是全 repo
-        // 唯一不跟主題的聚焦環。換過來之後就受 ring-offset 那條守衛管：沒有 offset 的環
-        // 是貼著卡片邊框畫的，對比要對邊框算而不是對背景算。
+        // 聚焦環用 `ring-ring` 而不是 `ring-primary`——跟 token 走，不綁死具體值。
+        // ring 自 ADR-0007 起是全主題一致的中性色（聚焦不吃主題色相，避免與欄位
+        // 提醒色撞成兩套強調），但元件不需要知道這件事：值的決定在 token 層。
+        // 用了 ring 就受 ring-offset 那條守衛管：沒有 offset 的環是貼著卡片邊框
+        // 畫的，對比要對邊框算而不是對背景算。
         className="pointer-events-auto fixed w-[min(340px,calc(100vw-24px))] rounded-lg border bg-popover p-3 text-popover-foreground shadow-lg outline-none ring-1 ring-transparent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <div className="mb-1 flex items-start justify-between gap-2">

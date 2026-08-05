@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "change-summary",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "type": "registry:component",
   "title": "ChangeSummary 變更摘要",
   "description": "送出前的舊值→新值清單，可逐欄還原。",
   "dependencies": [
-    "@dooping/tokens@^0.5.0",
+    "@dooping/tokens@^0.6.0",
     "lucide-react"
   ],
   "registryDependencies": [

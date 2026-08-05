@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "seg-group",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "type": "registry:ui",
   "title": "SegGroup 分段選擇",
   "description": "少量互斥選項，radiogroup ＋ roving tabindex。",
   "dependencies": [
-    "@dooping/tokens@^0.5.0",
+    "@dooping/tokens@^0.6.0",
     "lucide-react"
   ],
   "registryDependencies": [

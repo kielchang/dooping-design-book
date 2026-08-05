@@ -120,3 +120,47 @@ export const demoChanges = [
     afterText: "第一組 分機 220",
   },
 ];
+
+/**
+ * 時間軸示範（Gantt）。日期跨兩個月：刻度會落在「週」粒度，
+ * 看得到格線、今天線與長條的相對位置。category 對映 `--chart-N`——
+ * 同一類的項目在時間軸與其他圖表上同色（分類色跟資料實體走）。
+ */
+export interface DemoPhase {
+  id: string;
+  label: string;
+  start: string;
+  end: string;
+  category?: number;
+  progress?: number;
+}
+
+export const demoPhases: DemoPhase[] = [
+  { id: "P-01", label: "甲案 第一階段", start: "2024-01-08", end: "2024-01-26", category: 1, progress: 100 },
+  { id: "P-02", label: "甲案 第二階段", start: "2024-01-22", end: "2024-02-16", category: 1, progress: 55 },
+  { id: "P-03", label: "乙案 基礎項目", start: "2024-01-15", end: "2024-02-02", category: 2, progress: 80 },
+  { id: "P-04", label: "乙案 擴充", start: "2024-02-05", end: "2024-02-23", category: 2, progress: 10 },
+  { id: "P-05", label: "丙案 初版", start: "2024-01-29", end: "2024-02-09", category: 3, progress: 40 },
+  { id: "P-06", label: "丁案 例行項目", start: "2024-01-10", end: "2024-02-28", category: 4 },
+  { id: "P-07", label: "戊案 整併", start: "2024-02-12", end: "2024-03-01", category: 5, progress: 0 },
+];
+
+/**
+ * 節點畫布示範（GraphCanvas）。流程是抽象的「階段推進」：
+ * 節點分類沿用 demoPhases 的 category，示範「同一實體跨畫面同色」。
+ */
+export const demoGraphNodes = [
+  { id: "n1", label: "接收", position: { x: 0, y: 80 }, category: 1 },
+  { id: "n2", label: "初審", position: { x: 180, y: 0 }, category: 2 },
+  { id: "n3", label: "複核", position: { x: 180, y: 160 }, category: 2 },
+  { id: "n4", label: "彙整", position: { x: 360, y: 80 }, category: 3 },
+  { id: "n5", label: "確認", position: { x: 540, y: 80 }, category: 5 },
+];
+
+export const demoGraphEdges = [
+  { id: "e1-2", source: "n1", target: "n2" },
+  { id: "e1-3", source: "n1", target: "n3" },
+  { id: "e2-4", source: "n2", target: "n4", label: "通過" },
+  { id: "e3-4", source: "n3", target: "n4" },
+  { id: "e4-5", source: "n4", target: "n5" },
+];

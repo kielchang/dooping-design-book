@@ -32,6 +32,10 @@ const LIB_MODULES = {
 /** 外部套件 → npm 相依（其餘視為 peer，不列入） */
 const NPM_DEPS = [
   { re: /@radix-ui\/react-([a-z-]+)/g, name: (m) => `@radix-ui/react-${m[1]}` },
+  // GraphCanvas 的隔離相依（boundary 守衛保證只有那一個檔案 import 它）。
+  // 不在這份白名單裡的外部套件不會被寫進 registry item——取用端就裝不到，
+  // 所以「收了新相依卻忘了加這裡」的症狀是 shadcn add 之後畫布整個沒樣式。
+  { re: /from\s+["']@xyflow\/react["']/, name: () => "@xyflow/react" },
   { re: /from\s+["']lucide-react["']/, name: () => "lucide-react" },
   { re: /from\s+["']clsx["']/, name: () => "clsx" },
   { re: /from\s+["']tailwind-merge["']/, name: () => "tailwind-merge" },
@@ -97,6 +101,8 @@ const TITLES = {
   "empty-state": ["EmptyState 空狀態", "圖示＋標題＋說明＋行動呼籲。"],
   stepper: ["Stepper 步驟指示", "多步驟流程進度，完成態同時用勾選與顏色。"],
   coachmark: ["Coachmark 聚光導引", "純呈現的引導聚光框，可縮小、可鍵盤操作、支援驗收標記。"],
+  gantt: ["Gantt 時間軸", "檢視與選取用的精簡時間軸：分類色長條、進度、今天線、列選取。"],
+  "graph-canvas": ["GraphCanvas 節點畫布", "@xyflow/react 的薄封裝：token 橋接、狀態層選取、中性聚焦環。"],
   mockup: ["Mockup 文件示意積木", "Placeholder／Spotlight／MockScreenFrame：零截圖文件示意。"],
   "editable-field": ["EditableField 唯讀逐欄編輯", "點擊才進編輯、改動標色、undo/redo 先確認。"],
   "change-summary": ["ChangeSummary 變更摘要", "送出前的舊值→新值清單，可逐欄還原。"],

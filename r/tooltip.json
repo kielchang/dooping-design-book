@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "tooltip",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "type": "registry:ui",
   "title": "Tooltip 提示泡泡",
   "description": "hover／鍵盤聚焦／長壓顯示，含邊緣防溢與截斷文字元件。",
   "dependencies": [
-    "@dooping/tokens@^0.5.0"
+    "@dooping/tokens@^0.6.0"
   ],
   "registryDependencies": [
     "https://kielchang.github.io/dooping-design-book/r/utils.json"

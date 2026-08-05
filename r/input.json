@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "input",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "type": "registry:ui",
   "title": "Input 輸入框",
   "description": "文字輸入，高度對齊控制項尺寸 token。",
   "dependencies": [
-    "@dooping/tokens@^0.5.0"
+    "@dooping/tokens@^0.6.0"
   ],
   "registryDependencies": [
     "https://kielchang.github.io/dooping-design-book/r/utils.json"

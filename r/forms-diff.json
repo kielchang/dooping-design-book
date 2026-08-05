@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "forms-diff",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "type": "registry:lib",
   "title": "forms/diff 欄位比對",
   "description": "FieldSpec 驅動的變更偵測與顯示格式化。",
   "dependencies": [
-    "@dooping/tokens@^0.5.0"
+    "@dooping/tokens@^0.6.0"
   ],
   "registryDependencies": [],
   "files": [

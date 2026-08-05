@@ -338,28 +338,18 @@ const shown = capItems(data, 8);
 
 ### 文字等價：`role="img"` 的義務
 
-`role="img"` **不是中性標記**。它同時做兩件事：把 `<svg>` 當成一張圖，
-並使**子樹對輔助技術隱藏**——圖內 `<text>` 畫的類別名與數值，螢幕報讀器一個都讀不到。
+規則本身是**通則**，正本在[無障礙四原則](/accessibility/principles)：
+`role="img"` 會讓子樹對輔助技術隱藏，掛了就必須用文字補回（WCAG 1.1.1，Level A）；
+文字出口用 `sr-only` 表格、不做 SVG 焦點管理；數值已在鄰近可見文字時圖形改標 `aria-hidden`。
+這裡不重講——同一條規則有兩份說明，必然會分歧。
 
-所以掛了 `role="img"` 就等於承諾「我會給你文字說明」。沒給的話，
-資訊對報讀器使用者**完全消失**，比不寫 `role` 更糟（不寫至少 `<text>` 還可能被讀到）。
-這是 WCAG 1.1.1，Level A。
-
-實作必須提供兩層文字等價，分三種處理：
+本頁只留**各圖種對應到哪一種做法**：
 
 | 圖種 | 做法 |
 | --- | --- |
 | `BarChart`／`Pareto`／`TrendChart`／`LineChart`／`Scatter` | `aria-label` 摘要（由資料自動生成）＋ 一份 `sr-only` 的 `<table>`（`<caption>`＋`scope`），把原本只有 hover 拿得到的精確數值補成文字 |
 | `StackedBar`／`Bullet` | 數值**已在鄰近可見文字**（列標籤＋合計／實際＋目標＋差額）→ 圖形標 `aria-hidden`，避免同一份資料唸兩次；`StackedBar` 的分段明細改由整體表格提供 |
 | `Heatmap` | 本來就是真表格（數值是可見文字、顏色只是輔助）→ 不加額外表格，改補正表格語意（`caption`／`scope`／列標頭用 `<th scope="row">`） |
-
-<Rules>
-  <Do><p><strong>用表格</strong>當文字出口。SVG 內部的焦點與無障礙樹支援在
-  各瀏覽器 × 各報讀器之間很不一致；<code>&lt;table&gt;</code> 的語意則是普世的
-  （報讀器有專門的表格瀏覽指令）。</p></Do>
-  <Dont><p>不要花力氣讓 SVG 可以逐點瀏覽。投入大、跨環境結果不可預期，
-  而且做完還是不如一張表格好用。</p></Dont>
-</Rules>
 
 ### 鍵盤等價：實作時必須一併解掉
 

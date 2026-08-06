@@ -16,9 +16,9 @@ import {
   Table, TableHeader, TableBody, TableFooter, TableRow, TableHead, TableCell, NumCell, NumHead,
   DataTable, TabPills, Delta, EmptyState, Stepper,
   Placeholder, Spotlight, MockScreenFrame, MockRow,
-  EditableField, ChangeSummary,
+  EditableField, ChangeSummary, FormField, FieldError,
   BarChart, Pareto, StackedBar, TrendChart, Bullet, Scatter, Heatmap, LineChart, Legend,
-  Skeleton, SkeletonText, FormField, FieldError,
+  FormField, FieldError,
 } from "@dooping/react";
 
 export default {
@@ -34,6 +34,6 @@ export default {
   Table, TableHeader, TableBody, TableFooter, TableRow, TableHead, TableCell, NumCell, NumHead,
   DataTable, TabPills, Delta, EmptyState, Stepper,
   Placeholder, Spotlight, MockScreenFrame, MockRow,
-  EditableField, ChangeSummary,
+  EditableField, ChangeSummary, FormField, FieldError,
   BarChart, Pareto, StackedBar, TrendChart, Bullet, Scatter, Heatmap, LineChart, Legend,
 };

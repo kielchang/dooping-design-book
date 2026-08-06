@@ -40,3 +40,6 @@ title: 元件總覽
 3. **不自帶資料抓取**——元件只接受 props，狀態由宿主決定。
 4. **文案可覆寫**——多字串元件（DataTable、Coachmark、EditableField）都吃 `labels` prop。
 5. **不依賴任何應用層概念**——由[守衛測試](/governance/drift-guards)強制。
+6. **分類色與狀態語意脫鉤（雙向）**——圖表序列色只表達「這是哪一類」，
+   好壞一律走 `success`／`warning`／`danger`；反過來，維度本身是狀態時必須沿用狀態色。
+   判斷樹見[圖表的配色策略](/components/charts#配色策略先問資料形態再問維度語意)。

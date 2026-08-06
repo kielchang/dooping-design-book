@@ -4,6 +4,9 @@ import { Input } from "./input";
 import { Label } from "./label";
 import { NumberInput } from "./number-input";
 import { Checkbox } from "./checkbox";
+import { Switch } from "./switch";
+import { Textarea } from "./textarea";
+import { RadioGroup, RadioGroupItem } from "./radio-group";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./select";
 import { SegGroup } from "./seg-group";
 import { Chips } from "./chips";
@@ -139,6 +142,98 @@ export const 分段選擇: Story = {
           <SegGroup label="等級（鎖定）" options={TIER_OPTIONS} value={locked} onPick={() => {}} disabled lockHint="此筆已結案，需先解除鎖定" />
         </div>
         <p className="text-tiny text-muted-foreground">鍵盤：方向鍵移動、Space/Enter 選定、Esc 取消。整組只佔一個 Tab 停留點。</p>
+      </div>
+    );
+  },
+};
+
+export const 開關: Story = {
+  render: function Render() {
+    const [autoSave, setAutoSave] = useState(true);
+    const [dense, setDense] = useState(false);
+    return (
+      <div className="max-w-sm space-y-4">
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="sw-save">自動儲存</Label>
+          <Switch id="sw-save" checked={autoSave} onCheckedChange={setAutoSave} />
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="sw-dense">密集列表</Label>
+          <Switch id="sw-dense" checked={dense} onCheckedChange={setDense} />
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="sw-locked" className="opacity-60">週報寄送（由管理端統一設定）</Label>
+          <Switch id="sw-locked" checked disabled />
+        </div>
+        <p className="text-tiny text-muted-foreground">
+          開關＝<strong>切了立即生效</strong>（設定頁）；「送出才生效」的表單選項用 Checkbox。
+          所以開關沒有「已改動未送出」的琥珀態——立即生效的控制項不存在未送出狀態。
+        </p>
+      </div>
+    );
+  },
+};
+
+export const 長文輸入: Story = {
+  render: function Render() {
+    const [note, setNote] = useState("");
+    const tooLong = note.length > 200;
+    return (
+      <div className="max-w-xl space-y-4">
+        <div className="space-y-1">
+          <Label htmlFor="ta-note">備註</Label>
+          <Textarea
+            id="ta-note"
+            placeholder="補充說明（選填）"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            rows={3}
+            aria-invalid={tooLong || undefined}
+            aria-describedby={tooLong ? "ta-err" : undefined}
+          />
+          {tooLong && (
+            <p id="ta-err" className="text-tiny text-danger">
+              超過 200 字上限（目前 {note.length} 字）。
+            </p>
+          )}
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor="ta-ro">結案原因（停用示意）</Label>
+          <Textarea id="ta-ro" defaultValue="重複建立，已併入既有紀錄。" disabled />
+        </div>
+        <p className="text-tiny text-muted-foreground">
+          與 Input 同一套邊框／聚焦環／不合格態；只准直向調整大小（resize-y），
+          橫向拉寬會破壞表單欄寬對齊。
+        </p>
+      </div>
+    );
+  },
+};
+
+export const 單選群: Story = {
+  render: function Render() {
+    const [v, setV] = useState("all");
+    return (
+      <div className="max-w-md space-y-3">
+        <RadioGroup value={v} onValueChange={setV} aria-label="通知範圍">
+          {[
+            { value: "all", label: "全部動態", hint: "每一筆變更都通知" },
+            { value: "important", label: "重要事項", hint: "只有需要動作的才通知" },
+            { value: "none", label: "暫停通知", hint: "改到站內清單自行查看" },
+          ].map((o) => (
+            <div key={o.value} className="flex items-start gap-2">
+              <RadioGroupItem value={o.value} id={`rg-${o.value}`} className="mt-0.5" />
+              <Label htmlFor={`rg-${o.value}`} className="font-normal">
+                <span className="block text-sm">{o.label}</span>
+                <span className="block text-tiny text-muted-foreground">{o.hint}</span>
+              </Label>
+            </div>
+          ))}
+        </RadioGroup>
+        <p className="text-tiny text-muted-foreground">
+          選項長或含說明 → 單選群（垂直）；2–5 個短標籤 → 分段選擇；
+          超過 5 個或選項動態增減 → 下拉。整組只佔一個 Tab 停留點，方向鍵移動。
+        </p>
       </div>
     );
   },

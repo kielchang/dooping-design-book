@@ -55,7 +55,9 @@ title: 表單頁
 
 跨頁一致性守則第 4 條在表單頁的展開：
 
-- **行內錯誤緊貼欄位**：`aria-invalid` ＋ 欄位下方的紅色小字（`aria-describedby` 連起來）。
+- **行內錯誤緊貼欄位**：用 `FormField`——它把 `aria-invalid`＋`aria-describedby`＋
+  錯誤小字的固定寫法接好（見[錯誤態](/components/input#錯誤態formfield-把固定寫法接好)），
+  不再需要手寫這三條。
 - **頂部只做彙總**：用 [Callout](/components/callout)（warning）列「有幾個欄位待補」，
   不重複每一條錯誤內容。
 - **時機**：blur 或送出後才標紅。使用者還沒碰過的欄位就標紅，

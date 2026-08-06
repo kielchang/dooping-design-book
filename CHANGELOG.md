@@ -37,6 +37,107 @@ commit 本身記在 tag 描述裡，不會遺失。
 
 ---
 
+## v0.11.0 · 2026-08-06
+
+三個工作項的合併發佈（B 段終驗＋兩個 P0＋缺件六件）。
+**tokens 維持 0.6.0**——全部用既有 token，不發 npm、不推 tokens tag。
+
+### 交接包 B 段終驗：節級比對全數在頁，補上唯一的選用項（純文件）
+
+**改了什麼**：逐份補充稿做**節級**比對（8 份、21 個插入節）——全部已在
+先前批次落地，B 段實質完成。唯一缺的是 overview 補充稿標為「選用」的
+共同約定第 6 條，這次補上：「分類色與狀態語意脫鉤（雙向）」一句＋連到
+配色策略判斷樹（正本在 charts 頁，不寫第二份）。
+**我需要做什麼**：不用。
+**為什麼改**：草案當時把這條列為取捨（總覽收齊 vs 保持精簡）；
+配色策略判斷樹落地後，這條有了可連結的正本，一句話收齊的成本趨近於零。
+至此**交接包 22 份草案全部收束**，含所有選用項與合併注意事項。
+
+### 兩個 P0 設計缺口：載入態與欄位錯誤態（規範 v0.11.0，tokens 不變）
+
+**改了什麼**
+
+覆蓋度清查（交接包 D 段）點名的兩個 P0——「全庫沒有 loading 態」
+「全庫沒有 error 態」——它們是**設計缺口不是測試缺口**，先補 story 只會
+補出五種不同的 loading。這批先定規範再落元件：
+
+- **載入態規範〈載入中〉**（[色彩語意](book/docs/2-foundations/01-color.mdx)新節）：
+  三種手段各有位置——首載＝**Skeleton**（版面已知不跳動）、
+  重查＝**就地變暗保留舊內容**（已有資料再蓋骨架會閃）、
+  提交＝disabled＋圖示＋文案（按鈕沒有 loading 變體的既有立場，銜接不推翻）。
+  載入不是狀態語意，一律中性（`--muted`），不進提醒色彩色家族
+- **新增 `Skeleton`／`SkeletonText`**；**`DataTable` 加 `loading`**：
+  首載渲染骨架列（列數＝每頁筆數、上限 15），已有資料就地變暗＋`aria-busy`；
+  讀屏出口由容器宣告一次（`role="status"`），骨架塊 `aria-hidden`
+- **新增 `FormField`／`FieldError`**：「Label＋`aria-describedby`＋`aria-invalid`＋
+  錯誤小字」的固定寫法元件化，id 連動自動接好；錯誤三重編碼（色＋圖示＋文字）；
+  與區塊層 Callout 彙總是分工不是取代
+- **修掉一個真實的深色違規**：先前錯誤欄整格染 `--danger-subtle`，
+  深色下 danger 邊框對那個底只有 **2.42:1**（低於 1.4.11 的 3:1）。
+  修法不是放寬門檻也不是動全域淡底（會破壞染色量等量），而是**不整格染紅**——
+  錯誤主訊號是邊框＋文字＋圖示，整格紅底還會吃掉高飽和面積預算
+  （十個錯誤欄＝十塊紅底）。欄位狀態三層表同步修正
+- **verify:color 新門檻**：danger 邊框對兩種欄位底（`background`／`--field-editable`）
+  兩模式都 ≥3:1——這條**第一次跑就抓到上述違規**，反向驗證過
+- **第一支 play function**：FormField 的 aria 連動（`aria-invalid`／`describedby`
+  指向存在的錯誤節點／無錯誤欄不得帶 invalid）——樣式看起來都對、
+  讀屏卻接不到訊息，正是改版時最容易安靜壞掉的部分
+- 缺件表劃掉 Skeleton 與 Form 兩列（`missing-piece.yml` 同步，表下補「畢業」紀錄）；
+  文件八處同步（05-input 錯誤態節＋活範例、13-data-table 載入節、16-empty-state
+  「載入中不是空」、01-button 連結、提醒色辭典同框表加錯誤行、表單頁改用 FormField）
+
+**我需要做什麼**：
+
+想用的專案：`npx shadcn add …/r/skeleton.json`／`…/r/form-field.json`。
+**已在用 `aria-invalid` 樣式鉤子的**：錯誤欄不再整格染紅（深色違規修正）——
+重抄 Input／Select 兩支，或自行拿掉 `aria-[invalid=true]:bg-danger-subtle`。
+其餘零影響；DataTable 的 `loading` 是新增 prop，不傳＝現況。
+
+**為什麼改**：
+
+載入與錯誤是後台系統每一頁都會遇到的兩種狀態，卻是全庫唯二沒有規範的——
+每個畫面自己發明的結果就是五種 loading、三種錯誤標法。規範先行
+（決策表＋反例），元件只是把規範變成預設值；深色違規的修正順帶證明了
+「新增守衛必須反向驗證」之外的另一半：**新守衛第一次跑就該對著現況跑**，
+它抓到的每一條都是已經存在的問題。
+### 缺件表六件收錄：Toast、Switch、Textarea、RadioGroup、Skeleton、DateRange（規範 v0.11.0，tokens 不變）
+
+**改了什麼**
+
+- **頁面章缺件表的前六列全數收錄**，替代方案功成身退；表與認領模板同步刪除六個選項
+- **Toast 操作回饋**（[27-toast](book/docs/3-components/27-toast.mdx)）：「操作回饋的去向全站固定一種」
+  自此有載體，規則成文——右下、堆疊上限 3、success/info/warning 5 秒自動消失
+  （hover/聚焦暫停）、**danger 一律手動關閉**、讀屏 status/alert 分級、z-[70]；
+  表單驗證錯誤不進 Toast（貼欄位）。淡底表面與 Callout 共用同一份
+  `STATUS_SUBTLE_SURFACE`（同一份事實只寫一次）
+- **Switch**：切了立即生效；與 Checkbox 的分工成文（送出才生效用 Checkbox），
+  因此刻意無「已改動未送出」琥珀態
+- **Textarea**：逐項鏡射 Input（邊框/聚焦環/aria-invalid/停用）；只准直向調整大小
+- **RadioGroup**：垂直、每項可帶說明；選中填實心點不只靠顏色；
+  文件附單選四載體分工表（SegGroup/RadioGroup/Select/EditableField）
+- **Skeleton**：保留真實版面形狀、只用於首載、aria-hidden＋容器 aria-busy、
+  尊重 prefers-reduced-motion
+- **DateRange 期間選擇 v1**：檔位一等公民（今日/近 7 日/近 30 日/本月）＋自訂起訖；
+  反序自動修正；**刻意不做日曆格**（檔位＋原生 date 輸入涵蓋主要場景，
+  視覺化日曆等三次法則證據）
+- 順帶兩個既有小修：Stepper 步驟按鈕補標準聚焦環四件組（先前走瀏覽器預設）；
+  Storybook 步驟指示 story 的 completed 死 key 修正
+
+**我需要做什麼**
+
+要用就抄：`npx shadcn add <站台>/r/{toast,switch,textarea,radio-group,skeleton,date-range}.json`。
+Switch/RadioGroup 會自動帶入兩個新的 radix 相依。**tokens 維持 0.6.0**——
+六件全部使用既有 token，npm 端零動作。已在用替代方案的畫面不必立刻改，
+但新畫面請直接用正式件；操作回饋請照 Toast 頁的全站規則收斂。
+
+**為什麼改**
+
+頁面章成文時盤出九個缺件，其中六件已有多頁場景反覆出現（表單頁/設定頁/
+清單頁/儀表板都指向同幾件）——三次法則的證據在成表當下就湊齊了。
+一次收錄讓「先用替代方案」的過渡期最短，也讓認領表單聚焦在真正未定案的三件。
+
+---
+
 ## 2026-08-06（第二則·純 CI 進版，版號未動）
 
 ### 渲染守衛的 Playwright 快取（純 CI，版號不動）

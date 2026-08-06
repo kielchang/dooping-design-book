@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "skeleton",
+  "version": "0.11.0",
+  "type": "registry:ui",
+  "title": "Skeleton 骨架屏",
+  "description": "首載用的版面灰塊；三種載入手段的分工見文件〈載入中〉。",
+  "dependencies": [
+    "@dooping/tokens@^0.6.0"
+  ],
+  "registryDependencies": [
+    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+  ],
+  "files": [
+    {
+      "path": "dooping/ui/skeleton.tsx",
+      "content": "import { cn } from \"@/lib/dooping/utils\";\n\n// 載入中的三種手段各有位置（規範見文件〈載入中〉一節），這支只負責第一種：\n//\n//   1. 首次載入、版面已知 → Skeleton（本檔）：反映真實版面的灰塊，保留版面不跳動\n//   2. 已有內容、重新查詢 → 就地變暗＋保留舊內容＋aria-busy（元件各自實作，如 DataTable）\n//   3. 提交中（按鈕）     → disabled＋換圖示＋改文案（01-button 的既有立場，沒有 loading 變體）\n//\n// 載入不是狀態語意——顏色一律中性（--muted），不進提醒色的彩色家族。\n// 動畫用 Tailwind 內建 animate-pulse，並**顯式**以 motion-reduce:animate-none 停下——\n// prefers-reduced-motion 的使用者拿到靜態灰塊，它本身已足以表達「這裡還沒好」。零新 token。\n//\n// 無障礙分工：骨架本身 aria-hidden（它不承載資訊）；「載入中」由**容器**宣告\n// （aria-busy ＋ role=\"status\" 的 sr-only 文字），不是每一塊灰各念一次。\n\n/** 骨架塊：尺寸由 className 決定（h-4 w-32 之類），反映它替代的真實內容。 */\nexport function Skeleton({ className }: { className?: string }) {\n  return (\n    <div\n      aria-hidden\n      className={cn(\"animate-pulse rounded-md bg-muted motion-reduce:animate-none\", className)}\n    />\n  );\n}\n\n/**\n * 多行文字骨架：預設三行，最後一行短一截（真實段落的形狀，不是三條等長的槓）。\n */\nexport function SkeletonText({ lines = 3, className }: { lines?: number; className?: string }) {\n  return (\n    <div aria-hidden className={cn(\"space-y-2\", className)}>\n      {Array.from({ length: lines }, (_, i) => (\n        <Skeleton key={i} className={cn(\"h-4\", i === lines - 1 ? \"w-3/5\" : \"w-full\")} />\n      ))}\n    </div>\n  );\n}\n",
+      "type": "registry:ui",
+      "target": "components/dooping/skeleton.tsx"
+    }
+  ]
+}

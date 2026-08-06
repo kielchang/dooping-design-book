@@ -34,6 +34,50 @@ commit 本身記在 tag 描述裡，不會遺失。
 
 ---
 
+## 未發佈（`dev`）
+
+> 純文件站變更——合併時標題只寫日期、不 bump 版號、不產生新 tag。
+
+### 文件站成為第一個驗收宿主：站台 chrome 橋接 token、嵌入跟主題
+
+**改了什麼**
+
+- **Infima → token 橋接**（`book/src/css/custom.css`）：站台的主色六階、頁面底、
+  navbar／card／footer、邊框、程式碼底、字體全部改為引用 token
+  （`hsl(var(--x))`），原本兩段手寫 hex **副本整組刪除**。只寫一次 `:root`——
+  token 自己在 `[data-theme="dark"]` 下翻值，橋接引用自動跟著翻
+- **StoryFrame 把文件站的明暗傳進 iframe**（`&globals=theme:dark`，
+  對建置產物實測過語法）；色相主題刻意不傳——兩邊預設都是石墨，本來就一致
+- 修掉 StoryFrame 註解裡「守衛還沒寫」的過期敘述（`doc-hooks` 已在）
+
+**我需要做什麼**：不用。純文件站變更，token 與元件零改動。
+
+**為什麼改**：
+
+v0.9.0 合併後使用者回報「文件和 Storybook 元件配色有些不符合」。查出兩個根因，
+共同點是**文件站沒有把自己當成宿主**：
+
+1. **iframe 是獨立 document**：文件站切深色動的是自己的 `<html>`，
+   Storybook 嵌入永遠停在預設淺色。`respectPrefersColorScheme: true` 讓
+   OS 深色的使用者一進站就深色——24／25 兩頁整頁亮色 iframe，
+   23-charts 同一頁上活範例（跟深色）與嵌入（不跟）並排成兩種配色
+2. **站台表面不是 token 表面**：Storybook canvas 是 `bg-background`
+   （深色 `222 22% 8%`），文件站是 Infima 的 `#1b1b1d`——元件裡吃
+   `--background` 的部份（outline 按鈕、Gantt 未完成段遮罩）在深色頁上
+   是一塊塊色差補丁。而 custom.css 那兩段 hex 本身就是 token primary 的
+   手寫副本——漂移防護第 6 支點名要消滅的東西
+
+定調（使用者）：**文件庫應該等同於第一個驗收設計版本的宿主**。
+修法因此不是把示範容器補個底色，而是站台 chrome 直接消費 token——
+與 GraphCanvas 橋接 `--xy-*` 同一個手法。hover 色階用 `color-mix` 從
+primary **衍生**而非複寫：primary 換值時它們自動跟上，不產生新副本。
+
+**實測數字**：深色下頁面 `html` 底與 iframe 內部底同為 `rgb(16, 19, 25)`
+（token `--background` 深色值），逐位元同色；淺色連結 `#0f172a` ≈ 原硬編
+`#1e293b`，視覺回歸幾乎無感。
+
+---
+
 ## v0.9.0 · 2026-08-06
 
 兩個工作項（Charts 實作收錄＋交接包收尾）。**tokens 維持 0.6.0 不動**——

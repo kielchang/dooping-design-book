@@ -1,0 +1,1 @@
+{ "label": "決策紀錄 ADR", "position": 8, "link": { "type": "generated-index", "slug": "/adr", "description": "每則爭議性決策的背景、選項、決定、理由與影響。正本在 repo 的 docs/adr/。" } }

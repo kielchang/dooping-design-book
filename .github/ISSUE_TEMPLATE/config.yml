@@ -1,0 +1,10 @@
+# 關掉空白 issue：三分流各有表單，先讀判準再提，雙方都省時間。
+# contact_links 一律連正式站（trailingSlash: true 含結尾斜線）；絕不連 /preview/。
+blank_issues_enabled: false
+contact_links:
+  - name: 先讀三分流與五題判準
+    url: https://kielchang.github.io/dooping-design-book/governance/rfc/
+    about: Bug／小調整／RFC 各走哪條路、RFC 要回答哪五題、誰決定。
+  - name: 取用方式與導入文件
+    url: https://kielchang.github.io/dooping-design-book/start/three-ways/
+    about: 怎麼裝 token、怎麼抄元件、新專案與既有系統各怎麼起手。

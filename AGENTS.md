@@ -12,8 +12,8 @@
 | 層 | 內容 | 取用方式 | 改動權 |
 | --- | --- | --- | --- |
 | `packages/tokens` | 設計 token（語意色、間距、字級、陰影、動態） | `npm install @dooping/tokens` | **不可改語意，只可改值** |
-| `packages/react` | React 參考實作（29 個 registry 項目） | `npx shadcn add <URL>` | 複製後就是你的，隨便改 |
-| `book/docs/4-patterns` | 操作模式（問題→做法→取捨→反例） | 讀懂，用你的技術棧實作 | 不含程式碼 |
+| `packages/react` | React 參考實作（32 個 registry 項目） | `npx shadcn add <URL>` | 複製後就是你的，隨便改 |
+| `book/docs`（模式與頁面章） | 操作模式（問題→做法→取捨→反例）＋五種頁型的組成規範 | 讀懂，用你的技術棧實作 | 不含程式碼 |
 
 理由見 [ADR-0004](docs/adr/0004-registry-over-npm-package.md)（元件一定會被改，所以不發套件）
 與 [ADR-0005](docs/adr/0005-tokens-are-the-only-hard-dependency.md)（token 幾乎不會被改，所以它才是契約）。
@@ -40,6 +40,30 @@ src/
 
 放在 `dooping/` 子目錄是為了讓「哪些是設計中心來的」一眼可辨，
 之後上游修 bug 時你才找得到要同步哪幾個檔案。
+
+### 宿主前置條件：樣式基座（preflight）
+
+元件的 utility class 只宣告 border-width；「`border-style: solid`、`border-width: 0`、
+預設邊框色」由 Tailwind preflight 提供。**宿主沒有這層基座時元件不會報錯，
+只會安靜地變形**：邊框整批消失（只有寬度沒有樣式）、裸按鈕露出瀏覽器原生
+灰底凸框、表格吃到宿主的格線。看到這三種症狀，先查基座，不是查元件。
+
+- **標準 Tailwind／shadcn 專案**：`shadcn init` 標配 `@tailwind base`，天然滿足。
+  建議再加一條（shadcn 慣例，把「不帶色的 border」接到 token）：
+
+  ```css
+  @layer base {
+    * { border-color: hsl(var(--border)); }
+  }
+  ```
+
+- **把元件嵌進有自己 CSS 的既有站台**（後台框架、文件站、CMS——關掉 preflight
+  的宿主）：不要全站開 preflight（會打爆站台既有樣式），改在元件所在的 scope 內
+  鋪等價基座——本 repo 的文件站就是這種宿主，作法照抄
+  [`book/src/css/demo-base.css`](book/src/css/demo-base.css)。
+  注意 **portal 內容**（Dialog／Select／Tooltip／資料表篩選面板）掛在 `body` 直下，
+  逃出容器子樹，scope 必須一併涵蓋。取捨與驗收方式見
+  [ADR-0010](docs/adr/0010-demo-host-baseline-contract.md)。
 
 ## 取 token
 
@@ -89,7 +113,7 @@ semanticColors();      // 35 個語意色（HSL 三元組）
 2. **琥珀色是「已改動未送出」的保留色**，不作他用。見 [ADR-0002](docs/adr/0002-amber-reserved-for-dirty-state.md)。
 3. **深色模式鉤子**掛在 `document.documentElement`，`.dark` class 與 `[data-theme="dark"]` 屬性擇一即可（兩種都內建支援）。
    掛在 wrapper 上會讓 Dialog / Select / Tooltip 這類 portal 浮層抓不到。
-4. **不要靠顏色單獨傳達語意。** 狀態要同時有文字或圖示——見[無障礙原則](book/docs/5-accessibility/01-principles.mdx)。
+4. **不要靠顏色單獨傳達語意。** 狀態要同時有文字或圖示——見[無障礙原則](book/docs/6-accessibility/01-principles.mdx)。
 
 ## 相容性與版本
 
@@ -123,9 +147,19 @@ npm ls @dooping/tokens; curl -s https://kielchang.github.io/dooping-design-book/
 線上比 npm 能裝到的還新＝上游合併了但還沒發佈（等一下，或提醒維護者）。
 配對模型的完整定義見上游文件站「治理 → 版本策略」。
 
-**看版號差距判斷要不要跟進**：大版差＝有會壞的變更、中版差＝有新能力、小版差＝修正微調。
-落後不代表要升——元件複製走之後就是你的程式碼，**只有在上游修了你也踩到的 bug 時才需要同步**，
-CHANGELOG 會寫清楚每一版改了什麼、你要不要動作。
+### 怎麼知道有新版
+
+- **推播（建議）**：repo 頁 Watch → Custom → **Releases**。每次進版自動發 Release，
+  **notes 就是 CHANGELOG 那一則全文**——通知本身回答三問，不用點連結。
+  RSS：`https://github.com/kielchang/dooping-design-book/releases.atom`
+- **拉式**：`gh release list -R kielchang/dooping-design-book`，
+  或比對線上 `/r/index.json` 的 `version` 與你抄走那份的戳記
+
+純文件進版不打 tag、也不發 Release——**安靜就是「不需要動作」的訊號**。
+
+收到訊號後的判斷流程（讀「我需要做什麼」→ 大中小判準 → 台帳逐列評估 →
+配對自查）、每一層的更新程序、以及開發中怎麼跟上游維持節奏，正本在
+上游文件站「治理 → [跟上新版](book/docs/7-governance/06-staying-current.mdx)」。
 
 ### 0.x 期間的穩定性聲明
 
@@ -158,9 +192,22 @@ npm run build:registry # 元件改了就要重新產生 registry JSON 並一起�
 `npm run build:registry` 的產物 `registry/*.json` 是**進版控的**。
 改了 `packages/react/src` 卻沒重跑，線上 registry 就會跟原始碼對不起來。
 
+### 去哪裡提
+
+| 要提的是 | 門口 |
+| --- | --- |
+| Bug（行為與規範不符） | <https://github.com/kielchang/dooping-design-book/issues/new?template=bug.yml> |
+| 小調整（文案、對比、一個 prop） | 直接開 PR，模板自帶自查清單 |
+| 新元件／新 token／改語意 | <https://github.com/kielchang/dooping-design-book/issues/new?template=rfc.yml>（五題逐欄） |
+| 頁面章缺件表的項目 | <https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml>（一則＝三次法則的一次證據） |
+
+守門人、狀態機與 RFC→ADR 的銜接見文件站「治理 → 回饋與 RFC 流程」；
+**未合併的提案不得在下游先行實作**（符合性台帳的鐵律）。
+
 ## 入口
 
 - 📘 文件站 <https://kielchang.github.io/dooping-design-book/>
 - 🧩 Storybook <https://kielchang.github.io/dooping-design-book/storybook/>
 - 📦 Registry 索引 <https://kielchang.github.io/dooping-design-book/r/index.json>
 - 🧭 決策紀錄 [`docs/adr/`](docs/adr/README.md) — 「為什麼是這樣」都寫在這裡
+- 💬 提出建議 <https://github.com/kielchang/dooping-design-book/issues/new/choose>

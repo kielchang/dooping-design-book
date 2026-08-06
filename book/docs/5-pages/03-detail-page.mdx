@@ -1,0 +1,100 @@
+---
+title: 明細頁
+---
+
+# 明細頁
+
+**一筆資料的家。** 看這一筆的全貌、在授權範圍內改它、追它的歷史——
+三件事都發生在這裡，所以它的頁首要一眼回答「這是誰、現在什麼狀態、我能對它做什麼」。
+
+## 何時用
+
+<Rules>
+  <Do><p>一筆紀錄有超過一屏的內容、有生命週期（狀態會變）、或有關聯資料要一起看時，
+  給它一個明細頁——而且要有<strong>自己的網址</strong>，能被收藏與轉貼。</p></Do>
+  <Dont><p>只有三五個欄位、看完就走的內容，不要開整頁——用
+  <a href="/components/dialog">Dialog</a> 就地看完。反過來，Dialog 內容超過兩個畫面高
+  就該升級成明細頁（Dialog 那頁的既有規則）。</p></Dont>
+</Rules>
+
+## 組成
+
+<StoryFrame id="頁面-明細頁--典型組成" title="明細頁：頁首＋分頁籤＋分區內容" height={620} />
+
+| 區 | 內容 | 元件與規範 |
+| --- | --- | --- |
+| 頁首區 | 返回入口＋識別（名稱、代號）＋狀態徽章＋**這個狀態允許的動作** | [Badge](/components/badge)、[Button](/components/button) |
+| 工具區 | 分頁籤：基本資料／關聯清單／異動紀錄 | [TabPills](/components/tab-pills) |
+| 內容區 | 分組卡＋逐欄編輯欄位；關聯清單用精簡資料表 | [EditableField](/components/editable-field)、[DataTable](/components/data-table) |
+
+## 頁首＝識別＋狀態＋動作
+
+<Rules>
+  <Do><p>動作跟著狀態走：已鎖定就顯示「解除鎖定」而不是灰掉的「編輯」，
+  已作廢就只剩「檢視歷程」。狀態與動作的對應規則見<a href="/patterns/hard-lock">硬鎖定</a>。</p></Do>
+  <Dont><p>不要把所有可能的動作都排出來再逐一停用。五顆按鈕三顆灰，
+  使用者的問題從「我要做什麼」變成「為什麼不能按」——後者沒有好答案。</p></Dont>
+</Rules>
+
+破壞性動作（作廢、停用）放頁首動作區的最後、用 `destructive` 樣式、
+必經 Dialog 確認並寫明後果。
+
+## 唯讀優先，逐欄編輯
+
+明細頁**不做「編輯模式」**——沒有一顆「編輯」按鈕把整頁翻成表單。
+欄位平常是乾淨的唯讀版面，點值才就地變成輸入框；改過未送出的欄位標琥珀，
+送出前用變更摘要看全貌。整套行為的規範與理由見
+[唯讀逐欄編輯](/patterns/inline-field-editing)。
+
+<StoryFrame id="頁面-明細頁--編輯與變更摘要" title="逐欄編輯＋送出前的變更摘要" height={560} />
+
+<Rules>
+  <Do><p>送出鈕與 <a href="/components/change-summary">ChangeSummary</a> 放在一起、
+  沒有變更就停用。使用者送出前看到的清單，就是稽核紀錄之後呈現的內容。</p></Do>
+  <Dont><p>不要讓「儲存」藏在每個欄位裡逐欄送出。一次修三個欄位變成三次寫入、
+  三筆稽核紀錄，還會出現「改到一半的中間狀態」被別人讀到。</p></Dont>
+</Rules>
+
+## 分頁籤切區
+
+<Rules>
+  <Do><p>內容超過一屏就用分頁籤切區，而且<strong>目前分頁要寫進網址</strong>
+  （<code>?tab=records</code>）——待辦與同事轉貼的連結才能直接落在正確分區
+  （見<a href="/patterns/back-office-ia">深連結</a>）。</p></Do>
+  <Dont><p>不要超過 5 個分頁。塞不下代表這一頁承載了兩個實體，
+  該拆頁而不是加分頁。</p></Dont>
+</Rules>
+
+TabPills 只提供分頁列本身；**顯示哪個分區由宿主的狀態決定**（元件刻意不管內容切換）。
+異動紀錄放獨立分頁，格式與回復規則見[稽核與回復](/patterns/audit-and-restore)。
+
+## 關聯清單
+
+明細頁裡的關聯資料表用**精簡版**：`dense`、關掉搜尋、不分頁（超過一頁就給
+「查看全部」連去完整清單頁）。它是這一筆的附屬視角，不該長得跟主清單頁一樣重。
+
+## 無障礙
+
+- 狀態徽章一定帶文字（Badge 的既有規則），不能只用顏色區分狀態。
+- 分頁籤是 `role="tablist"`；切換分頁不清空焦點位置。
+- 逐欄編輯的鍵盤路徑（Enter 進入編輯、Esc 取消）由 EditableField 自帶。
+- 返回入口是真連結不是 JS 後退——直接開連結進來的人也要能往上走。
+
+## 取用
+
+```bash
+npx shadcn@latest add \
+  https://kielchang.github.io/dooping-design-book/r/card.json \
+  https://kielchang.github.io/dooping-design-book/r/badge.json \
+  https://kielchang.github.io/dooping-design-book/r/tab-pills.json \
+  https://kielchang.github.io/dooping-design-book/r/editable-field.json \
+  https://kielchang.github.io/dooping-design-book/r/change-summary.json \
+  https://kielchang.github.io/dooping-design-book/r/data-table.json \
+  https://kielchang.github.io/dooping-design-book/r/dialog.json
+```
+
+## 缺件與替代
+
+PageHeader、Breadcrumb、DefinitionList（鍵值對展示）尚未收錄：頁首照本頁規範手排、
+上層路徑用一顆「返回清單」ghost 按鈕、鍵值對用兩欄 grid。完整缺件表見
+[頁面總覽](/pages/overview)。

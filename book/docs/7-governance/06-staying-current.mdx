@@ -1,0 +1,99 @@
+---
+title: 跟上新版
+---
+
+# 跟上新版
+
+**導入是一天的事，跟上是每個月的事。** 這一頁回答導入之後的三個問題：
+怎麼知道上游動了、怎麼判斷要不要跟、決定要跟之後每一層各怎麼跟。
+（導入本身見[導入三階段](/governance/adoption)；版號的定義見[版本策略](/governance/versioning)。）
+
+## 訊號從哪來
+
+上游進版時會發出的訊號，依層整理如下——**挑一條訂閱，不要靠想起來**：
+
+| 通道 | 涵蓋 | 怎麼訂 |
+| --- | --- | --- |
+| GitHub Release（`vX.Y.Z`） | 規範版：元件與 token 有取用端可感知的變更 | repo 頁 Watch → Custom → Releases，有新版就收到通知 |
+| [CHANGELOG](https://github.com/kielchang/dooping-design-book/blob/main/CHANGELOG.md) | 每次進版一則，含「我需要做什麼」 | 判斷時讀；不適合當提醒機制 |
+| `npm outdated @dooping/tokens` | token 層 | 放進宿主 CI 例行跑 |
+| `/r/index.json` 的 `version` | 元件層＋配對正本（`tokensVersion`） | 下面的檢查片段，放進宿主 CI |
+
+兩個刻意設計要知道：
+
+- **純文件進版不打 tag、不發 Release。** 版號沒動＝取用端不需要任何動作，
+  所以你不會收到通知——安靜本身就是訊號。
+- 規範版與 token 版是**配對**的：每版規範恰好宣告一個 tokens 版，
+  正本在 `/r/index.json` 的 `tokensVersion`（見[版本策略](/governance/versioning)的配對模型）。
+
+宿主 CI 的例行檢查（提醒用，**不擋建置**——升級是決定，不是 CI 事件）：
+
+```bash
+UPSTREAM=$(curl -s https://kielchang.github.io/dooping-design-book/r/index.json | jq -r .version)
+RECORDED="0.10.0"   # 你的台帳記錄的上游版本，跟著台帳一起改
+if [ "$UPSTREAM" != "$RECORDED" ]; then
+  echo "::warning::上游規範已到 v${UPSTREAM}（台帳記 v${RECORDED}）——讀該版 CHANGELOG 決定要不要跟。"
+fi
+```
+
+## 判斷要不要跟
+
+收到訊號之後的流程只有一條，而它的每一步都在**縮小要評估的範圍**：
+
+<FlowStayingCurrent />
+
+1. **讀該版 CHANGELOG 的「我需要做什麼」。** 每一則都會明說，不需要就寫不需要——
+   寫不需要就結束，這是最常見的出口。
+2. **對照[符合性台帳](/governance/conformance-ledger)。** 只有標「遵循」的列需要評估；
+   「自製」不受影響，「刻意偏離」只需重讀一次原因（上游這版說不定正好解掉了偏離的理由）。
+3. **衡量差距與影響再決定。** 版號差距是線索：大版差＝有會壞的變更、中版差＝有新能力、
+   小版差＝修正微調。但差距只回答「上游改了多大」，不回答「你要不要跟」——判準是影響：
+
+| 情況 | 決定 |
+| --- | --- |
+| 上游修了你也踩到的問題 | **跟進**，這是唯一「必須同步」的情況 |
+| 有用的新能力，但這期排不進 | **記台帳、延後**——在台帳的上游版本欄記下差距 |
+| 與本地的刻意做法衝突 | **偏離**，在台帳寫下原因（沒寫原因的偏離是待修項目） |
+
+<Rules>
+  <Do><p>把「上游 bump」當成一個要排程的<strong>決定</strong>：逐列評估、更新台帳、
+  在自己的 CHANGELOG 記一則。</p></Do>
+  <Dont><p>不要 <code>npm update</code> 之後看 CI 綠就當作升級完成。
+  設計系統的變更改的是已上線畫面的外觀與行為，CI 不看外觀。</p></Dont>
+</Rules>
+
+## 決定跟進之後：每層的程序
+
+| 層 | 程序 |
+| --- | --- |
+| token | `npm update @dooping/tokens`（`^` 範圍內）。跨大版先讀 CHANGELOG；0.x 期間任何版本都可能 breaking，語意色**名稱**已穩定、值仍可能調 |
+| 元件 | 重跑同名 `npx shadcn@latest add <URL>`（覆寫 `components/dooping/` 同名檔）→ 用 `git diff` 逐檔審查——落點固定就是為了這一刻 diff 是乾淨的 → 台帳該列更新上游版本 |
+| 模式／頁面 | 重讀該則文件，對照本地實作；有差就記台帳（遵循／刻意偏離） |
+
+<Rules>
+  <Do><p>元件更新走「重抄＋diff 審查」，把上游的改動<strong>看過一遍</strong>再合進去；
+  本地改過的部分會在 diff 裡現形，逐塊決定保留或讓位。</p></Do>
+  <Dont><p>不要手動把上游的改動「挑幾行抄過來」。半套的同步讓台帳那一列
+  既不是遵循也不是偏離，下一次升級就沒有人敢動它了。</p></Dont>
+</Rules>
+
+## 開發中的節奏
+
+跟上游的關係不是升級當天才存在。日常開發的四個習慣，讓每次升級都是小事：
+
+1. **新畫面動工前先查上游**：到[頁面章](/pages)選頁型、查元件章有沒有現成件。
+   最貴的漂移是「上游有，但我們自己又做了一個」。
+2. **缺件不長私有版**：先用[缺件表](/pages/overview)的替代方案，
+   需要正式元件走 [RFC](/governance/rfc) 提回上游——三次法則過了就是大家的元件。
+   直達入口：[缺件認領表單](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml)（湊證據）、
+   [RFC 表單](https://github.com/kielchang/dooping-design-book/issues/new?template=rfc.yml)（正式提案）。
+3. **節奏掛在里程碑上**：sprint 或版本邊界檢查一次訊號就夠，不必每天。
+   衝刺中收到新版訊號，記台帳延後即可——**衝刺中途不升大版**。
+4. **台帳與[離線摘要](/governance/conformance-ledger)跟著改**：
+   台帳記「跟上游的關係」，摘要記「最常用的判斷依據」，兩者過期比沒有更糟。
+
+<Rules>
+  <Do><p>把「檢查上游」寫進里程碑的定型工作（跟「更新相依」同一個時段做）。</p></Do>
+  <Dont><p>不要等到「畫面看起來怪怪的」才發現落後了四個版。中間每一版的
+  CHANGELOG 都在講你要不要動作，一次補讀四版的成本遠高於四次各讀一版。</p></Dont>
+</Rules>

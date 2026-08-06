@@ -53,6 +53,14 @@ jobs:
           BOOK_BASE_URL: /dooping-design-book/
           BOOK_SITE_URL: https://kielchang.github.io
 
+      # 渲染守衛：正式站的建置產物也要過同一道驗收（ADR-0010）
+      - name: 安裝 Playwright Chromium（渲染守衛用）
+        run: npx playwright install --with-deps chromium
+      - name: 渲染守衛：demo 宿主基座（verify:book）
+        run: npm run verify:book
+        env:
+          BOOK_BASE_URL: /dooping-design-book/
+
       - name: 建置 Storybook → /storybook
         run: npm run build-storybook -- -o book/build/storybook
 
@@ -76,13 +84,17 @@ jobs:
       # 而且 GITHUB_TOKEN 建立的 ref 依 GitHub 防遞迴機制不會觸發其他 workflow。
       # npm 發佈仍然只有人工的 tokens-v* 或 workflow_dispatch 那兩條路。
       - name: 蓋上規範版號 tag（vX.Y.Z）
+        id: tag
         run: |
           git fetch --tags -q origin
           TAG="v$(node -p "require('./package.json').version")"
+          echo "name=$TAG" >> "$GITHUB_OUTPUT"
           if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
             echo "tag $TAG 已存在——版號未變的進版（純文件）或重跑，都不另打 tag"
+            echo "created=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          echo "created=true" >> "$GITHUB_OUTPUT"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # tag 訊息帶上配對的 tokens 版本——「這一版規範配哪一版 token」從此
@@ -94,6 +106,48 @@ jobs:
             -m "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           git push origin "$TAG"
           echo "### 🏷 $TAG（tokens 配對版 $TOKENS_VER）" >> "$GITHUB_STEP_SUMMARY"
+
+      # Release＝tag 的推播通道。tag 給機器（git tag -n 可稽核），Release 給人——
+      # 取用端在 repo 頁 Watch → Custom → Releases 就會收到新版通知
+      # （光打 tag 不會通知任何人；見治理章「跟上新版」的訊號表）。
+      # 純文件進版不打 tag、也就不發 Release：安靜本身就是「不需動作」的訊號。
+      # 冪等：tag 已有 Release 就跳過，重跑不會重複發；上一步早退（沒有新 tag）
+      # 但 tag 存在而 Release 缺的情況（歷史 tag、上次半途失敗）也會在這裡補上。
+      #
+      # notes 直接抽 CHANGELOG 該則全文——通知本身就回答三問，取用端不必點連結。
+      # CHANGELOG 仍是唯一正本，這裡是發佈時的自動投影；抽不到（改名步驟被跳過）
+      # 才退回連結並出 warning。
+      - name: 建立 GitHub Release（讓 Watch → Releases 通知生效）
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --tags -q origin
+          TAG="v$(node -p "require('./package.json').version")"
+          if ! git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "沒有 $TAG 這個 tag（不該發生：上一步要嘛打了 tag、要嘛 tag 已存在）"
+            exit 0
+          fi
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG 已存在——純文件進版或重跑，不另發"
+            exit 0
+          fi
+          # 抽出「## vX.Y.Z · 日期」到下一個 --- 之間的內容（不含標題行）
+          awk -v tag="$TAG" 'index($0, "## " tag " ") == 1 {f=1; next} f && /^---$/ {exit} f' \
+            CHANGELOG.md > /tmp/release-notes.md
+          if [ ! -s /tmp/release-notes.md ]; then
+            echo "::warning::CHANGELOG 找不到 $TAG 的段落——請回頭補查「合併前改名」步驟"
+            echo "改了什麼、你需要做什麼：讀 [CHANGELOG](${{ github.server_url }}/${{ github.repository }}/blob/main/CHANGELOG.md) 的 $TAG 一則。" > /tmp/release-notes.md
+          fi
+          {
+            echo ""
+            echo "---"
+            echo "判斷要不要跟進：[跟上新版](https://kielchang.github.io/dooping-design-book/governance/staying-current/)"
+          } >> /tmp/release-notes.md
+          TOKENS_VER=$(jq -r '.dependencies["@dooping/tokens"]' packages/react/package.json | sed 's/^[~^>=< ]*//')
+          gh release create "$TAG" --verify-tag \
+            --title "$TAG（tokens 配對版 $TOKENS_VER）" \
+            --notes-file /tmp/release-notes.md
+          echo "### 📣 Release $TAG 已發佈" >> "$GITHUB_STEP_SUMMARY"
 
       # 進版當下的配對狀態。ci.yml 的漂移警告只跑在 dev push／PR——
       # 但「該去推 tokens-v* 了」這件事最該被看見的時刻是**進版成功的這一刻**。

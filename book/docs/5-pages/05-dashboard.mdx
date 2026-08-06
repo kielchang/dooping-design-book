@@ -1,0 +1,99 @@
+---
+title: 儀表板
+---
+
+# 儀表板
+
+**回答「狀況如何」，不做任何事。** 儀表板是唯讀頁：看完之後要動手，
+點下去進[清單頁](/pages/list-page)。「今天要處理什麼」是工作台的事——
+待辦與成效分開，是[站台層](/patterns/back-office-ia)已有的分工。
+
+## 何時用
+
+<Rules>
+  <Do><p>使用者需要<strong>定期回答同一組問題</strong>（這期進度如何？哪裡卡住？）時，
+  做儀表板——問題清單就是版面規格。</p></Do>
+  <Dont><p>不要因為「首頁要放點什麼」而做儀表板。沒有明確問題的儀表板會長成
+  指標動物園：每張圖都有人要求加上去，沒有一張有人真的在看。</p></Dont>
+</Rules>
+
+## 組成
+
+<StoryFrame id="頁面-儀表板--典型組成" title="儀表板：KPI 磚列＋圖表區，期間一處控全頁" height={780} />
+
+| 區 | 內容 | 元件與規範 |
+| --- | --- | --- |
+| 頁首區 | 標題＋資料期間說明＋**期間切換**（唯一的全頁控制） | [SegGroup](/components/seg-group) |
+| 內容區（上） | KPI 磚列：3–5 磚一排 | [Card](/components/card)＋[Delta](/components/delta) |
+| 內容區（下） | 圖表區：每張圖回答一個問題 | [Charts](/components/charts) |
+
+## 先問題，後圖表
+
+每張圖放上去之前，要寫得出它回答的問題（「金額往哪個方向走？」「哪個單位卡住了？」），
+而且**把問題印在圖的標題位置**。寫不出問題的圖，是裝飾。
+
+選圖種照 [Charts 的「何時用哪種圖」](/components/charts)；
+配色走同一頁的配色策略判斷樹——儀表板最常踩的兩個雷：
+
+<Rules>
+  <Do><p>維度是<strong>狀態</strong>的圖（各單位的完成／待處理組成）用 <code>STATUS_SERIES</code>：
+  「已完成」在圖上與徽章同一個綠，語意記憶不被拆掉。</p></Do>
+  <Dont><p>不要照序取分類色盤畫狀態圖——「已完成」會變藍、與旁邊的徽章打架。
+  分類色盤只給<strong>身分</strong>維度（單位、類別），且用 <code>colorByKey</code>
+  讓顏色跟實體走。</p></Dont>
+</Rules>
+
+## KPI 磚
+
+| 磚的內容 | 規則 |
+| --- | --- |
+| 數字 | `text-3xl` 等寬數字；格式函式與表格同一套（`formatMoney` 等） |
+| 期間標籤 | 數字量測的期間寫在磚上（「總金額（二月）」），不能只在頁首 |
+| 變異 | 用 [Delta](/components/delta)：箭頭＋文字＋顏色三重編碼（見[變異顯示](/patterns/empty-delta-status)） |
+
+<Rules>
+  <Do><p>一排 3–5 磚，每磚都是入口——點「待處理」要<strong>帶著同一組篩選條件</strong>進清單頁，
+  兩邊數字對得上，使用者才會信任這個磚。</p></Do>
+  <Dont><p>不要擺一排點不動的數字。「還有 12 筆待處理」卻不告訴你是哪 12 筆，
+  只會製造焦慮（<a href="/patterns/back-office-ia">狀態列</a>的同一條規則）。</p></Dont>
+</Rules>
+
+沒得比的期間不硬擠變異數字——顯示「—」比捏一個對照基準誠實。
+
+## 期間一處控全頁
+
+期間切換放頁首、全頁只出現一次，換期間時所有磚與圖一起換，
+而且**選中的期間寫進網址**。每張圖各自帶期間選單的結果是：
+兩張圖顯示不同期間，使用者拿著它們互相對照，得出錯誤結論。
+
+跨期趨勢圖（本來就畫多期）不受期間切換影響，在標題註明「全期」。
+
+## 空與載入
+
+- 圖表的空資料由 `ChartEmpty` 呈現「此期間沒有資料」——**無資料不是 0**，
+  畫一條貼地的線是說謊（[Charts](/components/charts) 的既有規則）。
+- KPI 磚載入時保留磚位與高度，數字位置給「—」；不要讓四塊磚輪流跳出來。
+
+## 無障礙
+
+- 每張圖要有文字等價：標題寫清楚結論、或旁附 `ChartDataTable` 數據表。
+- Delta 的三重編碼保證灰階列印仍可讀——驗收方式見[無障礙驗收](/accessibility/checklist)。
+- 磚是入口就要是真連結／按鈕，可聚焦、可 Enter。
+
+## 取用
+
+```bash
+npx shadcn@latest add \
+  https://kielchang.github.io/dooping-design-book/r/charts.json \
+  https://kielchang.github.io/dooping-design-book/r/card.json \
+  https://kielchang.github.io/dooping-design-book/r/delta.json \
+  https://kielchang.github.io/dooping-design-book/r/badge.json \
+  https://kielchang.github.io/dooping-design-book/r/seg-group.json
+```
+
+charts 是單一 item（八種圖共用底座），會一起帶 empty-state 與工具函式。
+
+## 缺件與替代
+
+KPI 磚沒有專用元件（用 Card＋Delta 照上表規格組）、期間選擇器用 SegGroup 固定選項、
+Skeleton 用保留高度替代——見[頁面總覽的缺件表](/pages/overview)。

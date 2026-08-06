@@ -77,6 +77,10 @@ title: 符合性台帳
    → 才回頭更新台帳與本地實作
 ```
 
+括號裡的四題是 [RFC 五題](/governance/rfc)的**速記版**，用在自己 repo 的台帳與內部討論；
+正式送上游用 [RFC 表單](https://github.com/kielchang/dooping-design-book/issues/new?template=rfc.yml)
+（五題逐欄）或直接開 PR——入口都列在[回饋與 RFC 流程](/governance/rfc)。
+
 **最後一步的順序是重點：未合併的提案不得在下游先行實作。**
 
 先實作的誘惑很大——反正提案一定會過、反正我這邊很急。
@@ -108,7 +112,9 @@ title: 符合性台帳
 
 ## 上游更新不自動套用
 
-上游 bump 之後的動作是：
+怎麼知道上游 bump 了：**Watch 上游 repo 的 Releases**（每次進版自動發，
+notes 就是 CHANGELOG 那一則；完整訊號表見[跟上新版](/governance/staying-current)）。
+訊號送上門之後，動作是：
 
 ```
 拉取 → 對台帳逐列評估 → 決定跟不跟 → 更新台帳的上游版本欄

@@ -142,7 +142,9 @@ ring 改中性之後，「彩色＝語意、中性＝焦點」在所有主題下
 
 1. **現有四種＋強度分級蓋不蓋得住？** 大多數「需要新顏色」的需求其實是
    「需要高一階或低一階的強度」。細節差異靠文字與圖示，不靠新色相。
-2. **蓋不住 → 走 [RFC](/governance/rfc)。** 提醒色是全系統契約，新增是規範變更。
+2. **蓋不住 → 走 [RFC](/governance/rfc)
+   （[表單直達](https://github.com/kielchang/dooping-design-book/issues/new?template=rfc.yml)）。**
+   提醒色是全系統契約，新增是規範變更。
 3. **通過 → 在 `generate-theme.mjs` 加參數**，不是手填 hex。
    四件組（實色＋前景＋淡底＋淡底前景）由同一條規則生成，對比自動保證。
 4. **在 `verify:color` 補門檻**：新色相不得落入既有狀態色的保留區、

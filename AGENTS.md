@@ -89,7 +89,7 @@ semanticColors();      // 35 個語意色（HSL 三元組）
 2. **琥珀色是「已改動未送出」的保留色**，不作他用。見 [ADR-0002](docs/adr/0002-amber-reserved-for-dirty-state.md)。
 3. **深色模式鉤子**掛在 `document.documentElement`，`.dark` class 與 `[data-theme="dark"]` 屬性擇一即可（兩種都內建支援）。
    掛在 wrapper 上會讓 Dialog / Select / Tooltip 這類 portal 浮層抓不到。
-4. **不要靠顏色單獨傳達語意。** 狀態要同時有文字或圖示——見[無障礙原則](book/docs/5-accessibility/01-principles.mdx)。
+4. **不要靠顏色單獨傳達語意。** 狀態要同時有文字或圖示——見[無障礙原則](book/docs/6-accessibility/01-principles.mdx)。
 
 ## 相容性與版本
 

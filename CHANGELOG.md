@@ -2,7 +2,7 @@
 
 這份設計規範每次「進版」的紀錄。進版＝`dev` 併進 `main`，其他系統以 `main` 為參照。
 
-每則回答三個問題（格式見[版本策略](book/docs/6-governance/01-versioning.mdx)）：
+每則回答三個問題（格式見[版本策略](book/docs/7-governance/01-versioning.mdx)）：
 
 1. **改了什麼**
 2. **我需要做什麼**（不需要就明說）

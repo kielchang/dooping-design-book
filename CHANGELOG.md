@@ -34,6 +34,36 @@ commit 本身記在 tag 描述裡，不會遺失。
 
 ---
 
+## 未發佈（`dev`）
+
+> 純 CI 與文件變更——合併時標題只寫日期、不 bump 版號、不產生新 tag。
+
+### 進版自動發 GitHub Release：新版訊號從拉式變推播
+
+**改了什麼**
+
+- **`deploy.yml` 蓋完 tag 後自動發 GitHub Release**：notes 從 CHANGELOG 抽該則
+  （抽取邏輯對 v0.7.0／v0.9.0／v0.10.0 與不存在的版本四案例反向驗證過，
+  各版只取自己那節、找不到走連結 fallback）；標題帶 tokens 配對版；
+  重跑冪等（Release 已存在就略過）；純文件進版無新 tag 也就不發
+- **回填 `v0.10.0` 的 Release**——訂閱頻道從第一天就有內容
+- **取用方法與更新策略入文件**：`AGENTS.md` 新增〈怎麼知道有新版〉
+  （Watch Releases／`releases.atom`／`gh release list`）與
+  〈收到新版訊號之後的更新策略〉四步（讀「我需要做什麼」→ 大中小判準 →
+  台帳逐列評估 → 配對自查）；[版本策略](book/docs/6-governance/01-versioning.mdx)
+  進版流程補第 ⑤ 步；[符合性台帳](book/docs/6-governance/05-conformance-ledger.mdx)
+  補訊號來源
+
+**我需要做什麼**：取用端建議把上游 repo 的 Watch 設成 Custom → Releases——
+之後每次進版通知會送上門，notes 直接回答三問。其餘零影響。
+
+**為什麼改**：先前所有新版訊號（tag／`index.json`／CHANGELOG）都是**拉式**的，
+「main 有新版需要檢討」完全靠取用端記得來查——tag 推上去 GitHub 不通知任何人。
+Release 讓訊號變推播，同時維持「沒有訊號＝不需要動作」的語意
+（純文件進版不發）。notes 取自 CHANGELOG 而不是另寫，不製造第二份真相。
+
+---
+
 ## v0.10.0 · 2026-08-06
 
 兩個工作項（圖表配色策略＋文件站成為第一個驗收宿主）。

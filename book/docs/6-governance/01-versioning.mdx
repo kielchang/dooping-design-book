@@ -118,10 +118,17 @@ npm ls @dooping/tokens; curl -s https://kielchang.github.io/dooping-design-book/
      └ CI 在 PR 上把關：守衛全綠？內容變了版號有沒有跟上？
 ③ 在 GitHub 看 PR（版號、CHANGELOG、檢查結果）→ 合併 ＝ 確認
 ④ 部署成功後自動蓋上 tag vX.Y.Z（版號沒動就不打，重跑不重複打）
+⑤ 自動發 GitHub Release：notes＝CHANGELOG 該則，標題帶 tokens 配對版
 ```
 
 tag 是**自動蓋章**，不是閘門——閘門是第 ③ 步的合併。日期不佔 tag 名稱，
 在 tag 描述與 CHANGELOG 裡。
+
+第 ⑤ 步是給取用端的**推播訊號**：Watch 這個 repo 的 Releases（或訂
+`releases.atom`）就會在每次進版時被主動告知，notes 直接回答三問——
+不用記得來查 tag。純文件進版不發 Release，「沒有訊號＝不需要動作」。
+訂閱方式與收到訊號後的更新策略，見取用指南（`AGENTS.md`）與
+[符合性台帳](/governance/conformance-ledger)。
 
 :::warning 一次合併只會蓋一個 tag
 第 ④ 步讀的是**合併當下**根目錄 `package.json` 的 `version`。所以如果 `dev` 上累積了

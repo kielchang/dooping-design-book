@@ -123,9 +123,26 @@ npm ls @dooping/tokens; curl -s https://kielchang.github.io/dooping-design-book/
 線上比 npm 能裝到的還新＝上游合併了但還沒發佈（等一下，或提醒維護者）。
 配對模型的完整定義見上游文件站「治理 → 版本策略」。
 
-**看版號差距判斷要不要跟進**：大版差＝有會壞的變更、中版差＝有新能力、小版差＝修正微調。
-落後不代表要升——元件複製走之後就是你的程式碼，**只有在上游修了你也踩到的 bug 時才需要同步**，
-CHANGELOG 會寫清楚每一版改了什麼、你要不要動作。
+### 怎麼知道有新版
+
+- **推播（建議）**：在 GitHub 上 Watch → Custom → **Releases**。每次進版都會
+  自動發 Release，notes 就是 CHANGELOG 那一則——通知送上門，不用記得來查。
+  想用 RSS：`https://github.com/kielchang/dooping-design-book/releases.atom`
+- **拉式**：`gh release list -R kielchang/dooping-design-book`，
+  或比對線上 `/r/index.json` 的 `version` 與你抄走那份的戳記
+
+純文件進版沒有新 tag、也不發 Release——**沒有訊號就代表不需要任何動作**。
+
+### 收到新版訊號之後的更新策略
+
+1. **讀 Release notes 的「我需要做什麼」**——每一版都會明說，寫「無須調整」就到此為止
+2. **看版號差距**：大版差＝有會壞的變更、中版差＝有新能力、小版差＝修正微調。
+   落後不代表要升——元件複製走之後就是你的程式碼，
+   **只有在上游修了你也踩到的 bug 時才需要同步**
+3. **長期跟著走的專案**：對符合性台帳逐列評估（只有標「遵循」的列需要看；
+   「刻意偏離」的重讀一次原因——這次的改動可能剛好解掉偏離的理由），
+   決定跟不跟之後更新台帳的上游版本欄。做法見文件站「治理 → 符合性台帳」
+4. **token 配對自查**：見下方那行指令——本地版落後 `tokensVersion` 就是該升級 token
 
 ### 0.x 期間的穩定性聲明
 

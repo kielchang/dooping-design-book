@@ -76,13 +76,17 @@ jobs:
       # 而且 GITHUB_TOKEN 建立的 ref 依 GitHub 防遞迴機制不會觸發其他 workflow。
       # npm 發佈仍然只有人工的 tokens-v* 或 workflow_dispatch 那兩條路。
       - name: 蓋上規範版號 tag（vX.Y.Z）
+        id: tag
         run: |
           git fetch --tags -q origin
           TAG="v$(node -p "require('./package.json').version")"
+          echo "name=$TAG" >> "$GITHUB_OUTPUT"
           if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
             echo "tag $TAG 已存在——版號未變的進版（純文件）或重跑，都不另打 tag"
+            echo "created=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          echo "created=true" >> "$GITHUB_OUTPUT"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # tag 訊息帶上配對的 tokens 版本——「這一版規範配哪一版 token」從此
@@ -94,6 +98,38 @@ jobs:
             -m "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           git push origin "$TAG"
           echo "### 🏷 $TAG（tokens 配對版 $TOKENS_VER）" >> "$GITHUB_STEP_SUMMARY"
+
+      # 進版的**推播訊號**：tag 蓋好後自動發 GitHub Release，notes 取自
+      # CHANGELOG 該則。在這之前所有新版訊號都是拉式的（tag／index.json），
+      # 沒有任何機制會主動告知取用端——取用端 Watch releases 或訂 releases.atom
+      # 之後，「main 有新版需要檢討」就是被送上門的，不是要記得去查的。
+      #
+      # 純文件進版沒有新 tag，也就不發 Release——「沒有訊號＝不需要動作」的語意不變。
+      # GITHUB_TOKEN 建的 Release 依防遞迴機制不會觸發其他 workflow。
+      - name: 發佈 GitHub Release（notes 取自 CHANGELOG 該則）
+        if: steps.tag.outputs.created == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ steps.tag.outputs.name }}"
+          # 重跑防護：Release 已存在就不再發
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG 已存在，略過"
+            exit 0
+          fi
+          # 抽出 CHANGELOG 裡「## vX.Y.Z · 日期」到下一個 --- 之間的內容（不含標題行）
+          awk -v tag="$TAG" 'index($0, "## " tag " ") == 1 {f=1; next} f && /^---$/ {exit} f' \
+            CHANGELOG.md > /tmp/release-notes.md
+          if [ ! -s /tmp/release-notes.md ]; then
+            echo "::warning::CHANGELOG 找不到 $TAG 的段落——notes 改放連結，請回頭補查改名步驟"
+            echo "本版說明見 [CHANGELOG](${{ github.server_url }}/${{ github.repository }}/blob/main/CHANGELOG.md)。" > /tmp/release-notes.md
+          fi
+          TOKENS_VER=$(jq -r '.dependencies["@dooping/tokens"]' packages/react/package.json | sed 's/^[~^>=< ]*//')
+          gh release create "$TAG" \
+            --verify-tag \
+            --title "$TAG（tokens 配對版 $TOKENS_VER）" \
+            --notes-file /tmp/release-notes.md
+          echo "### 📣 Release $TAG 已發佈" >> "$GITHUB_STEP_SUMMARY"
 
       # 進版當下的配對狀態。ci.yml 的漂移警告只跑在 dev push／PR——
       # 但「該去推 tokens-v* 了」這件事最該被看見的時刻是**進版成功的這一刻**。

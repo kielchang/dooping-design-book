@@ -80,7 +80,7 @@ export const 步驟指示: Story = {
         <Stepper
           current={cur}
           onStep={setCur}
-          completed={{ customer: true }}
+          completed={{ unit: true }}
           steps={[
             { key: "unit", label: "選擇單位", hint: "或建立新單位" },
             { key: "items", label: "加入項目", hint: "數量與金額" },

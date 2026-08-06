@@ -8,7 +8,7 @@ import {
 } from "@site/src/components/flow-diagrams";
 import {
   Button, Badge, Callout, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter,
-  Input, Label, Checkbox, NumberInput,
+  Input, Label, Checkbox, NumberInput, Switch, Textarea, RadioGroup, RadioGroupItem,
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
   Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose,
   Tooltip, TruncatedText,
@@ -25,7 +25,7 @@ export default {
   Demo, Rules, Do, Dont, StoryFrame,
   FlowThreeWays, FlowAdoptionStages, FlowStayingCurrent, FlowPageFirstSteps,
   Button, Badge, Callout, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter,
-  Input, Label, Checkbox, NumberInput,
+  Input, Label, Checkbox, NumberInput, Switch, Textarea, RadioGroup, RadioGroupItem,
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
   Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose,
   Tooltip, TruncatedText,

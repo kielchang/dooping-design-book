@@ -38,7 +38,9 @@ export function Stepper({ steps, current, completed = {}, onStep, className }: S
               type="button"
               onClick={() => onStep?.(s.key)}
               aria-current={isCurrent ? "step" : undefined}
-              className="group flex flex-col items-center gap-1.5 text-center"
+              // 聚焦環走全庫標準四件組（ring + offset）。先前漏掉，鍵盤焦點只剩
+              // 瀏覽器預設外觀——在有 preflight 的宿主上甚至完全看不見。
+              className="group flex flex-col items-center gap-1.5 rounded-md text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               <span
                 className={cn(

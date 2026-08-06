@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">符合性台帳 | Dooping Design Book</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://kielchang.github.io/dooping-design-book/preview/governance/conformance-ledger/"><meta data-rh="true" property="og:locale" content="zh_Hant"><meta data-rh="true" name="docusaurus_locale" content="zh-Hant"><meta data-rh="true" name="docsearch:language" content="zh-Hant"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="符合性台帳 | Dooping Design Book"><meta data-rh="true" name="description" content="問題"><meta data-rh="true" property="og:description" content="問題"><link data-rh="true" rel="icon" href="/dooping-design-book/preview/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://kielchang.github.io/dooping-design-book/preview/governance/conformance-ledger/"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/preview/governance/conformance-ledger/" hreflang="zh-Hant"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/preview/governance/conformance-ledger/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"治理 Governance","item":"https://kielchang.github.io/dooping-design-book/preview/governance"},{"@type":"ListItem","position":2,"name":"符合性台帳","item":"https://kielchang.github.io/dooping-design-book/preview/governance/conformance-ledger"}]}</script><link rel="stylesheet" href="/dooping-design-book/preview/assets/css/styles.da952b0d.css">
-<script src="/dooping-design-book/preview/assets/js/runtime~main.60c26f16.js" defer="defer"></script>
+<script src="/dooping-design-book/preview/assets/js/runtime~main.9d555bad.js" defer="defer"></script>
 <script src="/dooping-design-book/preview/assets/js/main.5b134c5c.js" defer="defer"></script>
 </head>
 <body>
@@ -64,7 +64,9 @@
 <p>一次變更常常兩本都要動：改了元件 → CHANGELOG 加一則；
 如果這次改動讓某個元件從「刻意偏離」變回「遵循」→ 台帳那一列也要改。</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="上游更新不自動套用">上游更新不自動套用<a href="#上游更新不自動套用" class="hash-link" aria-label="上游更新不自動套用的直接連結" title="上游更新不自動套用的直接連結" translate="no">​</a></h2>
-<p>上游 bump 之後的動作是：</p>
+<p>怎麼知道上游 bump 了：<strong>Watch 上游 repo 的 Releases</strong>（每次進版自動發，
+notes 就是 CHANGELOG 那一則；完整訊號表見<a class="" href="/dooping-design-book/preview/governance/staying-current/">跟上新版</a>）。
+訊號送上門之後，動作是：</p>
 <div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token plain">拉取 → 對台帳逐列評估 → 決定跟不跟 → 更新台帳的上游版本欄</span><br></div></code></pre></div></div>
 <p>不是 <code>npm update</code> 然後看 CI 綠不綠。</p>
 <p><strong>升級是一個決定，不是一件意外。</strong>

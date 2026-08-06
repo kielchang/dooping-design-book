@@ -1,4 +1,4 @@
-// 渲染守衛 —— 文件站 demo 宿主基座的驗收（ADR-0008）。
+// 渲染守衛 —— 文件站 demo 宿主基座的驗收（ADR-0009）。
 //
 //   node scripts/verify-book-host.mjs      # 對 book/build 逐頁驗 computed style，不合格 exit 1
 //
@@ -364,7 +364,7 @@ async function main() {
   console.log(`\n掃描 ${pages.length} 頁（淺色全頁 + 深色抽驗 + portal 互動）`);
   if (allFails.length) {
     console.error(`\n✗ 渲染守衛不通過（${allFails.length} 條）：\n` + allFails.map((f) => "  " + f).join("\n"));
-    console.error("\n宿主基座說明見 ADR-0008 與 book/src/css/demo-base.css。");
+    console.error("\n宿主基座說明見 ADR-0009 與 book/src/css/demo-base.css。");
     process.exit(1);
   }
   console.log("✓ demo 宿主基座驗收通過：邊框、底色、表格與步驟的渲染結果符合 token 有效值。");

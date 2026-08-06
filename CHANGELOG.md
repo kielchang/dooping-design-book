@@ -44,7 +44,7 @@ commit 本身記在 tag 描述裡，不會遺失。
   在範例 scope 內補上元件的樣式前提，於是 Infima 對裸 `<table>` 的格線、瀏覽器
   對裸 `<button>` 的原生外框都滲進 demo，而元件自己的邊框（列底線、步驟圓圈）
   反而整批畫不出來。修法是新增 `book/src/css/demo-base.css`——preflight 逐條
-  移植到 `.demo-body` 與 portal 兩個 scope，配 Infima 表格變數反制（[ADR-0008](docs/adr/0008-demo-host-baseline-contract.md)）
+  移植到 `.demo-body` 與 portal 兩個 scope，配 Infima 表格變數反制（[ADR-0009](docs/adr/0009-demo-host-baseline-contract.md)）
 - **新增雙守衛**：`tests/host-baseline.test.ts`（靜態——移植檔與 Tailwind 的
   preflight 逐條對應、鎖 kit.css 引入順序）；`npm run verify:book`（渲染——
   Playwright 對建置產物逐頁驗 computed style：儲存格無格線、列底線 1px solid

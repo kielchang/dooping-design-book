@@ -146,4 +146,23 @@ describe("色彩", () => {
     }
     expect(offenders, `拿掉 transition-colors：${offenders.join("、")}`).toEqual([]);
   });
+
+  // 圖表配色判斷樹第 1 層的守衛：STATUS_SERIES 是「語意維度沿用狀態色」的機制，
+  // 它的鍵必須是提醒色辭典的合法語意、值必須引用**對應**的語意 token——
+  // 有人往裡面塞 PALETTE 或塞錯家的 token，正是這個色表要擋的錯。
+  it("STATUS_SERIES 的鍵與值都綁在對應的語意 token 上", async () => {
+    const { STATUS_SERIES, STATUS_SERIES_STRONG } = await import("../packages/react/src/charts/base");
+    const LEGAL = ["success", "warning", "info", "danger", "muted"];
+
+    for (const [table, label, expected] of [
+      [STATUS_SERIES, "STATUS_SERIES", (k: string) => (k === "muted" ? "--muted" : `--${k}-subtle`)],
+      [STATUS_SERIES_STRONG, "STATUS_SERIES_STRONG", (k: string) => (k === "muted" ? "--muted-foreground" : `--${k}`)],
+    ] as const) {
+      expect(Object.keys(table).sort(), `${label} 的鍵必須是提醒色辭典的語意`).toEqual([...LEGAL].sort());
+      for (const [k, v] of Object.entries(table)) {
+        expect(v, `${label}.${k} 必須引用 ${expected(k)}（塞別的 token 或 PALETTE 就是語意錯置）`)
+          .toBe(`hsl(var(${expected(k)}))`);
+      }
+    }
+  });
 });

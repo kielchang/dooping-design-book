@@ -1,24 +1,47 @@
-/* 文件站主題：主色對齊 token 的冷靛藍，深色由 Docusaurus 內建切換（同時觸發 token 的
-   [data-theme="dark"] 鉤子，所以嵌在文件裡的真元件會跟著換皮）。 */
+/* ── 橋接契約：文件站是設計系統的第一個驗收宿主 ──────────────
+ *
+ * 站台 chrome 的顏色一律**引用 token**（`hsl(var(--x))`），不留字面值副本。
+ * 這與 GraphCanvas 橋接 `--xy-*` 是同一個手法、同一個理由：
+ * Infima 有自己的視覺語言，橋接之後深淺模式與元件示範坐在同一套表面上。
+ *
+ * 改版前這裡放著兩段手寫 hex——那就是 token primary 的副本（漂移防護第 6 支
+ * 要消滅的東西），而且 Infima 深色底 #1b1b1d 與 token 深色底（222 22% 8%）
+ * 不同：元件裡吃 `--background` 的部份（outline 按鈕、Gantt 未完成段遮罩）
+ * 在深色文件頁上是一塊塊色差補丁。
+ *
+ * 只寫一次 `:root`：token 變數自己在 [data-theme="dark"] 下翻值，
+ * 橋接引用會自動跟著翻，不需要第二段深色規則。
+ * hover 色階 Infima 需要六階，用 color-mix 從 primary 衍生——
+ * 這是「衍生」不是「副本」：primary 換值時它們自動跟上。 */
 :root {
-  --ifm-color-primary: #1e293b;
-  --ifm-color-primary-dark: #1b2434;
-  --ifm-color-primary-darker: #192231;
-  --ifm-color-primary-darkest: #151c29;
-  --ifm-color-primary-light: #223047;
-  --ifm-color-primary-lighter: #24334c;
-  --ifm-color-primary-lightest: #2b3d5a;
+  --ifm-color-primary: hsl(var(--primary));
+  --ifm-color-primary-dark: color-mix(in srgb, hsl(var(--primary)) 92%, hsl(var(--background)));
+  --ifm-color-primary-darker: color-mix(in srgb, hsl(var(--primary)) 85%, hsl(var(--background)));
+  --ifm-color-primary-darkest: color-mix(in srgb, hsl(var(--primary)) 75%, hsl(var(--background)));
+  --ifm-color-primary-light: color-mix(in srgb, hsl(var(--primary)) 92%, hsl(var(--foreground)));
+  --ifm-color-primary-lighter: color-mix(in srgb, hsl(var(--primary)) 85%, hsl(var(--foreground)));
+  --ifm-color-primary-lightest: color-mix(in srgb, hsl(var(--primary)) 75%, hsl(var(--foreground)));
+
+  --ifm-background-color: hsl(var(--background));
+  --ifm-font-color-base: hsl(var(--foreground));
+  --ifm-navbar-background-color: hsl(var(--card));
+  --ifm-card-background-color: hsl(var(--card));
+  --ifm-footer-background-color: hsl(var(--muted));
+  --ifm-footer-color: hsl(var(--muted-foreground));
+  --ifm-toc-border-color: hsl(var(--border));
+  --ifm-hr-border-color: hsl(var(--border));
+  --ifm-table-border-color: hsl(var(--border));
+  --ifm-code-background: hsl(var(--muted));
+
+  --ifm-font-family-base: var(--font-family-sans);
   --ifm-code-font-size: 95%;
 }
 
+/* Docusaurus 的深色底預設寫在 [data-theme="dark"] 的 --ifm-background-color，
+   權重蓋過 :root——明確再宣告一次，讓深色也走 token（值由 token 自己翻）。 */
 html[data-theme="dark"] {
-  --ifm-color-primary: #93b4e8;
-  --ifm-color-primary-dark: #74a0e2;
-  --ifm-color-primary-darker: #6496df;
-  --ifm-color-primary-darkest: #3577d5;
-  --ifm-color-primary-light: #b2c8ee;
-  --ifm-color-primary-lighter: #c2d2f1;
-  --ifm-color-primary-lightest: #f0f4fc;
+  --ifm-background-color: hsl(var(--background));
+  --ifm-background-surface-color: hsl(var(--card));
 }
 
 /* ── 活範例外框 ─────────────────────────────────────────── */
@@ -75,7 +98,8 @@ html[data-theme="dark"] {
 }
 /* 連結推到最右邊 */
 .story-frame-title > a { margin-left: auto; font-size: 11px; }
-.story-frame > iframe { display: block; width: 100%; border: 0; }
+/* iframe 載入前的底色跟 token 走：深色下不白閃（載入後 Storybook 自己的底會蓋掉） */
+.story-frame > iframe { display: block; width: 100%; border: 0; background: hsl(var(--background)); }
 
 /* 規範條目：做 / 不做 */
 .rule-grid { display: grid; gap: 12px; grid-template-columns: 1fr; }

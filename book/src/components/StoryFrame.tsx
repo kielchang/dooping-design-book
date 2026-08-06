@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import useBaseUrl from "@docusaurus/useBaseUrl";
+import { useColorMode } from "@docusaurus/theme-common";
 
 /**
  * 嵌入一個 Storybook story，讓讀者不離開文件就能動手操作。
@@ -26,8 +27,8 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
  * 2. **story 改名之後這裡不會報錯**，只會安靜地變成一塊空白。
  *    所以標頭刻意把 id 印出來、並附一個直接開新視窗的連結——
  *    壞掉的嵌入至少要看得出來壞在哪，而且讀者還有一條路走得過去。
- *    真正的解是一支守衛測試（比對文件引用的 id 與 stories 實際產出的 id 集合），
- *    那條還沒有寫。
+ *    真正的解是 `tests/doc-hooks.test.ts`：比對文件引用的 id 與 stories
+ *    推導出的合法 id 集合，引用不存在的 story 就紅。
  */
 export function StoryFrame({
   id,
@@ -41,8 +42,24 @@ export function StoryFrame({
   /** iframe 高度（px）。內容被切到就加大 */
   height?: number;
 }) {
-  const iframeSrc = `${useBaseUrl("storybook/iframe.html")}?id=${encodeURIComponent(id)}&viewMode=story`;
-  const openSrc = `${useBaseUrl("storybook/")}?path=/story/${encodeURIComponent(id)}`;
+  // iframe 是**獨立的 document**：文件站切深色動的是自己的 <html>，
+  // 影響不到裡面的 Storybook——主題必須用 Storybook 的 globals 參數傳進去
+  // （`&globals=theme:dark`，對建置產物實測過），否則深色頁面上會嵌著亮色框，
+  // 同一頁的活範例（跟文件站主題）與嵌入（不跟）並排成兩種配色。
+  //
+  // 色相主題刻意**不傳**：文件站不設 data-color-theme（石墨），
+  // Storybook 的 colorTheme 預設也是石墨，兩邊本來就一致。
+  //
+  // 掛載後才套用（Mockup 頁的 SSR 規則：初始畫面不能取決於瀏覽器環境）——
+  // SSR 與首次渲染一律用預設淺色的 src，避免 hydration 不一致；
+  // 淺色時不帶參數＝Storybook 預設，只有深色（與切換）才改 src 觸發重載。
+  const { colorMode } = useColorMode();
+  const [mode, setMode] = useState<"light" | "dark" | null>(null);
+  useEffect(() => setMode(colorMode), [colorMode]);
+  const themeParam = mode === "dark" ? "&globals=theme:dark" : "";
+
+  const iframeSrc = `${useBaseUrl("storybook/iframe.html")}?id=${encodeURIComponent(id)}&viewMode=story${themeParam}`;
+  const openSrc = `${useBaseUrl("storybook/")}?path=/story/${encodeURIComponent(id)}${themeParam}`;
 
   return (
     <div className="story-frame">

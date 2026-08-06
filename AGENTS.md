@@ -168,9 +168,22 @@ npm run build:registry # 元件改了就要重新產生 registry JSON 並一起�
 `npm run build:registry` 的產物 `registry/*.json` 是**進版控的**。
 改了 `packages/react/src` 卻沒重跑，線上 registry 就會跟原始碼對不起來。
 
+### 去哪裡提
+
+| 要提的是 | 門口 |
+| --- | --- |
+| Bug（行為與規範不符） | <https://github.com/kielchang/dooping-design-book/issues/new?template=bug.yml> |
+| 小調整（文案、對比、一個 prop） | 直接開 PR，模板自帶自查清單 |
+| 新元件／新 token／改語意 | <https://github.com/kielchang/dooping-design-book/issues/new?template=rfc.yml>（五題逐欄） |
+| 頁面章缺件表的項目 | <https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml>（一則＝三次法則的一次證據） |
+
+守門人、狀態機與 RFC→ADR 的銜接見文件站「治理 → 回饋與 RFC 流程」；
+**未合併的提案不得在下游先行實作**（符合性台帳的鐵律）。
+
 ## 入口
 
 - 📘 文件站 <https://kielchang.github.io/dooping-design-book/>
 - 🧩 Storybook <https://kielchang.github.io/dooping-design-book/storybook/>
 - 📦 Registry 索引 <https://kielchang.github.io/dooping-design-book/r/index.json>
 - 🧭 決策紀錄 [`docs/adr/`](docs/adr/README.md) — 「為什麼是這樣」都寫在這裡
+- 💬 提出建議 <https://github.com/kielchang/dooping-design-book/issues/new/choose>

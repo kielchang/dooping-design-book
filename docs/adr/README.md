@@ -27,3 +27,10 @@
 ```
 
 檔名 `NNNN-kebab-case-title.md`，編號不重用。
+
+## 「提議中」從哪裡來、往哪裡去
+
+「提議中」的 ADR 來自**已接受的 RFC**（issue）：守門人把 RFC 標成 `rfc:已接受` 時
+開立 ADR（背景段連回該 issue），實作 PR 合併時由守門人改成「已採用」。
+被婉拒的 RFC 不寫 ADR——理由留在 issue。RFC 的入口與狀態機見文件站
+「治理 → 回饋與 RFC 流程」（正本 `book/docs/7-governance/02-rfc.mdx`）。

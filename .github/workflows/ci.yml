@@ -185,7 +185,7 @@ jobs:
 
       # 渲染守衛：對剛建好的 book/build 逐頁驗 computed style——
       # 表格只有列底線、按鈕沒有 UA 外框、portal 面板有基座。這是整條流水線裡
-      # 唯一「看得見畫出來的結果」的檢查，其餘守衛都是靜態的（ADR-0009）。
+      # 唯一「看得見畫出來的結果」的檢查，其餘守衛都是靜態的（ADR-0010）。
       - name: 安裝 Playwright Chromium（渲染守衛用）
         run: npx playwright install --with-deps chromium
       - name: 渲染守衛：demo 宿主基座（verify:book）

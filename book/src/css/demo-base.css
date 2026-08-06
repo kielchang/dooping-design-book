@@ -1,5 +1,5 @@
 /* demo 宿主基座 — 把 Tailwind preflight 逐條移植到兩個 scope,
- * 讓文件站的活範例拿到與 Storybook 完全相同的樣式前提(ADR-0009)。
+ * 讓文件站的活範例拿到與 Storybook 完全相同的樣式前提(ADR-0010)。
  *
  * 為什麼需要:元件的 utility 只宣告 border-width;「border-style: solid、
  * border-width: 0、預設邊框色」是 preflight 提供的隱含契約。文件站關掉

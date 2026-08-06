@@ -1,0 +1,68 @@
+# 三分流的第三條：新元件／新 token／改語意 → RFC。
+# 欄位與文件站「回饋與 RFC 流程」的五題一對一；守門人三問據此裁決。
+name: RFC 提案（新元件／新 token／改語意）
+description: 五題判準——三次法則證據必填
+labels: ["rfc", "rfc:討論中"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        五題判準與三次法則見文件站
+        [〈回饋與 RFC 流程〉](https://kielchang.github.io/dooping-design-book/governance/rfc/)。
+        **已知的無障礙或安全問題不必等三次，直接提。**
+        提案被接受後會開一則 ADR（提議中）記錄決策；婉拒會留下一句可被推翻的理由。
+  - type: textarea
+    id: problem
+    attributes:
+      label: 問題
+      description: 使用者遇到什麼？不解決會怎樣？
+      placeholder: 設定頁的開關目前用 Checkbox 替代，使用者常把「勾選＝啟用」誤讀為「勾選＝送出」……
+    validations:
+      required: true
+  - type: textarea
+    id: rule-of-three
+    attributes:
+      label: 三次法則證據
+      description: "**三個具體出處**，一行一個（哪個系統的哪種頁）——不是「以後可能會用到」。"
+      placeholder: |
+        1. A 系統的設定頁（功能開關區，6 個開關）
+        2. B 系統的通知偏好頁（9 個開關）
+        3. C 系統的單位設定頁（3 個開關＋立即生效說明）
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 提案
+      description: API 長什麼樣？舉一個真實使用情境。示範請用中性詞（項目／單位／類別／批次／紀錄）。
+      placeholder: |
+        <Switch checked={enabled} onCheckedChange={...} label="啟用此單位" />
+        用在設定頁「立即生效區」；改動即生效，不搭配儲存鈕。
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 替代方案
+      description: 考慮過什麼？為什麼不採用？（沒有替代方案通常代表想得不夠。）
+      placeholder: 續用 Checkbox——語意上「勾選」與「開關」不同；SegGroup 兩選項——佔位太寬……
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: 影響
+      description: 會不會改變既有行為？現有取用端要做什麼？
+      placeholder: 純新增，不影響既有元件；設定頁文件的「缺件與替代」表要更新。
+    validations:
+      required: true
+  - type: dropdown
+    id: breaking
+    attributes:
+      label: 影響評估
+      options:
+        - 不改變既有行為（minor 以下）
+        - 改變既有行為（需要 major）
+        - 不確定，請守門人評估
+    validations:
+      required: true

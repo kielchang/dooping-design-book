@@ -80,6 +80,13 @@ const config: Config = {
         docs: {
           routeBasePath: "/",
           sidebarPath: "./sidebars.ts",
+          // 每頁的「編輯此頁」。8-adr 是 sync-adr.mjs 的建置產物（gitignored），
+          // 對它的編輯要導向正本 docs/adr/，否則連到一個不存在的檔案。
+          // 指向 dev：日常修訂都在 dev 累積，main 只收進版合併。
+          editUrl: ({ docPath }) =>
+            docPath.startsWith("8-adr/")
+              ? `https://github.com/kielchang/dooping-design-book/edit/dev/docs/adr/${docPath.slice("8-adr/".length)}`
+              : `https://github.com/kielchang/dooping-design-book/edit/dev/book/docs/${docPath}`,
         },
         blog: false,
         pages: false,
@@ -112,11 +119,32 @@ const config: Config = {
       title: "Dooping Design Book",
       items: [
         { href: STORYBOOK_URL, label: "Storybook ↗", position: "right" },
+        {
+          href: "https://github.com/kielchang/dooping-design-book/issues/new/choose",
+          label: "提出建議 ↗",
+          position: "right",
+        },
         { href: "https://github.com/kielchang/dooping-design-book", label: "GitHub ↗", position: "right" },
       ],
     },
     footer: {
       style: "dark",
+      links: [
+        {
+          title: "回饋",
+          items: [
+            { label: "提出建議（三分流表單）", href: "https://github.com/kielchang/dooping-design-book/issues/new/choose" },
+            { label: "回饋與 RFC 流程", to: "/governance/rfc" },
+          ],
+        },
+        {
+          title: "版本",
+          items: [
+            { label: "CHANGELOG", href: "https://github.com/kielchang/dooping-design-book/blob/main/CHANGELOG.md" },
+            { label: "Releases（訂閱新版通知）", href: "https://github.com/kielchang/dooping-design-book/releases" },
+          ],
+        },
+      ],
       copyright: "Dooping Design Book · 設計語言與模式手冊 · MIT",
     },
     prism: { theme: prismThemes.github, darkTheme: prismThemes.dracula },

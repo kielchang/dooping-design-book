@@ -1,0 +1,53 @@
+# 缺件認領：頁面章缺件表的提案入口。每一則就是三次法則的一次證據；
+# 三個場景湊齊，就到了開 RFC 或直接動工的門檻。
+# 注意：piece 的選項字串必須與 book/docs/5-pages/00-overview.mdx 缺件表逐字一致——
+# 缺件表的「認領」欄用這些字串做 URL 預填（?piece=<encodeURIComponent(選項)>），改表要同步改這裡。
+name: 缺件認領
+description: 頁面章缺件表的項目——回報使用場景、湊三次法則證據
+labels: ["缺件"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        缺件與目前替代方案見文件站
+        [〈頁面總覽〉的缺件表](https://kielchang.github.io/dooping-design-book/pages/overview/)。
+        **先用替代方案，不要長私有版**——這裡是湊三次法則證據的地方，證據齊了就會動工。
+  - type: dropdown
+    id: piece
+    attributes:
+      label: 哪一件
+      options:
+        - Toast
+        - Switch
+        - Skeleton
+        - 期間選擇器
+        - Textarea
+        - RadioGroup
+        - Form 包裝／欄位錯誤元件
+        - PageHeader／Breadcrumb
+        - Drawer／Popover／DropdownMenu
+        - 其他（下方說明）
+    validations:
+      required: true
+  - type: textarea
+    id: scenario
+    attributes:
+      label: 使用場景
+      description: 哪個系統的哪種頁？這一頁回答什麼問題？——這就是三次法則的一次證據。
+      placeholder: A 系統的設定頁「立即生效區」，6 個開關；使用者要一眼看出目前狀態並就地切換。
+    validations:
+      required: true
+  - type: textarea
+    id: gap
+    attributes:
+      label: 目前替代方案哪裡不夠
+      description: 缺件表的替代做法試過了嗎？具體卡在哪一步？
+      placeholder: 用 Checkbox 替代後，使用者把「勾選」誤讀為待送出的表單欄位，以為還要按儲存。
+    validations:
+      required: true
+  - type: checkboxes
+    id: claim
+    attributes:
+      label: 認領
+      options:
+        - label: 三個場景湊齊、守門人點頭後，我願意送 PR 實作

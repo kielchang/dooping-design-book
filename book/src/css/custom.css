@@ -110,8 +110,9 @@ html[data-theme="dark"] {
 .rule-do > strong, .rule-dont > strong { display: block; margin-bottom: 4px; }
 
 /* ── 每頁列印 ───────────────────────────────────────────── */
-.doc-print-bar { display: flex; justify-content: flex-end; margin-bottom: 0.5rem; }
-.doc-print-bar button {
+.doc-print-bar { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 0.5rem; }
+.doc-print-bar button,
+.doc-print-bar a {
   border: 1px solid var(--ifm-color-emphasis-300);
   background: transparent;
   color: var(--ifm-font-color-base);
@@ -119,8 +120,14 @@ html[data-theme="dark"] {
   padding: 4px 12px;
   font-size: 13px;
   cursor: pointer;
+  text-decoration: none;
 }
-.doc-print-bar button:hover { background: var(--ifm-color-emphasis-100); }
+.doc-print-bar button:hover,
+.doc-print-bar a:hover {
+  background: var(--ifm-color-emphasis-100);
+  color: var(--ifm-font-color-base);
+  text-decoration: none;
+}
 
 @media print {
   /* 底色在後台介面裡是內容不是裝飾（徽章／提示框／佔位塊全靠底色辨義）。

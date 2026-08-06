@@ -1,6 +1,6 @@
 /* 活元件示例的樣式管線：token（來自 @dooping/tokens 的產物）＋ demo 宿主基座
    ＋ Tailwind utilities。preflight 已在 tailwind.config.js 關閉——不對全站注入
-   第二套 reset；元件需要的樣式前提由 demo-base.css 在範例的 scope 內提供（ADR-0009）。
+   第二套 reset；元件需要的樣式前提由 demo-base.css 在範例的 scope 內提供（ADR-0010）。
 
    順序是承重結構：demo-base 必須在 @tailwind utilities 之前——基座與 utilities
    同為 (0,1,0) 特異度，靠「utilities 較晚」讓元件宣告獲勝。

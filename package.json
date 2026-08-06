@@ -12,6 +12,7 @@
     "build:theme": "node packages/tokens/scripts/generate-theme.mjs",
     "build:registry": "node scripts/build-registry.mjs",
     "verify:color": "node scripts/verify-color.mjs",
+    "status": "node scripts/version-status.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "storybook": "storybook dev -p 6006",

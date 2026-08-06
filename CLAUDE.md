@@ -62,6 +62,11 @@ BOOK_BASE_URL=/dooping-design-book/preview/ npm run build:book   # onBrokenLinks
 
 CI 有守衛：元件或 token 相對 `main` 有變但版號沒動，直接擋 PR。
 
+**版本狀態速查**：`npm run status` 一次印出「已發佈（main）／工作中（dev）／
+token 配對／領先 commit／未發佈工作項／合併後會不會蓋 tag 發 Release」。
+設計端看的是 dev−main 的差距（提議中的未來）；取用端只看 main
+（Releases／`/r/index.json`／npm），他們的正本在文件站「治理 → 跟上新版」。
+
 ## 去領域化是硬閘門
 
 `tests/de-domain.test.ts` 掃全庫 176 個領域詞，零容忍。寫範例時用中性詞

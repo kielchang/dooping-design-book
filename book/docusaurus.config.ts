@@ -11,6 +11,10 @@ import type * as Preset from "@docusaurus/preset-classic";
 
 const BASE_URL = process.env.BOOK_BASE_URL ?? "/";
 const SITE_URL = process.env.BOOK_SITE_URL ?? "https://kielchang.github.io";
+// 預覽站＝dev 的工作狀態，不是發佈。文件寫了「不可參照」，但誤入的人不會先讀文件——
+// 站台自己要說。用 baseUrl 判斷：只有 /preview/ 建置掛橫幅，正式站與本機都不出現。
+const IS_PREVIEW = BASE_URL.includes("/preview/");
+const PROD_URL = "https://kielchang.github.io/dooping-design-book/";
 const STORYBOOK_URL = `${SITE_URL.replace(/\/$/, "")}${BASE_URL}storybook/`;
 const REGISTRY_BASE = `${SITE_URL.replace(/\/$/, "")}${BASE_URL}r`;
 
@@ -92,6 +96,17 @@ const config: Config = {
   ],
 
   themeConfig: {
+    // 常駐、不可關——它就是提醒色辭典「低強度提醒」的用例（warning 淡底＋同色相深墨），
+    // 站台自己是驗收宿主，橫幅顏色也吃 token。
+    ...(IS_PREVIEW && {
+      announcementBar: {
+        id: "dev-preview",
+        content: `dev 預覽站——非發佈版、隨時被下一次 push 覆蓋。取用一律以 <a href="${PROD_URL}"><b>正式站</b></a> 為準。`,
+        backgroundColor: "hsl(var(--warning-subtle))",
+        textColor: "hsl(var(--warning-subtle-foreground))",
+        isCloseable: false,
+      },
+    }),
     colorMode: { respectPrefersColorScheme: true },
     navbar: {
       title: "Dooping Design Book",

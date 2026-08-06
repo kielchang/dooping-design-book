@@ -1,21 +1,29 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "dooping",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "tokensVersion": "0.6.0",
   "homepage": "https://kielchang.github.io/dooping-design-book",
   "items": [
     {
       "name": "badge",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Badge 狀態徽章",
       "description": "帶文字的狀態標記，不只靠顏色傳達語意。",
       "url": "https://kielchang.github.io/dooping-design-book/r/badge.json"
     },
     {
+      "name": "breadcrumb",
+      "version": "0.12.0",
+      "type": "registry:ui",
+      "title": "breadcrumb",
+      "description": "",
+      "url": "https://kielchang.github.io/dooping-design-book/r/breadcrumb.json"
+    },
+    {
       "name": "button",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Button 按鈕",
       "description": "主要／次要／破壞性動作按鈕，含 asChild 組合。",
@@ -23,7 +31,7 @@
     },
     {
       "name": "callout",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Callout 提示框",
       "description": "良好／警示／提醒／危險四種語意提示。",
@@ -31,7 +39,7 @@
     },
     {
       "name": "card",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Card 卡片",
       "description": "內容容器：標題／描述／內容／頁尾。",
@@ -39,7 +47,7 @@
     },
     {
       "name": "change-summary",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:component",
       "title": "ChangeSummary 變更摘要",
       "description": "送出前的舊值→新值清單，可逐欄還原。",
@@ -47,7 +55,7 @@
     },
     {
       "name": "charts",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Charts 圖表",
       "description": "後台閱讀型的八種零相依圖＋圖例＋色票工具，含文字與鍵盤等價。",
@@ -55,7 +63,7 @@
     },
     {
       "name": "checkbox",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Checkbox 勾選框",
       "description": "單一勾選（Radix Checkbox）。",
@@ -63,7 +71,7 @@
     },
     {
       "name": "chips",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Chips 多選標籤片",
       "description": "已選與未選同時可見的多選控制項。",
@@ -71,7 +79,7 @@
     },
     {
       "name": "coachmark",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Coachmark 聚光導引",
       "description": "純呈現的引導聚光框，可縮小、可鍵盤操作、支援驗收標記。",
@@ -79,7 +87,7 @@
     },
     {
       "name": "csv",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:lib",
       "title": "csv 序列化",
       "description": "含 UTF-8 BOM 的 CSV 產出與解析。",
@@ -87,7 +95,7 @@
     },
     {
       "name": "data-table",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "DataTable 資料表",
       "description": "搜尋・單欄篩選・排序・分頁・合計・凍結首欄・CSV 匯出。",
@@ -95,7 +103,7 @@
     },
     {
       "name": "date-range",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "date-range",
       "description": "",
@@ -103,7 +111,7 @@
     },
     {
       "name": "delta",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Delta 變異顯示",
       "description": "箭頭＋文字＋顏色三重編碼的差異呈現。",
@@ -111,7 +119,7 @@
     },
     {
       "name": "dialog",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Dialog 對話框",
       "description": "模態對話框（Radix Dialog）。",
@@ -119,15 +127,31 @@
     },
     {
       "name": "download",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:lib",
       "title": "download 下載工具",
       "description": "觸發瀏覽器下載 Blob。",
       "url": "https://kielchang.github.io/dooping-design-book/r/download.json"
     },
     {
+      "name": "drawer",
+      "version": "0.12.0",
+      "type": "registry:ui",
+      "title": "drawer",
+      "description": "",
+      "url": "https://kielchang.github.io/dooping-design-book/r/drawer.json"
+    },
+    {
+      "name": "dropdown-menu",
+      "version": "0.12.0",
+      "type": "registry:ui",
+      "title": "dropdown-menu",
+      "description": "",
+      "url": "https://kielchang.github.io/dooping-design-book/r/dropdown-menu.json"
+    },
+    {
       "name": "editable-field",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:component",
       "title": "EditableField 唯讀逐欄編輯",
       "description": "點擊才進編輯、改動標色、undo/redo 先確認。",
@@ -135,7 +159,7 @@
     },
     {
       "name": "empty-state",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "EmptyState 空狀態",
       "description": "圖示＋標題＋說明＋行動呼籲。",
@@ -143,7 +167,7 @@
     },
     {
       "name": "form-field",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:component",
       "title": "FormField 欄位包裝",
       "description": "Label＋aria 連動＋錯誤態的固定寫法元件化，含 FieldError。",
@@ -151,7 +175,7 @@
     },
     {
       "name": "forms-diff",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:lib",
       "title": "forms/diff 欄位比對",
       "description": "FieldSpec 驅動的變更偵測與顯示格式化。",
@@ -159,7 +183,7 @@
     },
     {
       "name": "gantt",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Gantt 時間軸",
       "description": "檢視與選取用的精簡時間軸：分類色長條、進度、今天線、列選取。",
@@ -167,7 +191,7 @@
     },
     {
       "name": "graph-canvas",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "GraphCanvas 節點畫布",
       "description": "@xyflow/react 的薄封裝：token 橋接、狀態層選取、中性聚焦環。",
@@ -175,7 +199,7 @@
     },
     {
       "name": "input",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Input 輸入框",
       "description": "文字輸入，高度對齊控制項尺寸 token。",
@@ -183,7 +207,7 @@
     },
     {
       "name": "label",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Label 標籤",
       "description": "表單標籤（Radix Label）。",
@@ -191,7 +215,7 @@
     },
     {
       "name": "mockup",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Mockup 文件示意積木",
       "description": "Placeholder／Spotlight／MockScreenFrame：零截圖文件示意。",
@@ -199,15 +223,31 @@
     },
     {
       "name": "number-input",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "NumberInput 數值輸入",
       "description": "右對齊等寬數字，行動裝置出數字鍵盤。",
       "url": "https://kielchang.github.io/dooping-design-book/r/number-input.json"
     },
     {
+      "name": "page-header",
+      "version": "0.12.0",
+      "type": "registry:ui",
+      "title": "page-header",
+      "description": "",
+      "url": "https://kielchang.github.io/dooping-design-book/r/page-header.json"
+    },
+    {
+      "name": "popover",
+      "version": "0.12.0",
+      "type": "registry:ui",
+      "title": "popover",
+      "description": "",
+      "url": "https://kielchang.github.io/dooping-design-book/r/popover.json"
+    },
+    {
       "name": "radio-group",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "radio-group",
       "description": "",
@@ -215,7 +255,7 @@
     },
     {
       "name": "seg-group",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "SegGroup 分段選擇",
       "description": "少量互斥選項，radiogroup ＋ roving tabindex。",
@@ -223,7 +263,7 @@
     },
     {
       "name": "select",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Select 下拉選單",
       "description": "單選下拉（Radix Select）。",
@@ -231,7 +271,7 @@
     },
     {
       "name": "skeleton",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Skeleton 骨架屏",
       "description": "首載用的版面灰塊；三種載入手段的分工見文件〈載入中〉。",
@@ -239,7 +279,7 @@
     },
     {
       "name": "stepper",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Stepper 步驟指示",
       "description": "多步驟流程進度，完成態同時用勾選與顏色。",
@@ -247,7 +287,7 @@
     },
     {
       "name": "switch",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "switch",
       "description": "",
@@ -255,7 +295,7 @@
     },
     {
       "name": "tab-pills",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "TabPills 分頁膠囊",
       "description": "分頁切換的統一元件，含 tablist 語意。",
@@ -263,7 +303,7 @@
     },
     {
       "name": "table",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Table 表格基礎件",
       "description": "表格語意元素＋數字欄／凍結首欄／可排序表頭。",
@@ -271,7 +311,7 @@
     },
     {
       "name": "textarea",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "textarea",
       "description": "",
@@ -279,7 +319,7 @@
     },
     {
       "name": "toast",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "toast",
       "description": "",
@@ -287,7 +327,7 @@
     },
     {
       "name": "tooltip",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:ui",
       "title": "Tooltip 提示泡泡",
       "description": "hover／鍵盤聚焦／長壓顯示，含邊緣防溢與截斷文字元件。",
@@ -295,7 +335,7 @@
     },
     {
       "name": "use-record-diff",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:component",
       "title": "useRecordDiff 變更追蹤",
       "description": "草稿 vs 原始值的差異與還原 hook。",
@@ -303,7 +343,7 @@
     },
     {
       "name": "use-sort",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:lib",
       "title": "useSort 排序 hook",
       "description": "無→大到小→小到大 的三態排序。",
@@ -311,7 +351,7 @@
     },
     {
       "name": "utils",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "type": "registry:lib",
       "title": "utils 通用工具",
       "description": "cn 與數值／金額／百分比格式化。",

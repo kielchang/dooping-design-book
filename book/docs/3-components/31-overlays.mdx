@@ -1,0 +1,112 @@
+---
+title: Drawer、Popover 與 DropdownMenu
+---
+
+# Drawer、Popover 與 DropdownMenu 浮層三件
+
+補齊浮層家族。先記這張決策表——浮層選錯比樣式錯更常見：
+
+| 我要… | 用 | 為什麼 |
+| --- | --- | --- |
+| 純文字補充，看一眼就好 | [Tooltip](/components/tooltip) | hover／聚焦出現，不可互動 |
+| 點開一個可互動的小面板 | **Popover** | 非模態，點外面就關 |
+| 收納一列的次要「動作」 | **DropdownMenu** | 動詞選單，選完事情就發生 |
+| 選一個「值」進表單 | [Select](/components/checkbox-select) | 名詞選單，選完顯示在觸發器上 |
+| 攔截使用者：確認、短表單 | [Dialog](/components/dialog) | 置中、背景失焦，做完才能繼續 |
+| 從清單延伸看一筆，保留背景脈絡 | **Drawer** | 右側滑出，背景仍看得到來處 |
+| 內容超過兩個畫面高、要能收藏轉貼 | [明細頁](/pages/detail-page) | 浮層裝不下的就該是頁 |
+
+## Drawer 側板
+
+<Demo title="從清單快看一筆（背景保留脈絡）">
+  <Drawer>
+    <DrawerTrigger asChild>
+      <Button variant="outline" size="sm">快看 R-2406</Button>
+    </DrawerTrigger>
+    <DrawerContent>
+      <DrawerHeader>
+        <DrawerTitle>R-2406 台興機械</DrawerTitle>
+        <DrawerDescription>快看用側板；要改很多欄位，開完整明細頁。</DrawerDescription>
+      </DrawerHeader>
+      <div className="space-y-2 text-sm">
+        <p className="flex justify-between"><span className="text-muted-foreground">狀態</span><Badge variant="info">已確認</Badge></p>
+        <p className="flex justify-between"><span className="text-muted-foreground">數量</span><span className="tabular-nums">300</span></p>
+        <p className="flex justify-between"><span className="text-muted-foreground">金額</span><span className="tabular-nums">$91,200</span></p>
+      </div>
+      <DrawerFooter>
+        <DrawerClose asChild><Button variant="outline" size="sm">關閉</Button></DrawerClose>
+        <Button size="sm">開啟完整明細</Button>
+      </DrawerFooter>
+    </DrawerContent>
+  </Drawer>
+</Demo>
+
+與 Dialog 的分工是**脈絡**不是大小：Dialog 攔截（做完才能繼續）、
+Drawer 延伸（背景仍看得到「我從哪一列來」）。刻意只做右側
+（閱讀動線由左至右，要左側／底部等三次法則證據）；行動版全寬。
+底層復用 Dialog 的 Radix 基元——焦點圈禁、Esc、aria 連動全部繼承，零新相依。
+
+## Popover 小面板
+
+<Demo title="欄位顯示設定（非模態、可互動）">
+  <Popover>
+    <PopoverTrigger asChild>
+      <Button variant="outline" size="sm">顯示設定</Button>
+    </PopoverTrigger>
+    <PopoverContent>
+      <div className="space-y-3">
+        <p className="text-xs font-medium">清單顯示</p>
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="doc-pp-dense">密集列表</Label>
+          <Switch id="doc-pp-dense" />
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="doc-pp-zebra">斑馬紋</Label>
+          <Switch id="doc-pp-zebra" defaultChecked />
+        </div>
+      </div>
+    </PopoverContent>
+  </Popover>
+</Demo>
+
+<Rules>
+  <Do><p>放「就地設定」與可互動的說明卡：顯示開關、欄位挑選、帶連結的說明。</p></Do>
+  <Dont><p>表單的一部分不要收進 Popover——藏在浮層裡的必填欄位一定會被漏掉。
+  表單欄位屬於表單版面。</p></Dont>
+</Rules>
+
+## DropdownMenu 動作選單
+
+<Demo title="一列的「更多動作」（破壞性動作在最後）">
+  <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <Button variant="outline" size="sm" aria-label="更多動作">⋯</Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent>
+      <DropdownMenuLabel>R-2406</DropdownMenuLabel>
+      <DropdownMenuItem>複製一筆</DropdownMenuItem>
+      <DropdownMenuItem>匯出這一筆</DropdownMenuItem>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem destructive>作廢（需確認）</DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
+</Demo>
+
+- **動詞與名詞**：DropdownMenu 執行動作，Select 選值進表單。互換會讓鍵盤與讀屏語意錯位。
+- 選單收「次要動作」；一頁唯一的主要動作永遠是看得見的按鈕（跨頁守則）。
+- 破壞性動作放最後、`destructive` 樣式、必經 Dialog 確認並寫明後果。
+- 高亮與 SelectItem 同一條規則：`state-layer` 拉到「已選」階、`focus:` 不換
+  `focus-visible:`（滑鼠與鍵盤走同一條路）。
+- 收錄下限：Root／Trigger／Content／Item／Separator／Label。
+  子選單與勾選項等三次法則證據。
+
+三件的內容都 portal 到 `body` 直下——嵌進自帶 CSS 的宿主時，
+樣式基座必須涵蓋 portal（見 [ADR-0010](/adr/demo-host-baseline-contract)）。
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/drawer.json
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/popover.json
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/dropdown-menu.json
+```

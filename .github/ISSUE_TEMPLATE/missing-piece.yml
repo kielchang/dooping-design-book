@@ -17,8 +17,6 @@ body:
     attributes:
       label: 哪一件
       options:
-        - PageHeader／Breadcrumb
-        - Drawer／Popover／DropdownMenu
         - 其他（下方說明）
     validations:
       required: true

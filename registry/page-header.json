@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "page-header",
+  "version": "0.12.0",
+  "type": "registry:ui",
+  "title": "page-header",
+  "description": "",
+  "dependencies": [
+    "@dooping/tokens@^0.6.0",
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "https://kielchang.github.io/dooping-design-book/r/breadcrumb.json",
+    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+  ],
+  "files": [
+    {
+      "path": "dooping/ui/page-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowLeft } from \"lucide-react\";\nimport { cn } from \"@/lib/dooping/utils\";\nimport { Breadcrumb, type Crumb } from \"@/components/dooping/breadcrumb\";\n\n/**\n * 頁首區：把「頁面解剖」的第①區做成預設值。\n *\n * 排列固定（可缺項、不可換序）：麵包屑或返回 → h1 標題＋狀態徽章＋識別資訊 →\n * 一行說明 → 右側動作區。跨頁守則直接內建：\n *   - 一頁只有一個 h1——h1 由本元件渲染，內容區不要再開第二個\n *   - 至多一顆主要動作（`actions` 裡其餘用 outline／ghost；破壞性動作放最後）\n *   - 說明只有一行的位置——長說明放內容區，不要塞頁首\n *\n * `breadcrumb` 與 `back` 擇一：階層清楚用麵包屑（含逐層返回），\n * 只需要「回上一層」用 back。兩個都傳時只渲染麵包屑。\n */\nexport interface PageHeaderProps {\n  title: ReactNode;\n  breadcrumb?: Crumb[];\n  /** 返回入口（明細頁常用）。SPA 宿主用 onNav 接路由。 */\n  back?: { label?: ReactNode; href?: string; onNav?: () => void };\n  /** 狀態徽章（通常是 <Badge>）——「這一筆現在什麼狀態」。 */\n  badge?: ReactNode;\n  /** 識別資訊或筆數（「共 18 筆」「代號 R-2406」），弱化字。 */\n  meta?: ReactNode;\n  /** 一行說明。 */\n  description?: ReactNode;\n  /** 右側動作區。 */\n  actions?: ReactNode;\n  className?: string;\n}\n\nexport function PageHeader({\n  title, breadcrumb, back, badge, meta, description, actions, className,\n}: PageHeaderProps) {\n  return (\n    <header className={cn(\"space-y-1.5\", className)}>\n      {breadcrumb && breadcrumb.length > 0 ? (\n        <Breadcrumb items={breadcrumb} />\n      ) : back ? (\n        <a\n          href={back.href ?? \"#\"}\n          onClick={back.onNav ? (e) => { e.preventDefault(); back.onNav!(); } : undefined}\n          className=\"inline-flex items-center gap-1 rounded-sm text-sm text-muted-foreground hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background\"\n        >\n          <ArrowLeft className=\"size-3.5\" aria-hidden />\n          {back.label ?? \"返回\"}\n        </a>\n      ) : null}\n      <div className=\"flex flex-wrap items-center gap-x-3 gap-y-1.5\">\n        {/* 標題階層表：頁面標題 text-2xl font-semibold，一頁一個 */}\n        <h1 className=\"text-2xl font-semibold leading-tight\">{title}</h1>\n        {badge}\n        {meta && <span className=\"text-sm text-muted-foreground\">{meta}</span>}\n        {actions && <div className=\"ml-auto flex shrink-0 flex-wrap items-center gap-2\">{actions}</div>}\n      </div>\n      {description && <p className=\"text-sm text-muted-foreground\">{description}</p>}\n    </header>\n  );\n}\n",
+      "type": "registry:ui",
+      "target": "components/dooping/page-header.tsx"
+    }
+  ]
+}

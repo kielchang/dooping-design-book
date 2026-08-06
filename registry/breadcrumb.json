@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "breadcrumb",
+  "version": "0.12.0",
+  "type": "registry:ui",
+  "title": "breadcrumb",
+  "description": "",
+  "dependencies": [
+    "@dooping/tokens@^0.6.0",
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+  ],
+  "files": [
+    {
+      "path": "dooping/ui/breadcrumb.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronRight } from \"lucide-react\";\nimport { cn } from \"@/lib/dooping/utils\";\n\nexport interface Crumb {\n  label: ReactNode;\n  /** 有 href 走一般連結；SPA 宿主可改用 onNav 接路由。兩者都沒有＝純文字。 */\n  href?: string;\n  onNav?: () => void;\n}\n\n/**\n * 麵包屑：回答「我在階層裡的哪一層」，並提供逐層返回。\n *\n * 元件庫不綁路由（邊界守衛擋 router import），所以導覽用 href 或 onNav\n * 由宿主接。最後一項是**目前頁**：不可點、`aria-current=\"page\"`——\n * 目前頁做成連結會讓使用者點了以為壞掉（什麼都沒發生）。\n *\n * 兩層就好。超過三層通常代表資訊架構太深，該修的是站台層的分區，\n * 不是把麵包屑加長（站台層規範見〈後台系統的資訊架構〉）。\n */\nexport function Breadcrumb({\n  items,\n  label = \"所在位置\",\n  className,\n}: {\n  items: Crumb[];\n  label?: string;\n  className?: string;\n}) {\n  if (items.length === 0) return null;\n  return (\n    <nav aria-label={label} className={className}>\n      <ol className=\"flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground\">\n        {items.map((c, i) => {\n          const last = i === items.length - 1;\n          const clickable = !last && (c.href || c.onNav);\n          return (\n            <li key={i} className=\"flex items-center gap-1.5\">\n              {clickable ? (\n                <a\n                  href={c.href ?? \"#\"}\n                  onClick={c.onNav ? (e) => { e.preventDefault(); c.onNav!(); } : undefined}\n                  className=\"rounded-sm hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background\"\n                >\n                  {c.label}\n                </a>\n              ) : (\n                <span aria-current={last ? \"page\" : undefined} className={cn(last && \"font-medium text-foreground\")}>\n                  {c.label}\n                </span>\n              )}\n              {!last && <ChevronRight className=\"size-3.5 shrink-0 opacity-60\" aria-hidden />}\n            </li>\n          );\n        })}\n      </ol>\n    </nav>\n  );\n}\n",
+      "type": "registry:ui",
+      "target": "components/dooping/breadcrumb.tsx"
+    }
+  ]
+}

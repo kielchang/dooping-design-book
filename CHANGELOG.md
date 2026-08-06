@@ -37,6 +37,48 @@ commit 本身記在 tag 描述裡，不會遺失。
 
 ---
 
+## 未發佈（`dev`）
+
+> 合併進 `main` 前把這一節改名。這批動了規範版號（0.12.0，新增元件＝minor）；
+> **tokens 維持 0.6.0**——全部用既有 token，不發 npm、不推 tokens tag。
+
+### 缺件表清空：PageHeader／Breadcrumb 與浮層三件（規範 v0.12.0，tokens 不變）
+
+**改了什麼**
+
+- **頁面章缺件表最後兩列收錄，九件全數畢業**——表清空、認領模板剩「其他」
+  （新缺口由回報重新入表），表改記畢業紀錄
+- **PageHeader**（[30-page-header](book/docs/3-components/30-page-header.mdx)）：
+  頁面解剖第①區的預設值——排列固定（麵包屑或返回 → h1＋徽章＋識別 → 一行說明 →
+  動作區），跨頁守則內建：h1 由元件渲染（一頁一個）、至多一顆主要動作、
+  破壞性動作最後且必經確認
+- **Breadcrumb**：最後一項＝目前頁（不可點、`aria-current="page"`）；
+  不綁路由（`href` 或 `onNav` 由宿主接）；超過三層該修站台層分區，不是加長麵包屑
+- **Drawer 側板**（[31-overlays](book/docs/3-components/31-overlays.mdx)）：
+  與 Dialog 的分工是**脈絡**不是大小——Dialog 攔截、Drawer 延伸（背景保留來處）；
+  刻意只做右側、行動版全寬；復用 Dialog 的 Radix 基元零新相依
+- **Popover 小面板**：非模態可互動；表單欄位不進浮層
+- **DropdownMenu 動作選單**：動詞（執行）vs Select 名詞（選值）的分工成文；
+  高亮與 SelectItem 同一條規則（state-layer 拉到已選階、`focus:` 不換 focus-visible）；
+  收錄下限 Root／Trigger／Content／Item／Separator／Label，子選單等三次法則
+- 文件附**浮層決策表**（Tooltip／Popover／DropdownMenu／Select／Dialog／Drawer／明細頁
+  七格），浮層選錯比樣式錯更常見
+
+**我需要做什麼**
+
+要用就抄：`npx shadcn add <站台>/r/{page-header,breadcrumb,drawer,popover,dropdown-menu}.json`。
+Popover 與 DropdownMenu 各帶一個新 radix 相依（自動安裝）；Drawer 零新相依。
+**tokens 維持 0.6.0**，npm 端零動作。頁首先前手排的畫面不必立刻改，
+新頁請直接用 PageHeader。
+
+**為什麼改**
+
+九個缺件在兩個版本內全數收錄，「先用替代方案」的過渡期正式結束；
+缺件表從待辦清單變成畢業紀錄，之後的新缺口回到「回報 → 三次證據 → 入表 → 動工」
+的正常循環。
+
+---
+
 ## v0.11.0 · 2026-08-06
 
 三個工作項的合併發佈（B 段終驗＋兩個 P0＋缺件六件）。

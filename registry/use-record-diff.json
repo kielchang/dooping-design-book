@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "use-record-diff",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "type": "registry:component",
   "title": "useRecordDiff 變更追蹤",
   "description": "草稿 vs 原始值的差異與還原 hook。",

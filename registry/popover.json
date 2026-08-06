@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "popover",
+  "version": "0.12.0",
+  "type": "registry:ui",
+  "title": "popover",
+  "description": "",
+  "dependencies": [
+    "@dooping/tokens@^0.6.0",
+    "@radix-ui/react-popover"
+  ],
+  "registryDependencies": [
+    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+  ],
+  "files": [
+    {
+      "path": "dooping/ui/popover.tsx",
+      "content": "import * as React from \"react\";\nimport * as PopoverPrimitive from \"@radix-ui/react-popover\";\nimport { cn } from \"@/lib/dooping/utils\";\n\n/**\n * 小面板（非模態浮層）。與近親的分工：\n *   - Tooltip：純文字補充，hover／聚焦出現，**不可互動**\n *   - Popover：點擊開合，裡面可以有控制項（欄位顯示設定、說明卡帶連結）\n *   - Dialog：需要攔截使用者完成才能繼續的，才升級成對話框\n * 表單的一部分不要放進 Popover——收在浮層裡的必填欄位一定會被漏掉。\n */\nconst Popover = PopoverPrimitive.Root;\nconst PopoverTrigger = PopoverPrimitive.Trigger;\nconst PopoverAnchor = PopoverPrimitive.Anchor;\n\nconst PopoverContent = React.forwardRef<\n  React.ElementRef<typeof PopoverPrimitive.Content>,\n  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>\n>(({ className, align = \"start\", sideOffset = 4, ...props }, ref) => (\n  <PopoverPrimitive.Portal>\n    <PopoverPrimitive.Content\n      ref={ref}\n      align={align}\n      sideOffset={sideOffset}\n      className={cn(\n        \"z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none\",\n        \"animate-in fade-in slide-in-from-top-1 duration-fast motion-reduce:animate-none\",\n        className,\n      )}\n      {...props}\n    />\n  </PopoverPrimitive.Portal>\n));\nPopoverContent.displayName = PopoverPrimitive.Content.displayName;\n\nexport { Popover, PopoverTrigger, PopoverAnchor, PopoverContent };\n",
+      "type": "registry:ui",
+      "target": "components/dooping/popover.tsx"
+    }
+  ]
+}

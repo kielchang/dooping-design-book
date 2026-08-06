@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dropdown-menu",
+  "version": "0.12.0",
+  "type": "registry:ui",
+  "title": "dropdown-menu",
+  "description": "",
+  "dependencies": [
+    "@dooping/tokens@^0.6.0",
+    "@radix-ui/react-dropdown-menu"
+  ],
+  "registryDependencies": [
+    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+  ],
+  "files": [
+    {
+      "path": "dooping/ui/dropdown-menu.tsx",
+      "content": "import * as React from \"react\";\nimport * as DropdownMenuPrimitive from \"@radix-ui/react-dropdown-menu\";\nimport { cn } from \"@/lib/dooping/utils\";\n\n/**\n * 動作選單（「更多動作」的家）。與 Select 的分工是**動詞與名詞**：\n *   - Select 選一個「值」進表單（名詞，選完顯示在觸發器上）\n *   - DropdownMenu 執行一個「動作」（動詞，選完事情就發生）\n * 拿 DropdownMenu 當表單選值、或拿 Select 放動作，鍵盤與讀屏語意都會錯位。\n *\n * 主要動作不進選單——選單是「次要動作的收納」，一頁唯一的主要動作\n * 永遠是看得見的按鈕（跨頁守則）。破壞性動作放最後、用 danger 樣式，\n * 且必經 Dialog 確認。\n *\n * 收錄下限（YAGNI）：Root／Trigger／Content／Item／Separator／Label。\n * 子選單、勾選項、radio 群等到有三個真實場景再收。\n */\nconst DropdownMenu = DropdownMenuPrimitive.Root;\nconst DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;\n\nconst DropdownMenuContent = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.Content>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>\n>(({ className, sideOffset = 4, ...props }, ref) => (\n  <DropdownMenuPrimitive.Portal>\n    <DropdownMenuPrimitive.Content\n      ref={ref}\n      sideOffset={sideOffset}\n      className={cn(\n        \"z-50 min-w-36 overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md\",\n        \"animate-in fade-in slide-in-from-top-1 duration-fast motion-reduce:animate-none\",\n        className,\n      )}\n      {...props}\n    />\n  </DropdownMenuPrimitive.Portal>\n));\nDropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;\n\nconst DropdownMenuItem = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.Item>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & { destructive?: boolean }\n>(({ className, destructive, ...props }, ref) => (\n  <DropdownMenuPrimitive.Item\n    ref={ref}\n    className={cn(\n      // `focus:` 是刻意的，不要換 focus-visible——理由與 SelectItem 同一條：\n      // Radix 把 DOM 焦點移到被指向的項目，滑鼠與鍵盤走同一條路；\n      // highlight 強度拉到「已選」階，意思是「按 Enter 會執行這個」。\n      \"state-layer focus:[--state-layer-alpha:var(--state-selected-alpha)] relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50\",\n      destructive && \"text-danger\",\n      className,\n    )}\n    {...props}\n  />\n));\nDropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName;\n\nconst DropdownMenuLabel = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.Label>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label>\n>(({ className, ...props }, ref) => (\n  <DropdownMenuPrimitive.Label\n    ref={ref}\n    className={cn(\"px-2 py-1.5 text-xs font-medium text-muted-foreground\", className)}\n    {...props}\n  />\n));\nDropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName;\n\nconst DropdownMenuSeparator = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.Separator>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>\n>(({ className, ...props }, ref) => (\n  <DropdownMenuPrimitive.Separator ref={ref} className={cn(\"-mx-1 my-1 h-px bg-border\", className)} {...props} />\n));\nDropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName;\n\nexport {\n  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,\n  DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator,\n};\n",
+      "type": "registry:ui",
+      "target": "components/dooping/dropdown-menu.tsx"
+    }
+  ]
+}

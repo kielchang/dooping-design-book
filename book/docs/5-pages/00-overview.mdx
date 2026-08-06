@@ -94,18 +94,16 @@ title: 頁面總覽
 「認領」欄直達[缺件認領表單](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml)：
 回報一個使用場景＝三次法則的一次證據，三個場景湊齊就會動工。
 
-| 缺件 | 目前替代 | 用在 | 認領 |
-| --- | --- | --- | --- |
-| PageHeader／Breadcrumb | 頁首區照解剖規範手排 | 明細頁 | [提出](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml&piece=PageHeader%EF%BC%8FBreadcrumb) |
-| Drawer／Popover／DropdownMenu | `Dialog` 或就地展開 | 各頁 | [提出](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml&piece=Drawer%EF%BC%8FPopover%EF%BC%8FDropdownMenu) |
+**成表時盤出的九個缺件已全數收錄**，這張表目前是空的——新的缺口用
+認領表單的「其他」回報，湊齊三次法則證據就會補回表裡動工。
+（表若有列，下拉選項要與列**逐字一致**——同步改 `.github/ISSUE_TEMPLATE/missing-piece.yml`。）
 
-（表單的下拉選項與這張表**逐字一致**——改表要同步改 `.github/ISSUE_TEMPLATE/missing-piece.yml`。）
+畢業紀錄：
 
-v0.11.0 已收錄七件，替代方案功成身退：
-[Toast](/components/toast)、[Switch／Textarea／RadioGroup](/components/form-controls)、
-[Skeleton](/components/skeleton)（規範正本在〈載入中〉，`DataTable` 內建 `loading`）、
-[DateRange 期間選擇](/components/date-range)、
-Form 包裝 → `FormField`／`FieldError`（見 [Input 的錯誤態](/components/input)）。
+| 版本 | 收錄 |
+| --- | --- |
+| v0.11.0 | [Toast](/components/toast)、[Switch／Textarea／RadioGroup](/components/form-controls)、[Skeleton](/components/skeleton)（規範正本在〈載入中〉，`DataTable` 內建 `loading`）、[DateRange](/components/date-range)、Form 包裝 → `FormField`／`FieldError`（見 [Input 的錯誤態](/components/input)） |
+| v0.12.0 | [PageHeader／Breadcrumb](/components/page-header)（頁面解剖第①區的預設值）、[Drawer／Popover／DropdownMenu](/components/overlays)（含浮層決策表） |
 
 AppShell 與 Sidebar **不在此列**——外殼不收進元件庫是刻意決策，
 規範正本在[站台層](/patterns/back-office-ia)。

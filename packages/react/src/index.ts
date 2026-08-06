@@ -23,6 +23,9 @@ export * from "./ui/radio-group";
 export * from "./ui/select";
 export * from "./ui/dialog";
 export * from "./ui/tooltip";
+export * from "./ui/drawer";
+export * from "./ui/popover";
+export * from "./ui/dropdown-menu";
 export * from "./ui/number-input";
 
 // 選擇
@@ -37,6 +40,10 @@ export * from "./ui/tab-pills";
 export * from "./ui/delta";
 export * from "./ui/empty-state";
 export * from "./ui/stepper";
+
+// 版面：頁首區（「頁面解剖」第①區的預設值）
+export * from "./ui/breadcrumb";
+export * from "./ui/page-header";
 
 // 回饋（Toast 的全站規則見文件〈Toast 操作回饋〉）
 export * from "./ui/toast";

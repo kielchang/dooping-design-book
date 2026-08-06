@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "form-field",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "type": "registry:component",
   "title": "FormField 欄位包裝",
   "description": "Label＋aria 連動＋錯誤態的固定寫法元件化，含 FieldError。",

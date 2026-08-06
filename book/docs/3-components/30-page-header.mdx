@@ -1,0 +1,73 @@
+---
+title: PageHeader 與 Breadcrumb
+---
+
+# PageHeader 頁首區與 Breadcrumb 麵包屑
+
+把[頁面解剖](/pages/page-anatomy)第①區做成預設值——先前「照解剖規範手排」的
+頁首，現在有正式件。
+
+<Demo title="明細頁頁首（返回＋識別＋狀態＋動作）">
+  <PageHeader
+    back={{ label: "返回清單", onNav: () => {} }}
+    title="R-2406 台興機械"
+    badge={<Badge variant="info">已確認</Badge>}
+    meta="代號 R-2406"
+    actions={
+      <>
+        <Button size="sm" variant="outline">匯出</Button>
+        <Button size="sm">補充資訊</Button>
+      </>
+    }
+  />
+</Demo>
+
+<Demo title="清單頁頁首（標題＋筆數＋唯一主要動作）">
+  <PageHeader
+    title="項目清單"
+    meta="共 18 筆"
+    description="這一頁列出全部項目；點任一列進明細。"
+    actions={<Button size="sm">新增項目</Button>}
+  />
+</Demo>
+
+## 內建的跨頁守則
+
+排列固定（可缺項、不可換序）：麵包屑或返回 → h1＋徽章＋識別 → 一行說明 → 動作區。
+
+<Rules>
+  <Do><p><strong>h1 由 PageHeader 渲染</strong>，一頁一個——內容區不要再開第二個 h1。</p></Do>
+  <Dont><p>動作區不要放第二顆主要按鈕。兩顆主要按鈕＝沒有主要按鈕；
+  其餘動作用 outline／ghost，塞不下就收進<a href="/components/overlays">動作選單</a>。</p></Dont>
+</Rules>
+
+破壞性動作（作廢、停用）放動作區最後、用 `destructive` 樣式、
+必經 Dialog 確認——與[明細頁](/pages/detail-page)的規範同一條。
+
+## Breadcrumb：兩層就好
+
+<Demo title="麵包屑（最後一項是目前頁，不可點）">
+  <Breadcrumb
+    items={[
+      { label: "項目清單", onNav: () => {} },
+      { label: "R-2406 台興機械" },
+    ]}
+  />
+</Demo>
+
+- 最後一項是**目前頁**：不可點、`aria-current="page"`——目前頁做成連結，
+  點了什麼都沒發生，使用者會以為壞掉。
+- `breadcrumb` 與 `back` **擇一**：階層清楚用麵包屑（含逐層返回），
+  只需要「回上一層」用返回。兩個都傳只渲染麵包屑。
+- 超過三層代表資訊架構太深——該修的是站台層分區
+  （見[後台系統的資訊架構](/patterns/back-office-ia)），不是把麵包屑加長。
+
+元件庫不綁路由：導覽用 `href` 走一般連結，SPA 宿主改用 `onNav` 接自己的 router。
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/page-header.json
+```
+
+相依會自動帶上 `breadcrumb`；麵包屑也可單獨取用（`/r/breadcrumb.json`）。

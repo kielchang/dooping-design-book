@@ -1,0 +1,84 @@
+---
+title: 頁面解剖
+---
+
+# 頁面解剖
+
+**每一頁都由同四個區組成，順序固定。** 五種頁型只是這副骨架的五種填法——
+先記骨架，各頁型文件裡的「組成對照表」都用這裡的區塊名詞。
+
+## 四個區
+
+<Demo title="標準骨架（以清單頁填法為例）">
+  <MockScreenFrame>
+    <div className="flex items-center gap-3">
+      <Spotlight label="① 頁首區"><span className="text-lg font-semibold">項目清單</span></Spotlight>
+      <span className="text-xs text-muted-foreground">共 18 筆</span>
+      <span className="ml-auto"><Button size="sm">新增項目</Button></span>
+    </div>
+    <div className="flex items-center gap-2">
+      <Spotlight label="② 工具區"><Placeholder w={200} label="搜尋與篩選" /></Spotlight>
+      <Placeholder w={120} label="檢視切換" />
+    </div>
+    <MockRow />
+    <MockRow focus={<Spotlight label="③ 內容區"><Badge variant="info">已確認</Badge></Spotlight>} />
+    <MockRow />
+    <div className="flex justify-end gap-2">
+      <Spotlight label="④ 動作區（表單頁才有）"><Button size="sm" variant="outline">取消</Button></Spotlight>
+      <Button size="sm">送出</Button>
+    </div>
+  </MockScreenFrame>
+</Demo>
+
+| 區 | 放什麼 | 不放什麼 |
+| --- | --- | --- |
+| ① 頁首區 | 標題（h1）、筆數或識別資訊、狀態徽章、**這一頁唯一的主要動作** | 說明長文、第二顆主要按鈕 |
+| ② 工具區 | 作用在內容區的控制：搜尋、篩選、檢視切換、期間切換 | 與眼前內容無關的全站功能 |
+| ③ 內容區 | 這一頁的主體：表、卡、圖、欄位 | 自己的第二層頁首 |
+| ④ 動作區 | 對整頁生效的送出／取消 | 只影響單一區塊的按鈕（放回那個區塊） |
+
+四區不必每頁都齊：清單頁沒有動作區（動作在頁首與列上）、
+儀表板只有①②③、表單頁的工具區常常是空的。**可以缺區，不能換序。**
+
+<Rules>
+  <Do><p>工具區<strong>貼著</strong>它作用的內容區。篩選器影響哪張表，就放在那張表上方。</p></Do>
+  <Dont><p>不要把兩張表的篩選器合併成頁面頂部的一排——使用者分不出哪個控制哪張表，
+  改一個條件、兩張表一起動，只會讓人不敢碰。</p></Dont>
+</Rules>
+
+## 標題階層
+
+| 層 | 樣式 | 用在 |
+| --- | --- | --- |
+| 頁面標題 | `text-2xl font-semibold` | 頁首區，一頁一個 |
+| 區塊標題 | `CardTitle`（`text-base`） | 內容區的分組卡 |
+| 欄位標籤 | `Label`（`text-sm`） | 表單欄位 |
+
+字級的完整刻度見[字級與排版](/foundations/typography)。跳層（頁面標題直接配 `text-xs` 內文）
+或加層（卡片裡再開 `text-xl` 標題）都會讓掃讀的視覺錨點失效。
+
+## 間距節奏
+
+區與區之間用 `space-y-4`（16px）、卡片內部欄位用 `space-y-4`、
+同一列內的元素用 `gap-2`／`gap-3`。刻度的語意見[間距與圓角](/foundations/space-radius)——
+這裡只需要記一件事：**區塊間距（16px）要大於區塊內間距（8–12px）**，
+否則四個區在視覺上糊成一片，骨架就白排了。
+
+## 動作區的吸底取捨
+
+表單長過一個螢幕時，動作區有兩種擺法：
+
+| 擺法 | 好處 | 代價 |
+| --- | --- | --- |
+| 內容尾端（預設） | 版面單純；送出前必然經過所有欄位 | 長表單要捲到底才能送 |
+| 吸底（sticky bottom） | 隨時可送出 | 蓋掉一條內容高度；行動版鍵盤彈出時容易疊住輸入框 |
+
+預設用內容尾端。**改用吸底的門檻**：使用者會在表單裡反覆修改、
+而不是從頭填到尾（例如[逐欄編輯](/patterns/inline-field-editing)的明細頁掛著
+變更摘要時）。吸底列要帶目前狀態（「3 項變更」），不能只有一顆孤零零的按鈕。
+
+## 行動版
+
+四區順序不變，只是變窄：頁首區的主要動作可縮成整寬按鈕、工具區可收合、
+表格橫向捲動。側邊欄收成抽屜是站台層的事，見
+[後台系統的資訊架構](/patterns/back-office-ia)——頁面自己不要另做一套行動版結構。

@@ -1,0 +1,94 @@
+---
+title: 清單頁
+---
+
+# 清單頁
+
+**找到那一筆，然後進去。** 清單頁是後台使用頻率最高的頁型：
+它的職責是「找」，不是「看」——看的事交給[明細頁](/pages/detail-page)。
+
+## 何時用
+
+<Rules>
+  <Do><p>凡是「使用者要在一批紀錄裡找到某一筆」的畫面，用清單頁：
+  等著被處理的、被管理的、被查的，都算。</p></Do>
+  <Dont><p>不要把清單頁當儀表板用。要回答「整體狀況如何」是
+  <a href="/pages/dashboard">儀表板</a>的事——在清單上方堆一排統計數字，
+  兩件事會互相擠壓，最後找也不好找、看也看不清。</p></Dont>
+</Rules>
+
+## 組成
+
+<StoryFrame id="頁面-清單頁--典型組成" title="清單頁：頁首＋檢視切換＋資料表" height={640} />
+
+| 區 | 內容 | 元件與規範 |
+| --- | --- | --- |
+| 頁首區 | 標題＋總筆數＋唯一主要動作（右上，通常是「新增」） | [Button](/components/button)：一頁一顆主要按鈕 |
+| 工具區 | 檢視切換（狀態分組）；搜尋與欄篩選由資料表自帶 | [TabPills](/components/tab-pills)、[DataTable](/components/data-table) |
+| 內容區 | 資料表：排序、篩選、分頁、合計、匯出 | [資料表標準](/patterns/data-table-standard) |
+
+表內行為（合計算法、分頁檔位、欄篩選、空狀態自動分流）**全部由資料表標準管**，
+這一頁不重述；這裡只管表之外的事。
+
+## 行為規範
+
+<Rules>
+  <Do><p>主要動作只有一顆、永遠在右上。使用者第二次進來就不用找了。</p></Do>
+  <Dont><p>不要在頁首放第二顆實色按鈕。「新增」與「匯入」都想強調的結果是兩個都不突出——
+  次要動作用 <code>outline</code>，或收進資料表的 <code>toolbar</code> 插槽。</p></Dont>
+</Rules>
+
+<Rules>
+  <Do><p>檢視切換（全部／草稿／已確認…）用 TabPills，而且<strong>選中的分頁要寫進網址</strong>。
+  待辦連結才能直接落在「已確認」分頁上（見<a href="/patterns/back-office-ia">深連結</a>）。</p></Do>
+  <Dont><p>不要用檢視切換取代欄篩選、也不要反過來。切換是「這頁常用的固定視角」（≤5 個），
+  篩選是臨時組合條件；十個分頁的 TabPills 是把篩選器攤平，反而更難用。</p></Dont>
+</Rules>
+
+<Rules>
+  <Do><p>列本身就是入口：整列可點、進明細頁。逐列動作收斂到明細頁的動作區。</p></Do>
+  <Dont><p>不要在每一列尾端放一排小圖示按鈕。一頁 15 列 × 4 顆圖示＝60 個誤觸點，
+  而且每顆都太小。真的需要就地動作（例如批次），用勾選欄。</p></Dont>
+</Rules>
+
+<Rules>
+  <Do><p>批次操作列<strong>勾選之後才出現</strong>，出現時顯示已選筆數；
+  破壞性批次動作必經 <a href="/components/dialog">Dialog</a> 確認、寫明筆數與後果。</p></Do>
+  <Dont><p>不要常駐一排灰色的批次按鈕等人勾選。常駐的停用按鈕是視覺噪音，
+  而且「為什麼按不了」要使用者自己猜。</p></Dont>
+</Rules>
+
+## 空與載入
+
+<StoryFrame id="頁面-清單頁--空與載入" title="首次空狀態與載入中" height={560} />
+
+三種空狀態（首次使用／查無結果／無權限）的文案分流見
+[空狀態、變異與狀態徽章](/patterns/empty-delta-status)。清單頁補兩條：
+
+- 篩選後的空狀態**必附「清除篩選」**——使用者常常不記得自己掛了什麼條件。
+- 載入中要**保留版面高度**（Skeleton 尚未收錄，先用固定高度容器＋「載入中…」）。
+  數字未回來前顯示 0 是錯的：0 是一個答案，載入中不是。
+
+## 無障礙
+
+- 可點擊列由資料表自帶 `role="button"` 與鍵盤觸發；不要在列裡再包互動元素造成巢狀焦點。
+- TabPills 是 `role="tablist"`；分頁切換後焦點留在原 tab，內容區更新不搶焦點。
+- 空狀態的行動按鈕要可聚焦、可 Enter 觸發——它常是鍵盤使用者在這頁唯一能做的事。
+- 完整清單見[無障礙驗收](/accessibility/checklist)。
+
+## 取用
+
+```bash
+npx shadcn@latest add \
+  https://kielchang.github.io/dooping-design-book/r/data-table.json \
+  https://kielchang.github.io/dooping-design-book/r/tab-pills.json \
+  https://kielchang.github.io/dooping-design-book/r/badge.json \
+  https://kielchang.github.io/dooping-design-book/r/delta.json
+```
+
+data-table 會自動帶 table、input、button、select、tooltip、empty-state 等相依——
+這四個 item 就是一張清單頁的全部。
+
+## 缺件與替代
+
+Skeleton（載入佔位）與批次操作列尚未收錄，替代方案見[頁面總覽的缺件表](/pages/overview)。

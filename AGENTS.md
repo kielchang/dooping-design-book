@@ -12,8 +12,8 @@
 | 層 | 內容 | 取用方式 | 改動權 |
 | --- | --- | --- | --- |
 | `packages/tokens` | 設計 token（語意色、間距、字級、陰影、動態） | `npm install @dooping/tokens` | **不可改語意，只可改值** |
-| `packages/react` | React 參考實作（29 個 registry 項目） | `npx shadcn add <URL>` | 複製後就是你的，隨便改 |
-| `book/docs/4-patterns` | 操作模式（問題→做法→取捨→反例） | 讀懂，用你的技術棧實作 | 不含程式碼 |
+| `packages/react` | React 參考實作（32 個 registry 項目） | `npx shadcn add <URL>` | 複製後就是你的，隨便改 |
+| `book/docs`（模式與頁面章） | 操作模式（問題→做法→取捨→反例）＋五種頁型的組成規範 | 讀懂，用你的技術棧實作 | 不含程式碼 |
 
 理由見 [ADR-0004](docs/adr/0004-registry-over-npm-package.md)（元件一定會被改，所以不發套件）
 與 [ADR-0005](docs/adr/0005-tokens-are-the-only-hard-dependency.md)（token 幾乎不會被改，所以它才是契約）。
@@ -89,7 +89,7 @@ semanticColors();      // 35 個語意色（HSL 三元組）
 2. **琥珀色是「已改動未送出」的保留色**，不作他用。見 [ADR-0002](docs/adr/0002-amber-reserved-for-dirty-state.md)。
 3. **深色模式鉤子**掛在 `document.documentElement`，`.dark` class 與 `[data-theme="dark"]` 屬性擇一即可（兩種都內建支援）。
    掛在 wrapper 上會讓 Dialog / Select / Tooltip 這類 portal 浮層抓不到。
-4. **不要靠顏色單獨傳達語意。** 狀態要同時有文字或圖示——見[無障礙原則](book/docs/5-accessibility/01-principles.mdx)。
+4. **不要靠顏色單獨傳達語意。** 狀態要同時有文字或圖示——見[無障礙原則](book/docs/6-accessibility/01-principles.mdx)。
 
 ## 相容性與版本
 
@@ -125,24 +125,17 @@ npm ls @dooping/tokens; curl -s https://kielchang.github.io/dooping-design-book/
 
 ### 怎麼知道有新版
 
-- **推播（建議）**：在 GitHub 上 Watch → Custom → **Releases**。每次進版都會
-  自動發 Release，notes 就是 CHANGELOG 那一則——通知送上門，不用記得來查。
-  想用 RSS：`https://github.com/kielchang/dooping-design-book/releases.atom`
+- **推播（建議）**：repo 頁 Watch → Custom → **Releases**。每次進版自動發 Release，
+  **notes 就是 CHANGELOG 那一則全文**——通知本身回答三問，不用點連結。
+  RSS：`https://github.com/kielchang/dooping-design-book/releases.atom`
 - **拉式**：`gh release list -R kielchang/dooping-design-book`，
   或比對線上 `/r/index.json` 的 `version` 與你抄走那份的戳記
 
-純文件進版沒有新 tag、也不發 Release——**沒有訊號就代表不需要任何動作**。
+純文件進版不打 tag、也不發 Release——**安靜就是「不需要動作」的訊號**。
 
-### 收到新版訊號之後的更新策略
-
-1. **讀 Release notes 的「我需要做什麼」**——每一版都會明說，寫「無須調整」就到此為止
-2. **看版號差距**：大版差＝有會壞的變更、中版差＝有新能力、小版差＝修正微調。
-   落後不代表要升——元件複製走之後就是你的程式碼，
-   **只有在上游修了你也踩到的 bug 時才需要同步**
-3. **長期跟著走的專案**：對符合性台帳逐列評估（只有標「遵循」的列需要看；
-   「刻意偏離」的重讀一次原因——這次的改動可能剛好解掉偏離的理由），
-   決定跟不跟之後更新台帳的上游版本欄。做法見文件站「治理 → 符合性台帳」
-4. **token 配對自查**：見下方那行指令——本地版落後 `tokensVersion` 就是該升級 token
+收到訊號後的判斷流程（讀「我需要做什麼」→ 大中小判準 → 台帳逐列評估 →
+配對自查）、每一層的更新程序、以及開發中怎麼跟上游維持節奏，正本在
+上游文件站「治理 → [跟上新版](book/docs/7-governance/06-staying-current.mdx)」。
 
 ### 0.x 期間的穩定性聲明
 

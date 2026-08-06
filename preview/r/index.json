@@ -94,6 +94,14 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/data-table.json"
     },
     {
+      "name": "date-range",
+      "version": "0.11.0",
+      "type": "registry:ui",
+      "title": "date-range",
+      "description": "",
+      "url": "https://kielchang.github.io/dooping-design-book/r/date-range.json"
+    },
+    {
       "name": "delta",
       "version": "0.11.0",
       "type": "registry:ui",
@@ -198,6 +206,14 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/number-input.json"
     },
     {
+      "name": "radio-group",
+      "version": "0.11.0",
+      "type": "registry:ui",
+      "title": "radio-group",
+      "description": "",
+      "url": "https://kielchang.github.io/dooping-design-book/r/radio-group.json"
+    },
+    {
       "name": "seg-group",
       "version": "0.11.0",
       "type": "registry:ui",
@@ -230,6 +246,14 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/stepper.json"
     },
     {
+      "name": "switch",
+      "version": "0.11.0",
+      "type": "registry:ui",
+      "title": "switch",
+      "description": "",
+      "url": "https://kielchang.github.io/dooping-design-book/r/switch.json"
+    },
+    {
       "name": "tab-pills",
       "version": "0.11.0",
       "type": "registry:ui",
@@ -244,6 +268,22 @@
       "title": "Table 表格基礎件",
       "description": "表格語意元素＋數字欄／凍結首欄／可排序表頭。",
       "url": "https://kielchang.github.io/dooping-design-book/r/table.json"
+    },
+    {
+      "name": "textarea",
+      "version": "0.11.0",
+      "type": "registry:ui",
+      "title": "textarea",
+      "description": "",
+      "url": "https://kielchang.github.io/dooping-design-book/r/textarea.json"
+    },
+    {
+      "name": "toast",
+      "version": "0.11.0",
+      "type": "registry:ui",
+      "title": "toast",
+      "description": "",
+      "url": "https://kielchang.github.io/dooping-design-book/r/toast.json"
     },
     {
       "name": "tooltip",

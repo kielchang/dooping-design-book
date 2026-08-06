@@ -1,0 +1,27 @@
+import{j as t}from"./jsx-runtime-D_zvdyIk.js";import{r as i}from"./index-BFQ_Q9OP.js";import{c as F}from"./utils-pm6Xa0Qd.js";import{S as I}from"./seg-group-C31EXuC6.js";import{L as h}from"./label-8atcQy7k.js";import{I as y}from"./input-BrhjGTHk.js";import"./check-SsieMrcg.js";import"./createLucideIcon-DDRU598s.js";import"./index-BTi5fV8z.js";import"./index-BvEpo9bQ.js";import"./index-CI1UOwFw.js";import"./index-DdXKfkXy.js";const q=[{value:"today",label:"今日"},{value:"7d",label:"近 7 日"},{value:"30d",label:"近 30 日"},{value:"month",label:"本月"},{value:"custom",label:"自訂"}],p=a=>`${a.getFullYear()}-${String(a.getMonth()+1).padStart(2,"0")}-${String(a.getDate()).padStart(2,"0")}`;function x(a,s=new Date){const n=p(s),r=o=>{const l=new Date(s);return l.setDate(l.getDate()-o),p(l)};switch(a){case"today":return{from:n,to:n};case"7d":return{from:r(6),to:n};case"30d":return{from:r(29),to:n};case"month":return{from:p(new Date(s.getFullYear(),s.getMonth(),1)),to:n}}}function g({value:a,onChange:s,initialPreset:n="30d",label:r="期間",disabled:o,className:l}){const[m,b]=i.useState(n),v=i.useId(),f=i.useId(),V=e=>{const d=e;b(d),d!=="custom"&&s(x(d),d)},w=e=>{e&&s(e>a.to?{from:e,to:e}:{...a,from:e},"custom")},T=e=>{e&&s(e<a.from?{from:e,to:e}:{...a,to:e},"custom")};return t.jsxs("div",{role:"group","aria-label":r,className:F("space-y-2",l),children:[t.jsx(I,{label:r,options:q,value:m,onPick:V,disabled:o}),m==="custom"&&t.jsxs("div",{className:"flex flex-wrap items-end gap-2",children:[t.jsxs("div",{className:"space-y-1",children:[t.jsx(h,{htmlFor:v,className:"text-xs",children:"起"}),t.jsx(y,{id:v,type:"date",value:a.from,max:a.to||void 0,onChange:e=>w(e.target.value),disabled:o,className:"w-40 tabular-nums"})]}),t.jsx("span",{className:"pb-2 text-xs text-muted-foreground",children:"～"}),t.jsxs("div",{className:"space-y-1",children:[t.jsx(h,{htmlFor:f,className:"text-xs",children:"迄"}),t.jsx(y,{id:f,type:"date",value:a.to,min:a.from||void 0,onChange:e=>T(e.target.value),disabled:o,className:"w-40 tabular-nums"})]})]})]})}g.__docgenInfo={description:"",methods:[],displayName:"DateRange",props:{value:{required:!0,tsType:{name:"DateRangeValue"},description:""},onChange:{required:!0,tsType:{name:"signature",type:"function",raw:"(value: DateRangeValue, preset: DateRangePreset) => void",signature:{arguments:[{type:{name:"DateRangeValue"},name:"value"},{type:{name:"union",raw:'"today" | "7d" | "30d" | "month" | "custom"',elements:[{name:"literal",value:'"today"'},{name:"literal",value:'"7d"'},{name:"literal",value:'"30d"'},{name:"literal",value:'"month"'},{name:"literal",value:'"custom"'}]},name:"preset"}],return:{name:"void"}}},description:"換檔位或改自訂起訖時觸發；`preset` 告訴宿主這個值是哪個檔位算出來的。"},initialPreset:{required:!1,tsType:{name:"union",raw:'"today" | "7d" | "30d" | "month" | "custom"',elements:[{name:"literal",value:'"today"'},{name:"literal",value:'"7d"'},{name:"literal",value:'"30d"'},{name:"literal",value:'"month"'},{name:"literal",value:'"custom"'}]},description:"初始選中的檔位（僅初始；之後由元件自己管理）。預設「近 30 日」。",defaultValue:{value:'"30d"',computed:!1}},label:{required:!1,tsType:{name:"string"},description:"",defaultValue:{value:'"期間"',computed:!1}},disabled:{required:!1,tsType:{name:"boolean"},description:""},className:{required:!1,tsType:{name:"string"},description:""}}};const B={title:"元件/表單/期間選擇"},u={render:function(){const[s,n]=i.useState(()=>x("30d")),[r,o]=i.useState("30d");return t.jsxs("div",{className:"max-w-xl space-y-3",children:[t.jsx(g,{value:s,initialPreset:"30d",onChange:(l,m)=>{n(l),o(m)}}),t.jsxs("p",{className:"text-xs tabular-nums text-muted-foreground",children:["目前值：",s.from," ～ ",s.to,"（檔位：",r,"）"]}),t.jsx("p",{className:"text-tiny text-muted-foreground",children:"檔位是一等公民——儀表板九成的期間需求是這四個檔位；「自訂」才展開起訖輸入。 切到「自訂」試試把「起」選到「迄」之後：另一端會自動夾到同一天，不跳錯誤訊息。"})]})}},c={render:function(){const[s,n]=i.useState(()=>x("7d"));return t.jsxs("div",{className:"max-w-xl space-y-2",children:[t.jsx(g,{value:s,initialPreset:"7d",onChange:n,disabled:!0}),t.jsx("p",{className:"text-tiny text-muted-foreground",children:"整組停用：檔位鎖定、輸入不可改。"})]})}};var N,R,j;u.parameters={...u.parameters,docs:{...(N=u.parameters)==null?void 0:N.docs,source:{originalSource:`{
+  render: function Render() {
+    const [v, setV] = useState<DateRangeValue>(() => dateRangeFromPreset("30d"));
+    const [p, setP] = useState<DateRangePreset>("30d");
+    return <div className="max-w-xl space-y-3">
+        <DateRange value={v} initialPreset="30d" onChange={(nv, np) => {
+        setV(nv);
+        setP(np);
+      }} />
+        <p className="text-xs tabular-nums text-muted-foreground">
+          目前值：{v.from} ～ {v.to}（檔位：{p}）
+        </p>
+        <p className="text-tiny text-muted-foreground">
+          檔位是一等公民——儀表板九成的期間需求是這四個檔位；「自訂」才展開起訖輸入。
+          切到「自訂」試試把「起」選到「迄」之後：另一端會自動夾到同一天，不跳錯誤訊息。
+        </p>
+      </div>;
+  }
+}`,...(j=(R=u.parameters)==null?void 0:R.docs)==null?void 0:j.source}}};var D,P,S;c.parameters={...c.parameters,docs:{...(D=c.parameters)==null?void 0:D.docs,source:{originalSource:`{
+  render: function Render() {
+    const [v, setV] = useState<DateRangeValue>(() => dateRangeFromPreset("7d"));
+    return <div className="max-w-xl space-y-2">
+        <DateRange value={v} initialPreset="7d" onChange={setV} disabled />
+        <p className="text-tiny text-muted-foreground">整組停用：檔位鎖定、輸入不可改。</p>
+      </div>;
+  }
+}`,...(S=(P=c.parameters)==null?void 0:P.docs)==null?void 0:S.source}}};const H=["檔位與自訂","停用態"];export{H as __namedExportsOrder,B as default,c as 停用態,u as 檔位與自訂};

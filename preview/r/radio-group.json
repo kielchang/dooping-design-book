@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "radio-group",
+  "version": "0.11.0",
+  "type": "registry:ui",
+  "title": "radio-group",
+  "description": "",
+  "dependencies": [
+    "@dooping/tokens@^0.6.0",
+    "@radix-ui/react-radio-group",
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+  ],
+  "files": [
+    {
+      "path": "dooping/ui/radio-group.tsx",
+      "content": "import * as React from \"react\";\nimport * as RadioGroupPrimitive from \"@radix-ui/react-radio-group\";\nimport { Circle } from \"lucide-react\";\nimport { cn } from \"@/lib/dooping/utils\";\n\n/**\n * 單選群（垂直）。選項標籤長、或每個選項需要一行說明時用這個；\n * 選項 2–5 個且標籤短到能橫排一眼看完，用 `SegGroup`；\n * 超過 5 個或選項動態增減，用 `Select`；\n * 在「唯讀 ↔ 編輯」的欄位語境裡，用 `EditableField` 的 `radio` 型態。\n *\n * 鍵盤與焦點行為（roving tabindex、方向鍵移動）由 Radix 提供，\n * 與 `SegGroup` 的手刻版本一致：整組只佔一個 Tab 停留點。\n */\nconst RadioGroup = React.forwardRef<\n  React.ElementRef<typeof RadioGroupPrimitive.Root>,\n  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>\n>(({ className, ...props }, ref) => (\n  <RadioGroupPrimitive.Root ref={ref} className={cn(\"grid gap-2\", className)} {...props} />\n));\nRadioGroup.displayName = RadioGroupPrimitive.Root.displayName;\n\n/**\n * 單選項圓鈕。選中同時「填實心點」——形狀變化不只靠顏色，\n * 灰階列印與色覺障礙下仍分得出選了哪個。\n */\nconst RadioGroupItem = React.forwardRef<\n  React.ElementRef<typeof RadioGroupPrimitive.Item>,\n  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>\n>(({ className, ...props }, ref) => (\n  <RadioGroupPrimitive.Item\n    ref={ref}\n    className={cn(\n      \"aspect-square size-4 shrink-0 rounded-full border border-primary shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background aria-[invalid=true]:border-danger disabled:cursor-not-allowed disabled:opacity-50\",\n      className,\n    )}\n    {...props}\n  >\n    <RadioGroupPrimitive.Indicator className=\"flex items-center justify-center\">\n      <Circle className=\"size-2.5 fill-primary text-primary\" aria-hidden />\n    </RadioGroupPrimitive.Indicator>\n  </RadioGroupPrimitive.Item>\n));\nRadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName;\n\nexport { RadioGroup, RadioGroupItem };\n",
+      "type": "registry:ui",
+      "target": "components/dooping/radio-group.tsx"
+    }
+  ]
+}

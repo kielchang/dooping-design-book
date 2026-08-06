@@ -186,8 +186,21 @@ jobs:
       # 渲染守衛：對剛建好的 book/build 逐頁驗 computed style——
       # 表格只有列底線、按鈕沒有 UA 外框、portal 面板有基座。這是整條流水線裡
       # 唯一「看得見畫出來的結果」的檢查，其餘守衛都是靜態的（ADR-0010）。
+      # Chromium 下載實測 622 秒、守衛本身 15 秒——瀏覽器必須快取（key 綁
+      # package-lock，playwright 版本變了才重抓；命中時只補系統相依）。
+      - name: 快取 Playwright Chromium
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - name: 安裝 Playwright Chromium（渲染守衛用）
-        run: npx playwright install --with-deps chromium
+        run: |
+          if [ "${{ steps.pw-cache.outputs.cache-hit }}" = "true" ]; then
+            npx playwright install-deps chromium
+          else
+            npx playwright install --with-deps chromium
+          fi
       - name: 渲染守衛：demo 宿主基座（verify:book）
         run: npm run verify:book
         env:

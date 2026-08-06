@@ -19,11 +19,13 @@ const ROOT = fileURLToPath(new URL("..", import.meta.url));
 /**
  * 掃描範圍＝「取用端看得到的，或會被複製走的」全部東西。
  * templates/ 與 scripts/ 是 v0.2.1 補的洞：前者被整份抄走，後者的 TITLES 會寫進 registry JSON。
+ * .github/ 是回饋入口補的洞：issue 表單的欄位文案是取用端提案時第一眼看到的規範措辭。
  */
 const SCAN_DIRS = [
   "packages/react/src",
   "packages/tokens/src",
   ".storybook",
+  ".github",
   "book/docs",
   "book/src",
   "docs",
@@ -36,13 +38,15 @@ const SCAN_FILES = [
   "README.md",
   "AGENTS.md",
   "CHANGELOG.md",
+  "CONTRIBUTING.md",
+  "SECURITY.md",
   "packages/react/README.md",
   "packages/tokens/README.md",
   // 側欄標題與站台設定都是使用者可見文字
   "book/docusaurus.config.ts",
   "book/sidebars.ts",
 ];
-const EXTS = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".md", ".mdx", ".json", ".css"]);
+const EXTS = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".md", ".mdx", ".json", ".css", ".yml", ".yaml"]);
 
 /**
  * 禁用詞。

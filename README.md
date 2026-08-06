@@ -83,6 +83,15 @@ npm workspaces 已經滿足，而且**不需要在每個 CI／每台機器多裝
 第 1 條由 `tests/de-domain.test.ts` 自動把關，零容忍。
 見 [ADR-0006](docs/adr/0006-de-domainization-as-hard-gate.md)。
 
+## 回饋與貢獻
+
+三種回饋，三個門口（詳見 [CONTRIBUTING.md](CONTRIBUTING.md)）：
+
+- **Bug** → [Bug 回報表單](https://github.com/kielchang/dooping-design-book/issues/new?template=bug.yml)
+- **小調整** → 直接開 PR（模板自帶自查清單）
+- **新元件／新 token／改語意** → [RFC 提案表單](https://github.com/kielchang/dooping-design-book/issues/new?template=rfc.yml)；
+  頁面章缺件表的項目走[缺件認領](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml)
+
 ## 授權
 
 MIT

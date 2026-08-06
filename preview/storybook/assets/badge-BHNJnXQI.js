@@ -1,8 +1,0 @@
-import{j as s}from"./jsx-runtime-D_zvdyIk.js";import{c as o}from"./index-DHGqUdmq.js";import{c as a}from"./utils-Cn0sxhoU.js";const i=o("inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none",{variants:{variant:{default:"border-transparent bg-primary text-primary-foreground",secondary:"border-transparent bg-secondary text-secondary-foreground",outline:"text-foreground",success:"border-transparent bg-success-subtle text-success-subtle-foreground",warning:"border-transparent bg-warning-subtle text-warning-subtle-foreground",info:"border-transparent bg-info-subtle text-info-subtle-foreground",danger:"border-transparent bg-danger-subtle text-danger-subtle-foreground",edit:"border-edit bg-edit-bg text-edit-foreground"},intensity:{low:"",high:""}},compoundVariants:[{variant:"success",intensity:"high",class:"bg-success text-success-foreground"},{variant:"warning",intensity:"high",class:"bg-warning text-warning-foreground"},{variant:"info",intensity:"high",class:"bg-info text-info-foreground"},{variant:"danger",intensity:"high",class:"bg-danger text-danger-foreground"}],defaultVariants:{variant:"default",intensity:"low"}});function d({className:n,variant:e,intensity:t,...r}){return s.jsx("span",{className:a(i({variant:e,intensity:t}),n),...r})}d.__docgenInfo={description:`狀態徽章。
-
-規約：徽章上永遠要有**文字**，顏色只是加速辨識。純色點／純色塊在灰階列印與色覺障礙下等於消失，
-而後台系統的表格幾乎一定會被印出來存檔。
-
-四種狀態預設走**淡底層**（與 \`Callout\` 的 \`intensity="low"\` 同一組 token）。
-這讓整排徽章的構造與極性一致：全部是「淡底＋同色相深墨」，L\\* 全距從 23.5 收到 10。
-需要喊的場合才傳 \`intensity="high"\` 換成實色——**但表格裡不要用**。`,methods:[],displayName:"Badge",composes:["VariantProps"]};export{d as B};

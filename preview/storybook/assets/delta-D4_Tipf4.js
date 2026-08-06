@@ -1,0 +1,9 @@
+import{j as t}from"./jsx-runtime-D_zvdyIk.js";import{c as i,a as c}from"./utils-pm6Xa0Qd.js";function f({value:e,goodWhen:u="positive",posLabel:l="",negLabel:o="",format:r=c,zeroLabel:m="持平",className:s}){if(e===0)return t.jsxs("span",{className:i("tabular-nums text-muted-foreground",s),children:["— ",m]});const n=e>0,p=u==="positive"?n:!n,d=n?"▲":"▼",a=n?l:o;return t.jsxs("span",{className:i("inline-flex items-center gap-0.5 tabular-nums",p?"text-success":"text-danger",s),title:`${a}${r(Math.abs(e))}`,children:[t.jsx("span",{"aria-hidden":!0,children:d}),a&&t.jsx("span",{children:a}),r(Math.abs(e))]})}f.__docgenInfo={description:`變異顯示。
+
+三重編碼：**箭頭符號 ▲▼ ＋ 文字 ＋ 顏色**。顏色是三者中最弱的一環——
+8% 的男性有紅綠色覺障礙，而後台報表幾乎一定會被灰階列印出來存檔。
+因此箭頭與文字必須自己就能把話說完，顏色只是加速。`,methods:[],displayName:"Delta",props:{value:{required:!0,tsType:{name:"number"},description:""},goodWhen:{required:!1,tsType:{name:"union",raw:'"positive" | "negative"',elements:[{name:"literal",value:'"positive"'},{name:"literal",value:'"negative"'}]},description:`哪個方向算「好」。差異數字的好壞是**業務決定**、不是數學決定：
+「差異 +100」可能是好（餘裕充足）也可能是壞（累積過多），元件不猜。`,defaultValue:{value:'"positive"',computed:!1}},posLabel:{required:!1,tsType:{name:"string"},description:"正值前綴文字（如「超出」「增加」）",defaultValue:{value:'""',computed:!1}},negLabel:{required:!1,tsType:{name:"string"},description:"負值前綴文字（如「短少」「減少」）",defaultValue:{value:'""',computed:!1}},format:{required:!1,tsType:{name:"signature",type:"function",raw:"(n: number) => string",signature:{arguments:[{type:{name:"number"},name:"n"}],return:{name:"string"}}},description:"",defaultValue:{value:`function formatNumber(n: number, locale = "en-US"): string {
+  if (!Number.isFinite(n)) return String(n);
+  return n.toLocaleString(locale, { maximumFractionDigits: 10 });
+}`,computed:!1}},zeroLabel:{required:!1,tsType:{name:"string"},description:"",defaultValue:{value:'"持平"',computed:!1}},className:{required:!1,tsType:{name:"string"},description:""}}};export{f as D};

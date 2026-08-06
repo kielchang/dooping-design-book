@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "charts",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "type": "registry:ui",
   "title": "Charts 圖表",
   "description": "後台閱讀型的八種零相依圖＋圖例＋色票工具，含文字與鍵盤等價。",

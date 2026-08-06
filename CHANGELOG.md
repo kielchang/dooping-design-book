@@ -37,6 +37,46 @@ commit 本身記在 tag 描述裡，不會遺失。
 
 ---
 
+## 未發佈（`dev`）
+
+### 缺件表六件收錄：Toast、Switch、Textarea、RadioGroup、Skeleton、DateRange（規範 v0.11.0，tokens 不變）
+
+**改了什麼**
+
+- **頁面章缺件表的前六列全數收錄**，替代方案功成身退；表與認領模板同步刪除六個選項
+- **Toast 操作回饋**（[27-toast](book/docs/3-components/27-toast.mdx)）：「操作回饋的去向全站固定一種」
+  自此有載體，規則成文——右下、堆疊上限 3、success/info/warning 5 秒自動消失
+  （hover/聚焦暫停）、**danger 一律手動關閉**、讀屏 status/alert 分級、z-[70]；
+  表單驗證錯誤不進 Toast（貼欄位）。淡底表面與 Callout 共用同一份
+  `STATUS_SUBTLE_SURFACE`（同一份事實只寫一次）
+- **Switch**：切了立即生效；與 Checkbox 的分工成文（送出才生效用 Checkbox），
+  因此刻意無「已改動未送出」琥珀態
+- **Textarea**：逐項鏡射 Input（邊框/聚焦環/aria-invalid/停用）；只准直向調整大小
+- **RadioGroup**：垂直、每項可帶說明；選中填實心點不只靠顏色；
+  文件附單選四載體分工表（SegGroup/RadioGroup/Select/EditableField）
+- **Skeleton**：保留真實版面形狀、只用於首載、aria-hidden＋容器 aria-busy、
+  尊重 prefers-reduced-motion
+- **DateRange 期間選擇 v1**：檔位一等公民（今日/近 7 日/近 30 日/本月）＋自訂起訖；
+  反序自動修正；**刻意不做日曆格**（檔位＋原生 date 輸入涵蓋主要場景，
+  視覺化日曆等三次法則證據）
+- 順帶兩個既有小修：Stepper 步驟按鈕補標準聚焦環四件組（先前走瀏覽器預設）；
+  Storybook 步驟指示 story 的 completed 死 key 修正
+
+**我需要做什麼**
+
+要用就抄：`npx shadcn add <站台>/r/{toast,switch,textarea,radio-group,skeleton,date-range}.json`。
+Switch/RadioGroup 會自動帶入兩個新的 radix 相依。**tokens 維持 0.6.0**——
+六件全部使用既有 token，npm 端零動作。已在用替代方案的畫面不必立刻改，
+但新畫面請直接用正式件；操作回饋請照 Toast 頁的全站規則收斂。
+
+**為什麼改**
+
+頁面章成文時盤出九個缺件，其中六件已有多頁場景反覆出現（表單頁/設定頁/
+清單頁/儀表板都指向同幾件）——三次法則的證據在成表當下就湊齊了。
+一次收錄讓「先用替代方案」的過渡期最短，也讓認領表單聚焦在真正未定案的三件。
+
+---
+
 ## 2026-08-06（第二則·純 CI 進版，版號未動）
 
 ### 渲染守衛的 Playwright 快取（純 CI，版號不動）

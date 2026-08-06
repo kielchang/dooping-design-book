@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "skeleton",
+  "version": "0.11.0",
+  "type": "registry:ui",
+  "title": "skeleton",
+  "description": "",
+  "dependencies": [
+    "@dooping/tokens@^0.6.0"
+  ],
+  "registryDependencies": [
+    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+  ],
+  "files": [
+    {
+      "path": "dooping/ui/skeleton.tsx",
+      "content": "import { cn } from \"@/lib/dooping/utils\";\n\n/**\n * 載入佔位。規範：骨架必須**保留真實版面的高度與形狀**——載入完成的瞬間版面不跳動，\n * 這是骨架存在的唯一理由；隨便丟三根灰條反而比「載入中…」文字更糟。\n *\n * 只用於**首次載入**。重新整理既有畫面時保留舊內容——把使用者已經在看的資料\n * 閃成灰塊，等於把「更新」演成「壞掉」。\n *\n * 脈動尊重 prefers-reduced-motion（`motion-reduce:animate-none`）：\n * 靜止的灰塊本身已足以表達「這裡還沒好」，動態只是輔助。\n *\n * 無障礙：骨架一律 `aria-hidden`，載入語意掛在**容器**上\n * （`aria-busy=\"true\"`，完成後移除）。讀屏使用者不需要逐根聽到灰條。\n */\nexport function Skeleton({ className }: { className?: string }) {\n  return (\n    <div\n      aria-hidden\n      className={cn(\"animate-pulse rounded-md bg-muted motion-reduce:animate-none\", className)}\n    />\n  );\n}\n\n/** 文字段落骨架：n 行，末行 60% 寬——等寬到底的假段落一眼就假。 */\nexport function SkeletonText({ lines = 3, className }: { lines?: number; className?: string }) {\n  return (\n    <div className={cn(\"space-y-2\", className)} aria-hidden>\n      {Array.from({ length: lines }, (_, i) => (\n        <Skeleton key={i} className={cn(\"h-4\", i === lines - 1 ? \"w-3/5\" : \"w-full\")} />\n      ))}\n    </div>\n  );\n}\n",
+      "type": "registry:ui",
+      "target": "components/dooping/skeleton.tsx"
+    }
+  ]
+}

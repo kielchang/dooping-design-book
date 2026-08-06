@@ -1,0 +1,6 @@
+# 守門人（文件站「治理 → 回饋與 RFC 流程」的具名落地）。
+# token 與 foundations 章是全系統契約，與其他部分同一位守門人——
+# 分開設 owner 的前提是有第二位維護者，目前沒有。
+# 注意:在 branch protection 開啟「Require review from Code Owners」之前，
+# 本檔是宣告不是強制;它先把「誰決定」這件事寫成可查的事實。
+* @kielchang

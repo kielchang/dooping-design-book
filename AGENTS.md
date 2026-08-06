@@ -12,8 +12,8 @@
 | 層 | 內容 | 取用方式 | 改動權 |
 | --- | --- | --- | --- |
 | `packages/tokens` | 設計 token（語意色、間距、字級、陰影、動態） | `npm install @dooping/tokens` | **不可改語意，只可改值** |
-| `packages/react` | React 參考實作（29 個 registry 項目） | `npx shadcn add <URL>` | 複製後就是你的，隨便改 |
-| `book/docs/4-patterns` | 操作模式（問題→做法→取捨→反例） | 讀懂，用你的技術棧實作 | 不含程式碼 |
+| `packages/react` | React 參考實作（32 個 registry 項目） | `npx shadcn add <URL>` | 複製後就是你的，隨便改 |
+| `book/docs`（模式與頁面章） | 操作模式（問題→做法→取捨→反例）＋五種頁型的組成規範 | 讀懂，用你的技術棧實作 | 不含程式碼 |
 
 理由見 [ADR-0004](docs/adr/0004-registry-over-npm-package.md)（元件一定會被改，所以不發套件）
 與 [ADR-0005](docs/adr/0005-tokens-are-the-only-hard-dependency.md)（token 幾乎不會被改，所以它才是契約）。
@@ -89,7 +89,7 @@ semanticColors();      // 35 個語意色（HSL 三元組）
 2. **琥珀色是「已改動未送出」的保留色**，不作他用。見 [ADR-0002](docs/adr/0002-amber-reserved-for-dirty-state.md)。
 3. **深色模式鉤子**掛在 `document.documentElement`，`.dark` class 與 `[data-theme="dark"]` 屬性擇一即可（兩種都內建支援）。
    掛在 wrapper 上會讓 Dialog / Select / Tooltip 這類 portal 浮層抓不到。
-4. **不要靠顏色單獨傳達語意。** 狀態要同時有文字或圖示——見[無障礙原則](book/docs/5-accessibility/01-principles.mdx)。
+4. **不要靠顏色單獨傳達語意。** 狀態要同時有文字或圖示——見[無障礙原則](book/docs/6-accessibility/01-principles.mdx)。
 
 ## 相容性與版本
 
@@ -126,6 +126,11 @@ npm ls @dooping/tokens; curl -s https://kielchang.github.io/dooping-design-book/
 **看版號差距判斷要不要跟進**：大版差＝有會壞的變更、中版差＝有新能力、小版差＝修正微調。
 落後不代表要升——元件複製走之後就是你的程式碼，**只有在上游修了你也踩到的 bug 時才需要同步**，
 CHANGELOG 會寫清楚每一版改了什麼、你要不要動作。
+
+**怎麼被通知**：repo 頁 Watch → Custom → Releases——規範版進版會發 Release，
+純文件進版不發（＝你不需要動作，安靜就是訊號）。收到通知後的判斷流程、
+每一層的更新程序、以及開發中怎麼跟上游維持節奏，
+見上游文件站「治理 → [跟上新版](book/docs/7-governance/06-staying-current.mdx)」。
 
 ### 0.x 期間的穩定性聲明
 

@@ -53,7 +53,7 @@ const preview: Preview = {
   parameters: {
     layout: "fullscreen",
     controls: { expanded: true },
-    options: { storySort: { order: ["基礎", "元件", ["基礎", "表單", "資料", "狀態", "浮層", "引導", "文件示意"]] } },
+    options: { storySort: { order: ["基礎", "元件", ["基礎", "表單", "資料", "狀態", "浮層", "引導", "文件示意"], "頁面"] } },
   },
   globalTypes: {
     theme: {

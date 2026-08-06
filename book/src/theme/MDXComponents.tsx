@@ -4,6 +4,9 @@ import MDXComponents from "@theme-original/MDXComponents";
 import { Demo, Rules, Do, Dont } from "@site/src/components/Demo";
 import { StoryFrame } from "@site/src/components/StoryFrame";
 import {
+  FlowThreeWays, FlowAdoptionStages, FlowStayingCurrent, FlowPageFirstSteps,
+} from "@site/src/components/flow-diagrams";
+import {
   Button, Badge, Callout, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter,
   Input, Label, Checkbox, NumberInput,
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
@@ -20,6 +23,7 @@ import {
 export default {
   ...MDXComponents,
   Demo, Rules, Do, Dont, StoryFrame,
+  FlowThreeWays, FlowAdoptionStages, FlowStayingCurrent, FlowPageFirstSteps,
   Button, Badge, Callout, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter,
   Input, Label, Checkbox, NumberInput,
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,

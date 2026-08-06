@@ -1,0 +1,59 @@
+---
+title: DateRange 期間選擇
+---
+
+import { useState } from "react";
+import { dateRangeFromPreset } from "@dooping/react";
+
+export function RangeDemo() {
+  const [v, setV] = useState(() => dateRangeFromPreset("30d"));
+  return (
+    <div className="space-y-3">
+      <DateRange value={v} initialPreset="30d" onChange={setV} />
+      <p className="text-xs tabular-nums text-muted-foreground">目前值：{v.from} ～ {v.to}</p>
+    </div>
+  );
+}
+
+# DateRange 期間選擇
+
+儀表板與清單篩選的時間範圍。**檔位是一等公民**：今日／近 7 日／近 30 日／本月
+一鍵切換，「自訂」才展開起訖輸入。
+
+<Demo title="期間選擇（切到「自訂」試試把起訖選反）">
+  <RangeDemo />
+</Demo>
+
+## 行為規範
+
+| 規則 | 說明 |
+| --- | --- |
+| 檔位含今日 | 「近 7 日」＝含今日往回 7 天；「本月」＝本月 1 日至今日 |
+| 起訖反了自動修正 | 把「起」選到「迄」之後，另一端夾到同一天——反著選幾乎都是想選單日，不跳錯誤訊息 |
+| 值的格式 | `yyyy-mm-dd`（本地日期，不含時區）；跨時區解讀由宿主決定 |
+| 初始化 | 宿主用 `dateRangeFromPreset("30d")` 算初始值——跟元件同一套算法，不會差一天 |
+
+```tsx
+const [range, setRange] = useState(() => dateRangeFromPreset("30d"));
+<DateRange value={range} initialPreset="30d" onChange={setRange} />
+```
+
+## 刻意不做的：日曆格
+
+視覺化日曆的鍵盤導覽、讀屏語意與在地化是一整座山，而檔位＋原生 `date` 輸入
+已涵蓋主要場景。原生輸入的外觀跨瀏覽器略有差異——接受，它換來免費的
+日期驗證、行動裝置的原生選擇器與讀屏支援。
+
+要視覺化日曆？先到缺件認領回報使用場景——三個實際場景湊齊（三次法則）就動工。
+
+<Rules>
+  <Do><p>儀表板與清單的期間篩選用檔位；查特定日期區間用「自訂」。</p></Do>
+  <Dont><p>不要為了單一畫面自刻日曆——那會是全站第二種日期互動，
+  而且鍵盤與讀屏幾乎一定做不全。</p></Dont>
+</Rules>
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/date-range.json
+```

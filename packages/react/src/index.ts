@@ -28,6 +28,7 @@ export * from "./ui/number-input";
 // 選擇
 export * from "./ui/seg-group";
 export * from "./ui/chips";
+export * from "./ui/date-range";
 
 // 資料呈現
 export * from "./ui/table";

@@ -1,0 +1,50 @@
+# 三分流的第一條：Bug → Issue，附最小重現（規範見文件站「治理 → 回饋與 RFC 流程」）。
+name: Bug 回報
+description: 行為與規範不符——附最小重現
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感謝回報。先確認分流：**小調整**（文案、對比、一個 prop）直接開 PR；
+        **新元件、新 token、改語意**請改用「RFC 提案」表單。
+        這裡收的是「行為與規範不符」。
+  - type: textarea
+    id: repro
+    attributes:
+      label: 最小重現
+      description: 重現步驟或最小程式片段；Storybook／文件站頁面連結也可以。
+      placeholder: |
+        1. 開 Storybook 的「元件/表單/輸入控制項 → 欄位狀態」
+        2. 切到深色模式，Tab 到第三格
+        3. 聚焦環與紅色邊框對比不足，幾乎看不到
+    validations:
+      required: true
+  - type: textarea
+    id: expected-actual
+    attributes:
+      label: 期望 vs 實際
+      placeholder: |
+        期望：聚焦環為中性色、與邊框之間有 ring-offset（規範〈提醒色辭典〉）
+        實際：聚焦環直接貼在紅框上，深色模式下對比 1.04:1
+    validations:
+      required: true
+  - type: input
+    id: spec-version
+    attributes:
+      label: 規範版號
+      description: 線上 `/r/index.json` 的 `version`，或你抄走元件時檔頭的版號戳記。
+      placeholder: "0.10.0"
+    validations:
+      required: true
+  - type: input
+    id: host-env
+    attributes:
+      label: 宿主環境
+      placeholder: React 18 + Tailwind 3 ／ Chrome ／ dark
+  - type: input
+    id: page
+    attributes:
+      label: 相關規範頁
+      description: 文件站頁面連結（從文件站的「回報這一頁」進來會自動帶入）。
+      placeholder: https://kielchang.github.io/dooping-design-book/components/input/

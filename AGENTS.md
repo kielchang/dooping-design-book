@@ -41,6 +41,30 @@ src/
 放在 `dooping/` 子目錄是為了讓「哪些是設計中心來的」一眼可辨，
 之後上游修 bug 時你才找得到要同步哪幾個檔案。
 
+### 宿主前置條件：樣式基座（preflight）
+
+元件的 utility class 只宣告 border-width；「`border-style: solid`、`border-width: 0`、
+預設邊框色」由 Tailwind preflight 提供。**宿主沒有這層基座時元件不會報錯，
+只會安靜地變形**：邊框整批消失（只有寬度沒有樣式）、裸按鈕露出瀏覽器原生
+灰底凸框、表格吃到宿主的格線。看到這三種症狀，先查基座，不是查元件。
+
+- **標準 Tailwind／shadcn 專案**：`shadcn init` 標配 `@tailwind base`，天然滿足。
+  建議再加一條（shadcn 慣例，把「不帶色的 border」接到 token）：
+
+  ```css
+  @layer base {
+    * { border-color: hsl(var(--border)); }
+  }
+  ```
+
+- **把元件嵌進有自己 CSS 的既有站台**（後台框架、文件站、CMS——關掉 preflight
+  的宿主）：不要全站開 preflight（會打爆站台既有樣式），改在元件所在的 scope 內
+  鋪等價基座——本 repo 的文件站就是這種宿主，作法照抄
+  [`book/src/css/demo-base.css`](book/src/css/demo-base.css)。
+  注意 **portal 內容**（Dialog／Select／Tooltip／資料表篩選面板）掛在 `body` 直下，
+  逃出容器子樹，scope 必須一併涵蓋。取捨與驗收方式見
+  [ADR-0010](docs/adr/0010-demo-host-baseline-contract.md)。
+
 ## 取 token
 
 ```bash
@@ -168,9 +192,22 @@ npm run build:registry # 元件改了就要重新產生 registry JSON 並一起�
 `npm run build:registry` 的產物 `registry/*.json` 是**進版控的**。
 改了 `packages/react/src` 卻沒重跑，線上 registry 就會跟原始碼對不起來。
 
+### 去哪裡提
+
+| 要提的是 | 門口 |
+| --- | --- |
+| Bug（行為與規範不符） | <https://github.com/kielchang/dooping-design-book/issues/new?template=bug.yml> |
+| 小調整（文案、對比、一個 prop） | 直接開 PR，模板自帶自查清單 |
+| 新元件／新 token／改語意 | <https://github.com/kielchang/dooping-design-book/issues/new?template=rfc.yml>（五題逐欄） |
+| 頁面章缺件表的項目 | <https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml>（一則＝三次法則的一次證據） |
+
+守門人、狀態機與 RFC→ADR 的銜接見文件站「治理 → 回饋與 RFC 流程」；
+**未合併的提案不得在下游先行實作**（符合性台帳的鐵律）。
+
 ## 入口
 
 - 📘 文件站 <https://kielchang.github.io/dooping-design-book/>
 - 🧩 Storybook <https://kielchang.github.io/dooping-design-book/storybook/>
 - 📦 Registry 索引 <https://kielchang.github.io/dooping-design-book/r/index.json>
 - 🧭 決策紀錄 [`docs/adr/`](docs/adr/README.md) — 「為什麼是這樣」都寫在這裡
+- 💬 提出建議 <https://github.com/kielchang/dooping-design-book/issues/new/choose>

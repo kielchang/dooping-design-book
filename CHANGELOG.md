@@ -130,6 +130,76 @@ registry 與 npm 產物逐位元不變。（合併進 `main` 時本節標題改�
 沒有任何主動通知機制，也沒有單一入口把判斷流程走完。v0.6.1 的檢討就記過
 「導入之後的每個月怎麼跟上游走，沒有頁面回答」，這次補上。
 
+### 文件站 demo 宿主基座：修外框不一致＋補上第一道渲染守衛（純文件與站台修正，版號不動）
+
+**改了什麼**
+
+- **修正回報的外框不一致**（資料表頁、步驟指示頁）：文件站關 preflight 卻沒有
+  在範例 scope 內補上元件的樣式前提，於是 Infima 對裸 `<table>` 的格線、瀏覽器
+  對裸 `<button>` 的原生外框都滲進 demo，而元件自己的邊框（列底線、步驟圓圈）
+  反而整批畫不出來。修法是新增 `book/src/css/demo-base.css`——preflight 逐條
+  移植到 `.demo-body` 與 portal 兩個 scope，配 Infima 表格變數反制（[ADR-0010](docs/adr/0010-demo-host-baseline-contract.md)）
+- **新增雙守衛**：`tests/host-baseline.test.ts`（靜態——移植檔與 Tailwind 的
+  preflight 逐條對應、鎖 kit.css 引入順序）；`npm run verify:book`（渲染——
+  Playwright 對建置產物逐頁驗 computed style：儲存格無格線、列底線 1px solid
+  等於 token 有效值、按鈕無 UA 外觀、portal 面板有框、深色重驗），
+  兩支 workflow 都接了 verify:book。反向驗證過：修復前的建置紅了 200+ 條並
+  指名全部三類症狀；把移植檔改壞一條宣告，靜態守衛指名那一條
+- **[Table](book/docs/3-components/12-table.mdx)／[DataTable](book/docs/3-components/13-data-table.mdx)／[Stepper](book/docs/3-components/17-stepper.mdx)
+  補「外觀不變量」**：只有列底線、無格線無外框；步驟是無框透明按鈕。
+  先前這些視覺事實只存在於元件 class 字串裡，沒有條文就沒有可守的東西
+- **AGENTS.md 新增「宿主前置條件：樣式基座」**：標準 shadcn 宿主天然滿足；
+  嵌進自帶 CSS 的站台照 demo-base.css 的 scoped 作法，portal 一併涵蓋
+
+**我需要做什麼**：
+
+標準 Tailwind／shadcn 宿主**零動作**（你的 preflight 本來就在）。
+只有把元件嵌進關 preflight 的既有站台的取用端，照 AGENTS.md 新節檢查基座。
+tokens 與元件原始碼零變更——npm 不發版、registry 內容不變。
+
+**為什麼改**
+
+文件庫是第一個驗收宿主，但它與 Storybook 的樣式基座不對等——同一份元件在
+兩個宿主長成兩種樣子，而全部既有守衛都是靜態的，沒有一道看得見渲染結果。
+上一輪只橋接了 Infima 的顏色變數，等於把污染的格線調成 token 色；
+這次把「元件的樣式基座是宿主契約」定成通則，並讓它第一次有了會擋人的驗收。
+### 回饋入口：三分流接上實際門口
+
+**改了什麼**
+
+- **三個 Issue 表單**（`.github/ISSUE_TEMPLATE/`）：Bug 回報（最小重現＋規範版號必填）、
+  RFC 提案（五題逐欄、三次法則證據必填）、**缺件認領**（下拉列頁面章缺件表 9 項，
+  一則＝三次法則的一次證據）；空白 issue 關閉，導向文件站判準
+- **PR 模板**：小調整分流的載體，checklist 對齊 CI 守衛（四道驗證、registry 重跑、
+  版號三處、CHANGELOG 三問）
+- **[回饋與 RFC 流程](book/docs/7-governance/02-rfc.mdx)改版**：三分流表加「入口」欄、
+  守門人具名（@kielchang，`.github/CODEOWNERS` 落地）、新增〈提案的狀態機〉
+  （`rfc:討論中／已接受／已婉拒／已擱置`，只有守門人動）與〈RFC → ADR〉銜接
+  （已接受＝開 ADR「提議中」→實作合併改「已採用」；已婉拒＝issue 留可推翻的理由，不寫 ADR）；
+  台帳四題明示為五題的下游速記版
+- **文件站出口**：每頁「編輯此頁」（8-adr 產物頁導向正本 `docs/adr/`）與
+  「回報這一頁」鈕（自動帶頁面網址進 Bug 表單）；navbar「提出建議」；footer 回饋與版本連結
+- **缺件表可認領**：[頁面總覽](book/docs/5-pages/00-overview.mdx)缺件表加「認領」欄，
+  每列一鍵預填認領表單
+- **`CONTRIBUTING.md`／`SECURITY.md`**：貢獻操作版一頁（含維護者一次性設定：建 labels、
+  啟用私密安全回報）；安全回報通道與「不必等三次法則」的快速通道
+- **[ADR-0009](docs/adr/0009-feedback-via-issue-forms.md)**：回饋以 Issue 表單承載、
+  決策以 ADR 落地、不設 `docs/rfc/` 檔案庫的決策紀錄
+- **守衛掃描範圍擴大**：`tests/de-domain.test.ts` 加入 `.github/`、`CONTRIBUTING.md`、
+  `SECURITY.md`（含 `.yml`）——表單與貢獻文件的措辭同樣零容忍
+
+**我需要做什麼**
+
+想提建議的話：repo 的 Issues → New issue 就有三個表單；文件站每頁右上也有
+「回報這一頁」。維護者要做一次性設定（建 labels、啟用私密安全回報），
+步驟在 `CONTRIBUTING.md`。
+
+**為什麼改**
+
+治理章把回饋流程寫得很完整，但整條管線沒有門口：六個「走 RFC」的觸點全部
+指回同一頁抽象敘述，讀者知道要寫什麼、不知道貼到哪；守門人沒具名、
+RFC 與 ADR 互不認識。取用端要能真的提出設計建議，缺的不是原則，是入口。
+
 ---
 
 ## v0.10.0 · 2026-08-06

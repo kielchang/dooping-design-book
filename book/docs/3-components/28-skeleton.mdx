@@ -1,0 +1,67 @@
+---
+title: Skeleton 載入佔位
+---
+
+# Skeleton 載入佔位
+
+首次載入時，用灰塊佔住**真實版面的形狀**。
+
+<Demo title="卡片的載入佔位（左：載入中 → 右：載入完成）">
+  <div className="grid gap-4 md:grid-cols-2">
+    <div aria-busy="true" className="space-y-3 rounded-lg border p-4">
+      <div className="flex items-center gap-3">
+        <Skeleton className="size-10 rounded-full" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-4 w-2/5" />
+          <Skeleton className="h-3 w-3/5" />
+        </div>
+      </div>
+      <SkeletonText lines={3} />
+      <Skeleton className="h-8 w-24" />
+    </div>
+    <div className="space-y-3 rounded-lg border p-4">
+      <div className="flex items-center gap-3">
+        <div className="flex size-10 items-center justify-center rounded-full bg-muted text-sm font-semibold">乙</div>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium">乙單位</p>
+          <p className="text-xs text-muted-foreground">最近更新：今天 09:40</p>
+        </div>
+      </div>
+      <p className="text-sm leading-relaxed text-muted-foreground">
+        本期共 128 筆紀錄，其中 12 筆待確認；金額合計與上期持平。
+      </p>
+      <Button size="sm">檢視明細</Button>
+    </div>
+  </div>
+</Demo>
+
+## 規範
+
+<Rules>
+  <Do><p>骨架<strong>保留真實版面的高度與形狀</strong>——載入完成的瞬間版面不跳動。
+  這是骨架存在的唯一理由。</p></Do>
+  <Dont><p>不要隨手丟三根等寬灰條。跟真實內容對不上的骨架，
+  載入完成時整頁跳一下，比「載入中…」文字更糟。</p></Dont>
+</Rules>
+
+<Rules>
+  <Do><p>只用於<strong>首次載入</strong>。</p></Do>
+  <Dont><p>重新整理既有畫面時不要換回骨架——把使用者看得好好的資料閃成灰塊，
+  等於把「更新」演成「壞掉」。保留舊內容，資料到了再換。</p></Dont>
+</Rules>
+
+## 無障礙與動態
+
+- 骨架本身 `aria-hidden`；載入語意掛在**容器**的 `aria-busy="true"` 上，完成後移除。
+  讀屏使用者不需要逐根聽到灰條。
+- 脈動尊重 `prefers-reduced-motion`（`motion-reduce:animate-none`）——
+  靜止的灰塊已足以表達「這裡還沒好」。
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/skeleton.json
+```
+
+`Skeleton` 是形狀自訂的單塊（尺寸全由 class 決定）；`SkeletonText` 是 n 行文字段落
+（末行 60% 寬——等寬到底的假段落一眼就假）。

@@ -1,0 +1,91 @@
+---
+title: 設定頁
+---
+
+# 設定頁
+
+**很少來，來了就要一次改對。** 設定頁的訪問頻率最低、影響半徑最大——
+所以它的每一區都要回答一個問題：**這個改動什麼時候生效、影響到誰。**
+
+## 何時用
+
+<Rules>
+  <Do><p>改變<strong>系統或單位行為</strong>的東西放設定頁：顯示偏好、額度、開關、權限。</p></Do>
+  <Dont><p>不要把某一筆紀錄的欄位塞進設定頁——那是<a href="/pages/detail-page">明細頁</a>的事。
+  判準：這個值屬於「一筆資料」還是「系統怎麼運作」。</p></Dont>
+</Rules>
+
+設定入口放在側邊欄**最不順手的位置**——順手程度與按錯的代價成反比，
+是[站台層](/patterns/back-office-ia)的既有規則。
+
+## 組成
+
+<StoryFrame id="頁面-設定頁--典型組成" title="設定頁：立即生效／需儲存／危險操作三區" height={880} />
+
+| 區 | 內容 | 元件與規範 |
+| --- | --- | --- |
+| 頁首區 | 標題＋這些設定屬於誰（單位、系統） | — |
+| 內容區 | 分組卡：**立即生效區 → 需儲存區 → 危險操作區**，順序固定 | [Card](/components/card) |
+
+## 立即生效 vs 需儲存
+
+這是設定頁最重要的一條線，**同一張卡不得混用兩種模式**：
+
+| 模式 | 適用 | 卡片的長相 |
+| --- | --- | --- |
+| 立即生效 | 只影響自己的偏好（密集模式、預設檢視） | 沒有儲存鈕；卡片說明寫「變更立即生效」 |
+| 需儲存 | 影響其他人或正式資料（額度、管道） | 卡片自帶「還原／儲存」；改動未存標琥珀 |
+
+<Rules>
+  <Do><p>需儲存區改動後在卡片標題旁掛 <code>edit</code> 徽章（「已改動未送出」），
+  儲存成功就地給 <code>Callout live</code>（success）——琥珀語意與
+  <a href="/patterns/inline-field-editing">逐欄編輯</a>同一套。</p></Do>
+  <Dont><p>不要整頁一顆「儲存全部」。使用者只改了一格，卻要為整頁的未知改動負責；
+  儲存失敗時也說不清是哪一區失敗。</p></Dont>
+</Rules>
+
+影響會跨期間的設定（費率、額度這類「改了之後從何時起算」的值）不要就地覆寫，
+走[生效日版本化設定](/patterns/effective-dated-settings)。
+
+## 危險操作區
+
+做了就很難回頭的事（停用、重設、清空）**集中在最後一張卡**，
+不散落在各區：
+
+<Rules>
+  <Do><p>危險卡用 <code>destructive</code> 按鈕＋<a href="/components/dialog">Dialog</a> 二次確認，
+  確認文案寫明<strong>後果與回頭路</strong>（「重新啟用需要管理者權限」）。</p></Do>
+  <Dont><p>不要把危險動作與一般設定並排。「停用單位」貼著「密集模式」，
+  遲早有人在改顯示偏好時順手點到它。</p></Dont>
+</Rules>
+
+## 留痕
+
+需儲存區的每次變更都寫入異動紀錄，卡片上顯示「上次修改：時間・負責組別」——
+格式與回復規則見[稽核與回復](/patterns/audit-and-restore)。
+功能開關類設定的上線節奏見[功能開關](/patterns/feature-flags)。
+
+## 無障礙
+
+- 開關暫用 Checkbox（Switch 未收錄）：`Label` 綁定、狀態用文字寫清楚，不只靠勾選框。
+- 儲存成功的 Callout 帶 `live`，螢幕閱讀器唸得到「已儲存」。
+- 危險操作的 Dialog 焦點落在「返回」上，Enter 的預設路徑是安全的那條。
+
+## 取用
+
+```bash
+npx shadcn@latest add \
+  https://kielchang.github.io/dooping-design-book/r/card.json \
+  https://kielchang.github.io/dooping-design-book/r/checkbox.json \
+  https://kielchang.github.io/dooping-design-book/r/seg-group.json \
+  https://kielchang.github.io/dooping-design-book/r/number-input.json \
+  https://kielchang.github.io/dooping-design-book/r/chips.json \
+  https://kielchang.github.io/dooping-design-book/r/badge.json \
+  https://kielchang.github.io/dooping-design-book/r/callout.json \
+  https://kielchang.github.io/dooping-design-book/r/dialog.json
+```
+
+## 缺件與替代
+
+Switch 用 Checkbox 替代、Toast 用 `Callout live` 替代——見
+[頁面總覽的缺件表](/pages/overview)。

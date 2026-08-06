@@ -84,7 +84,7 @@ CI 有守衛：元件或 token 相對 `main` 有變但版號沒動，直接擋 P
 ## 截圖驗證的方法論
 
 要用截圖確認顏色時，**一定要比對 token 的期望值**，不要只用肉眼看。
-實測過的三個坑，都寫在 `book/docs/7-governance/07-story-conventions.mdx`：
+實測過的三個坑，都寫在 `book/docs/7-governance/08-story-conventions.mdx`：
 
 1. `--virtual-time-budget` 走虛擬時間、**不等非同步工作**，單次截圖會拍到
    主題還沒套用的畫面。要驗到相符為止（重試），加長等待無效。

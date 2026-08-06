@@ -32,6 +32,9 @@ commit 本身記在 tag 描述裡，不會遺失。
 
 改文件、CI、重構、改名 → 進 `main`、站台與 registry 更新，但**不 bump npm 版號**。
 
+取用端怎麼訂閱新版訊號、收到之後怎麼判斷要不要跟、每層怎麼跟——
+見文件站的[跟上新版](book/docs/7-governance/06-staying-current.mdx)。
+
 ---
 
 ## v0.10.0 · 2026-08-06

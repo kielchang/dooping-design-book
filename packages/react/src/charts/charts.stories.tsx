@@ -9,9 +9,10 @@ import { Scatter } from "./scatter";
 import { Heatmap } from "./heatmap";
 import { LineChart } from "./line-chart";
 import { Legend } from "./legend";
-import { PALETTE, type BarDatum } from "./base";
+import { PALETTE, STATUS_SERIES, colorByKey, type BarDatum } from "./base";
+import { Badge } from "../ui/badge";
 import { formatMoney, formatNumber } from "../lib/utils";
-import { demoRecords } from "../demo/sample-data";
+import { demoRecords, STATUS_LABEL } from "../demo/sample-data";
 
 const meta: Meta = { title: "元件/資料/圖表 Charts" };
 export default meta;
@@ -145,6 +146,68 @@ export const 散布與熱圖: Story = {
       </div>
     </div>
   ),
+};
+
+export const 語意維度的堆疊: Story = {
+  render: () => {
+    // 維度＝狀態：這不是「分類」，是系統已有語意色的維度（判斷樹第 1 層）
+    const STATUS_TO_SERIES = { done: "success", confirmed: "info", draft: "muted", void: "danger" } as const;
+    const units = [...new Set(demoRecords.map((r) => r.unit))].slice(0, 4);
+    const rowsWith = (color: (s: keyof typeof STATUS_TO_SERIES, i: number) => string) =>
+      units.map((unit) => ({
+        label: unit,
+        segments: (Object.keys(STATUS_TO_SERIES) as (keyof typeof STATUS_TO_SERIES)[]).map((s, i) => ({
+          label: STATUS_LABEL[s],
+          value: demoRecords.filter((r) => r.unit === unit && r.status === s).length,
+          color: color(s, i),
+        })),
+      }));
+
+    return (
+      <div className="max-w-xl space-y-8">
+        <div>
+          <p className="mb-1 text-sm font-medium">
+            ✅ 狀態維度用 STATUS_SERIES——與徽章同一套語意
+          </p>
+          <div className="mb-2 flex gap-2">
+            <Badge variant="success">{STATUS_LABEL.done}</Badge>
+            <Badge variant="info">{STATUS_LABEL.confirmed}</Badge>
+            <Badge variant="danger">{STATUS_LABEL.void}</Badge>
+          </div>
+          <StackedBar
+            title="各單位狀態組成（語意色）"
+            rows={rowsWith((s) => STATUS_SERIES[STATUS_TO_SERIES[s]])}
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            「{STATUS_LABEL.done}」在徽章上是綠的，在圖表裡也是綠的——語意記憶不被拆掉。
+          </p>
+        </div>
+        <div>
+          <p className="mb-1 text-sm font-medium">
+            🚫 同一份資料照序取 PALETTE——「{STATUS_LABEL.done}」變藍、與徽章打架
+          </p>
+          <StackedBar
+            title="各單位狀態組成（誤：分類色）"
+            rows={rowsWith((_s, i) => PALETTE[i])}
+          />
+        </div>
+        <div>
+          <p className="mb-1 text-sm font-medium">
+            第 2 層【身分】：colorByKey——「{units[1]}」在所有圖表、所有期別同一色
+          </p>
+          <BarChart
+            title="依固定鍵清單取色"
+            data={units.map((u) => ({ label: u, value: demoRecords.filter((r) => r.unit === u).length }))}
+            color={colorByKey(units[1], units)}
+            showValues
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            鍵清單是維度的定義（宿主宣告一次、所有圖表共用），不是當期資料的排序。
+          </p>
+        </div>
+      </div>
+    );
+  },
 };
 
 export const 子彈圖: Story = {

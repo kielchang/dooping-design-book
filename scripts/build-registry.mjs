@@ -112,6 +112,7 @@ const TITLES = {
   csv: ["csv 序列化", "含 UTF-8 BOM 的 CSV 產出與解析。"],
   download: ["download 下載工具", "觸發瀏覽器下載 Blob。"],
   "forms-diff": ["forms/diff 欄位比對", "FieldSpec 驅動的變更偵測與顯示格式化。"],
+  charts: ["Charts 圖表", "後台閱讀型的八種零相依圖＋圖例＋色票工具，含文字與鍵盤等價。"],
 };
 
 /**
@@ -161,6 +162,9 @@ const items = [];
 for (const abs of walk(SRC)) {
   const rel = relative(SRC, abs).replace(/\\/g, "/");
   if (rel === "index.ts" || rel === "version.ts" || rel.startsWith("demo/")) continue;
+  // charts/ 整組打包成單一 item（見迴圈後）——八種圖互相引用共同底座，
+  // 拆成十個 item 只會讓取用端裝到一半。
+  if (rel.startsWith("charts/")) continue;
 
   const modKey = rel.replace(/\.tsx?$/, "");
   const isLib = modKey in LIB_MODULES;
@@ -193,6 +197,51 @@ for (const abs of walk(SRC)) {
   };
   writeFileSync(join(OUT, `${name}.json`), `${JSON.stringify(item, null, 2)}\n`, "utf8");
   items.push({ name, version: SPEC_VERSION, type: item.type, title, description });
+}
+
+// ── charts：單一多檔 item ─────────────────────────────────────
+//
+// 八種圖共用一個底座（型別、PALETTE、capItems、文字／鍵盤等價表）並互相引用，
+// 拆成十個 item 的話 `npx shadcn add bar-chart` 會漏掉底座、裝到一半。
+// 整組一個 item：一個指令帶走全部，相依仍然只有 token 與 utils。
+{
+  const chartFiles = walk(join(SRC, "charts"));
+  if (chartFiles.length > 0) {
+    const allDeps = new Set();
+    const allRegistryDeps = new Set();
+    const selfNames = new Set(
+      chartFiles.map((abs) => basename(relative(SRC, abs)).replace(/\.tsx?$/, "")),
+    );
+    const files = chartFiles.map((abs) => {
+      const rel = relative(SRC, abs).replace(/\\/g, "/");
+      const content = rewrite(readFileSync(abs, "utf8").replace(/\r\n/g, "\n"));
+      const { deps, registryDeps } = analyse(content);
+      for (const d of deps) allDeps.add(d);
+      // 圖表檔互相引用會被改寫成 @/components/dooping/<name>，
+      // 對 item 內部的引用不算 registry 相依——它們就在同一包裡。
+      for (const d of registryDeps) if (!selfNames.has(d)) allRegistryDeps.add(d);
+      return {
+        path: `dooping/${rel}`,
+        content,
+        type: "registry:ui",
+        target: COMPONENT_TARGET(rel.replace(/^charts\//, "").replace(/\.tsx?$/, "")),
+      };
+    });
+    const [title, description] = TITLES.charts;
+    const item = {
+      $schema: "https://ui.shadcn.com/schema/registry-item.json",
+      name: "charts",
+      version: SPEC_VERSION,
+      type: "registry:ui",
+      title,
+      description,
+      dependencies: [TOKENS_DEP, ...[...allDeps].sort()],
+      registryDependencies: [...allRegistryDeps].sort().map((d) => `${BASE}/r/${d}.json`),
+      files,
+    };
+    writeFileSync(join(OUT, "charts.json"), `${JSON.stringify(item, null, 2)}\n`, "utf8");
+    items.push({ name: "charts", version: SPEC_VERSION, type: item.type, title, description });
+  }
 }
 
 // registry 索引（給人看、也給工具列舉用）。

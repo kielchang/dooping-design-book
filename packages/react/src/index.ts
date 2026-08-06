@@ -45,6 +45,18 @@ export * from "./ui/graph-canvas";
 // 文件示意積木（寫文件用，不是產品元件）
 export * from "./ui/mockup";
 
+// 圖表：後台閱讀型（八種圖＋圖例＋色票工具，見文件〈Charts 圖表〉的邊界）
+export * from "./charts/base";
+export * from "./charts/bar-chart";
+export * from "./charts/pareto";
+export * from "./charts/stacked-bar";
+export * from "./charts/trend-chart";
+export * from "./charts/bullet";
+export * from "./charts/scatter";
+export * from "./charts/heatmap";
+export * from "./charts/line-chart";
+export * from "./charts/legend";
+
 // 表單：唯讀逐欄編輯系統
 export * from "./form/editable-field";
 export * from "./form/change-summary";

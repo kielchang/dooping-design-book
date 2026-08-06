@@ -19,15 +19,14 @@ title: 元件總覽
 | 資料 | Table、DataTable、TabPills、Delta、EmptyState、Stepper |
 | 進階表單 | EditableField、ChangeSummary |
 | 引導 | Coachmark |
+| 圖表 | BarChart、Pareto、StackedBar、TrendChart、Bullet、Scatter、Heatmap、LineChart、Legend |
 | 文件用 | Placeholder / Spotlight / MockScreenFrame |
 
 ## 不收什麼
 
-- **完整的圖表庫**——[圖表](/components/charts)的**規範已經定稿**
-  （八種後台閱讀型的零相依 SVG 圖：邊界、資料形狀、參數、無障礙義務），
-  但參考實作還沒進 registry，所以這一版仍只提供[圖表色票 token](/foundations/color)。
-  規範本身刻意不做縮放、刷選、圖內鑽取，資料點也只撐到百位數——
-  需要分析型互動請直接用成熟圖表庫，不要改造那一組。
+- **完整的圖表庫**——[圖表](/components/charts)只收「後台閱讀型」的八種零相依圖，
+  刻意不做縮放、刷選、圖內鑽取，資料點也只撐到百位數。
+  需要分析型互動請直接用成熟圖表庫，不要改造這一組。
 - **ErrorBoundary、Layout、Sidebar**——這些是應用外殼的職責，不是設計語言。
 - **任何綁定特定業務流程的複合畫面**——它們在原專案裡是對的，抄到別的產業就是錯的。
 

@@ -1,6 +1,6 @@
 {
   "name": "@dooping/react",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Dooping React 參考實作 — 通用元件庫，只依賴 @dooping/tokens 與彼此",
   "license": "MIT",
   "type": "module",

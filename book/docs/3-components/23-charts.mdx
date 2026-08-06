@@ -7,10 +7,21 @@ title: Charts 圖表
 **一組零相依的 SVG 圖表**：不裝任何圖表庫，直接用 token 的色票畫。
 八種圖各自回答一個問題，超出這八個問題的需求，這組元件刻意不做。
 
-<Callout variant="info" title="這一頁目前是規範，實作還沒收">
-  八種圖的邊界、資料形狀、參數與無障礙義務已經定稿，但 `packages/react` 還沒有這些元件，
-  registry 也還沒有 `charts.json`。**現在還不能用 `npx shadcn add` 裝**——理由與後續見〈取用〉。
-</Callout>
+<Demo title="八種圖都是真元件（資料是行內宣告的兩鍵示範值）">
+  <div className="grid max-w-3xl gap-6 sm:grid-cols-2">
+    <BarChart
+      title="各單位數量"
+      showValues
+      data={[
+        { label: "甲單位", value: 420 },
+        { label: "乙單位", value: 250 },
+        { label: "丙單位", value: 610 },
+        { label: "丁單位", value: 180 },
+      ]}
+    />
+    <Bullet label="本期進度（目標＝上限）" value={640} target={800} />
+  </div>
+</Demo>
 
 ## 先講邊界：這組元件不適合什麼
 
@@ -138,6 +149,31 @@ type Point    = { x: number; y: number; label?: string; id?: string };
 | `onSelectRow` / `selectedRow` | 整列點擊鑽取與選取態 |
 | `height` | 單列高度 |
 
+<Demo title="每列右側固定顯示總量；圖例配 Legend">
+  <div className="max-w-md space-y-2">
+    <Legend items={[
+      { label: "甲類", color: "var(--chart-1)" },
+      { label: "乙類", color: "var(--chart-2)" },
+      { label: "丙類", color: "var(--chart-3)" },
+    ]} />
+    <StackedBar
+      title="各單位分類組成"
+      rows={[
+        { label: "甲單位", segments: [
+          { label: "甲類", value: 120, color: "var(--chart-1)" },
+          { label: "乙類", value: 80, color: "var(--chart-2)" },
+          { label: "丙類", value: 40, color: "var(--chart-3)" },
+        ] },
+        { label: "乙單位", segments: [
+          { label: "甲類", value: 60, color: "var(--chart-1)" },
+          { label: "乙類", value: 150, color: "var(--chart-2)" },
+          { label: "丙類", value: 30, color: "var(--chart-3)" },
+        ] },
+      ]}
+    />
+  </div>
+</Demo>
+
 ### TrendChart 趨勢折線
 
 **同一個量隨時間怎麼變。**
@@ -233,6 +269,19 @@ type Point    = { x: number; y: number; label?: string; id?: string };
   <Dont><p>不要在多張並排的熱圖上各自用自動值域。每張圖的「最紅」代表不同的數字，
   並排比較就是錯的——而且錯得完全看不出來。</p></Dont>
 </Rules>
+
+<Demo title="null 畫成灰底＋「—」，跟 0 分得開">
+  <Heatmap
+    title="單位 × 分類數量"
+    rowLabels={["甲單位", "乙單位", "丙單位"]}
+    colLabels={["甲類", "乙類", "丙類", "丁類"]}
+    cells={[
+      [120, 45, null, 8],
+      [60, 150, 12, null],
+      [null, 30, 95, 0],
+    ]}
+  />
+</Demo>
 
 ### LineChart 累積分布折線
 
@@ -338,14 +387,12 @@ const shown = capItems(data, 8);
 
 ### 文字等價：`role="img"` 的義務
 
-`role="img"` **不是中性標記**。它同時做兩件事：把 `<svg>` 當成一張圖，
-並使**子樹對輔助技術隱藏**——圖內 `<text>` 畫的類別名與數值，螢幕報讀器一個都讀不到。
+規則本身是**通則**，正本在[無障礙四原則](/accessibility/principles)：
+`role="img"` 會讓子樹對輔助技術隱藏，掛了就必須用文字補回（WCAG 1.1.1，Level A）；
+文字出口用 `sr-only` 表格、不做 SVG 焦點管理；數值已在鄰近可見文字時圖形改標 `aria-hidden`。
+這裡不重講——同一條規則有兩份說明，必然會分歧。
 
-所以掛了 `role="img"` 就等於承諾「我會給你文字說明」。沒給的話，
-資訊對報讀器使用者**完全消失**，比不寫 `role` 更糟（不寫至少 `<text>` 還可能被讀到）。
-這是 WCAG 1.1.1，Level A。
-
-實作必須提供兩層文字等價，分三種處理：
+本頁只留**各圖種對應到哪一種做法**：
 
 | 圖種 | 做法 |
 | --- | --- |
@@ -353,26 +400,29 @@ const shown = capItems(data, 8);
 | `StackedBar`／`Bullet` | 數值**已在鄰近可見文字**（列標籤＋合計／實際＋目標＋差額）→ 圖形標 `aria-hidden`，避免同一份資料唸兩次；`StackedBar` 的分段明細改由整體表格提供 |
 | `Heatmap` | 本來就是真表格（數值是可見文字、顏色只是輔助）→ 不加額外表格，改補正表格語意（`caption`／`scope`／列標頭用 `<th scope="row">`） |
 
-<Rules>
-  <Do><p><strong>用表格</strong>當文字出口。SVG 內部的焦點與無障礙樹支援在
-  各瀏覽器 × 各報讀器之間很不一致；<code>&lt;table&gt;</code> 的語意則是普世的
-  （報讀器有專門的表格瀏覽指令）。</p></Do>
-  <Dont><p>不要花力氣讓 SVG 可以逐點瀏覽。投入大、跨環境結果不可預期，
-  而且做完還是不如一張表格好用。</p></Dont>
-</Rules>
+### 鍵盤等價：資料表兼任操作介面
 
-### 鍵盤等價：實作時必須一併解掉
+hover 提示與點擊鑽取對鍵盤使用者不可達（WCAG 2.1.1，Level A）。
+解法**不是** SVG 焦點管理（理由同上節），而是讓文字等價的那張資料表**兼任鍵盤介面**：
 
-來源專案的實作把 hover 提示與 `onSelect` 鑽取做成**只有滑鼠拿得到**——
-資料點的熱區沒有 `tabIndex`／`onFocus`／`onKeyDown`。
-這違反 **WCAG 2.1.1 Keyboard（Level A）**，而且不只是無障礙問題：
-觸控筆電以外的替代輸入裝置一樣按不到。
+- 有 `onSelect` 的圖，資料表的每一列是一顆**真按鈕**，Enter 觸發同一個鑽取回呼
+- 資料表平常 `sr-only`，**鍵盤焦點進入時現形**（同 skip-link 慣例）——
+  明眼的鍵盤使用者不會把焦點丟進看不見的地方
+- 來源專案的實作沒有做這一層，收錄時已補上——這是收錄的前提，不是後續優化
 
-這條在收錄實作時**必須解掉**，不能當成已知限制帶進來——
-[無障礙四原則](/accessibility/principles)是門檻，不是建議。
+用 Tab 走到下面這個活範例就看得到：
 
-建議的解法是**讓上面那份資料表兼任鍵盤操作介面**（表格列變成按鈕觸發 `onSelect`），
-而不是去做 SVG 焦點管理——理由同上一節。
+<Demo title="Tab 進圖表，資料表會現形（列是可按的）">
+  <BarChart
+    title="各分類批次數"
+    data={[
+      { label: "甲類", value: 34 },
+      { label: "乙類", value: 51 },
+      { label: "丙類", value: 22 },
+    ]}
+    onSelect={() => {}}
+  />
+</Demo>
 
 ## 列印
 
@@ -384,27 +434,28 @@ const shown = capItems(data, 8);
 - 圖表卡片套 `print-block`（`break-inside: avoid`），避免一張圖被切成兩頁。
   見[列印與匯出](/patterns/print-and-export)。
 
+## 互動示範
+
+上面的活範例都是靜態資料。要玩鑽取、選取態、資料表現形，用 Storybook 的版本：
+
+<StoryFrame id="元件-資料-圖表-charts--長條與柏拉圖" title="長條與柏拉圖：點擊鑽取" height={520} />
+
 ## 取用
 
-⚠️ **這一頁是規範，參考實作還沒進 registry——現在還裝不了。**
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/charts.json
+```
 
-`packages/react` 還沒有這八支元件，`registry/` 裡也還沒有 `charts.json`。
-色票 token 已經在了（`--chart-1` … `--chart-8`），所以**你現在就可以照這份規範自己畫**，
-畫出來的顏色與主題、深淺模式、列印都會是對的。
+一個 item 帶走整組：八種圖＋`Legend`＋共同底座（型別、`PALETTE`、`capItems`、
+文字／鍵盤等價表）。相依只有 `@dooping/tokens`（色票與軸線變數）與 `utils`（`cn`）——
+沒有圖表庫、沒有 d3、沒有 canvas polyfill。
 
-**為什麼規範先落地、實作後收**：圖表是這本書裡唯一「規範比實作更急」的一層。
-色票 token 早就發佈了，各專案已經在自己畫圖表——沒有規範的話，
-它們會各自決定「幾段算太多」「空資料要畫什麼」「顏色能不能表達狀態」，
-而分家之後再統一的成本，比現在先把線劃出來高得多。
+抄進宿主後的匯入長這樣：
 
-實作收進來時要一併補的東西：
-
-| 要補什麼 | 說明 |
-| --- | --- |
-| 八支元件進 `packages/react` | 只能相依 token 與同伴模組，由[元件庫邊界守衛](/governance/drift-guards)把關 |
-| 註冊到 `book/src/theme/MDXComponents.tsx` | 註冊之後才能在每一節補 `<Demo>` 活範例；**本頁結構不必動** |
-| `registry/charts.json` | 由 `npm run build:registry` 產生，相依是 token 與 `lib/utils` |
-| 鍵盤等價 | 見上一節。這是收錄的前提，不是後續優化 |
+```tsx
+import { BarChart } from "@/components/dooping/bar-chart";
+import { PALETTE, capItems } from "@/components/dooping/base";
+```
 
 色彩驗收不需要新增守衛：`npm run verify:color` 已經在驗這 8 色的分類色票
 （彼此的色覺障礙 ΔE00、對四種底色的對比、以及不得靠近六個狀態色）。

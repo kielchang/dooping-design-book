@@ -47,6 +47,14 @@ export const columns = [
   />
 </Demo>
 
+## 外觀不變量：只有列底線
+
+與 <a href="/components/table">Table</a> 相同：表格本體**沒有外框、沒有直向格線、
+儲存格沒有邊框**，唯一的線是列與列之間 `--border` 的 1px 底線。
+篩選面板是 `popover` 底、`--border` 1px 框——它 portal 到 `body` 直下
+（避免被水平捲動裁掉），所以宿主的樣式基座必須涵蓋 portal 內容，不能只鋪在
+範例容器裡。本站的活範例由渲染守衛 `npm run verify:book` 驗收，機制見 ADR-0008。
+
 ## 欄位設定就是全部的 API
 
 ```tsx

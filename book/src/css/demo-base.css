@@ -1,0 +1,386 @@
+/* demo 宿主基座 — 把 Tailwind preflight 逐條移植到兩個 scope,
+ * 讓文件站的活範例拿到與 Storybook 完全相同的樣式前提(ADR-0008)。
+ *
+ * 為什麼需要:元件的 utility 只宣告 border-width;「border-style: solid、
+ * border-width: 0、預設邊框色」是 preflight 提供的隱含契約。文件站關掉
+ * preflight(tailwind.config.js,保護站台 chrome,維持不變),所以這份契約
+ * 要在範例的範圍內自己鋪——否則按鈕吃瀏覽器原生外框、表格吃 Infima 格線、
+ * 元件自畫的邊框整批安靜消失。
+ *
+ * 兩個 scope:
+ *   A) .demo-body :where(…)                      — Demo 容器內的活範例
+ *   B) body > :where(:not(#__docusaurus)) :where(…) — portal 內容(Dialog/
+ *      Select/Tooltip/資料表篩選面板都掛在 body 直下,逃出 Demo 子樹)
+ *
+ * 特異度是承重結構,改 selector 前先讀:
+ *   - 一律用 :where() 壓到 (0,1,0) 以下:蓋得過 Infima 的裸元素規則與
+ *     UA 預設,又讓元件的 utilities(同為 0,1,0、在本檔之後載入)靠順序獲勝。
+ *   - scope B 的 body 必須留在 :where 外(0,0,1,與 Infima 平手、靠本檔
+ *     後載順序贏);#__docusaurus 必須包在 :where 內(否則 :not(#id) 帶
+ *     1,0,0,反過來蓋掉 utilities)。
+ *   - 本檔必須在 kit.css 的 @tailwind utilities 之前引入。
+ *
+ * 同步守衛:tests/host-baseline.test.ts 把本檔與
+ * node_modules/tailwindcss/lib/css/preflight.css 逐條對應——Tailwind 升版
+ * 改了 preflight,那支測試會紅,紅了就回來重新移植。
+ * theme() 的解法寫死(preset 沒有 borderColor.DEFAULT、預設色盤已清空):
+ *   theme('borderColor.DEFAULT', …) → hsl(var(--border))
+ *   theme('fontFamily.sans', …)     → var(--font-family-sans)
+ *   theme('fontFamily.mono', …)     → var(--font-family-mono)
+ *   theme('fontFamily.…Settings', …)→ normal
+ *   theme('colors.gray.400', …)     → #9ca3af(與 Storybook 實解一致)
+ *
+ * 注意:Demo 內只放元件,不要放散文清單或連結——a / ol / ul 在這裡會被
+ * reset 成元件語境(list-style: none、color: inherit),散文請寫在 Demo 外。
+ */
+
+/* ── preflight 移植(順序與原檔一致) ─────────────────────────── */
+
+.demo-body :where(*),
+body > :where(:not(#__docusaurus)),
+body > :where(:not(#__docusaurus)) :where(*) {
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: hsl(var(--border));
+}
+
+.demo-body ::before,
+.demo-body ::after,
+body > :where(:not(#__docusaurus)) ::before,
+body > :where(:not(#__docusaurus)) ::after {
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: hsl(var(--border));
+  --tw-content: '';
+}
+
+/* 原檔 html/:host 的可繼承部份,落在兩個 scope 根上
+   (html-only 的 -webkit-text-size-adjust 捨棄;body 的 margin/line-height 規則整條捨棄) */
+.demo-body,
+body > :where(:not(#__docusaurus)) {
+  line-height: 1.5;
+  -moz-tab-size: 4;
+  tab-size: 4;
+  font-family: var(--font-family-sans);
+  font-feature-settings: normal;
+  font-variation-settings: normal;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.demo-body :where(hr),
+body > :where(:not(#__docusaurus)) :where(hr) {
+  height: 0;
+  color: inherit;
+  border-top-width: 1px;
+}
+
+.demo-body :where(abbr:where([title])),
+body > :where(:not(#__docusaurus)) :where(abbr:where([title])) {
+  text-decoration: underline dotted;
+}
+
+.demo-body :where(h1),
+.demo-body :where(h2),
+.demo-body :where(h3),
+.demo-body :where(h4),
+.demo-body :where(h5),
+.demo-body :where(h6),
+body > :where(:not(#__docusaurus)) :where(h1),
+body > :where(:not(#__docusaurus)) :where(h2),
+body > :where(:not(#__docusaurus)) :where(h3),
+body > :where(:not(#__docusaurus)) :where(h4),
+body > :where(:not(#__docusaurus)) :where(h5),
+body > :where(:not(#__docusaurus)) :where(h6) {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.demo-body :where(a),
+body > :where(:not(#__docusaurus)) :where(a) {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+.demo-body :where(b),
+.demo-body :where(strong),
+body > :where(:not(#__docusaurus)) :where(b),
+body > :where(:not(#__docusaurus)) :where(strong) {
+  font-weight: bolder;
+}
+
+.demo-body :where(code),
+.demo-body :where(kbd),
+.demo-body :where(samp),
+.demo-body :where(pre),
+body > :where(:not(#__docusaurus)) :where(code),
+body > :where(:not(#__docusaurus)) :where(kbd),
+body > :where(:not(#__docusaurus)) :where(samp),
+body > :where(:not(#__docusaurus)) :where(pre) {
+  font-family: var(--font-family-mono);
+  font-feature-settings: normal;
+  font-variation-settings: normal;
+  font-size: 1em;
+}
+
+.demo-body :where(small),
+body > :where(:not(#__docusaurus)) :where(small) {
+  font-size: 80%;
+}
+
+.demo-body :where(sub),
+.demo-body :where(sup),
+body > :where(:not(#__docusaurus)) :where(sub),
+body > :where(:not(#__docusaurus)) :where(sup) {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+.demo-body :where(sub),
+body > :where(:not(#__docusaurus)) :where(sub) {
+  bottom: -0.25em;
+}
+
+.demo-body :where(sup),
+body > :where(:not(#__docusaurus)) :where(sup) {
+  top: -0.5em;
+}
+
+.demo-body :where(table),
+body > :where(:not(#__docusaurus)) :where(table) {
+  text-indent: 0;
+  border-color: inherit;
+  border-collapse: collapse;
+}
+
+.demo-body :where(button),
+.demo-body :where(input),
+.demo-body :where(optgroup),
+.demo-body :where(select),
+.demo-body :where(textarea),
+body > :where(:not(#__docusaurus)) :where(button),
+body > :where(:not(#__docusaurus)) :where(input),
+body > :where(:not(#__docusaurus)) :where(optgroup),
+body > :where(:not(#__docusaurus)) :where(select),
+body > :where(:not(#__docusaurus)) :where(textarea) {
+  font-family: inherit;
+  font-feature-settings: inherit;
+  font-variation-settings: inherit;
+  font-size: 100%;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+.demo-body :where(button),
+.demo-body :where(select),
+body > :where(:not(#__docusaurus)) :where(button),
+body > :where(:not(#__docusaurus)) :where(select) {
+  text-transform: none;
+}
+
+.demo-body :where(button),
+.demo-body :where(input:where([type='button'])),
+.demo-body :where(input:where([type='reset'])),
+.demo-body :where(input:where([type='submit'])),
+body > :where(:not(#__docusaurus)) :where(button),
+body > :where(:not(#__docusaurus)) :where(input:where([type='button'])),
+body > :where(:not(#__docusaurus)) :where(input:where([type='reset'])),
+body > :where(:not(#__docusaurus)) :where(input:where([type='submit'])) {
+  -webkit-appearance: button;
+  background-color: transparent;
+  background-image: none;
+}
+
+.demo-body :where(:-moz-focusring),
+body > :where(:not(#__docusaurus)) :where(:-moz-focusring) {
+  outline: auto;
+}
+
+.demo-body :where(:-moz-ui-invalid),
+body > :where(:not(#__docusaurus)) :where(:-moz-ui-invalid) {
+  box-shadow: none;
+}
+
+.demo-body :where(progress),
+body > :where(:not(#__docusaurus)) :where(progress) {
+  vertical-align: baseline;
+}
+
+.demo-body ::-webkit-inner-spin-button,
+.demo-body ::-webkit-outer-spin-button,
+body > :where(:not(#__docusaurus)) ::-webkit-inner-spin-button,
+body > :where(:not(#__docusaurus)) ::-webkit-outer-spin-button {
+  height: auto;
+}
+
+.demo-body :where([type='search']),
+body > :where(:not(#__docusaurus)) :where([type='search']) {
+  -webkit-appearance: textfield;
+  outline-offset: -2px;
+}
+
+.demo-body ::-webkit-search-decoration,
+body > :where(:not(#__docusaurus)) ::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+.demo-body ::-webkit-file-upload-button,
+body > :where(:not(#__docusaurus)) ::-webkit-file-upload-button {
+  -webkit-appearance: button;
+  font: inherit;
+}
+
+.demo-body :where(summary),
+body > :where(:not(#__docusaurus)) :where(summary) {
+  display: list-item;
+}
+
+.demo-body :where(blockquote),
+.demo-body :where(dl),
+.demo-body :where(dd),
+.demo-body :where(h1),
+.demo-body :where(h2),
+.demo-body :where(h3),
+.demo-body :where(h4),
+.demo-body :where(h5),
+.demo-body :where(h6),
+.demo-body :where(hr),
+.demo-body :where(figure),
+.demo-body :where(p),
+.demo-body :where(pre),
+body > :where(:not(#__docusaurus)) :where(blockquote),
+body > :where(:not(#__docusaurus)) :where(dl),
+body > :where(:not(#__docusaurus)) :where(dd),
+body > :where(:not(#__docusaurus)) :where(h1),
+body > :where(:not(#__docusaurus)) :where(h2),
+body > :where(:not(#__docusaurus)) :where(h3),
+body > :where(:not(#__docusaurus)) :where(h4),
+body > :where(:not(#__docusaurus)) :where(h5),
+body > :where(:not(#__docusaurus)) :where(h6),
+body > :where(:not(#__docusaurus)) :where(hr),
+body > :where(:not(#__docusaurus)) :where(figure),
+body > :where(:not(#__docusaurus)) :where(p),
+body > :where(:not(#__docusaurus)) :where(pre) {
+  margin: 0;
+}
+
+.demo-body :where(fieldset),
+body > :where(:not(#__docusaurus)) :where(fieldset) {
+  margin: 0;
+  padding: 0;
+}
+
+.demo-body :where(legend),
+body > :where(:not(#__docusaurus)) :where(legend) {
+  padding: 0;
+}
+
+.demo-body :where(ol),
+.demo-body :where(ul),
+.demo-body :where(menu),
+body > :where(:not(#__docusaurus)) :where(ol),
+body > :where(:not(#__docusaurus)) :where(ul),
+body > :where(:not(#__docusaurus)) :where(menu) {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.demo-body :where(dialog),
+body > :where(:not(#__docusaurus)) :where(dialog) {
+  padding: 0;
+}
+
+.demo-body :where(textarea),
+body > :where(:not(#__docusaurus)) :where(textarea) {
+  resize: vertical;
+}
+
+.demo-body :where(input)::placeholder,
+.demo-body :where(textarea)::placeholder,
+body > :where(:not(#__docusaurus)) :where(input)::placeholder,
+body > :where(:not(#__docusaurus)) :where(textarea)::placeholder {
+  opacity: 1;
+  color: #9ca3af;
+}
+
+.demo-body :where(button),
+.demo-body :where([role="button"]),
+body > :where(:not(#__docusaurus)) :where(button),
+body > :where(:not(#__docusaurus)) :where([role="button"]) {
+  cursor: pointer;
+}
+
+.demo-body :where(:disabled),
+body > :where(:not(#__docusaurus)) :where(:disabled) {
+  cursor: default;
+}
+
+.demo-body :where(img),
+.demo-body :where(svg),
+.demo-body :where(video),
+.demo-body :where(canvas),
+.demo-body :where(audio),
+.demo-body :where(iframe),
+.demo-body :where(embed),
+.demo-body :where(object),
+body > :where(:not(#__docusaurus)) :where(img),
+body > :where(:not(#__docusaurus)) :where(svg),
+body > :where(:not(#__docusaurus)) :where(video),
+body > :where(:not(#__docusaurus)) :where(canvas),
+body > :where(:not(#__docusaurus)) :where(audio),
+body > :where(:not(#__docusaurus)) :where(iframe),
+body > :where(:not(#__docusaurus)) :where(embed),
+body > :where(:not(#__docusaurus)) :where(object) {
+  display: block;
+  vertical-align: middle;
+}
+
+.demo-body :where(img),
+.demo-body :where(video),
+body > :where(:not(#__docusaurus)) :where(img),
+body > :where(:not(#__docusaurus)) :where(video) {
+  max-width: 100%;
+  height: auto;
+}
+
+.demo-body :where([hidden]:where(:not([hidden="until-found"]))),
+body > :where(:not(#__docusaurus)) :where([hidden]:where(:not([hidden="until-found"]))) {
+  display: none;
+}
+
+/* ── 以下不是 preflight:Docusaurus 宿主特有的反制與例外 ────────── */
+
+/* Infima 對裸 <table> 的格線、斑馬、儲存格 padding 全走 --ifm-table-* 變數。
+   在容器上把變數歸零——變數靠繼承生效、不吃特異度,所以不會誤傷元件自己的
+   bg/padding utilities(它們是顯式宣告,不讀這些變數)。 */
+.demo-body {
+  --ifm-table-border-width: 0;
+  --ifm-table-cell-padding: 0;
+  --ifm-table-stripe-background: transparent;
+  --ifm-table-background: transparent;
+  --ifm-table-head-background: transparent;
+}
+
+/* Infima 的 table { display: block; margin-bottom; overflow: auto } 沒走變數,
+   用結構規則反制((0,1,0) 蓋過裸元素的 (0,0,1))。 */
+.demo-body :where(table) {
+  display: table;
+  margin-bottom: 0;
+  overflow: visible;
+}
+
+/* 全站唯一在 Demo 外裸用的真元件是 Callout(散文旁註)。它只缺 preflight 的
+   border-style: solid 這一項;用它的 a11y role 當穩定鉤子,不動 tsx、不動 DOM。
+   誤中 Docusaurus admonition 也無害——Infima 的 .alert 本來就是 solid。 */
+.markdown :where([role="note"]),
+.markdown :where([role="alert"]) {
+  border-style: solid;
+}

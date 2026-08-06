@@ -187,6 +187,23 @@ export function runChecks() {
       // 改版前用實色狀態色，實測 1.60–5.43:1，八組裡有四組低於 3:1 的非文字門檻。
       if (c < NONTEXT) fail.push(`${s}/${mode} 左粗邊（＝文字色）對淡底只有 ${c.toFixed(2)}:1`);
     }
+
+    // 欄位錯誤態（aria-invalid）：danger **邊框**（欄位底不變）。
+    // 這條門檻第一次跑就抓到過真實違規：先前的實作把錯誤欄整格染 danger-subtle，
+    // 深色下邊框對那個底只有 2.42:1。修法不是放寬門檻也不是動全域淡底
+    // （會破壞染色量等量），而是拿掉整格染紅——錯誤的主訊號是邊框＋文字＋圖示，
+    // 整格淡底還會吃掉高飽和面積預算（十個錯誤欄＝十塊紅底）。
+    // 邊框對「欄位可能坐的兩種底」都要 ≥3:1，只驗一邊會有一側隱形而守衛照樣綠。
+    {
+      const dBorder = px(mode, "danger");
+      for (const [surfName, surf] of [
+        ["background（一般欄位底）", px(mode, "background")],
+        ["field-editable（可編輯欄位底）", px(mode, "field-editable")],
+      ]) {
+        const c = contrast(dBorder, surf);
+        if (c < NONTEXT) fail.push(`欄位錯誤邊框 danger/${mode} 對 ${surfName} 只有 ${c.toFixed(2)}:1（需 ${NONTEXT}）`);
+      }
+    }
     // 四種淡底的「染色量」要相等——這一條擋的是嚴重度階序在淡底層失效。
     // 改版前是「固定 L ＋ 固定 chroma」，但 sRGB 色域不是色相對稱的，於是 info／danger
     // 被色域裁切、success 沒有：實測 ΔE00(subtle, card) 是 11.0/12.6/14.1/18.5，

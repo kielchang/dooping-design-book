@@ -42,6 +42,9 @@ export * from "./ui/gantt";
 // @xyflow/react 的薄封裝——相依被隔離守衛關在那一個檔案裡
 export * from "./ui/graph-canvas";
 
+// 載入中（骨架屏；三種載入手段的分工見文件〈載入中〉）
+export * from "./ui/skeleton";
+
 // 文件示意積木（寫文件用，不是產品元件）
 export * from "./ui/mockup";
 
@@ -56,6 +59,9 @@ export * from "./charts/scatter";
 export * from "./charts/heatmap";
 export * from "./charts/line-chart";
 export * from "./charts/legend";
+
+// 表單：欄位包裝（Label＋aria 連動＋錯誤態）
+export * from "./form/form-field";
 
 // 表單：唯讀逐欄編輯系統
 export * from "./form/editable-field";

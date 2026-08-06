@@ -104,6 +104,8 @@ const TITLES = {
   gantt: ["Gantt 時間軸", "檢視與選取用的精簡時間軸：分類色長條、進度、今天線、列選取。"],
   "graph-canvas": ["GraphCanvas 節點畫布", "@xyflow/react 的薄封裝：token 橋接、狀態層選取、中性聚焦環。"],
   mockup: ["Mockup 文件示意積木", "Placeholder／Spotlight／MockScreenFrame：零截圖文件示意。"],
+  skeleton: ["Skeleton 骨架屏", "首載用的版面灰塊；三種載入手段的分工見文件〈載入中〉。"],
+  "form-field": ["FormField 欄位包裝", "Label＋aria 連動＋錯誤態的固定寫法元件化，含 FieldError。"],
   "editable-field": ["EditableField 唯讀逐欄編輯", "點擊才進編輯、改動標色、undo/redo 先確認。"],
   "change-summary": ["ChangeSummary 變更摘要", "送出前的舊值→新值清單，可逐欄還原。"],
   "use-record-diff": ["useRecordDiff 變更追蹤", "草稿 vs 原始值的差異與還原 hook。"],

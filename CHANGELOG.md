@@ -54,6 +54,61 @@ commit 本身記在 tag 描述裡，不會遺失。
 
 ---
 
+## 未發佈（`dev`）
+
+> 合併進 `main` 前把這一節改名。這批動了規範版號（0.11.0，新增元件＝minor）；
+> **tokens 維持 0.6.0**——全部用既有 token，不發 npm、不推 tokens tag。
+
+### 兩個 P0 設計缺口：載入態與欄位錯誤態（規範 v0.11.0，tokens 不變）
+
+**改了什麼**
+
+覆蓋度清查（交接包 D 段）點名的兩個 P0——「全庫沒有 loading 態」
+「全庫沒有 error 態」——它們是**設計缺口不是測試缺口**，先補 story 只會
+補出五種不同的 loading。這批先定規範再落元件：
+
+- **載入態規範〈載入中〉**（[色彩語意](book/docs/2-foundations/01-color.mdx)新節）：
+  三種手段各有位置——首載＝**Skeleton**（版面已知不跳動）、
+  重查＝**就地變暗保留舊內容**（已有資料再蓋骨架會閃）、
+  提交＝disabled＋圖示＋文案（按鈕沒有 loading 變體的既有立場，銜接不推翻）。
+  載入不是狀態語意，一律中性（`--muted`），不進提醒色彩色家族
+- **新增 `Skeleton`／`SkeletonText`**；**`DataTable` 加 `loading`**：
+  首載渲染骨架列（列數＝每頁筆數、上限 15），已有資料就地變暗＋`aria-busy`；
+  讀屏出口由容器宣告一次（`role="status"`），骨架塊 `aria-hidden`
+- **新增 `FormField`／`FieldError`**：「Label＋`aria-describedby`＋`aria-invalid`＋
+  錯誤小字」的固定寫法元件化，id 連動自動接好；錯誤三重編碼（色＋圖示＋文字）；
+  與區塊層 Callout 彙總是分工不是取代
+- **修掉一個真實的深色違規**：先前錯誤欄整格染 `--danger-subtle`，
+  深色下 danger 邊框對那個底只有 **2.42:1**（低於 1.4.11 的 3:1）。
+  修法不是放寬門檻也不是動全域淡底（會破壞染色量等量），而是**不整格染紅**——
+  錯誤主訊號是邊框＋文字＋圖示，整格紅底還會吃掉高飽和面積預算
+  （十個錯誤欄＝十塊紅底）。欄位狀態三層表同步修正
+- **verify:color 新門檻**：danger 邊框對兩種欄位底（`background`／`--field-editable`）
+  兩模式都 ≥3:1——這條**第一次跑就抓到上述違規**，反向驗證過
+- **第一支 play function**：FormField 的 aria 連動（`aria-invalid`／`describedby`
+  指向存在的錯誤節點／無錯誤欄不得帶 invalid）——樣式看起來都對、
+  讀屏卻接不到訊息，正是改版時最容易安靜壞掉的部分
+- 缺件表劃掉 Skeleton 與 Form 兩列（`missing-piece.yml` 同步，表下補「畢業」紀錄）；
+  文件八處同步（05-input 錯誤態節＋活範例、13-data-table 載入節、16-empty-state
+  「載入中不是空」、01-button 連結、提醒色辭典同框表加錯誤行、表單頁改用 FormField）
+
+**我需要做什麼**：
+
+想用的專案：`npx shadcn add …/r/skeleton.json`／`…/r/form-field.json`。
+**已在用 `aria-invalid` 樣式鉤子的**：錯誤欄不再整格染紅（深色違規修正）——
+重抄 Input／Select 兩支，或自行拿掉 `aria-[invalid=true]:bg-danger-subtle`。
+其餘零影響；DataTable 的 `loading` 是新增 prop，不傳＝現況。
+
+**為什麼改**：
+
+載入與錯誤是後台系統每一頁都會遇到的兩種狀態，卻是全庫唯二沒有規範的——
+每個畫面自己發明的結果就是五種 loading、三種錯誤標法。規範先行
+（決策表＋反例），元件只是把規範變成預設值；深色違規的修正順帶證明了
+「新增守衛必須反向驗證」之外的另一半：**新守衛第一次跑就該對著現況跑**，
+它抓到的每一條都是已經存在的問題。
+
+---
+
 ## 2026-08-06（第二則·純 CI 進版，版號未動）
 
 ### 渲染守衛的 Playwright 快取（純 CI，版號不動）

@@ -4,6 +4,7 @@ import {
   Table, TableHeader, TableBody, TableFooter, TableRow, TableHead, TableCell, freezeFirst,
 } from "./table";
 import { EmptyState } from "./empty-state";
+import { Skeleton } from "./skeleton";
 import { Input } from "./input";
 import { Button } from "./button";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./select";
@@ -66,6 +67,7 @@ export interface DataTableLabels {
   emptyTitle: string;
   noResultTitle: string;
   noResultHint: string;
+  loading: string;
   rowsRange: (from: number, to: number, total: number) => string;
   perPage: (n: number) => string;
   prev: string;
@@ -98,6 +100,7 @@ export const DEFAULT_DATA_TABLE_LABELS: DataTableLabels = {
   emptyTitle: "尚無資料",
   noResultTitle: "查無符合的資料",
   noResultHint: "請調整關鍵字或欄位篩選。",
+  loading: "載入中…",
   rowsRange: (f, t, n) => `第 ${f}–${t} ／ 共 ${n} 筆`,
   perPage: (n) => `每頁 ${n}`,
   prev: "上一頁",
@@ -129,6 +132,12 @@ export type DataTableProps<T> = {
   /** 可拖曳欄位邊界調整寬度、雙擊自適應；預設開 */
   resizable?: boolean;
   empty?: { title: string; hint?: string; icon?: ReactNode; action?: ReactNode };
+  /**
+   * 載入中。兩種長相，元件自己分（規範見文件〈載入中〉）：
+   * 還沒有資料 → 骨架列（列數＝每頁筆數，上限 15——骨架超過一屏沒有意義）；
+   * 已有資料（重新查詢）→ 保留舊內容就地變暗＋ `aria-busy`，**不要**蓋骨架（會閃）。
+   */
+  loading?: boolean;
   /** 工具列額外元素（期間選擇器、其他按鈕…），置於搜尋列右側 */
   toolbar?: ReactNode;
   /** 提供則顯示「匯出 CSV」按鈕，匯出**目前篩選排序後**的資料 */
@@ -154,7 +163,7 @@ export function DataTable<T>({
   pageSize = 15, pageSizeOptions = [5, 15, 30, 50],
   searchable = true, searchPlaceholder,
   zebra = true, stickyHeader = true, dense = false, maxHeight, crosshair = true, resizable = true,
-  empty, toolbar, csv, rowClassName, onRowClick, labels: labelOverrides,
+  empty, toolbar, csv, rowClassName, onRowClick, loading = false, labels: labelOverrides,
 }: DataTableProps<T>) {
   const L = { ...DEFAULT_DATA_TABLE_LABELS, ...labelOverrides };
   const [query, setQuery] = useState("");
@@ -344,7 +353,38 @@ export function DataTable<T>({
         </div>
       )}
 
-      {sorted.length === 0 ? (
+      {/* 載入的無障礙出口：狀態由容器宣告一次，骨架塊本身 aria-hidden */}
+      {loading && (
+        <p role="status" className="sr-only">
+          {L.loading}
+        </p>
+      )}
+      {loading && rows.length === 0 ? (
+        // 首載骨架：表頭是真的（欄位已知），列是灰塊——版面不跳動。
+        // 列數＝每頁筆數，上限 15：骨架超過一屏沒有意義。
+        <Table zebra={false} maxHeight={maxHeight}>
+          <TableHeader sticky={false}>
+            <TableRow>
+              {columns.map((c) => (
+                <TableHead key={c.key} className={cn(c.numeric && "text-right")}>
+                  <div className={cn("flex h-10 items-center px-2", c.numeric && "justify-end")}>{c.header}</div>
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody aria-hidden>
+            {Array.from({ length: Math.min(size, 15) }, (_, r) => (
+              <TableRow key={r}>
+                {columns.map((c) => (
+                  <TableCell key={c.key}>
+                    <Skeleton className={cn("h-4", c.numeric ? "ml-auto w-16" : "w-4/5")} />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      ) : sorted.length === 0 ? (
         <EmptyState
           title={query || activeFilterCount > 0 ? L.noResultTitle : empty?.title ?? L.emptyTitle}
           hint={query || activeFilterCount > 0 ? L.noResultHint : empty?.hint}
@@ -353,6 +393,9 @@ export function DataTable<T>({
           compact
         />
       ) : (
+        // 已有資料的重新查詢：保留舊內容就地變暗（仍可讀）＋鎖互動。
+        // 不蓋骨架——資料換一批就閃一次骨架，比「看著舊資料等新的」糟得多。
+        <div aria-busy={loading || undefined} className={cn(loading && "pointer-events-none opacity-60 transition-opacity")}>
         <Table ref={tableRef} zebra={zebra} maxHeight={maxHeight}>
           <TableHeader sticky={stickyHeader}>
             <TableRow onMouseLeave={() => crosshair && setCross(null)}>
@@ -467,6 +510,7 @@ export function DataTable<T>({
             </TableFooter>
           )}
         </Table>
+        </div>
       )}
 
       {/* 篩選面板走 portal＋fixed：留在表格內會被水平捲動裁掉，或被凍結首欄蓋住。 */}

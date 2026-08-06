@@ -37,6 +37,32 @@ Input、Select、EditableField 全部 36px（`--size-control`）。
   然後他忘記這格要填什麼——這是無障礙與可用性雙輸的做法。</p></Dont>
 </Rules>
 
+## 錯誤態：FormField 把固定寫法接好
+
+欄位錯誤是**欄位層**的語意事件：`aria-invalid` 讓邊框轉 `--danger`，
+錯誤小字＋圖示就地顯示在欄位下（色＋圖示＋文字三重編碼）。
+聚焦環照常是中性的——**語意用彩色、焦點用中性**，同框不打架
+（[提醒色辭典](/foundations/alert-colors)的分工在欄位上的落地）。
+錯誤欄**不整格染紅**：主訊號是邊框與文字，整格淡底會吃掉高飽和面積預算，
+深色下還會讓邊框對底的對比掉到門檻以下（verify:color 有一條盯著）。
+
+`FormField` 把「Label＋`aria-describedby`＋`aria-invalid`＋錯誤小字」的固定寫法元件化——
+id 連動自動接好，取用端不再手寫三條 aria、也就不會漏：
+
+<Demo title="錯誤欄聚焦看看：danger 邊框（語意）與中性聚焦環（焦點）同框">
+  <div className="max-w-sm space-y-4">
+    <FormField label="名稱" hint="2–20 個字" required>
+      <Input placeholder="輸入名稱" />
+    </FormField>
+    <FormField label="數量" required error="必須大於 0">
+      <Input defaultValue="0" inputMode="numeric" />
+    </FormField>
+  </div>
+</Demo>
+
+多欄錯誤的**彙總**仍由區塊層的 [Callout](/components/callout)（`live`）負責——
+它報「有幾個欄位要修」，不重複每一條內容；兩層是分工，不是取代。
+
 ## 取用
 
 ```bash

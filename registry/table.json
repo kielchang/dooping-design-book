@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "table",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "type": "registry:ui",
   "title": "Table 表格基礎件",
   "description": "表格語意元素＋數字欄／凍結首欄／可排序表頭。",

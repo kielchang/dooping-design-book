@@ -1,6 +1,6 @@
 {
   "name": "dooping-design-book",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "private": true,
   "type": "module",
   "description": "Dooping Design Book — 跨專案設計語言、模式手冊與 React 參考實作",
@@ -25,6 +25,7 @@
   "devDependencies": {
     "@storybook/addon-essentials": "^8.6.14",
     "@storybook/react-vite": "^8.6.18",
+    "@storybook/test": "^8.6.18",
     "@types/node": "^22.19.21",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

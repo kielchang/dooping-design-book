@@ -19,11 +19,9 @@ body:
       options:
         - Toast
         - Switch
-        - Skeleton
         - 期間選擇器
         - Textarea
         - RadioGroup
-        - Form 包裝／欄位錯誤元件
         - PageHeader／Breadcrumb
         - Drawer／Popover／DropdownMenu
         - 其他（下方說明）

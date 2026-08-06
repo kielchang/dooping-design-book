@@ -37,12 +37,14 @@ const ICON: Record<CalloutVariant, LucideIcon> = {
 //
 // 三邊的細邊框統一成同一個透明度（原本 success/info/danger 是 /30、warning 是 /40，
 // 沒有理由不同）。細邊框只是形狀提示，不承載語意，所以用透明度是可以的。
-const LOW: Record<CalloutVariant, string> = {
+// 具名匯出：Toast 與提示框共用同一組「淡底表面」語彙（同一份事實只寫一次）。
+export const STATUS_SUBTLE_SURFACE: Record<CalloutVariant, string> = {
   success: "border-success/30 bg-success-subtle text-success-subtle-foreground",
   warning: "border-warning/30 bg-warning-subtle text-warning-subtle-foreground",
   info: "border-info/30 bg-info-subtle text-info-subtle-foreground",
   danger: "border-danger/30 bg-danger-subtle text-danger-subtle-foreground",
 };
+const LOW = STATUS_SUBTLE_SURFACE;
 
 const HIGH: Record<CalloutVariant, string> = {
   success: "border-transparent bg-success text-success-foreground",

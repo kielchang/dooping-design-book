@@ -7,14 +7,20 @@ import { cn } from "../lib/utils";
 //   3. 提交中（按鈕）     → disabled＋換圖示＋改文案（01-button 的既有立場，沒有 loading 變體）
 //
 // 載入不是狀態語意——顏色一律中性（--muted），不進提醒色的彩色家族。
-// 動畫用 Tailwind 內建 animate-pulse：prefers-reduced-motion 下自動靜態，零新 token。
+// 動畫用 Tailwind 內建 animate-pulse，並**顯式**以 motion-reduce:animate-none 停下——
+// prefers-reduced-motion 的使用者拿到靜態灰塊，它本身已足以表達「這裡還沒好」。零新 token。
 //
 // 無障礙分工：骨架本身 aria-hidden（它不承載資訊）；「載入中」由**容器**宣告
 // （aria-busy ＋ role="status" 的 sr-only 文字），不是每一塊灰各念一次。
 
 /** 骨架塊：尺寸由 className 決定（h-4 w-32 之類），反映它替代的真實內容。 */
 export function Skeleton({ className }: { className?: string }) {
-  return <div aria-hidden className={cn("animate-pulse rounded-md bg-muted", className)} />;
+  return (
+    <div
+      aria-hidden
+      className={cn("animate-pulse rounded-md bg-muted motion-reduce:animate-none", className)}
+    />
+  );
 }
 
 /**

@@ -1,0 +1,111 @@
+---
+title: Switch、Textarea 與 RadioGroup
+---
+
+# Switch、Textarea 與 RadioGroup 表單基元三件
+
+補齊表單的三個基本控制項。三件都沿用既有的欄位語彙：同一套邊框（`--input`）、
+同一個聚焦環（`--ring` ＋ offset）、同一種不合格態（`aria-invalid` → `--danger`）。
+
+## Switch 開關：切了立即生效
+
+<Demo title="開關（設定頁語境）">
+  <div className="max-w-sm space-y-4">
+    <div className="flex items-center justify-between gap-2">
+      <Label htmlFor="doc-sw-a">自動儲存</Label>
+      <Switch id="doc-sw-a" defaultChecked />
+    </div>
+    <div className="flex items-center justify-between gap-2">
+      <Label htmlFor="doc-sw-b">密集列表</Label>
+      <Switch id="doc-sw-b" />
+    </div>
+    <div className="flex items-center justify-between gap-2">
+      <Label htmlFor="doc-sw-c">週報寄送（由管理端統一設定）</Label>
+      <Switch id="doc-sw-c" defaultChecked disabled />
+    </div>
+  </div>
+</Demo>
+
+**Switch 與 Checkbox 的分工是語意，不是外觀：**
+
+<Rules>
+  <Do><p>切下去<strong>立即生效</strong>的設定用 Switch（設定頁的開關、清單的顯示模式）。</p></Do>
+  <Dont><p>「送出才生效」的表單選項不要用 Switch——使用者會以為已經存了。
+  那種情境用 Checkbox，跟著表單一起送出。</p></Dont>
+</Rules>
+
+因此 Switch **刻意沒有**「已改動未送出」的琥珀態：立即生效的控制項不存在未送出狀態。
+開關必須配可見的文字標籤（`<Label htmlFor>`）——開／關語意不靠位置與顏色單獨傳達，
+標籤同時把 20px 高的軌道擴大成可點的一整列。
+
+## Textarea 長文輸入：鏡射 Input
+
+<Demo title="多行文字（含不合格態）">
+  <div className="max-w-xl space-y-4">
+    <div className="space-y-1">
+      <Label htmlFor="doc-ta-a">備註</Label>
+      <Textarea id="doc-ta-a" placeholder="補充說明（選填）" rows={3} />
+    </div>
+    <div className="space-y-1">
+      <Label htmlFor="doc-ta-b">不合格示意</Label>
+      <Textarea id="doc-ta-b" defaultValue="＊＊＊" aria-invalid />
+    </div>
+  </div>
+</Demo>
+
+樣式逐項鏡射 [Input](/components/input)：邊框、聚焦環、`aria-invalid`、停用態全部同源，
+兩者排在同一張表單裡不會出現第二套質感。**只准直向調整大小**（`resize-y`）——
+橫向拉寬會破壞表單欄寬對齊。高度下限約三行；低於這個高度的自由文字，用 Input 就好。
+
+v1 刻意不做字數計數器：需要上限時由宿主用 `aria-invalid` ＋ 錯誤訊息表達
+（示範見 Storybook「長文輸入」），等三個實際場景都要計數器再收進元件。
+
+## RadioGroup 單選群：垂直、可帶說明
+
+<Demo title="單選群（每項含一行說明）">
+  <div className="max-w-md">
+    <RadioGroup defaultValue="all" aria-label="通知範圍">
+      <div className="flex items-start gap-2">
+        <RadioGroupItem value="all" id="doc-rg-a" className="mt-0.5" />
+        <Label htmlFor="doc-rg-a" className="font-normal">
+          <span className="block text-sm">全部動態</span>
+          <span className="block text-tiny text-muted-foreground">每一筆變更都通知</span>
+        </Label>
+      </div>
+      <div className="flex items-start gap-2">
+        <RadioGroupItem value="important" id="doc-rg-b" className="mt-0.5" />
+        <Label htmlFor="doc-rg-b" className="font-normal">
+          <span className="block text-sm">重要事項</span>
+          <span className="block text-tiny text-muted-foreground">只有需要動作的才通知</span>
+        </Label>
+      </div>
+      <div className="flex items-start gap-2">
+        <RadioGroupItem value="none" id="doc-rg-c" className="mt-0.5" />
+        <Label htmlFor="doc-rg-c" className="font-normal">
+          <span className="block text-sm">暫停通知</span>
+          <span className="block text-tiny text-muted-foreground">改到站內清單自行查看</span>
+        </Label>
+      </div>
+    </RadioGroup>
+  </div>
+</Demo>
+
+選中同時「填實心點」——形狀變化不只靠顏色，灰階列印與色覺障礙下仍分得出選了哪個。
+鍵盤行為與 [SegGroup](/components/seg-group) 一致：整組只佔一個 Tab 停留點、方向鍵移動。
+
+### 單選的四種載體，怎麼選
+
+| 情境 | 用什麼 |
+| --- | --- |
+| 2–5 個短標籤、要一眼看完 | [SegGroup](/components/seg-group) |
+| 選項標籤長、或每項需要一行說明 | **RadioGroup**（垂直） |
+| 超過 5 個、或選項動態增減 | [Select](/components/checkbox-select) |
+| 「唯讀 ↔ 編輯」的欄位語境 | [EditableField](/components/editable-field) 的 `radio` 型態 |
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/switch.json
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/textarea.json
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/radio-group.json
+```

@@ -96,18 +96,16 @@ title: 頁面總覽
 
 | 缺件 | 目前替代 | 用在 | 認領 |
 | --- | --- | --- | --- |
-| Toast | `Callout` 加 `live`（就地顯示） | 表單頁、設定頁的儲存回饋 | [提出](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml&piece=Toast) |
-| Switch | `Checkbox` | 設定頁開關 | [提出](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml&piece=Switch) |
-| 期間選擇器 | `SegGroup` 固定選項 | 儀表板 | [提出](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml&piece=%E6%9C%9F%E9%96%93%E9%81%B8%E6%93%87%E5%99%A8) |
-| Textarea | 原生 `textarea` 套 Input 的樣式類 | 表單頁長文欄 | [提出](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml&piece=Textarea) |
-| RadioGroup | `SegGroup`（≤5 項）或 `EditableField` 的 `radio` | 表單頁單選 | [提出](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml&piece=RadioGroup) |
 | PageHeader／Breadcrumb | 頁首區照解剖規範手排 | 明細頁 | [提出](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml&piece=PageHeader%EF%BC%8FBreadcrumb) |
 | Drawer／Popover／DropdownMenu | `Dialog` 或就地展開 | 各頁 | [提出](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml&piece=Drawer%EF%BC%8FPopover%EF%BC%8FDropdownMenu) |
 
 （表單的下拉選項與這張表**逐字一致**——改表要同步改 `.github/ISSUE_TEMPLATE/missing-piece.yml`。）
 
-已從這張表畢業的：**Skeleton** →（含 `DataTable` 的 `loading`，見〈載入中〉規範）；
-**Form 包裝／欄位錯誤** → `FormField`／`FieldError`（見 [Input 的錯誤態](/components/input)）。
+v0.11.0 已收錄七件，替代方案功成身退：
+[Toast](/components/toast)、[Switch／Textarea／RadioGroup](/components/form-controls)、
+[Skeleton](/components/skeleton)（規範正本在〈載入中〉，`DataTable` 內建 `loading`）、
+[DateRange 期間選擇](/components/date-range)、
+Form 包裝 → `FormField`／`FieldError`（見 [Input 的錯誤態](/components/input)）。
 
 AppShell 與 Sidebar **不在此列**——外殼不收進元件庫是刻意決策，
 規範正本在[站台層](/patterns/back-office-ia)。

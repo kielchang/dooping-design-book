@@ -53,7 +53,7 @@ jobs:
           BOOK_BASE_URL: /dooping-design-book/
           BOOK_SITE_URL: https://kielchang.github.io
 
-      # 渲染守衛：正式站的建置產物也要過同一道驗收（ADR-0009）
+      # 渲染守衛：正式站的建置產物也要過同一道驗收（ADR-0010）
       - name: 安裝 Playwright Chromium（渲染守衛用）
         run: npx playwright install --with-deps chromium
       - name: 渲染守衛：demo 宿主基座（verify:book）

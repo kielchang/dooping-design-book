@@ -63,7 +63,7 @@ src/
   [`book/src/css/demo-base.css`](book/src/css/demo-base.css)。
   注意 **portal 內容**（Dialog／Select／Tooltip／資料表篩選面板）掛在 `body` 直下，
   逃出容器子樹，scope 必須一併涵蓋。取捨與驗收方式見
-  [ADR-0009](docs/adr/0009-demo-host-baseline-contract.md)。
+  [ADR-0010](docs/adr/0010-demo-host-baseline-contract.md)。
 
 ## 取 token
 

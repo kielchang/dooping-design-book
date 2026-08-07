@@ -15,8 +15,15 @@ const SITE_URL = process.env.BOOK_SITE_URL ?? "https://kielchang.github.io";
 // 站台自己要說。用 baseUrl 判斷：只有 /preview/ 建置掛橫幅，正式站與本機都不出現。
 const IS_PREVIEW = BASE_URL.includes("/preview/");
 const PROD_URL = "https://kielchang.github.io/dooping-design-book/";
-const STORYBOOK_URL = `${SITE_URL.replace(/\/$/, "")}${BASE_URL}storybook/`;
-const REGISTRY_BASE = `${SITE_URL.replace(/\/$/, "")}${BASE_URL}r`;
+// Storybook 與 registry 都不在文件站的 dev server 裡——本機 build/start（BASE_URL 為 `/`）
+// 時照 SITE_URL+BASE_URL 組出來的是 https://kielchang.github.io/storybook/ 這種不存在的
+// 網址，所以外連一律退回正式站。
+const IS_LOCAL = !process.env.BOOK_SITE_URL && BASE_URL === "/";
+const PUBLIC_BASE = IS_LOCAL
+  ? PROD_URL
+  : `${SITE_URL.replace(/\/$/, "")}${BASE_URL}`;
+const STORYBOOK_URL = `${PUBLIC_BASE}storybook/`;
+const REGISTRY_BASE = `${PUBLIC_BASE}r`;
 
 const config: Config = {
   title: "Dooping Design Book",

@@ -1,5 +1,6 @@
 import * as React from "react";
 import { cn } from "../lib/utils";
+import { EmptyState } from "./empty-state";
 
 /**
  * 時間軸（精簡 Gantt）。
@@ -51,11 +52,13 @@ export interface GanttLabels {
   today: string;
   /** 讀屏用：`{label}，{start} 到 {end}` 之後接的進度描述 */
   progressSuffix: (pct: number) => string;
+  emptyTitle: string;
 }
 
 export const DEFAULT_GANTT_LABELS: GanttLabels = {
   today: "今天",
   progressSuffix: (pct) => `，進度 ${pct}%`,
+  emptyTitle: "尚無資料",
 };
 
 export interface GanttProps {
@@ -68,6 +71,8 @@ export interface GanttProps {
   onSelect?: (id: string) => void;
   /** 顯示今天線（在視窗內才畫）。預設開 */
   today?: boolean;
+  /** `items` 為空時的空狀態文案（與 `DataTable` 同形）。省略＝`labels.emptyTitle` */
+  empty?: { title: string; hint?: string; icon?: React.ReactNode; action?: React.ReactNode };
   /** 左欄寬（px）。預設 176 */
   labelWidth?: number;
   labels?: Partial<GanttLabels>;
@@ -113,11 +118,29 @@ export function Gantt({
   onSelect,
   today = true,
   labelWidth = 176,
+  empty,
   labels,
   className,
   "aria-label": ariaLabel,
 }: GanttProps) {
   const L = { ...DEFAULT_GANTT_LABELS, ...labels };
+
+  // 視窗由資料推導，空陣列會算成 Math.min(...[]) → Infinity → Invalid Date。
+  // 空資料不是幾何問題：不畫空刻度，直接出空狀態（即使 viewStart/viewEnd 有給也一樣——
+  // 沒有列的刻度表看起來像壞掉，而不是「還沒有資料」）。
+  if (items.length === 0) {
+    return (
+      <div role="group" aria-label={ariaLabel} className={cn("rounded-md border", className)}>
+        <EmptyState
+          title={empty?.title ?? L.emptyTitle}
+          hint={empty?.hint}
+          icon={empty?.icon}
+          action={empty?.action}
+          compact
+        />
+      </div>
+    );
+  }
 
   const dates = items.flatMap((i) => [toDate(i.start), toDate(i.end)]);
   const min = viewStart ? toDate(viewStart) : new Date(Math.min(...dates.map(Number)));

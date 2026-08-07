@@ -121,19 +121,14 @@ export const 時間軸_互動: StoryObj<時間軸Args> = {
       const raw = makePhases(a.項目數, { spanDays: a.跨度天數 });
       return a.對齊今天 ? shiftToToday(raw, a.跨度天數) : raw;
     }, [a.項目數, a.跨度天數, a.對齊今天]);
-    // 空資料由宿主明說（Gantt 的視窗由資料推導，沒有資料就沒有視窗）
-    if (a.項目數 === 0) {
-      return (
-        <div className="max-w-4xl">
-          <EmptyState title="尚無項目" hint="把「項目數」拉回 1 以上，或由宿主提供建立入口。" />
-        </div>
-      );
-    }
     return (
       <div className="max-w-4xl">
         <Gantt
+          // 項目數拉到 0 直接餵空陣列——空狀態是元件內建的（與資料表同一套），
+          // story 不用繞路
           key={`${a.項目數}-${a.跨度天數}-${a.對齊今天}`}
           items={phases}
+          empty={{ title: "尚無項目", hint: "把「項目數」拉回 1 以上，或由宿主提供建立入口。" }}
           selectedId={selected}
           onSelect={(id) => setSelected((cur) => (cur === id ? null : id))}
           today={a.顯示今天線}

@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "confirm-dialog",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "type": "registry:ui",
   "title": "ConfirmDialog 確認對話框",
   "description": "破壞性操作確認：載入中鎖出口、可選硬確認輸入。",

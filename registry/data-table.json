@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "data-table",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "type": "registry:ui",
   "title": "DataTable 資料表",
   "description": "搜尋・篩選（表頭＋facet 鈕）・排序・分頁・合計・多選批次・欄位顯示・CSV 匯出・可同步網址。",

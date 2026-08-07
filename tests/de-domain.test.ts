@@ -37,6 +37,7 @@ const SCAN_DIRS = [
 const SCAN_FILES = [
   "README.md",
   "AGENTS.md",
+  "ARCHITECTURE.md",
   "CHANGELOG.md",
   "CONTRIBUTING.md",
   "SECURITY.md",
@@ -45,6 +46,8 @@ const SCAN_FILES = [
   // 側欄標題與站台設定都是使用者可見文字
   "book/docusaurus.config.ts",
   "book/sidebars.ts",
+  // 給 AI 的機器地圖：book/static 不在 SCAN_DIRS、.txt 也不在 EXTS，不列名就掃不到
+  "book/static/llms.txt",
 ];
 const EXTS = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".md", ".mdx", ".json", ".css", ".yml", ".yaml"]);
 

@@ -1,0 +1,71 @@
+# Dooping Design Book
+
+> 跨專案後台系統的設計語言正本（繁體中文）：設計 token（npm：@dooping/tokens）、
+> React 參考實作（shadcn registry 複製原始碼，不發 npm）、操作模式與五種頁型的組成規範。
+> 取用端不重新發明按鈕與表格，從這裡取用；一律以 main／正式站為唯一參照，
+> /preview/ 底下是開發中的預覽站，不得參照。
+
+- 機器可讀索引：https://kielchang.github.io/dooping-design-book/r/index.json
+  （version＝規範版、tokensVersion＝配對的 token 版、items[]＝全部元件項目，
+  含 name/title/description/url；單品一律 /r/<name>.json，
+  用 `npx shadcn@latest add <單品URL>` 安裝。版本數字問這個檔，本文件刻意不寫死。）
+- AI／agent 一頁式取用契約：https://kielchang.github.io/dooping-design-book/AGENTS.md
+- 四條不可改契約：語意色的名稱與意義不可改（換品牌改值不改名）；琥珀色保留給
+  「已改動未送出」；深色鉤子掛 document.documentElement（.dark class 或
+  [data-theme="dark"]）；不得只靠顏色傳達語意。
+- Storybook（活元件展示，元件頁的「互動」story 可在 Controls 面板調整資料）：
+  https://kielchang.github.io/dooping-design-book/storybook/
+
+## 開始使用
+
+- [這本書是什麼](https://kielchang.github.io/dooping-design-book/start/what-is-this/)
+- [三種取用方式](https://kielchang.github.io/dooping-design-book/start/three-ways/)：只讀規範（零相依）／registry 複製元件（推薦）／裝 token
+- [採用檢查表](https://kielchang.github.io/dooping-design-book/start/adoption-checklist/)：開發前期先過一遍
+
+## 基礎（token 層）
+
+- [章節索引](https://kielchang.github.io/dooping-design-book/foundations/)：色彩語意、字級排版、間距圓角、陰影層次、動態、深淺主題、選色方法、提醒色辭典
+
+## 元件
+
+- [元件總覽（人讀版）](https://kielchang.github.io/dooping-design-book/components/overview/)
+- [全部項目（機器可讀）](https://kielchang.github.io/dooping-design-book/r/index.json)
+
+## 模式（框架無關，最值錢的一章）
+
+- [章節索引](https://kielchang.github.io/dooping-design-book/patterns/)：唯讀逐欄編輯、硬鎖定與明確解鎖、稽核與回復、生效日設定、資料表標準、空狀態與變異、列印匯出、零截圖文件、後台資訊架構、功能開關等 12 則
+
+## 頁面（五種頁型，各頁末尾有最小安裝集指令）
+
+- [總覽](https://kielchang.github.io/dooping-design-book/pages/overview/)
+- [清單頁](https://kielchang.github.io/dooping-design-book/pages/list-page/)
+- [明細頁](https://kielchang.github.io/dooping-design-book/pages/detail-page/)
+- [表單頁](https://kielchang.github.io/dooping-design-book/pages/form-page/)
+- [儀表板](https://kielchang.github.io/dooping-design-book/pages/dashboard/)
+- [設定頁](https://kielchang.github.io/dooping-design-book/pages/settings-page/)
+
+## 無障礙
+
+- [原則](https://kielchang.github.io/dooping-design-book/accessibility/principles/)
+- [驗收清單](https://kielchang.github.io/dooping-design-book/accessibility/checklist/)
+- [實作對照](https://kielchang.github.io/dooping-design-book/accessibility/implementation-map/)
+
+## 治理與版本（取用端必讀三份：跟上新版、符合性台帳、版本策略）
+
+- [版本策略（配對模型）](https://kielchang.github.io/dooping-design-book/governance/versioning/)
+- [跟上新版](https://kielchang.github.io/dooping-design-book/governance/staying-current/)
+- [符合性台帳](https://kielchang.github.io/dooping-design-book/governance/conformance-ledger/)
+- [導入三階段（既有系統）](https://kielchang.github.io/dooping-design-book/governance/adoption/)
+- [回饋與 RFC 流程](https://kielchang.github.io/dooping-design-book/governance/rfc/)
+- [漂移防護](https://kielchang.github.io/dooping-design-book/governance/drift-guards/)
+- [系統架構（想貢獻或提建議先讀）](https://kielchang.github.io/dooping-design-book/governance/architecture/)
+
+## 決策紀錄
+
+- [ADR 索引](https://kielchang.github.io/dooping-design-book/adr/)：想推翻某條規則前，先讀為什麼當初這樣決定
+
+## Optional
+
+- [CHANGELOG](https://github.com/kielchang/dooping-design-book/blob/main/CHANGELOG.md)：每則回答「改了什麼／你要做什麼／為什麼改」
+- [原始碼](https://github.com/kielchang/dooping-design-book)
+- [提出建議（三分流表單）](https://github.com/kielchang/dooping-design-book/issues/new/choose)

@@ -41,6 +41,30 @@ commit 本身記在 tag 描述裡，不會遺失。
 
 **tokens 維持 0.6.0**——零新 token，不發 npm、不推 tokens tag。
 
+### 文件體系雙軌強化：AI 取用入口＋貢獻端架構文件＋Storybook 互動 playground
+
+1. **改了什麼**：
+   - **取用端（人＋AI）**：文件站新增 `/llms.txt`（機器地圖）；`AGENTS.md` 由
+     `book/scripts/sync-root-docs.mjs` 於 build 前同步上站（`/AGENTS.md`），並補強內容
+     （元件清單指向 `/r/index.json` 不再寫死數字、五種頁型最小安裝集入口、
+     `@xyflow/react` 大相依提醒、深色切換一行示範、可抄的符合性台帳骨架、
+     repo 相對連結全面改絕對 URL）。
+   - **貢獻端**：新增 `ARCHITECTURE.md`（系統地圖：資料流、token／registry 管線、
+     七支守衛一表、CI 閘門、版號模型、提案門口），同步為治理章「系統架構」頁。
+   - **Storybook**：新增 `demo/generate.ts` 確定性資料生成器（LCG 播種，不隨套件發佈），
+     五支中文 args 互動 playground（資料表、唯讀逐欄編輯、圖表、時間軸、節點畫布）——
+     Controls 面板可調資料筆數、狀態比例、極端值，筆數拉到 0 直接驗空狀態；
+     storySort 補「特殊介面」分類。
+   - **文件 × Storybook**：新增 `<StoryLink>` 深連結元件，元件章 28 頁逐頁掛
+     「在 Storybook 開啟」；`doc-hooks` 守衛擴充為同時驗 StoryFrame 與 StoryLink 的 id，
+     引用數下限 0 → 30；`demo-data` 守衛認可 `demo/generate` 為合法資料來源；
+     `de-domain` 守衛加掃 `ARCHITECTURE.md` 與 `llms.txt`。
+2. **我需要做什麼**：不需要。全是文件與示範層；元件 API、token、registry 內容零變更
+   （registry 只隨例行重建更新戳記）。AI agent 可改用 `/llms.txt` 當入口。
+3. **為什麼改**：取用契約此前只存在於 GitHub repo 根，只拿到文件站網址的人與 AI
+   讀不到；貢獻端的系統全貌散在四個檔案裡沒有地圖；治理章寫了「互動 playground 用
+   中文 arg」的規範卻零實作，Controls 面板一直是空的。這批把三個落差一次補平。
+
 ### 守衛基建：無障礙行為守衛＋視覺回歸（token 期望值掃描）
 
 1. **改了什麼**：兩支新守衛進 CI（Storybook 建置後自動跑）。

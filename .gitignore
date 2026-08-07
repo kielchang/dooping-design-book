@@ -9,3 +9,7 @@ storybook-static/
 
 # ADR 副本由 book/scripts/sync-adr.mjs 於 build 前產生（正本在 docs/adr/）
 book/docs/8-adr/*.md
+
+# 取用契約與架構文件副本由 book/scripts/sync-root-docs.mjs 於 build 前產生（正本在 repo 根）
+book/static/AGENTS.md
+book/docs/7-governance/10-architecture.md

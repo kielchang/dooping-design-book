@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
-    "prestart": "node ../packages/tokens/scripts/build-css.mjs && node scripts/sync-adr.mjs",
+    "prestart": "node ../packages/tokens/scripts/build-css.mjs && node scripts/sync-adr.mjs && node scripts/sync-root-docs.mjs",
     "start": "docusaurus start",
-    "prebuild": "node ../packages/tokens/scripts/build-css.mjs && node scripts/sync-adr.mjs",
+    "prebuild": "node ../packages/tokens/scripts/build-css.mjs && node scripts/sync-adr.mjs && node scripts/sync-root-docs.mjs",
     "build": "docusaurus build",
     "serve": "docusaurus serve",
     "clear": "docusaurus clear",

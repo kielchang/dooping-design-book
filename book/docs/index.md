@@ -16,7 +16,7 @@ sidebar_position: 0
 | 層 | 內容 | 建議取用方式 |
 | --- | --- | --- |
 | **[基礎](/foundations)** | 色彩語意、字級、間距、圓角、陰影、動態、深淺主題 | 安裝 `@dooping/tokens`（**唯一建議硬相依的一層**） |
-| **[元件](/components)** | 20+ 個通用元件的用途、界線、狀態、無障礙 | 用 registry 把原始碼複製進你的專案 |
+| **[元件](/components)** | 通用元件的用途、界線、狀態、無障礙（清單見[元件總覽](/components/overview)） | 用 registry 把原始碼複製進你的專案 |
 | **[模式](/patterns)** | 跨系統可複用的操作邏輯 | 讀懂、然後用你自己的技術棧實作 |
 | **[頁面](/pages)** | 五種常見頁型的組成規範與組合範例 | 讀懂、對照組合 story 用你的技術棧組 |
 | **[無障礙](/accessibility)** | 觸控目標、鍵盤、對比、不只靠顏色 | 當成驗收清單 |
@@ -49,3 +49,6 @@ sidebar_position: 0
 - 想馬上用 → [三種取用方式](/start/three-ways)
 - 新開專案要規劃畫面 → 從[頁面](/pages)章選頁型開始
 - 要說服團隊 → [模式](/patterns)章挑兩則給他們看，那才是真正省時間的地方
+- AI／機器入口 → [llms.txt](https://kielchang.github.io/dooping-design-book/llms.txt)、
+  [AGENTS.md](https://kielchang.github.io/dooping-design-book/AGENTS.md)、
+  [/r/index.json](https://kielchang.github.io/dooping-design-book/r/index.json)（靜態檔不是站內路由，一律用完整網址）

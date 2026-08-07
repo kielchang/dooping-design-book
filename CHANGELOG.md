@@ -37,6 +37,62 @@ commit 本身記在 tag 描述裡，不會遺失。
 
 ---
 
+## v0.11.1 · 2026-08-08
+
+三個工作項的合併發佈（守衛基建＋元件無障礙修正＋文件體系雙軌強化）。
+**tokens 維持 0.6.0**——零新 token，不發 npm、不推 tokens tag。
+
+### 文件體系雙軌強化：AI 取用入口＋貢獻端架構文件＋Storybook 互動 playground
+
+1. **改了什麼**：
+   - **取用端（人＋AI）**：文件站新增 `/llms.txt`（機器地圖）；`AGENTS.md` 由
+     `book/scripts/sync-root-docs.mjs` 於 build 前同步上站（`/AGENTS.md`），並補強內容
+     （元件清單指向 `/r/index.json` 不再寫死數字、五種頁型最小安裝集入口、
+     `@xyflow/react` 大相依提醒、深色切換一行示範、可抄的符合性台帳骨架、
+     repo 相對連結全面改絕對 URL）。
+   - **貢獻端**：新增 `ARCHITECTURE.md`（系統地圖：資料流、token／registry 管線、
+     七支守衛一表、CI 閘門、版號模型、提案門口），同步為治理章「系統架構」頁。
+   - **Storybook**：新增 `demo/generate.ts` 確定性資料生成器（LCG 播種，不隨套件發佈），
+     五支中文 args 互動 playground（資料表、唯讀逐欄編輯、圖表、時間軸、節點畫布）——
+     Controls 面板可調資料筆數、狀態比例、極端值，筆數拉到 0 直接驗空狀態；
+     storySort 補「特殊介面」分類。
+   - **文件 × Storybook**：新增 `<StoryLink>` 深連結元件，元件章 28 頁逐頁掛
+     「在 Storybook 開啟」；`doc-hooks` 守衛擴充為同時驗 StoryFrame 與 StoryLink 的 id，
+     引用數下限 0 → 30；`demo-data` 守衛認可 `demo/generate` 為合法資料來源；
+     `de-domain` 守衛加掃 `ARCHITECTURE.md` 與 `llms.txt`。
+2. **我需要做什麼**：不需要。全是文件與示範層；元件 API、token、registry 內容零變更
+   （registry 只隨例行重建更新戳記）。AI agent 可改用 `/llms.txt` 當入口。
+3. **為什麼改**：取用契約此前只存在於 GitHub repo 根，只拿到文件站網址的人與 AI
+   讀不到；貢獻端的系統全貌散在四個檔案裡沒有地圖；治理章寫了「互動 playground 用
+   中文 arg」的規範卻零實作，Controls 面板一直是空的。這批把三個落差一次補平。
+
+### 守衛基建：無障礙行為守衛＋視覺回歸（token 期望值掃描）
+
+1. **改了什麼**：兩支新守衛進 CI（Storybook 建置後自動跑）。
+   `verify:storybook` 對全部 story 跑 axe 掃描（顏色對比除外——`verify:color`
+   是唯一顏色權威）並驗收 play functions 全數執行；`verify:visual` 對六主題 ×
+   兩模式 × 兩支哨兵 story 截圖掃全圖，驗「期望色存在＋其他主題的 `--brand`
+   不存在」。互動元件補了七支 play functions（對話框焦點陷阱、下拉鍵盤操作、
+   資料表排序與篩選、操作回饋宣告、勾選與開關）。開發期同步加 addon-a11y 面板。
+2. **我需要做什麼**：不需要。這批是驗收基建；元件修正見下一項。
+3. **為什麼改**：行為層（焦點、鍵盤、aria 連動）此前沒有任何守衛——規範書寫了
+   行為規範卻驗不了；配色不符要靠肉眼在 12 種主題組合裡翻。方法論本來就寫在
+   治理章（截圖三坑），這次把它從教訓變成閘門。
+
+### 元件無障礙修正（首次全量掃描的收穫，patch → 0.11.1）
+
+1. **改了什麼**：`DataTable` 每頁筆數下拉補可及名稱、篩選面板補 Esc 關閉
+   （原本只能點背景關，鍵盤使用者會被困住）；`GraphCanvas` 容器 `role="img"` 改
+   `role="group"`（img 會把可聚焦的節點宣告成純呈現，構成巢狀互動違規）；
+   示範頁的 `SelectTrigger` 全數接上 `Label htmlFor`——**combobox 的可及名稱
+   不能取自值文字**，這條規則同步寫進 story 慣例。
+2. **我需要做什麼**：用到 `DataTable` 自訂 `labels` 的宿主可加 `perPageLabel`
+   （不加就用預設「每頁筆數」）；其他修正重抄元件即得，無 API 變更。
+3. **為什麼改**：新守衛第一次全量跑就抓到 8 條真違規——這正是它的存在理由；
+   修在元件層，所有取用端一起受益。
+
+---
+
 ## v0.11.0 · 2026-08-06
 
 三個工作項的合併發佈（B 段終驗＋兩個 P0＋缺件六件）。

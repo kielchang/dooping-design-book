@@ -1,11 +1,12 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { EditableField } from "./editable-field";
+import { EditableField, type EditableFieldValue } from "./editable-field";
 import { ChangeSummary } from "./change-summary";
 import { useRecordDiff } from "./use-record-diff";
-import type { FieldSpec } from "../lib/forms/diff";
+import type { FieldKind, FieldSpec } from "../lib/forms/diff";
 import { Button } from "../ui/button";
 import { demoProfile, TIER_OPTIONS, CHANNEL_OPTIONS, type DemoProfile } from "../demo/sample-data";
+import { makeOptions } from "../demo/generate";
 
 const meta: Meta = { title: "元件/表單/唯讀逐欄編輯" };
 export default meta;
@@ -85,6 +86,89 @@ export const 新增模式: Story = {
         <EditableField label="單位名稱" kind="text" value={draft.name} onChange={set("name")} alwaysEdit trackChanges={false} placeholder="輸入單位名稱" />
         <EditableField label="單位代號" kind="text" value={draft.code} onChange={set("code")} alwaysEdit trackChanges={false} placeholder="例：U-1042" />
         <EditableField label="等級" kind="radio" options={TIER_OPTIONS} value={draft.tier} onChange={set("tier")} alwaysEdit trackChanges={false} />
+      </div>
+    );
+  },
+};
+
+// 互動 playground：中文 arg 三層映射（規範見治理章〈Story 撰寫慣例〉）。
+// 改 args 時 value state 必須 remount 重置——否則多選的 value 會停在
+// 已不存在的選項上，所以用「內部 Demo 元件＋key」的寫法。
+const KIND_BY_LABEL = {
+  文字: "text", 數值: "number", 金額: "money", 比率: "rate", 日期: "date",
+  下拉: "select", 單選: "radio", 多選: "multiselect", 是否: "checkbox",
+} as const satisfies Record<string, FieldKind>;
+
+function originalOf(kind: FieldKind, opts: { value: string; label: string }[]): EditableFieldValue {
+  switch (kind) {
+    case "number": return 250;
+    case "money": return demoProfile.quota;
+    case "rate": return demoProfile.adjustRate;
+    case "date": return demoProfile.since;
+    case "select": case "radio": return opts[0]?.value ?? null;
+    case "multiselect": return opts.slice(0, 2).map((o) => o.value);
+    case "checkbox": return true;
+    default: return "甲案 第一階段";
+  }
+}
+
+type 互動Args = {
+  欄位型別: keyof typeof KIND_BY_LABEL;
+  選項數: number;
+  鎖定: boolean;
+  鎖定原因: string;
+  恆為輸入態: boolean;
+  追蹤變更: boolean;
+  說明文字: string;
+};
+
+export const 互動: StoryObj<互動Args> = {
+  args: {
+    欄位型別: "金額",
+    選項數: 4,
+    鎖定: false,
+    鎖定原因: "此筆已結案，需先解除鎖定",
+    恆為輸入態: false,
+    追蹤變更: true,
+    說明文字: "",
+  },
+  argTypes: {
+    欄位型別: { control: "select", options: Object.keys(KIND_BY_LABEL) },
+    // Storybook 的 if 條件只有 eq/neq/exists/truthy，表達不了「三選一才顯示」，
+    // 所以恆顯示、用描述講清楚適用範圍
+    選項數: { control: { type: "range", min: 0, max: 24, step: 1 }, description: "只影響 下拉／單選／多選" },
+    鎖定: { control: "boolean" },
+    鎖定原因: { control: "text", if: { arg: "鎖定" } },
+    恆為輸入態: { control: "boolean" },
+    追蹤變更: { control: "boolean" },
+    說明文字: { control: "text" },
+  },
+  render: (a) => {
+    const kind = KIND_BY_LABEL[a.欄位型別];
+    const opts = makeOptions(a.選項數);
+    const original = originalOf(kind, opts);
+    const Demo = () => {
+      const [v, setV] = useState<EditableFieldValue>(original);
+      return (
+        <EditableField
+          label="示範欄位"
+          kind={kind}
+          value={v}
+          original={original}
+          onChange={setV}
+          onRevert={() => setV(original)}
+          options={opts}
+          disabled={a.鎖定}
+          lockHint={a.鎖定 ? a.鎖定原因 : undefined}
+          alwaysEdit={a.恆為輸入態}
+          trackChanges={a.追蹤變更}
+          help={a.說明文字 || undefined}
+        />
+      );
+    };
+    return (
+      <div className="max-w-sm">
+        <Demo key={`${kind}-${a.選項數}-${a.恆為輸入態}`} />
       </div>
     );
   },

@@ -6,6 +6,7 @@
 - 📘 文件站：<https://kielchang.github.io/dooping-design-book/>
 - 🧩 Storybook：<https://kielchang.github.io/dooping-design-book/storybook/>
 - 📦 Registry：`https://kielchang.github.io/dooping-design-book/r/<name>.json`
+- 🤖 機器地圖（給 AI）：<https://kielchang.github.io/dooping-design-book/llms.txt>
 
 ## 這是什麼
 
@@ -17,7 +18,7 @@
 | 層 | 內容 | 取用方式 |
 | --- | --- | --- |
 | `packages/tokens` | 設計 token（色彩語意、間距、字級、動態…） | **唯一建議 npm 安裝的一層** |
-| `packages/react` | React 參考實作（20+ 元件） | registry 複製原始碼進你的專案 |
+| `packages/react` | React 參考實作（項目清單見 [`/r/index.json`](https://kielchang.github.io/dooping-design-book/r/index.json)） | registry 複製原始碼進你的專案 |
 | `book/docs/4-patterns` | 操作模式（問題→做法→取捨→反例） | 讀懂，用你自己的技術棧實作 |
 
 理由：**元件一定會被改，token 幾乎不會。** 詳見 [ADR-0004](docs/adr/0004-registry-over-npm-package.md)
@@ -46,7 +47,7 @@ packages/
 registry/          shadcn registry JSON（由 scripts/build-registry.mjs 產生）
 book/              Docusaurus 文件站（中文搜尋、可列印、內嵌真元件）
 docs/adr/          決策紀錄正本（build 時同步到文件站）
-tests/             守衛測試：元件庫邊界、token 一致性、去領域化詞彙
+tests/             守衛測試（7 支）：邊界、token、色彩、去領域化、示範資料、文件掛鉤、宿主基座
 .storybook/        Storybook 設定
 ```
 
@@ -55,7 +56,7 @@ tests/             守衛測試：元件庫邊界、token 一致性、去領域�
 ```bash
 npm run build:tokens       # token 產物（其他步驟的前提）
 npm run typecheck          # TypeScript
-npm test                   # 守衛測試（5 檔 96 項）
+npm test                   # 守衛測試（7 檔）
 npm run verify:color       # 六主題 × 兩模式的對比／色覺／互動狀態層門檻
 npm run build-storybook    # Storybook
 npm run build:registry     # registry JSON
@@ -63,7 +64,8 @@ npm --prefix book run build  # 文件站（onBrokenLinks: throw）
 ```
 
 在這個 repo 裡開發的完整約定（色彩值是生成的、版號要同步三處、去領域化閘門、
-截圖驗證的方法論）見 [`CLAUDE.md`](CLAUDE.md)。
+截圖驗證的方法論）見 [`CLAUDE.md`](CLAUDE.md)；
+系統怎麼組起來（管線、守衛、CI 閘門的全貌）見 [`ARCHITECTURE.md`](ARCHITECTURE.md)。
 
 ## 為什麼用 npm workspaces（而不是 pnpm）
 

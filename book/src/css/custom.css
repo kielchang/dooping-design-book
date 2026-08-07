@@ -101,6 +101,21 @@ html[data-theme="dark"] {
 /* iframe 載入前的底色跟 token 走：深色下不白閃（載入後 Storybook 自己的底會蓋掉） */
 .story-frame > iframe { display: block; width: 100%; border: 0; background: hsl(var(--background)); }
 
+/* 指向 Storybook 的深連結（StoryLink）：小徽章型，與 .story-frame 同一組視覺語彙。
+   開的是完整 Storybook UI（有 Controls 面板），與嵌入的 iframe 視圖是兩回事。 */
+.story-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 999px;
+  background: var(--ifm-color-emphasis-100);
+  font-size: 12px;
+  text-decoration: none;
+}
+.story-link:hover { background: var(--ifm-color-emphasis-200); text-decoration: none; }
+
 /* 規範條目：做 / 不做 */
 .rule-grid { display: grid; gap: 12px; grid-template-columns: 1fr; }
 @media (min-width: 720px) { .rule-grid { grid-template-columns: 1fr 1fr; } }

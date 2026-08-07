@@ -36,8 +36,13 @@ npm run verify:color       # 六主題 × 兩模式的對比／色覺／狀態�
 npm run build:theme        # 重新生成主題色、淡底、圖表色票（會改寫 tokens.json）
 npm run build:registry     # registry JSON — 改過元件就要重跑並提交
 npm run build-storybook
+npm run verify:storybook   # 無障礙行為守衛（axe＋play functions）— 需先 build-storybook
+npm run verify:visual      # 視覺回歸：token 期望值掃描 — 需先 build-storybook
 BOOK_BASE_URL=/dooping-design-book/preview/ npm run build:book   # onBrokenLinks: throw
 ```
+
+改過 stories 或元件行為，CI 會在 Storybook 建置後自動跑上面兩支守衛；
+規則分工與 play function 慣例見 `book/docs/7-governance/08-story-conventions.mdx`。
 
 ## 色彩：值是**生成**的，不要手改
 

@@ -3,6 +3,7 @@
 import MDXComponents from "@theme-original/MDXComponents";
 import { Demo, Rules, Do, Dont } from "@site/src/components/Demo";
 import { StoryFrame } from "@site/src/components/StoryFrame";
+import { StoryLink } from "@site/src/components/StoryLink";
 import {
   FlowThreeWays, FlowAdoptionStages, FlowStayingCurrent, FlowPageFirstSteps,
 } from "@site/src/components/flow-diagrams";
@@ -22,7 +23,7 @@ import {
 
 export default {
   ...MDXComponents,
-  Demo, Rules, Do, Dont, StoryFrame,
+  Demo, Rules, Do, Dont, StoryFrame, StoryLink,
   FlowThreeWays, FlowAdoptionStages, FlowStayingCurrent, FlowPageFirstSteps,
   Button, Badge, Callout, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter,
   Input, Label, Checkbox, NumberInput, Switch, Textarea, RadioGroup, RadioGroupItem,

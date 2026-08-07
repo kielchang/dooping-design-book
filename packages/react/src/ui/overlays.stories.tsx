@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { within, expect, userEvent, waitFor } from "@storybook/test";
 import { Tooltip, TruncatedText } from "./tooltip";
 import { Button } from "./button";
 import {
@@ -32,6 +33,16 @@ export const 提示泡泡: Story = {
       </p>
     </div>
   ),
+  // 泡泡的行為契約：hover 顯示 role=tooltip、移開消失（顯示時機規範的可驗部分）
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByText("已確認");
+    await userEvent.hover(trigger);
+    const tip = await canvas.findByRole("tooltip");
+    await expect(tip).toHaveTextContent("已鎖定內容與數量");
+    await userEvent.unhover(trigger);
+    await waitFor(() => expect(canvas.queryByRole("tooltip")).toBeNull());
+  },
 };
 
 export const 對話框: Story = {
@@ -52,4 +63,17 @@ export const 對話框: Story = {
       </DialogContent>
     </Dialog>
   ),
+  // 焦點陷阱三段式：開啟後焦點進對話框、Esc 關閉、焦點回到觸發鈕。
+  // Dialog 走 portal 掛在 body——斷言要查 ownerDocument.body，不是 canvas 子樹。
+  play: async ({ canvasElement }) => {
+    const doc = canvasElement.ownerDocument;
+    const body = within(doc.body);
+    const trigger = within(canvasElement).getByRole("button", { name: "作廢這筆" });
+    await userEvent.click(trigger);
+    const dialog = await body.findByRole("dialog");
+    await waitFor(() => expect(dialog.contains(doc.activeElement)).toBe(true));
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(body.queryByRole("dialog")).toBeNull());
+    await waitFor(() => expect(doc.activeElement).toBe(trigger));
+  },
 };

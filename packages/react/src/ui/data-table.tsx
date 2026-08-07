@@ -48,6 +48,8 @@ export interface DataTableLabels {
   search: string;
   exportCsv: string;
   filterOf: (header: string) => string;
+  /** 每頁筆數下拉的可及名稱——combobox 的名稱不能取自值文字 */
+  perPageLabel: string;
   activeFilters: string;
   clearAll: string;
   clear: string;
@@ -103,6 +105,8 @@ export const DEFAULT_DATA_TABLE_LABELS: DataTableLabels = {
   loading: "載入中…",
   rowsRange: (f, t, n) => `第 ${f}–${t} ／ 共 ${n} 筆`,
   perPage: (n) => `每頁 ${n}`,
+  // combobox 的可及名稱不能取自內容文字（值不是名稱）——觸發鈕必須另給程式可及標籤
+  perPageLabel: "每頁筆數",
   prev: "上一頁",
   next: "下一頁",
   totalRow: "合計",
@@ -176,6 +180,15 @@ export function DataTable<T>({
   const [selQuery, setSelQuery] = useState("");
   const [textInput, setTextInput] = useState("");
   useEffect(() => { setSelQuery(""); setTextInput(""); }, [openFilter?.key]);
+
+  // 篩選面板要吃 Esc：只靠點背景關閉，鍵盤使用者會被困在面板裡。
+  // 掛在 document 而不是面板上——焦點可能還停在表頭的篩選鈕，面板層收不到按鍵。
+  useEffect(() => {
+    if (!openFilter) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpenFilter(null); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [openFilter]);
 
   const tableRef = useRef<HTMLTableElement>(null);
   const headRefs = useRef<(HTMLTableCellElement | null)[]>([]);
@@ -657,7 +670,7 @@ export function DataTable<T>({
           <span>{L.rowsRange(page * size + 1, Math.min((page + 1) * size, sorted.length), sorted.length)}</span>
           <div className="flex items-center gap-2">
             <Select value={String(size)} onValueChange={(v) => setSize(Number(v))}>
-              <SelectTrigger className="h-7 w-24"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-7 w-24" aria-label={L.perPageLabel}><SelectValue /></SelectTrigger>
               <SelectContent>
                 {pageSizeOptions.map((n) => <SelectItem key={n} value={String(n)}>{L.perPage(n)}</SelectItem>)}
               </SelectContent>

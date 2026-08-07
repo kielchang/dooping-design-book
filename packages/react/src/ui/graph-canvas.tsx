@@ -225,7 +225,9 @@ export function GraphCanvas({
 
   return (
     <div
-      role="img"
+      // 不能用 role="img"：img 會把子樹視為純呈現，但 xyflow 的節點是可聚焦的互動元素，
+      // 巢在 img 底下是 nested-interactive 違規。group＋aria-label 讓讀屏知道這是一個具名區塊。
+      role="group"
       aria-label={ariaLabel}
       className={cn("dooping-graph overflow-hidden rounded-md border", className)}
       style={{ height, ...XY_BRIDGE }}

@@ -80,13 +80,15 @@ const config: Config = {
         docs: {
           routeBasePath: "/",
           sidebarPath: "./sidebars.ts",
-          // 每頁的「編輯此頁」。8-adr 是 sync-adr.mjs 的建置產物（gitignored），
-          // 對它的編輯要導向正本 docs/adr/，否則連到一個不存在的檔案。
+          // 每頁的「編輯此頁」。8-adr 與治理章的架構頁是 sync script 的建置產物
+          // （gitignored），對它們的編輯要導向正本，否則連到一個不存在的檔案。
           // 指向 dev：日常修訂都在 dev 累積，main 只收進版合併。
           editUrl: ({ docPath }) =>
             docPath.startsWith("8-adr/")
               ? `https://github.com/kielchang/dooping-design-book/edit/dev/docs/adr/${docPath.slice("8-adr/".length)}`
-              : `https://github.com/kielchang/dooping-design-book/edit/dev/book/docs/${docPath}`,
+              : docPath === "7-governance/10-architecture.md"
+                ? "https://github.com/kielchang/dooping-design-book/edit/dev/ARCHITECTURE.md"
+                : `https://github.com/kielchang/dooping-design-book/edit/dev/book/docs/${docPath}`,
         },
         blog: false,
         pages: false,

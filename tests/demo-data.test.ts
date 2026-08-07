@@ -25,8 +25,14 @@ const SCAN = [
   { dir: "book/docs", match: (f: string) => extname(f) === ".mdx" },
 ];
 
-/** 示範資料的唯一來源。引用它的檔案才可以在本地宣告衍生結構（例如欄位定義）。 */
-const SOURCE = /from\s+["'][^"']*demo\/sample-data["']/;
+/**
+ * 示範資料的唯一來源。引用它的檔案才可以在本地宣告衍生結構（例如欄位定義）。
+ *
+ * 來源有兩種形態：sample-data（靜態典型值）與 generate（參數化衍生值，
+ * playground 用）。兩者同屬單一來源——只用生成器的檔案不該被迫多 import
+ * 一份用不到的靜態資料。
+ */
+const SOURCE = /from\s+["'][^"']*demo\/(?:sample-data|generate)["']/;
 
 export interface Dataset {
   name: string;
@@ -111,7 +117,8 @@ describe("示範資料單一來源", () => {
       offenders,
       `以下檔案自己宣告了業務資料集（共 ${offenders.length} 處）：\n${offenders.join("\n")}\n\n` +
         "改為 import { demoRecords, ... } from \"@dooping/react/demo/sample-data\"（文件站）" +
-        "或 \"../demo/sample-data\"（stories）。欄位定義可以留在本地——" +
+        "或 \"../demo/sample-data\"（stories）；需要參數化資料時" +
+        "改用 import { makeRecords, ... } from \"../demo/generate\"。欄位定義可以留在本地——" +
         "有引用單一來源的檔案就放行，範本見 packages/react/src/ui/data-table.stories.tsx。",
     ).toEqual([]);
   });

@@ -169,3 +169,57 @@ render: (a) => {
 那個值**。本書的色彩驗收腳本犯過兩次——一次拿沒轉過色相的 `muted` 去量聚焦環對比，
 一次拿理想的純白去量 brand 的前景對比，兩次都印出低於門檻的假數字。
 報告算錯對象比不印還糟，它會讓人去修沒壞的東西。
+
+## play function：有行為規範就要有行為驗證
+
+story 並列的是**長相**，play function 驗的是**行為**——焦點去哪裡、鍵盤按了會怎樣、
+aria 屬性有沒有連動。判準很簡單：**文件頁寫了行為規範的元件，就要有一支 play function
+把那條規範變成可執行的斷言**。對話框寫了「Esc 關閉、焦點回到觸發鈕」，play 就按一次
+Esc 驗一次；欄位錯誤寫了「aria-describedby 指向錯誤訊息」，play 就查那條連線。
+
+寫法慣例（現有八支都照這個模式）：
+
+```tsx
+import { within, expect, userEvent, waitFor } from "@storybook/test";
+
+export const 對話框: Story = {
+  render: () => ( … ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "作廢這筆" }));
+    // …斷言
+  },
+};
+```
+
+<Rules>
+  <Do>
+    <p>portal 元件（Dialog、Select、Toast、篩選面板）的斷言要查
+    <code>canvasElement.ownerDocument.body</code>——浮層掛在 body 直下，
+    canvas 子樹裡找不到它。</p>
+  </Do>
+  <Do>
+    <p>查詢一律走 <code>getByRole</code> 帶可及名稱。這讓 play 順便當了半個
+    無障礙測試：role 或名稱斷了，查詢就失敗。</p>
+  </Do>
+  <Dont>
+    <p>不要在 play 結尾留下開著的浮層或改掉的狀態——後面的視覺掃描拍的是
+    play 跑完的畫面，殘留狀態會讓兩支守衛互相干擾。</p>
+  </Dont>
+</Rules>
+
+## 兩道 Storybook 守衛（CI 自動跑）
+
+| 守衛 | 指令 | 管什麼 | 不管什麼 |
+| --- | --- | --- | --- |
+| 無障礙行為 | `npm run verify:storybook` | 全部 story 的 axe 掃描（role、名稱、巢狀互動…）＋ play function 全數執行成功 | 顏色對比（`verify:color` 是唯一顏色權威）；`region` 等頁面級規則（story 是片段） |
+| 視覺回歸 | `npm run verify:visual` | 六主題 × 兩模式 × 哨兵 story：截圖掃全圖，驗「期望色存在＋其他主題的 `--brand` 不存在」 | 版面位移（沒有基準圖比對——跨平台字型假紅與基準維護成本，有三次證據再議） |
+
+兩支都吃建好的 Storybook 產物（本機 `npm run build-storybook` 後直接跑；
+CI 在建置步驟之後自動接）。上面截圖三坑的方法論——掃全圖不取座標、驗到相符為止、
+容差 ±2——就是 `verify:visual` 的實作，從「寫在文件裡的教訓」變成了每次都跑的閘門。
+
+combobox 有一條特別容易踩的規則，第一次全量掃描就抓到五處：
+**可及名稱不能取自值文字**（值會變，名稱不會）。`SelectTrigger` 一定要用
+`<Label htmlFor>` 接 `id`，或給 `aria-label`——選了「黃金」的下拉，讀屏要念的是
+「等級」，不是「黃金」。

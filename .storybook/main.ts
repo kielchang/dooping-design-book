@@ -6,7 +6,8 @@ import tailwindConfig from "../tailwind.config.cjs";
 
 const config: StorybookConfig = {
   stories: ["../packages/react/src/**/*.stories.@(ts|tsx)"],
-  addons: ["@storybook/addon-essentials"],
+  // addon-a11y：開發時面板即時看 axe 結果，與 CI 的 verify:storybook 同一套規則語言
+  addons: ["@storybook/addon-essentials", "@storybook/addon-a11y"],
   framework: { name: "@storybook/react-vite", options: {} },
   core: { disableTelemetry: true },
   viteFinal: async (cfg) => {

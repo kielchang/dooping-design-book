@@ -69,9 +69,9 @@ export const 典型組成: Story = {
               )}
             </div>
             <div className="space-y-1">
-              <Label>所屬單位</Label>
+              <Label htmlFor="fp-unit">所屬單位</Label>
               <Select defaultValue={UNIT_OPTIONS[0]}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger id="fp-unit"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {UNIT_OPTIONS.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}
                 </SelectContent>
@@ -150,9 +150,9 @@ export const 多步驟: Story = {
 
         {cur === "unit" && (
           <div className="max-w-sm space-y-1">
-            <Label>所屬單位</Label>
+            <Label htmlFor="ms-unit">所屬單位</Label>
             <Select value={unit} onValueChange={setUnit}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger id="ms-unit"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {UNIT_OPTIONS.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}
               </SelectContent>

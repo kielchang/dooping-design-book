@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { within, expect, userEvent, waitFor } from "@storybook/test";
 import { PackageOpen } from "lucide-react";
 import { DataTable, type Column } from "./data-table";
 import { Badge } from "./badge";
@@ -73,6 +74,24 @@ export const 完整功能: Story = {
       }}
     />
   ),
+  // 排序：點欄頭 → th 的 aria-sort 連動（首擊 desc——後台先看大的，再擊 asc）；
+  // 篩選：面板 portal 到 body、選項是 role=checkbox、Esc 收回。
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const doc = canvasElement.ownerDocument;
+    const sortBtn = canvas.getByRole("button", { name: /^單位/ });
+    await userEvent.click(sortBtn);
+    await waitFor(() =>
+      expect(sortBtn.closest("th")).toHaveAttribute("aria-sort", "descending"));
+    await userEvent.click(sortBtn);
+    await waitFor(() =>
+      expect(sortBtn.closest("th")).toHaveAttribute("aria-sort", "ascending"));
+
+    await userEvent.click(canvas.getByRole("button", { name: "篩選 單位" }));
+    await within(doc.body).findAllByRole("checkbox");
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(within(doc.body).queryAllByRole("checkbox")).toHaveLength(0));
+  },
 };
 
 export const 空狀態: Story = {

@@ -53,6 +53,19 @@ const preview: Preview = {
   parameters: {
     layout: "fullscreen",
     controls: { expanded: true },
+    // 與 scripts/verify-storybook.mjs 的 DISABLED_RULES 同一套：
+    // 顏色歸 verify:color（唯一權威），region 等頁面級規則不適用於 story 片段。
+    a11y: {
+      config: {
+        rules: [
+          { id: "color-contrast", enabled: false },
+          { id: "region", enabled: false },
+          { id: "landmark-one-main", enabled: false },
+          { id: "page-has-heading-one", enabled: false },
+          { id: "bypass", enabled: false },
+        ],
+      },
+    },
     options: { storySort: { order: ["基礎", "元件", ["基礎", "表單", "資料", "狀態", "浮層", "引導", "文件示意"], "頁面"] } },
   },
   globalTypes: {

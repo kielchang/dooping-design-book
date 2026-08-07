@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { within, expect, userEvent, waitFor } from "@storybook/test";
 import { Input } from "./input";
 import { Label } from "./label";
 import { NumberInput } from "./number-input";
@@ -110,9 +111,10 @@ export const 勾選與下拉: Story = {
           <Label htmlFor="s-active">啟用此單位</Label>
         </div>
         <div className="space-y-1">
-          <Label>等級</Label>
+          {/* combobox 的名稱不能取自值文字——Label 一定要用 htmlFor 接到觸發鈕的 id */}
+          <Label htmlFor="s-tier">等級</Label>
           <Select defaultValue="gold">
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger id="s-tier"><SelectValue /></SelectTrigger>
             <SelectContent>
               {TIER_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
             </SelectContent>
@@ -120,6 +122,26 @@ export const 勾選與下拉: Story = {
         </div>
       </div>
     );
+  },
+  // 勾選框：鍵盤 Space 切換 aria-checked；下拉：combobox 名稱來自 Label（不是值文字）、
+  // 鍵盤開啟出 listbox（portal 在 body）、Esc 收回且 aria-expanded 連動。
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const box = canvas.getByRole("checkbox", { name: "啟用此單位" });
+    await expect(box).toHaveAttribute("aria-checked", "true");
+    box.focus();
+    await userEvent.keyboard(" ");
+    await waitFor(() => expect(box).toHaveAttribute("aria-checked", "false"));
+    await userEvent.keyboard(" ");
+    await waitFor(() => expect(box).toHaveAttribute("aria-checked", "true"));
+
+    const trigger = canvas.getByRole("combobox", { name: "等級" });
+    trigger.focus();
+    await userEvent.keyboard("{Enter}");
+    await within(canvasElement.ownerDocument.body).findByRole("listbox");
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(trigger).toHaveAttribute("aria-expanded", "false"));
   },
 };
 
@@ -171,6 +193,18 @@ export const 開關: Story = {
         </p>
       </div>
     );
+  },
+  // 開關：role=switch、Space 切換 aria-checked、disabled 的不動
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const sw = canvas.getByRole("switch", { name: "自動儲存" });
+    await expect(sw).toHaveAttribute("aria-checked", "true");
+    sw.focus();
+    await userEvent.keyboard(" ");
+    await waitFor(() => expect(sw).toHaveAttribute("aria-checked", "false"));
+    await userEvent.keyboard(" ");
+    await waitFor(() => expect(sw).toHaveAttribute("aria-checked", "true"));
+    await expect(canvas.getByRole("switch", { name: "週報寄送（由管理端統一設定）" })).toBeDisabled();
   },
 };
 

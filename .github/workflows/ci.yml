@@ -209,6 +209,16 @@ jobs:
       - name: 建置 Storybook → /preview/storybook
         run: npm run build-storybook -- -o book/build/storybook
 
+      - name: 無障礙行為守衛（60+ story 的 axe＋play functions）
+        run: npm run verify:storybook
+        env:
+          STORYBOOK_DIR: book/build/storybook
+
+      - name: 視覺回歸：token 期望值掃描（六主題×兩模式）
+        run: npm run verify:visual
+        env:
+          STORYBOOK_DIR: book/build/storybook
+
       - name: 放置 registry → /preview/r
         run: |
           mkdir -p book/build/r

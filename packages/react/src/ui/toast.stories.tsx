@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { within, expect, userEvent } from "@storybook/test";
 import { Button } from "./button";
 import { ToastProvider, useToast } from "./toast";
 import { Skeleton, SkeletonText } from "./skeleton";
@@ -40,6 +41,15 @@ export const 操作回饋: Story = {
       </div>
     </ToastProvider>
   ),
+  // 宣告可被讀屏聽到：success 走 role=status（禮貌宣告）、danger 走 role=alert（立即打斷）
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const doc = within(canvasElement.ownerDocument.body);
+    await userEvent.click(canvas.getByRole("button", { name: "成功" }));
+    await expect(await doc.findByRole("status")).toHaveTextContent("已儲存");
+    await userEvent.click(canvas.getByRole("button", { name: "失敗（不自動消失）" }));
+    await expect(await doc.findByRole("alert")).toHaveTextContent("儲存失敗");
+  },
 };
 
 function StressButtons() {

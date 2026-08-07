@@ -112,7 +112,7 @@ export const 色相主題: Story = {
     <div className="space-y-5">
       <p className="max-w-2xl text-sm text-muted-foreground">
         用工具列的<strong>色相</strong>切換六組主題，<strong>主題</strong>切換淺深——兩者正交。
-        主題只影響 17 個 token：5 個主題色（下方）與 12 個帶色調的中性色（背景、邊框、muted…，
+        主題只影響 16 個 token：4 個主題色（下方）與 12 個帶色調的中性色（背景、邊框、muted…，
         只轉色相、明度與彩度不動）。
       </p>
       <div className="grid gap-3 sm:grid-cols-2">
@@ -126,13 +126,6 @@ export const 色相主題: Story = {
               被選中的項目
             </span>
           </div>
-          <div className="pt-1">
-            <input
-              className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm ring-2 ring-ring ring-offset-2 ring-offset-background"
-              defaultValue="聚焦環吃主題色相"
-              readOnly
-            />
-          </div>
         </div>
         <div className="space-y-2 rounded-md border p-3">
           <p className="text-xs font-semibold">與主題無關</p>
@@ -143,8 +136,17 @@ export const 色相主題: Story = {
             <span className="rounded-md bg-danger px-2.5 py-1 text-xs font-medium text-danger-foreground">異常</span>
             <span className="rounded-md bg-warning px-2.5 py-1 text-xs font-medium text-warning-foreground">注意</span>
           </div>
+          {/* 聚焦環自 ADR-0007 起是中性色：不隨主題轉相，才不會和欄位提醒色互相搶語意 */}
+          <div className="pt-1">
+            <input
+              aria-label="聚焦環示意"
+              className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm ring-2 ring-ring ring-offset-2 ring-offset-background"
+              defaultValue="聚焦環是中性色（ADR-0007）"
+              readOnly
+            />
+          </div>
           <p className="text-tiny text-muted-foreground">
-            <code>--primary</code> 維持中性近黑、狀態色色相鎖死。切色相時這一欄應該<strong>幾乎不動</strong>。
+            <code>--primary</code> 維持中性近黑、狀態色色相鎖死、聚焦環中性。切色相時這一欄應該<strong>幾乎不動</strong>。
           </p>
         </div>
       </div>

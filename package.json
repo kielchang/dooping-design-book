@@ -1,6 +1,6 @@
 {
   "name": "dooping-design-book",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "private": true,
   "type": "module",
   "description": "Dooping Design Book — 跨專案設計語言、模式手冊與 React 參考實作",
@@ -13,6 +13,8 @@
     "build:registry": "node scripts/build-registry.mjs",
     "verify:color": "node scripts/verify-color.mjs",
     "verify:book": "node scripts/verify-book-host.mjs",
+    "verify:storybook": "node scripts/verify-storybook.mjs",
+    "verify:visual": "node scripts/verify-visual.mjs",
     "status": "node scripts/version-status.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
@@ -23,6 +25,7 @@
     "build:all": "npm run build:tokens && npm run build:registry && npm run build-storybook && npm run build:book"
   },
   "devDependencies": {
+    "@storybook/addon-a11y": "^8.6.18",
     "@storybook/addon-essentials": "^8.6.14",
     "@storybook/react-vite": "^8.6.18",
     "@storybook/test": "^8.6.18",
@@ -31,6 +34,7 @@
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "axe-core": "^4.13.0",
     "playwright": "~1.56.0",
     "postcss": "^8.4.49",
     "storybook": "^8.6.18",

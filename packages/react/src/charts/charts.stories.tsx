@@ -13,6 +13,7 @@ import { PALETTE, STATUS_SERIES, colorByKey, type BarDatum } from "./base";
 import { Badge } from "../ui/badge";
 import { formatMoney, formatNumber } from "../lib/utils";
 import { demoRecords, STATUS_LABEL } from "../demo/sample-data";
+import { makeSeries, makeStackedRows } from "../demo/generate";
 
 const meta: Meta = { title: "元件/資料/圖表 Charts" };
 export default meta;
@@ -223,5 +224,77 @@ export const 子彈圖: Story = {
         </p>
       </div>
     );
+  },
+};
+
+// 互動 playground：中文 arg 三層映射（規範見治理章〈Story 撰寫慣例〉）。
+// 圖表全是純 props，不需要 remount；資料出自 demo/generate 的確定性生成器。
+// 驗收動線：資料點數拉到 0 看「無資料」；長條把點數拉超過類別上限看「其他（N 項）」封頂。
+type 互動Args = {
+  圖表類型: "長條" | "柏拉圖" | "趨勢" | "堆疊";
+  資料點數: number;
+  段數: number;
+  顯示數值: boolean;
+  類別上限: number;
+  從零起算: boolean;
+};
+
+export const 互動: StoryObj<互動Args> = {
+  args: {
+    圖表類型: "長條",
+    資料點數: 6,
+    段數: 4,
+    顯示數值: true,
+    類別上限: 12,
+    從零起算: true,
+  },
+  argTypes: {
+    圖表類型: { control: "select", options: ["長條", "柏拉圖", "趨勢", "堆疊"] },
+    資料點數: { control: { type: "range", min: 0, max: 30, step: 1 } },
+    段數: { control: { type: "range", min: 1, max: 12, step: 1 }, if: { arg: "圖表類型", eq: "堆疊" } },
+    顯示數值: { control: "boolean", if: { arg: "圖表類型", eq: "長條" } },
+    類別上限: { control: { type: "range", min: 3, max: 12, step: 1 }, if: { arg: "圖表類型", eq: "長條" } },
+    從零起算: { control: "boolean", if: { arg: "圖表類型", eq: "趨勢" } },
+  },
+  render: (a) => {
+    const chart = () => {
+      switch (a.圖表類型) {
+        case "柏拉圖":
+          return <Pareto data={makeSeries(a.資料點數)} title="集中度" valueFmt={(n) => formatNumber(n)} />;
+        case "趨勢":
+          // 趨勢的 x 軸必須是等距時間，所以用「第N期」而不是單位
+          return (
+            <TrendChart
+              data={makeSeries(a.資料點數, { labelKind: "period" })}
+              title="各期數值"
+              zeroBased={a.從零起算}
+              valueFmt={(n) => formatNumber(n)}
+            />
+          );
+        case "堆疊":
+          // 序列色要跨期穩定、由使用端指定——生成器不給色，story 端照序配 PALETTE
+          return (
+            <StackedBar
+              rows={makeStackedRows(a.資料點數, a.段數).map((row) => ({
+                ...row,
+                segments: row.segments.map((s, ci) => ({ ...s, color: PALETTE[ci % PALETTE.length] })),
+              }))}
+              title="分類組成"
+              valueFmt={(n) => formatNumber(n)}
+            />
+          );
+        default:
+          return (
+            <BarChart
+              data={makeSeries(a.資料點數)}
+              title="各單位數值"
+              showValues={a.顯示數值}
+              maxItems={a.類別上限}
+              valueFmt={(n) => formatNumber(n)}
+            />
+          );
+      }
+    };
+    return <div className="max-w-2xl">{chart()}</div>;
   },
 };

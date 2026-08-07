@@ -66,7 +66,7 @@ const preview: Preview = {
         ],
       },
     },
-    options: { storySort: { order: ["基礎", "元件", ["基礎", "表單", "資料", "狀態", "浮層", "引導", "文件示意"], "頁面"] } },
+    options: { storySort: { order: ["基礎", "元件", ["基礎", "表單", "資料", "特殊介面", "狀態", "浮層", "引導", "文件示意"], "頁面"] } },
   },
   globalTypes: {
     theme: {

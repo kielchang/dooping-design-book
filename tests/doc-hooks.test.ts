@@ -1,11 +1,13 @@
 // 文件掛鉤守衛：文件引用的 story id 必須真的存在。
 //
-// 文件一旦開始嵌入真元件（`<StoryFrame id="…">`），它就對元件庫產生了
-// **以字串為鍵的相依**——而字串沒有型別檢查。story 改名、export 改名、元件被刪，
+// 文件一旦開始嵌入真元件（`<StoryFrame id="…">`）或深連結到 story
+// （`<StoryLink id="…">`），它就對元件庫產生了**以字串為鍵的相依**——
+// 而字串沒有型別檢查。story 改名、export 改名、元件被刪，
 // TypeScript 一個字都不會說。
 //
-// 失敗的樣子不是壞掉，是**安靜地變成一塊空白 iframe**：沒有錯誤訊息、沒有紅燈，
-// 只有讀者看到空白然後以為文件壞了。這正是「同一份事實存在兩個地方就需要一支守衛」
+// 失敗的樣子不是壞掉：StoryFrame 是**安靜地變成一塊空白 iframe**，
+// StoryLink 是點過去看到 Storybook 的「找不到 story」——都沒有錯誤訊息、
+// 沒有紅燈，只有讀者以為文件壞了。這正是「同一份事實存在兩個地方就需要一支守衛」
 // 的標準案例（治理章〈漂移防護〉第 7 支）。
 import { describe, it, expect } from "vitest";
 import { readdirSync, readFileSync, statSync, existsSync } from "node:fs";
@@ -86,7 +88,7 @@ function collectRefs(): { file: string; id: string }[] {
       if (/^\s*```/.test(raw)) { inFence = !inFence; continue; }
       // 圍籬內原樣掃；圍籬外先把行內程式碼挖掉
       const line = inFence ? raw : raw.replace(/`[^`]*`/g, "");
-      for (const [, id] of line.matchAll(/<StoryFrame[^>]*\bid="([^"]+)"/g)) {
+      for (const [, id] of line.matchAll(/<Story(?:Frame|Link)[^>]*\bid="([^"]+)"/g)) {
         refs.push({ file, id });
       }
     }
@@ -104,11 +106,14 @@ describe("文件掛鉤", () => {
     expect(valid.size, "一個 story id 都推導不出來，代表 meta.title 或 export 的比對壞了").toBeGreaterThan(10);
   });
 
-  it("文件裡至少嵌了一個 story（守衛不是在對空集合微笑）", () => {
+  it("文件裡有足夠數量的 story 引用（守衛不是在對空集合微笑）", () => {
+    // 下限 30：元件章逐頁掛 StoryLink 之後的量級。壓在這裡而不是 >0，
+    // 是因為 StoryLink 的正則若壞掉，剩下的 StoryFrame 仍能讓 >0 過關——
+    // 新標籤的引用會安靜失守。
     expect(
       refs.length,
-      "book/docs 裡找不到任何 <StoryFrame>。若是刻意移除全部嵌入，請連這條下限一起改。",
-    ).toBeGreaterThan(0);
+      "book/docs 裡找不到足量的 <StoryFrame>／<StoryLink>。若是刻意移除大批引用，請連這條下限一起改。",
+    ).toBeGreaterThan(30);
   });
 
   it("文件引用的 story id 都真的存在", () => {

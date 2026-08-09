@@ -135,6 +135,19 @@ describe("設計 token", () => {
     expect(missing, `preset 未對映：${missing.join(", ")}`).toEqual([]);
   });
 
+  // 上一支只掃 color.*（semanticColors 的來源）。只存在於主題層的 token
+  // （brand 家族、sidebar-primary/accent 家族）不在其中，漏了對映不會有任何測試紅——
+  // 元件寫 bg-sidebar-accent 時 Tailwind 直接產不出樣式，安靜壞掉。
+  it("Tailwind preset 對映主題層 token（brand 與 sidebar-primary/accent 家族）", () => {
+    const preset = require("../packages/tokens/tailwind-preset.cjs");
+    const flat = JSON.stringify(preset.theme.colors);
+    const missing = [
+      "brand", "brand-foreground", "brand-subtle", "brand-subtle-foreground",
+      "sidebar-primary", "sidebar-primary-foreground", "sidebar-accent", "sidebar-accent-foreground",
+    ].filter((k) => !flat.includes(`--${k})`));
+    expect(missing, `preset 未對映主題層 token：${missing.join(", ")}`).toEqual([]);
+  });
+
   // 三道防漂移防線的第一道：清空 Tailwind 預設色盤，讓 bg-red-500 在取用端
   // 編譯期就產不出樣式。這一條一旦被改回 extend，防線會安靜地失效——
   // 畫面不會壞、測試不會紅、只有一致性慢慢流失。所以要有守衛盯著。

@@ -59,10 +59,11 @@ export function themeMeta(): { name: string; label: string; hue: number }[] {
 }
 
 /**
- * 某個色相主題的 5 個 token（HSL 三元組字串）。
+ * 某個色相主題覆蓋的全部 token（HSL 三元組字串）。
  *
- * 主題只影響 brand 三件組與 ring；背景、邊框、狀態色在所有主題之間相同，
- * 要拿那些請用 `semanticColors()`。
+ * 內容分三類：brand 家族、帶色調的中性色（只轉色相）、sidebar-primary/accent
+ * 家族（brand 的別名）。狀態色與圖表色票不隨主題變，要拿那些請用
+ * `semanticColors()`／`chartColors()`。
  */
 export function themeColors(
   name: string = DEFAULT_THEME,

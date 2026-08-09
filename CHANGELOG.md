@@ -37,7 +37,25 @@ commit 本身記在 tag 描述裡，不會遺失。
 
 ---
 
-## v0.11.1 · 2026-08-08
+## 未發佈（`dev`）
+
+蒸餾 shadcn-admin（MIT）進本書（[ADR-0011](docs/adr/0011-adopt-app-shell.md)，
+提議中——preview 評估通過才併 main）。規範 0.11.1 → 0.12.0、tokens 0.6.0 → 0.7.0。
+
+### Token：`--sidebar-*` 八件組（tokens 0.7.0）
+
+1. **改了什麼**：新增 shadcn 相容的 `--sidebar-*` 八個 token。只有 `--sidebar` 是
+   新顏色（「比頁面底沉一階的安靜區」，目標 ΔE00 反解：淺 2.5／深 3.0，
+   rung 序斷言保住表面抬升階）；其餘七個是別名——`sidebar-ring ≡ ring`（ADR-0007）、
+   `sidebar-foreground ≡ foreground`、`sidebar-border ≡ border`、
+   `sidebar-primary/accent 家族 ≡ brand/brand-subtle 家族`（識別層色相預算，零新增色相出口）。
+   主題層 token 每組 16 → 22。verify:color 新增側欄檢查組（文字 4.5:1、ring 3:1、
+   區域可辨 ΔE00 ≥2、選中項區分度 ≥6、七組別名恆等）；brand-subtle 求解器
+   多一個對象（與該主題 sidebar 亦拉開 ≥8，既有值零變動）。
+2. **我需要做什麼**：合併前不需要。preview 期間 tokens 0.7.0 **不發 npm**——
+   評估不過會整組收回，發佈壓在 dev→main 之後。
+3. **為什麼改**：外殼元件（見 ADR-0011）需要側欄表面的語意層；沿用 shadcn 命名
+   讓上游 sidebar 生態的 class 逐字可用。
 
 三個工作項的合併發佈（守衛基建＋元件無障礙修正＋文件體系雙軌強化）。
 **tokens 維持 0.6.0**——零新 token，不發 npm、不推 tokens tag。

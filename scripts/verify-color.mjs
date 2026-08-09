@@ -35,6 +35,8 @@ const BRAND_HUE_GAP = 25;  // 主題色與狀態色的**色相**距離：警報�
 const SUBTLE_MIN = 6;      // brand-subtle 與 muted 的距離：否則「被選中」看起來只是「有點灰」
 const BRAND_DISABLED_MIN = 12; // brand 與停用外觀的距離：近中性的主題色會被讀成 disabled
 const CHROMATIC_MIN = 0.04;    // 低於此視為無彩：色相角度在近中性色上沒有感知意義
+const SIDEBAR_ZONE_MIN = 2;    // sidebar 與頁面底的距離：低於此「另一個區」不成立
+const SIDEBAR_ZONE_MAX = 6;    // 上限（警告）：外殼是安靜區，不該比 muted 還響
 
 const MODES = ["light", "dark"];
 const STATUS = ["success", "warning", "danger", "info", "destructive", "edit"];
@@ -160,6 +162,44 @@ export function runChecks() {
         const c = contrast(resolve(name, mode, fg), resolve(name, mode, bg));
         if (c < TEXT) warn.push(`${tag} ${fg} 在 ${bg} 上 ${c.toFixed(2)}:1（需 ${TEXT}）`);
       }
+
+      // ── 側邊欄表面（ADR-0011） ──────────────────────────────
+      // sidebar 是全天候大面積表面，文字與聚焦環的門檻比照 background；
+      // 「另一個區」的可辨性（對頁面底的 ΔE00）與選中項的區分度（sidebar-accent）
+      // 是生成參數，這裡驗的是它們沒有被手改或漂移。
+      const sb = resolve(name, mode, "sidebar");
+      const cSbText = contrast(resolve(name, mode, "sidebar-foreground"), sb);
+      push(cSbText >= TEXT, `${tag} sidebar 上的文字只有 ${cSbText.toFixed(2)}:1（需 ${TEXT}）`);
+
+      const cSbSecondary = contrast(resolve(name, mode, "muted-foreground"), sb);
+      if (cSbSecondary < TEXT) warn.push(`${tag} muted-foreground 在 sidebar 上 ${cSbSecondary.toFixed(2)}:1（需 ${TEXT}）`);
+
+      const cSbRing = contrast(resolve(name, mode, "ring"), sb);
+      push(cSbRing >= NONTEXT, `${tag} ring 對 sidebar 只有 ${cSbRing.toFixed(2)}:1（需 ${NONTEXT}）`);
+
+      const dSbBg = deltaE00(lab(sb), lab(pageBgOf(name, mode)));
+      push(dSbBg >= SIDEBAR_ZONE_MIN,
+        `${tag} sidebar 與頁面底只差 ΔE00 ${dSbBg.toFixed(1)}（需 ${SIDEBAR_ZONE_MIN}）——「另一個區」不成立`);
+      if (dSbBg > SIDEBAR_ZONE_MAX) {
+        warn.push(`${tag} sidebar 與頁面底差到 ΔE00 ${dSbBg.toFixed(1)}（上限 ${SIDEBAR_ZONE_MAX}）——外殼太響`);
+      }
+
+      const dAccent = deltaE00(lab(at("sidebar-accent")), lab(sb));
+      push(dAccent >= SUBTLE_MIN,
+        `${tag} sidebar-accent 與 sidebar 只差 ΔE00 ${dAccent.toFixed(1)}（需 ${SUBTLE_MIN}）——選中項浮不出來`);
+
+      // 別名恆等：主題層的 sidebar-* 是 brand 家族的字面值複製（生成器唯一寫入者）。
+      // 手改 tokens.json 會讓兩個「應該永遠同色」的 token 安靜分家——這裡把它變成紅燈。
+      for (const [alias, base] of [
+        ["sidebar-primary", "brand"],
+        ["sidebar-primary-foreground", "brand-foreground"],
+        ["sidebar-accent", "brand-subtle"],
+        ["sidebar-accent-foreground", "brand-subtle-foreground"],
+        ["sidebar-border", "border"],
+      ]) {
+        push(t[alias]?.value === t[base]?.value,
+          `${tag} ${alias} 與 ${base} 的值分家了——sidebar-* 是別名，請重跑 generate-theme 而不是手改`);
+      }
       // 刻意不驗 border 對背景。分隔線是裝飾性的細線，WCAG 1.4.11 不涵蓋；
       // 訂一個自己發明的門檻只會產生六組主題各一則的雜訊，而假警報會訓練人忽略真警報。
 
@@ -167,6 +207,22 @@ export function runChecks() {
         brandText: cBrand, subtleText: cSubtle, ring: cRing, fill: cFill,
         nearestStatus: nearest.s, nearestStatusD: nearest.d,
       };
+    }
+  }
+
+  // ── 1a. 側邊欄基準層的別名恆等 ─────────────────────────────
+  // 主題層的別名在上面逐主題驗過；基準層（color.*）的三個別名在這裡驗一次。
+  // sidebar-ring ≡ ring 是 ADR-0007 的延伸：聚焦環中性、不進主題，側欄不重開戰場。
+  for (const mode of MODES) {
+    for (const [alias, base] of [
+      ["sidebar-foreground", "foreground"],
+      ["sidebar-border", "border"],
+      ["sidebar-ring", "ring"],
+    ]) {
+      const a = tokens.color[mode][alias]?.value;
+      const b = tokens.color[mode][base]?.value;
+      if (a === undefined) fail.push(`${mode} 缺 ${alias}——請重跑 generate-theme`);
+      else if (a !== b) fail.push(`${mode} ${alias} 與 ${base} 的值分家了——sidebar-* 是別名，請重跑 generate-theme 而不是手改`);
     }
   }
 
@@ -340,6 +396,7 @@ export function runChecks() {
     ["card", "card-foreground"],
     ["muted", "foreground"],
     ["popover", "popover-foreground"],
+    ["sidebar", "sidebar-foreground"],   // 側欄選單項的 hover／selected 也走狀態層（ADR-0011）
   ];
   for (const mode of MODES) {
     const s = { hover: Infinity, pressed: Infinity, selected: Infinity, loudest: 0, text: Infinity, sec: Infinity };

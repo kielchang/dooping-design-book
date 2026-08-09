@@ -87,16 +87,18 @@ chartColors("dark");  // 另外 8 色，L* 落在 49–86 —— 沒有任何一
 
 ### 主題影響哪些 token
 
-每組主題每個模式共 16 個，分兩類：
+每組主題每個模式共 22 個，分三類：
 
 | 類別 | Token | 怎麼變 |
 | --- | --- | --- |
 | **主題色**（4） | `--brand`、`--brand-foreground`、`--brand-subtle`、`--brand-subtle-foreground` | 完整重新生成（對比反解） |
-| **帶色調的中性色**（12） | `--background`、`--card`、`--popover`、`--muted`、`--secondary`、`--accent`、`--border`、`--input`、`--field-border`、`--field-editable`、`--field-readonly`、`--muted-foreground` | **只轉色相**，L 與 chroma 不動 |
+| **帶色調的中性色**（14） | `--background`、`--card`、`--popover`、`--muted`、`--secondary`、`--accent`、`--border`、`--input`、`--field-border`、`--field-editable`、`--field-readonly`、`--muted-foreground`、`--sidebar`、`--sidebar-border` | **只轉色相**，L 與 chroma 不動 |
+| **側欄別名**（4） | `--sidebar-primary`、`--sidebar-primary-foreground`、`--sidebar-accent`、`--sidebar-accent-foreground` | ＝brand 家族的**字面值複製**（生成器保證同值，verify:color 的別名守衛盯住） |
 
 **與主題無關的**：`--primary`（中性近黑，承擔多數控制項）、**`--ring`（聚焦環，
-中性——曾在 v0.4.0 吃主題色相，v0.7.0 依 [ADR-0007](/adr) 改回）**、全部狀態色、
-全部圖表色票、提醒視窗的 `--{狀態}-subtle`。
+中性——曾在 v0.4.0 吃主題色相，v0.7.0 依 [ADR-0007](/adr) 改回）**、
+`--sidebar-ring`（≡ ring，同一條規則）、`--sidebar-foreground`（≡ foreground）、
+全部狀態色、全部圖表色票、提醒視窗的 `--{狀態}-subtle`。
 
 ### 色相預算：主題色相只進識別層
 
@@ -105,8 +107,8 @@ chartColors("dark");  // 另外 8 色，L* 落在 49–86 —— 沒有任何一
 
 | 介面層 | 吃主題色相？ | 載體 |
 | --- | --- | --- |
-| Layout 大區塊背景風格色調 | ✅（只轉色相） | 12 個帶色調中性色 |
-| 選單／選中導覽項／品牌強調 | ✅ | `--brand` 家族（含 `Button` 的 `brand` variant——僅限非提交型入口） |
+| Layout 大區塊背景風格色調 | ✅（只轉色相） | 14 個帶色調中性色（含 `--sidebar`、`--sidebar-border`） |
+| 選單／選中導覽項／品牌強調 | ✅ | `--brand` 家族（含 `Button` 的 `brand` variant——僅限非提交型入口；`--sidebar-primary`／`--sidebar-accent` 是它的別名） |
 | 動作（確認／送出／儲存） | ❌ | `--primary` 中性近黑 |
 | 互動（hover／pressed／已選） | ❌ | `currentColor` 疊加，機制無色相 |
 | 聚焦環 | ❌ | `--ring` 中性，全主題一致 |

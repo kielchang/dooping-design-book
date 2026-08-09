@@ -6,6 +6,14 @@
   "homepage": "https://kielchang.github.io/dooping-design-book",
   "items": [
     {
+      "name": "app-shell",
+      "version": "0.12.0",
+      "type": "registry:ui",
+      "title": "AppShell 外殼容器",
+      "description": "側欄＋頂列＋主內容的佈局容器，刻意小到宿主可自行重寫。",
+      "url": "https://kielchang.github.io/dooping-design-book/r/app-shell.json"
+    },
+    {
       "name": "badge",
       "version": "0.12.0",
       "type": "registry:ui",
@@ -292,6 +300,22 @@
       "title": "Separator 分隔線",
       "description": "水平／垂直分隔（Radix Separator），預設裝飾性。",
       "url": "https://kielchang.github.io/dooping-design-book/r/separator.json"
+    },
+    {
+      "name": "sidebar",
+      "version": "0.12.0",
+      "type": "registry:ui",
+      "title": "Sidebar 側邊欄",
+      "description": "外殼側欄家族：Provider、收合圖示欄、行動版左滑抽屜（純呈現，不綁路由）。",
+      "url": "https://kielchang.github.io/dooping-design-book/r/sidebar.json"
+    },
+    {
+      "name": "sidebar-nav",
+      "version": "0.12.0",
+      "type": "registry:ui",
+      "title": "SidebarNav 導覽渲染",
+      "description": "NavGroup[] 的三態渲染：連結／展開群組／收合態右彈選單，含例行・試算標籤。",
+      "url": "https://kielchang.github.io/dooping-design-book/r/sidebar-nav.json"
     },
     {
       "name": "skeleton",

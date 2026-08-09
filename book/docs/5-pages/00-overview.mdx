@@ -25,8 +25,9 @@ title: 頁面總覽
 | **單頁層** | 一頁之內的區塊順序、組成元件、行為規範 | **本章** |
 | 區塊層 | 每個元件自身的用途、狀態、無障礙 | [元件章](/components) |
 
-本章不收應用外殼（Layout、Sidebar、路由）——那是宿主的職責，
-規範在站台層那一頁；本章從「進到這一頁之後」開始管。
+本章不收應用外殼——外殼**元件**在[元件章](/components/app-shell-sidebar)
+（ADR-0011，preview 評估中），路由與資料仍是宿主的職責，
+站台層的**規範**在上表那一頁；本章從「進到這一頁之後」開始管。
 
 ## 五種頁型
 
@@ -111,5 +112,7 @@ v0.12.0（[ADR-0011](/adr)，preview 評估中）再畢業兩件：
 [Popover／DropdownMenu](/components/popover-dropdown)——並同批收錄
 Collapsible、Separator、[ConfirmDialog](/components/confirm-dialog)。
 
-AppShell 與 Sidebar **不在此列**——外殼不收進元件庫是刻意決策，
-規範正本在[站台層](/patterns/back-office-ia)。
+AppShell 與 Sidebar 原本刻意不收（ADR-0008），v0.12.0 起由
+[ADR-0011](/adr) 修訂、以**純呈現元件**收進[元件章](/components/app-shell-sidebar)
+（preview 評估中）；站台層的規範正本不變，仍在
+[後台系統的資訊架構](/patterns/back-office-ia)。

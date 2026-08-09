@@ -68,6 +68,31 @@ commit 本身記在 tag 描述裡，不會遺失。
 3. **為什麼改**：缺件表對 Popover／DropdownMenu 已有場景證據；外殼與 DataTable
    強化（同批後續工作項）都以它們為零件，先行落地。
 
+### 指令面板：cmdk 單檔隔離＋導覽契約
+
+1. **改了什麼**：新收 Command（cmdk 薄封裝，對話框殼組合本書 Dialog）、
+   CommandPalette（⌘K、執行即關、兩層項顯示「父 › 子」）、`lib/nav`
+   （NavGroup discriminated union＋isNavActive 多層 fallback）。cmdk 比照
+   `@xyflow/react` 隔離在 `command.tsx` 單檔（boundary 守衛，反向驗證過）。
+2. **我需要做什麼**：不需要。裝 `command-palette` 會自動帶 cmdk——大相依提醒
+   見 AGENTS.md。
+3. **為什麼改**：導覽資料單一來源同時餵側邊欄與指令面板，是 shadcn-admin
+   最划算的原創 pattern；契約（lib/nav）先於外殼落地。
+
+### 應用外殼：Sidebar 家族＋SidebarNav＋AppShell（ADR-0011，preview 評估中）
+
+1. **改了什麼**：新收外殼三件——Sidebar 家族（Provider／Trigger／結構件／選單鈕；
+   桌面 icon 收合、行動版自動轉左滑抽屜＝既有 Radix Dialog 組成，焦點歸還自己記
+   開啟者）、SidebarNav（NavGroup[] 三態渲染：連結／展開 Collapsible／收合態右彈
+   DropdownMenu，〔例行〕〔試算〕標籤、renderLink 注入、收合態名稱走 sr-only）、
+   AppShell（純佈局，刻意小到宿主可自行重寫）。相對 shadcn 上游砍掉
+   floating/inset variant、SidebarRail、cookie、Ctrl+B——皆為刻意決定（ADR-0011）。
+   verify:visual 增第三支外殼哨兵（sidebar＋sidebar-accent 是主題指紋）。
+2. **我需要做什麼**：**先不要在正式系統採用**——ADR-0011 狀態提議中，preview
+   評估通過（時間盒 4–6 週或兩個取用端試裝）才併入 main；評估不過整組退場。
+3. **為什麼改**：外殼是跨系統不一致成本最高的一塊；〈後台系統的資訊架構〉的
+   規範從此有元件載體，行動版「分區順序不變」變成結構保證而不是紀律要求。
+
 三個工作項的合併發佈（守衛基建＋元件無障礙修正＋文件體系雙軌強化）。
 **tokens 維持 0.6.0**——零新 token，不發 npm、不推 tokens tag。
 

@@ -15,8 +15,9 @@ title: 元件總覽
 | --- | --- |
 | 基礎 | Button、Badge、Card、Callout、Separator |
 | 表單 | Input、NumberInput、Label、Checkbox、Select、SegGroup、Chips |
-| 浮層 | Tooltip、Dialog、Popover、DropdownMenu、ConfirmDialog |
+| 浮層 | Tooltip、Dialog、Popover、DropdownMenu、ConfirmDialog、Command |
 | 結構 | Collapsible |
+| 外殼 | AppShell、Sidebar、SidebarNav（[ADR-0011](/adr)，preview 評估中） |
 | 資料 | Table、DataTable、TabPills、Delta、EmptyState、Stepper |
 | 進階表單 | EditableField、ChangeSummary |
 | 引導 | Coachmark |
@@ -28,8 +29,10 @@ title: 元件總覽
 - **完整的圖表庫**——[圖表](/components/charts)只收「後台閱讀型」的八種零相依圖，
   刻意不做縮放、刷選、圖內鑽取，資料點也只撐到百位數。
   需要分析型互動請直接用成熟圖表庫，不要改造這一組。
-- **ErrorBoundary、Layout、Sidebar**——這些是應用外殼的職責，不是設計語言。
-  導覽層的規範見[後台系統的資訊架構](/patterns/back-office-ia)。
+- **ErrorBoundary、路由、資料抓取**——外殼元件（AppShell／Sidebar）收的是
+  **純呈現**的殼（[ADR-0011](/adr)）；路由、權限、資料抓取仍是宿主的職責，
+  一律以 `renderLink`／props 注入。導覽層的**規範**正本仍在
+  [後台系統的資訊架構](/patterns/back-office-ia)——元件是規範的載體，不是第二份規範。
 - **任何綁定特定業務流程的複合畫面**——它們在原專案裡是對的，抄到別的產業就是錯的。
   去領域化之後仍然成立的**頁型組成規範**（清單頁、明細頁、表單頁…）收在[頁面章](/pages)，
   以文件與組合 story 的形式存在，不發元件。

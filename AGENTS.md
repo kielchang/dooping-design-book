@@ -49,8 +49,9 @@ npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/data-tab
   [儀表板](https://kielchang.github.io/dooping-design-book/pages/dashboard/)、
   [設定頁](https://kielchang.github.io/dooping-design-book/pages/settings-page/)。
 
-**大相依提醒**：`graph-canvas` 會自動帶進 `@xyflow/react`（本 registry 唯一的大型外部相依，
-由邊界守衛隔離在單一檔案）。裝之前先確認你要的不是零相依的 `charts`（八種 SVG 圖）。
+**大相依提醒**：`graph-canvas` 會自動帶進 `@xyflow/react`、`command`／`command-palette`
+會自動帶進 `cmdk`（兩者都由邊界守衛隔離在單一檔案）。裝 graph-canvas 之前先確認
+你要的不是零相依的 `charts`（八種 SVG 圖）。
 
 **前置條件**：專案要有 `components.json` 與 `@/*` 路徑別名。沒有的話先 `npx shadcn@latest init`。
 Tailwind 的 `content` 掃描範圍要涵蓋落點（`./src/**/*.{ts,tsx}` 已含 `components/dooping/`）。

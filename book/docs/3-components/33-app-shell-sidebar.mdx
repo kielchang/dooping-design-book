@@ -1,0 +1,98 @@
+---
+title: AppShell／Sidebar 應用外殼
+---
+
+# AppShell／Sidebar 應用外殼
+
+後台的殼：側邊欄＋頂列＋主內容。**規範的正本在
+[後台系統的資訊架構](/patterns/back-office-ia)**——分區怎麼切、狀態列放什麼、
+單一出口與深連結，全以那一頁為準；這裡是那份規範的**元件載體**。
+
+:::caution 評估中
+外殼元件由 [ADR-0011](/adr) 收錄（修訂 ADR-0008 的外殼排除），目前狀態**提議中**：
+preview 評估通過才進正式版；評估不過會整組退場。取用端在此期間請以 preview 站為準。
+:::
+
+<StoryLink id="元件-外殼-應用外殼・側邊欄--典型組成" />
+
+## 用途
+
+三層 API，由小到大：
+
+| 元件 | 定位 |
+| --- | --- |
+| `Sidebar` 家族 | 側欄容器與結構件：Provider、Trigger、Header/Content/Footer、Group、Menu 系 |
+| `SidebarNav` | 吃 `NavGroup[]` 的三態渲染：連結／展開群組／收合態右彈選單，含〔例行〕〔試算〕標籤 |
+| `AppShell` | 佈局容器：側欄＋頂列＋主內容，轉發 Provider props |
+
+**純呈現，三不綁**：不綁路由（連結用 `renderLink` 注入，預設真 `<a>`）、
+不綁資料抓取、不碰儲存（收合狀態的持久化用受控 `open`/`onOpenChange` 交宿主）。
+這是 ADR-0011 的退場前提——砍掉時宿主一小時內能用同一份 token 重寫自己的殼。
+
+<StoryFrame id="元件-外殼-應用外殼・側邊欄--典型組成" title="典型組成：分區導覽＋收合＋狀態列落點" height={520} />
+
+## 何時不要用
+
+<Rules>
+  <Do><p>後台系統的站台外殼——與〈後台系統的資訊架構〉的分區規範成套使用。</p></Do>
+  <Dont><p>對外的行銷站、文件站、登入頁不要套這個殼——它們的導覽是內容結構，
+  不是工作節奏。登入頁在外殼<strong>之外</strong>（頁面章明文不收）。</p></Dont>
+</Rules>
+
+<Rules>
+  <Do><p>側欄項目用 <code>NavGroup[]</code> 描述，同一份資料餵
+  <a href="/components/command">CommandPalette</a>。</p></Do>
+  <Dont><p>不要在側欄與指令面板各維護一份清單——改名只改一邊，
+  使用者會以為是兩個功能。</p></Dont>
+</Rules>
+
+## 狀態
+
+- **桌面收合**：`collapsible="icon"`（預設）收成圖示欄；文字轉 sr-only
+  （可及名稱不消失）、群組標題隱藏、兩層群組改成往右彈出的
+  [DropdownMenu](/components/popover-dropdown)、hover 出提示泡泡。
+- **行動版**：自動轉左滑抽屜（既有 Radix Dialog 組成——焦點鎖定、Esc、焦點歸還
+  全部繼承），**分區與順序完全不變**；點選目的地即關閉。
+- **選中態**：`bg-sidebar-accent`（＝該主題的 `brand-subtle`，識別層）＋
+  `aria-current="page"`；hover 走狀態層。active 判定用 `isNavActive()` 的多層
+  fallback（完整相符 → 去 query → 路徑邊界的父路徑），可用 `isActive` 覆寫。
+- **開闔狀態**：`useSidebar()` 拿 `toggle()`／`state`——宿主要掛快捷鍵、
+  要存 localStorage 都從這裡接。
+
+### SPA 宿主的接法
+
+```tsx
+<SidebarNav
+  groups={navGroups}
+  currentPath={location.pathname}
+  renderLink={(props, item) => <Link to={item.url} {...props} />}
+/>
+```
+
+`renderLink` 收到的 props（含 `aria-current` 與行動版關抽屜的 `onClick`）要**原樣轉發**。
+
+## 無障礙
+
+- 側欄是 `nav` 地標，`label` 預設「主導覽」；行動版抽屜以同名可及名稱呈現。
+- 收合態的連結名稱走 sr-only 保留——`display:none` 會把可及名稱一起藏掉，
+  這是 stories 的 play 直接驗的契約。
+- SidebarTrigger 自帶 `aria-label` 與 `aria-expanded`。
+- 聚焦環走中性 `--ring`（`--sidebar-ring ≡ ring`，ADR-0007 的延伸）。
+
+## Token
+
+側欄有自己的表面語意（[主題](/foundations/theming)頁有完整清單）：
+`--sidebar` 是「比頁面底沉一階的安靜區」（唯一新顏色，反解生成）；
+`--sidebar-accent` ≡ `brand-subtle`、`--sidebar-primary` ≡ `brand`、
+`--sidebar-ring` ≡ `ring`——七個別名由 `verify:color` 的恆等守衛盯住。
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/app-shell.json
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/sidebar-nav.json
+```
+
+`sidebar-nav` 會自動帶入 `sidebar`、`collapsible`、`dropdown-menu`、`badge`、
+`tooltip` 與 `nav`（NavGroup 型別）。token 需要 `@dooping/tokens@^0.7.0`
+（`--sidebar-*` 自 0.7.0 起提供）。

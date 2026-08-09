@@ -64,8 +64,9 @@ AGENTS.md、ARCHITECTURE.md ──(book/scripts/sync-root-docs.mjs)──► boo
 2. **import 改寫**：相對路徑 → `@/components/dooping/*`、`@/lib/dooping/*`（落點固定，
    之後同步 diff 才乾淨）。
 3. **相依推導**：外部套件走白名單（`NPM_DEPS`）；不在白名單的不會寫進 registry，
-   取用端就裝不到——症狀是「畫布整個沒樣式」。`@xyflow/react` 是唯一的大型外部相依，
-   由 `tests/boundary.test.ts` 隔離在一個檔案裡。
+   取用端就裝不到——症狀是「畫布整個沒樣式」。大型外部相依有兩個：
+   `@xyflow/react`（graph-canvas）與 `cmdk`（command），都由 `tests/boundary.test.ts`
+   隔離在各自的一個檔案裡。`lib/` 檔案漏登錄 `LIB_MODULES` 會在產生端直接 throw。
 4. **token 相依注入**：每個 item 硬加 `@dooping/tokens@^x`（版號取自
    `packages/react/package.json` 的宣告，不寫第二份真相）。這是 v0.6.0 事故的修正：
    當年 item 沒宣告 token，元件裝進去吃不到變數，**畫面壞掉且不報錯**，漂移了四個版本。
@@ -83,7 +84,7 @@ AGENTS.md、ARCHITECTURE.md ──(book/scripts/sync-root-docs.mjs)──► boo
 
 | 檔案 | 守住的兩個所在 | 壞掉時的症狀 |
 | --- | --- | --- |
-| `tests/boundary.test.ts` | 元件庫 ↔ 應用層／第三方相依 | `@xyflow/react` 滲出隔離檔，取用端被迫吞大相依 |
+| `tests/boundary.test.ts` | 元件庫 ↔ 應用層／第三方相依 | `@xyflow/react`／`cmdk` 滲出隔離檔，取用端被迫吞大相依 |
 | `tests/tokens.test.ts` | tokens.json ↔ CSS 產物 ↔ preset ↔ 版號四處 | 淺深不成對、產物過期、版號漂移 |
 | `tests/color.test.ts` | 色彩生成參數 ↔ 無障礙門檻 | 對比不足、色覺混淆（接 `verify:color`） |
 | `tests/de-domain.test.ts` | 全庫文字 ↔ 176 詞黑名單 | 領域語彙被複製到取用端 |

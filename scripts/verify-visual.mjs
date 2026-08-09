@@ -63,6 +63,16 @@ const SENTINELS = [
       "danger-subtle": resolve(theme, mode, "danger-subtle"),
     }),
   },
+  {
+    // 外殼（ADR-0011）：sidebar 是全畫面最大的一塊實色，選中項的 sidebar-accent
+    // ＝逐主題的 brand-subtle——兩者一起構成「主題沒套上」的最強指紋。
+    title: "元件/外殼/應用外殼・側邊欄", name: "典型組成",
+    expect: (theme, mode) => ({
+      background: resolve(theme, mode, "background"),
+      sidebar: resolve(theme, mode, "sidebar"),
+      "sidebar-accent": resolve(theme, mode, "sidebar-accent"),
+    }),
+  },
 ];
 
 const MIME = {

@@ -37,7 +37,12 @@ const storyLink = (props: SidebarNavLinkProps) => (
   />
 );
 
-function Shell({ currentPath, mobileQuery, defaultOpen }: { currentPath: string; mobileQuery?: string; defaultOpen?: boolean }) {
+// 桌面版 story 一律釘 "(max-width: 0px)"（永不成立＝強制桌面）——
+// 與行動版 story 釘 "(min-width: 0px)" 是同一條規則：play 的性質不能隨
+// 觀看者的視窗寬度改變（窄視口下桌面斷言會找不到地標而假性失敗）。
+const FORCE_DESKTOP = "(max-width: 0px)";
+
+function Shell({ currentPath, mobileQuery = FORCE_DESKTOP, defaultOpen }: { currentPath: string; mobileQuery?: string; defaultOpen?: boolean }) {
   return (
     <AppShell
       mobileQuery={mobileQuery}

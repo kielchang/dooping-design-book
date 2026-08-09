@@ -96,6 +96,7 @@ export * from "./lib/utils";
 export * from "./lib/use-sort";
 export * from "./lib/use-dialog-state";
 export * from "./lib/nav";
+export * from "./lib/use-table-url-state";
 export * from "./lib/csv";
 export * from "./lib/download";
 export * from "./lib/forms/diff";

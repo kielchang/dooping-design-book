@@ -200,6 +200,59 @@ const columns: Column<Order>[] = [
 <DataTable labels={{ search: "Search…", exportCsv: "Export CSV", prev: "Prev", next: "Next" }} … />
 ```
 
+## 多選與批次操作（v0.12.0）
+
+<StoryLink id="元件-資料-資料表-datatable--批次操作" />
+
+`selectable` 在首欄前插勾選欄；`bulkActions` 給批次操作列（有選取才出現，
+sticky 在容器內置底，`role="toolbar"`＋方向鍵移動焦點）。三條規則：
+
+- **表頭勾選只切當頁**。批次操作是寫入，誤殺半徑優先於「跟著篩選走」——
+  合計與匯出是唯讀所以算全量，選取是寫入所以保守。
+- **選取跨頁保留**（鍵＝`getRowKey`，所以 `getRowKey` 不得依賴 index）。
+- 選取是**暫時狀態**：不進網址（見下）、換資料集自行清除。
+
+```tsx
+<DataTable selectable bulkActions={({ selected, clear }) => (
+  <Button size="sm" onClick={() => { doExport(selected); clear(); }}>匯出所選</Button>
+)} … />
+```
+
+## Facet 篩選鈕與欄位顯示（v0.12.0）
+
+<StoryLink id="元件-資料-資料表-datatable--facet-篩選" />
+
+`facets={["status"]}` 把 select 型欄位升級成工具列上的 faceted 鈕
+（Popover＋逐值計數）。它與表頭篩選**共用同一份狀態**——兩個入口、一個真相，
+從哪邊改都反映在同一排篩選 chip。逐值計數對「排除本欄的其餘篩選後」的
+列集合計算，勾了一個值不會把其他選項的數字歸零。
+
+`columnVisibility` 顯示「欄位」切換鈕；欄位設定加 `hideable`（凍結欄強制不可隱藏）
+與 `defaultHidden`。欄位顯示是暫時狀態，同樣不進網址。
+
+## 狀態同步網址（v0.12.0）
+
+<StoryLink id="元件-資料-資料表-datatable--網址同步" />
+
+[後台系統的資訊架構](/patterns/back-office-ia)的深連結規範在資料表上的落地——
+篩完的清單可以收藏、可以貼給同事、上一頁行為正確：
+
+```tsx
+const { state, onStateChange } = useTableUrlState();
+<DataTable state={state} onStateChange={onStateChange} … />
+```
+
+- 網址參數人看得懂：`q=甲`、`sort=amount.desc`、`page=2`（1-based）、
+  `f.status=已確認`、`fr.amount=1000..5000`；**預設值一律省略**，網址保持乾淨。
+- 篩選／搜尋變更自動回第 1 頁（`page` 參數消失）。
+- `selection` 與 `hiddenColumns` 不進網址——判準是「別人打開這個連結，
+  需要看到一樣的東西嗎？」。
+- 預設走 `history.replaceState`；TanStack Router／Next 宿主注入自己的
+  `adapter`（get／set／subscribe 三個函式）。同頁多張表用 `prefix` 隔開。
+
+`state`／`onStateChange` 是**逐鍵受控**：給了哪個鍵、哪個鍵由宿主管理，
+其餘維持元件內部狀態——不接網址同步時行為與舊版完全相同。
+
 ## 這張表撐得住多少資料
 
 門檻式分頁讓「一頁最多 50 列」成為渲染上限，但**篩選與排序仍然掃全量**。

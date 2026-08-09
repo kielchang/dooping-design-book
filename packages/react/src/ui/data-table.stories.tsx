@@ -1,3 +1,4 @@
+import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { within, expect, userEvent, waitFor } from "@storybook/test";
 import { PackageOpen } from "lucide-react";
@@ -6,6 +7,7 @@ import { Badge } from "./badge";
 import { Button } from "./button";
 import { Delta } from "./delta";
 import { formatMoney, formatNumber } from "../lib/utils";
+import { useTableUrlState, type UrlStateAdapter } from "../lib/use-table-url-state";
 import { demoRecords, STATUS_LABEL, type DemoRecord } from "../demo/sample-data";
 import { makeRecords } from "../demo/generate";
 
@@ -176,4 +178,148 @@ export const 互動: StoryObj<互動Args> = {
       loading={a.載入中}
     />
   ),
+};
+
+// ── v0.12.0 強化：faceted 篩選、批次操作、欄位顯示、網址同步 ──
+
+export const Facet_篩選: Story = {
+  render: () => (
+    <DataTable rows={demoRecords} columns={columns} getRowKey={(r) => r.id} facets={["status", "unit"]} />
+  ),
+  // 契約：facet 鈕與表頭篩選共用同一份狀態——勾選後列數變、篩選 chip 出現、鈕上出現數字。
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const doc = canvasElement.ownerDocument;
+    // 「狀態」同名者有二：工具列 facet 鈕與表頭排序鈕——工具列在 DOM 前面，取第一個
+    await userEvent.click(canvas.getAllByRole("button", { name: "狀態" })[0]);
+    const panel = await within(doc.body).findByRole("dialog");
+    const option = within(panel).getByRole("checkbox", { name: /已確認/ });
+    // 逐值計數顯示在選項右側
+    await expect(option).toHaveTextContent(/\d/);
+    await userEvent.click(option);
+    await userEvent.keyboard("{Escape}");
+    // 篩選 chip 與表頭篩選同一份狀態
+    await waitFor(() => expect(canvas.getByText("狀態：已確認")).toBeVisible());
+    const rows = canvas.getAllByRole("row");
+    expect(rows.length).toBeGreaterThan(1);
+    await userEvent.click(canvas.getByRole("button", { name: /全部清除|移除 狀態：已確認/ }));
+  },
+};
+
+function BulkDemo() {
+  const [message, setMessage] = React.useState("");
+  return (
+    <div className="space-y-2">
+      {message && <p className="text-sm text-muted-foreground" data-testid="bulk-result">{message}</p>}
+      <DataTable
+        rows={demoRecords}
+        columns={columns}
+        getRowKey={(r) => r.id}
+        selectable
+        bulkActions={({ selected, clear }) => (
+          <>
+            <Button size="sm" variant="outline" className="h-7" onClick={() => { setMessage(`已匯出 ${selected.length} 筆`); clear(); }}>
+              匯出所選
+            </Button>
+            <Button size="sm" variant="destructive" className="h-7" onClick={() => { setMessage(`已作廢 ${selected.length} 筆`); clear(); }}>
+              作廢所選
+            </Button>
+          </>
+        )}
+      />
+    </div>
+  );
+}
+
+export const 批次操作: Story = {
+  render: () => <BulkDemo />,
+  // 契約：無選取不渲染工具列；表頭勾選只切當頁；方向鍵在列內移動焦點；清除即消失。
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    expect(canvas.queryByRole("toolbar")).toBeNull();
+    const first = canvas.getByRole("checkbox", { name: "選取 R-2401" });
+    await userEvent.click(first);
+    await userEvent.click(canvas.getByRole("checkbox", { name: "選取 R-2402" }));
+    const bar = await canvas.findByRole("toolbar", { name: "已選 2 筆" });
+    // 方向鍵在列內移動焦點
+    within(bar).getByRole("button", { name: "匯出所選" }).focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(within(bar).getByRole("button", { name: "作廢所選" })).toHaveFocus();
+    await userEvent.keyboard("{End}");
+    await expect(within(bar).getByRole("button", { name: "清除選取" })).toHaveFocus();
+    await userEvent.click(within(bar).getByRole("button", { name: "清除選取" }));
+    await waitFor(() => expect(canvas.queryByRole("toolbar")).toBeNull());
+  },
+};
+
+export const 欄位顯示: Story = {
+  render: () => (
+    <DataTable
+      rows={demoRecords}
+      columns={columns.map((c) => (c.key === "createdAt" ? { ...c, defaultHidden: true } : c))}
+      getRowKey={(r) => r.id}
+      columnVisibility
+    />
+  ),
+  // 契約：取消勾選的欄整欄消失；defaultHidden 初始就隱藏；凍結欄不在選單裡。
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const doc = canvasElement.ownerDocument;
+    // 先證明 columnheader 查得到（否則後面的「不存在」斷言全是空轉）
+    await expect(canvas.getByRole("columnheader", { name: /單位/ })).toBeVisible();
+    expect(canvas.queryByRole("columnheader", { name: /建立日期/ })).toBeNull();
+
+    // 注意：Radix DropdownMenu 是 modal——開著時選單外的內容整個 aria-hidden，
+    // 對表頭的斷言一律要在 Escape 關閉**之後**做，否則查不到（或空轉）。
+    await userEvent.click(canvas.getByRole("button", { name: "欄位" }));
+    let menu = await within(doc.body).findByRole("menu");
+    expect(within(menu).queryByRole("menuitemcheckbox", { name: "編號" })).toBeNull(); // 凍結欄不可隱藏
+    await userEvent.click(within(menu).getByRole("menuitemcheckbox", { name: "單位" }));
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(canvas.queryByRole("columnheader", { name: /單位/ })).toBeNull());
+
+    // 重開選單再把 defaultHidden 的欄打開
+    await userEvent.click(canvas.getByRole("button", { name: "欄位" }));
+    menu = await within(doc.body).findByRole("menu");
+    await userEvent.click(within(menu).getByRole("menuitemcheckbox", { name: "建立日期" }));
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(canvas.getByRole("columnheader", { name: /建立日期/ })).toBeVisible());
+  },
+};
+
+/** 網址同步示範：畫面上直接顯示序列化字串，play 對它斷言（不碰真的 location）。 */
+function UrlSyncDemo() {
+  const [search, setSearch] = React.useState("");
+  const listeners = React.useRef(new Set<() => void>());
+  const adapter = React.useMemo<UrlStateAdapter>(() => ({
+    get: () => search,
+    set: (next) => { setSearch(next); listeners.current.forEach((cb) => cb()); },
+    subscribe: (cb) => { listeners.current.add(cb); return () => listeners.current.delete(cb); },
+  }), [search]);
+  const { state, onStateChange } = useTableUrlState({ adapter });
+  return (
+    <div className="space-y-2">
+      <p className="rounded border bg-muted px-2 py-1 font-mono text-xs" data-testid="url">
+        ?{search || "（全部預設，網址乾淨）"}
+      </p>
+      <DataTable rows={demoRecords} columns={columns} getRowKey={(r) => r.id} pageSize={5} state={state} onStateChange={onStateChange} />
+    </div>
+  );
+}
+
+export const 網址同步: Story = {
+  render: () => <UrlSyncDemo />,
+  // 契約：搜尋寫進 q=、翻頁寫進 page=（1-based）、改條件自動回第 1 頁（page 參數消失）。
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const url = () => canvas.getByTestId("url").textContent ?? "";
+    await userEvent.click(canvas.getByRole("button", { name: /下一頁/ }));
+    await waitFor(() => expect(url()).toContain("page=2"));
+    const input = canvas.getByRole("textbox", { name: "搜尋關鍵字…" });
+    await userEvent.type(input, "甲");
+    // 條件變更自動回第 1 頁：page 參數消失、q 出現
+    await waitFor(() => expect(url()).toContain("q="));
+    await waitFor(() => expect(url()).not.toContain("page="));
+    await userEvent.clear(input);
+  },
 };

@@ -9,12 +9,17 @@ import { Input } from "./input";
 import { Button } from "./button";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./select";
 import { Tooltip } from "./tooltip";
+import { Checkbox } from "./checkbox";
+import { Popover, PopoverTrigger, PopoverContent } from "./popover";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel,
+} from "./dropdown-menu";
 import { useSort, type SortState } from "../lib/use-sort";
 import { csvSerialize } from "../lib/csv";
 import { saveBlob } from "../lib/download";
 import { cn } from "../lib/utils";
 import {
-  Search, Download, ChevronLeft, ChevronRight, ChevronsUpDown, ChevronUp, ChevronDown, Filter, X, Check, Plus,
+  Search, Download, ChevronLeft, ChevronRight, ChevronsUpDown, ChevronUp, ChevronDown, Filter, X, Check, Plus, Columns3,
 } from "lucide-react";
 
 /** 欄位定義：用「設定」描述一欄怎麼顯示、排序、篩選、合計，而不是每張表各自手刻 `<td>`。 */
@@ -42,6 +47,10 @@ export type Column<T> = {
   cellClassName?: string | ((row: T) => string);
   /** 最大寬度(px)：超出以 … 截斷，hover/長壓顯示完整（提示文字取 filterText） */
   truncate?: number;
+  /** 可被「欄位」切換隱藏；預設 true，凍結欄強制不可隱藏 */
+  hideable?: boolean;
+  /** 預設隱藏（可從「欄位」切換打開） */
+  defaultHidden?: boolean;
 };
 
 export interface DataTableLabels {
@@ -76,6 +85,12 @@ export interface DataTableLabels {
   next: string;
   totalRow: string;
   resizeHint: string;
+  selectAllPage: string;
+  selectRow: (key: string) => string;
+  selectedCount: (n: number) => string;
+  clearSelection: string;
+  columnsButton: string;
+  columnsTitle: string;
 }
 
 /** 預設文案（繁體中文）。宿主要換語言時整包覆寫，不必改元件。 */
@@ -111,11 +126,32 @@ export const DEFAULT_DATA_TABLE_LABELS: DataTableLabels = {
   next: "下一頁",
   totalRow: "合計",
   resizeHint: "拖曳調整欄寬，雙擊自適應內容",
+  selectAllPage: "選取本頁全部",
+  selectRow: (key) => `選取 ${key}`,
+  selectedCount: (n) => `已選 ${n} 筆`,
+  clearSelection: "清除選取",
+  columnsButton: "欄位",
+  columnsTitle: "顯示欄位",
 };
 
-type ColFilter = { texts: string[]; min: string; max: string; values: string[] };
+export type ColFilter = { texts: string[]; min: string; max: string; values: string[] };
 const EMPTY_FILTER: ColFilter = { texts: [], min: "", max: "", values: [] };
 const POP_W = 224;
+
+/**
+ * 可受控／可同步網址的狀態全集。`selection` 與 `hiddenColumns` 是暫時狀態，
+ * 深連結判準（「別人打開這個連結需要看到一樣的東西嗎？」）之下**不進網址**——
+ * `useTableUrlState` 會自動忽略這兩鍵。
+ */
+export interface DataTableState {
+  page: number;
+  pageSize: number;
+  query: string;
+  sort: SortState;
+  filters: Record<string, ColFilter>;
+  hiddenColumns: string[];
+  selection: string[];
+}
 
 export type DataTableProps<T> = {
   rows: T[];
@@ -149,6 +185,28 @@ export type DataTableProps<T> = {
   rowClassName?: (row: T) => string;
   onRowClick?: (row: T) => void;
   labels?: Partial<DataTableLabels>;
+  /**
+   * 逐鍵受控（Radix 慣例）：給了哪個鍵、哪個鍵由宿主管理，其餘維持內部狀態。
+   * 配 `useTableUrlState` 一行接上網址同步：
+   * `const { state, onStateChange } = useTableUrlState(); <DataTable state={state} onStateChange={onStateChange} …/>`
+   */
+  state?: Partial<DataTableState>;
+  /** 任一狀態變更時回呼：patch＝這次改了什麼、next＝合併後的完整狀態。 */
+  onStateChange?: (patch: Partial<DataTableState>, next: DataTableState) => void;
+  /**
+   * 多選列：首欄前插勾選欄。表頭勾選只切**當頁**（批次操作是寫入，誤殺半徑優先），
+   * 選取跨頁保留。需要穩定的 `getRowKey`（不得依賴 index）。
+   */
+  selectable?: boolean;
+  /** 批次操作列：有選取才出現，sticky 置底（容器內，不蓋站台 UI）。 */
+  bulkActions?: (ctx: { selected: T[]; clear: () => void }) => ReactNode;
+  /**
+   * 升級為工具列 faceted 鈕的欄 key（欄的篩選型態需為／可推導為 select）。
+   * 與表頭篩選**共用同一份**狀態——兩個入口、一個真相，不會打架。
+   */
+  facets?: string[];
+  /** 顯示「欄位」顯示切換鈕（配 Column 的 hideable／defaultHidden）。 */
+  columnVisibility?: boolean;
 };
 
 /**
@@ -168,13 +226,46 @@ export function DataTable<T>({
   searchable = true, searchPlaceholder,
   zebra = true, stickyHeader = true, dense = false, maxHeight, crosshair = true, resizable = true,
   empty, toolbar, csv, rowClassName, onRowClick, loading = false, labels: labelOverrides,
+  state: stateProp, onStateChange, selectable = false, bulkActions, facets = [], columnVisibility = false,
 }: DataTableProps<T>) {
   const L = { ...DEFAULT_DATA_TABLE_LABELS, ...labelOverrides };
-  const [query, setQuery] = useState("");
-  const [size, setSize] = useState(pageSize);
-  const [page, setPage] = useState(0);
+
+  // ── 狀態：逐鍵受控 ─────────────────────────────────────────
+  // `state` 給了哪個鍵、哪個鍵由宿主管理（配 useTableUrlState 同步網址），
+  // 沒給的鍵維持內部狀態——兩種模式逐鍵混用。所有變更都走 update()：
+  // 篩選／搜尋／排序／每頁筆數的 patch 一律附帶 page:0（條件變了還停在第 7 頁沒有意義）。
+  const [queryState, setQueryState] = useState("");
+  const [sizeState, setSizeState] = useState(pageSize);
+  const [pageState, setPageState] = useState(0);
+  const [filtersState, setFiltersState] = useState<Record<string, ColFilter>>({});
+  const [sortState, setSortState] = useState<SortState>(initialSort);
+  const [hiddenState, setHiddenState] = useState<string[]>(
+    () => columns.filter((c) => c.defaultHidden).map((c) => c.key),
+  );
+  const [selectionState, setSelectionState] = useState<string[]>([]);
+
+  const query = stateProp?.query ?? queryState;
+  const size = stateProp?.pageSize ?? sizeState;
+  const page = stateProp?.page ?? pageState;
+  const colFilters = stateProp?.filters ?? filtersState;
+  const sort = stateProp?.sort !== undefined ? stateProp.sort : sortState;
+  const hiddenColumns = stateProp?.hiddenColumns ?? hiddenState;
+  const selection = stateProp?.selection ?? selectionState;
+
+  const update = (patch: Partial<DataTableState>) => {
+    if (patch.query !== undefined && stateProp?.query === undefined) setQueryState(patch.query);
+    if (patch.pageSize !== undefined && stateProp?.pageSize === undefined) setSizeState(patch.pageSize);
+    if (patch.page !== undefined && stateProp?.page === undefined) setPageState(patch.page);
+    if (patch.filters !== undefined && stateProp?.filters === undefined) setFiltersState(patch.filters);
+    if (patch.sort !== undefined && stateProp?.sort === undefined) setSortState(patch.sort);
+    if (patch.hiddenColumns !== undefined && stateProp?.hiddenColumns === undefined) setHiddenState(patch.hiddenColumns);
+    if (patch.selection !== undefined && stateProp?.selection === undefined) setSelectionState(patch.selection);
+    onStateChange?.(patch, {
+      page, pageSize: size, query, sort, filters: colFilters, hiddenColumns, selection, ...patch,
+    });
+  };
+
   const [cross, setCross] = useState<{ r: number; c: number } | null>(null);
-  const [colFilters, setColFilters] = useState<Record<string, ColFilter>>({});
   const [openFilter, setOpenFilter] = useState<{ key: string; top: number; left: number } | null>(null);
   const [colWidths, setColWidths] = useState<Record<string, number>>({});
   const [selQuery, setSelQuery] = useState("");
@@ -206,9 +297,12 @@ export function DataTable<T>({
   };
   const activeFilterCount = columns.filter(isFilterActive).length;
   const setFilter = (key: string, patch: Partial<ColFilter>) =>
-    setColFilters((m) => ({ ...m, [key]: { ...getFilter(key), ...patch } }));
-  const clearFilter = (key: string) => setColFilters((m) => { const { [key]: _drop, ...rest } = m; return rest; });
-  const clearAllFilters = () => setColFilters({});
+    update({ filters: { ...colFilters, [key]: { ...getFilter(key), ...patch } }, page: 0 });
+  const clearFilter = (key: string) => {
+    const { [key]: _drop, ...rest } = colFilters;
+    update({ filters: rest, page: 0 });
+  };
+  const clearAllFilters = () => update({ filters: {}, page: 0 });
 
   const filterLabel = (c: Column<T>) => {
     const f = getFilter(c.key);
@@ -224,9 +318,11 @@ export function DataTable<T>({
     return `${head}：${shown}${vals.length > 2 ? ` 等 ${vals.length} 項` : ""}`;
   };
 
-  const filtered = useMemo(() => {
+  // 篩選抽成可排除單欄的函式：faceted 鈕的逐值計數要對「除了自己以外的
+  // 其餘篩選＋搜尋後」的列集合算——否則勾了一個值，其他選項的數字全部歸零。
+  const applyFilters = (excludeKey?: string) => {
     const q = query.trim().toLowerCase();
-    const active = columns.filter(isFilterActive);
+    const active = columns.filter((c) => c.key !== excludeKey && isFilterActive(c));
     if (!q && active.length === 0) return rows;
     const rowText = (r: T) =>
       columns.map((c) => (c.filterText ? c.filterText(r) : !c.numeric && c.sortValue ? String(c.sortValue(r)) : "")).join(" ").toLowerCase();
@@ -250,22 +346,53 @@ export function DataTable<T>({
       }
       return true;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rows, query, columns, colFilters]);
+  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const filtered = useMemo(() => applyFilters(), [rows, query, columns, colFilters]);
 
   const accessors = useMemo(() => {
     const m: Record<string, (row: T) => number | string> = {};
     for (const c of columns) if (c.sortValue) m[c.key] = c.sortValue;
     return m;
   }, [columns]);
-  const { sorted, sort, toggle } = useSort(filtered, accessors, initialSort);
+  const { sorted, toggle } = useSort(filtered, accessors, initialSort, "zh-Hant", {
+    value: sort,
+    onChange: (next) => update({ sort: next, page: 0 }),
+  });
 
   const paged = sorted.length > size ? sorted.slice(page * size, page * size + size) : sorted;
   const pageCount = Math.max(1, Math.ceil(sorted.length / size));
   const showPager = sorted.length > size;
 
-  useEffect(() => { setPage(0); }, [query, size, sort, colFilters]);
-  useEffect(() => { if (page > pageCount - 1) setPage(0); }, [page, pageCount]);
+  // 頁碼越界（資料量縮小）回第 1 頁——與內部行為一致，受控時以 patch 通知宿主
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (page > pageCount - 1) update({ page: 0 }); }, [page, pageCount]);
+
+  // ── 欄位顯示與多選 ──────────────────────────────────────────
+  const visibleColumns = useMemo(
+    () => columns.filter((c) => !hiddenColumns.includes(c.key)),
+    [columns, hiddenColumns],
+  );
+  const hasFreeze = visibleColumns.some((c) => c.freeze);
+
+  const selectedSet = useMemo(() => new Set(selection), [selection]);
+  const pageKeys = selectable ? paged.map((row, i) => getRowKey(row, i)) : [];
+  const pageSelectedCount = pageKeys.filter((k) => selectedSet.has(k)).length;
+  const allPageSelected = pageKeys.length > 0 && pageSelectedCount === pageKeys.length;
+  const somePageSelected = pageSelectedCount > 0 && !allPageSelected;
+  const togglePageSelection = () => {
+    const next = new Set(selection);
+    if (allPageSelected) pageKeys.forEach((k) => next.delete(k));
+    else pageKeys.forEach((k) => next.add(k));
+    update({ selection: [...next] });
+  };
+  const toggleRowSelection = (key: string) =>
+    update({ selection: selectedSet.has(key) ? selection.filter((k) => k !== key) : [...selection, key] });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const selectedRows = useMemo(
+    () => (selectable ? rows.filter((r, i) => selectedSet.has(getRowKey(r, i))) : []),
+    [rows, selectedSet, selectable],
+  );
 
   // ── 欄寬調整 ────────────────────────────────────────────────
   const onResizeMove = useCallback((e: PointerEvent) => {
@@ -293,8 +420,8 @@ export function DataTable<T>({
     window.removeEventListener("pointerup", onResizeUp);
   }, [onResizeMove, onResizeUp]);
 
-  const hasTotals = columns.some((c) => c.total);
-  const showToolbar = searchable || toolbar || csv || activeFilterCount > 0;
+  const hasTotals = visibleColumns.some((c) => c.total);
+  const showToolbar = searchable || toolbar || csv || activeFilterCount > 0 || facets.length > 0 || columnVisibility;
 
   const exportCsv = () => {
     if (!csv) return;
@@ -321,15 +448,97 @@ export function DataTable<T>({
               <Search className="pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden />
               <Input
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => update({ query: e.target.value, page: 0 })}
                 placeholder={searchPlaceholder ?? L.search}
                 aria-label={searchPlaceholder ?? L.search}
                 className="h-8 w-48 pl-7"
               />
             </div>
           )}
+          {/* faceted 篩選鈕：與表頭篩選共用 colFilters——兩個入口、一個真相 */}
+          {facets.map((facetKey) => {
+            const c = columns.find((x) => x.key === facetKey);
+            if (!c) return null;
+            const f = getFilter(facetKey);
+            const head = typeof c.header === "string" ? c.header : c.key;
+            return (
+              <Popover key={facetKey}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-8 border-dashed">
+                    <Filter /> {head}
+                    {f.values.length > 0 && (
+                      <span className="rounded bg-primary/10 px-1.5 text-xs tabular-nums text-primary">{f.values.length}</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-56 p-2.5 text-sm">
+                  {(() => {
+                    // 逐值計數對「排除本欄的其餘篩選後」集合算（見 applyFilters 註解）
+                    const base = applyFilters(facetKey);
+                    const counts = new Map<string, number>();
+                    for (const r of base) {
+                      const v = colText(c, r);
+                      if (v !== "") counts.set(v, (counts.get(v) ?? 0) + 1);
+                    }
+                    const all = distinctValues(c);
+                    const toggleValue = (v: string) =>
+                      setFilter(facetKey, { values: f.values.includes(v) ? f.values.filter((x) => x !== v) : [...f.values, v] });
+                    return (
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium">{head}</p>
+                        <div className="max-h-56 space-y-0.5 overflow-y-auto">
+                          {all.map((v) => {
+                            const on = f.values.includes(v);
+                            return (
+                              <button key={v} type="button" role="checkbox" aria-checked={on} onClick={() => toggleValue(v)} className="state-layer flex w-full items-center gap-2 rounded px-1.5 py-1 text-left text-xs">
+                                <span className={cn("flex size-4 shrink-0 items-center justify-center rounded border", on ? "border-primary bg-primary text-primary-foreground" : "border-input")}>
+                                  {on && <Check className="size-3" aria-hidden />}
+                                </span>
+                                <span className="min-w-0 flex-1 truncate">{v}</span>
+                                <span className="tabular-nums text-muted-foreground">{counts.get(v) ?? 0}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {f.values.length > 0 && (
+                          <button type="button" onClick={() => clearFilter(facetKey)} className="w-full rounded border-t pt-1.5 text-center text-xs text-muted-foreground hover:underline">
+                            {L.clear}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </PopoverContent>
+              </Popover>
+            );
+          })}
           {toolbar}
           <div className="ml-auto flex items-center gap-2">
+            {columnVisibility && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm"><Columns3 /> {L.columnsButton}</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>{L.columnsTitle}</DropdownMenuLabel>
+                  {columns.filter((c) => (c.hideable ?? true) && !c.freeze).map((c) => (
+                    <DropdownMenuCheckboxItem
+                      key={c.key}
+                      checked={!hiddenColumns.includes(c.key)}
+                      onCheckedChange={(v) =>
+                        update({
+                          hiddenColumns: v === true
+                            ? hiddenColumns.filter((k) => k !== c.key)
+                            : [...hiddenColumns, c.key],
+                        })
+                      }
+                    >
+                      {typeof c.header === "string" ? c.header : c.key}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
             {csv && <Button variant="outline" size="sm" onClick={exportCsv}><Download /> {L.exportCsv}</Button>}
           </div>
         </div>
@@ -378,7 +587,8 @@ export function DataTable<T>({
         <Table zebra={false} maxHeight={maxHeight}>
           <TableHeader sticky={false}>
             <TableRow>
-              {columns.map((c) => (
+              {selectable && <TableHead className="w-10" />}
+              {visibleColumns.map((c) => (
                 <TableHead key={c.key} className={cn(c.numeric && "text-right")}>
                   <div className={cn("flex h-10 items-center px-2", c.numeric && "justify-end")}>{c.header}</div>
                 </TableHead>
@@ -388,7 +598,8 @@ export function DataTable<T>({
           <TableBody aria-hidden>
             {Array.from({ length: Math.min(size, 15) }, (_, r) => (
               <TableRow key={r}>
-                {columns.map((c) => (
+                {selectable && <TableCell className="w-10" />}
+                {visibleColumns.map((c) => (
                   <TableCell key={c.key}>
                     <Skeleton className={cn("h-4", c.numeric ? "ml-auto w-16" : "w-4/5")} />
                   </TableCell>
@@ -412,7 +623,18 @@ export function DataTable<T>({
         <Table ref={tableRef} zebra={zebra} maxHeight={maxHeight}>
           <TableHeader sticky={stickyHeader}>
             <TableRow onMouseLeave={() => crosshair && setCross(null)}>
-              {columns.map((c, ci) => {
+              {selectable && (
+                <TableHead className={cn("w-10 p-0", hasFreeze && freezeFirst)}>
+                  <div className="flex h-10 items-center justify-center px-2">
+                    <Checkbox
+                      aria-label={L.selectAllPage}
+                      checked={allPageSelected ? true : somePageSelected ? "indeterminate" : false}
+                      onCheckedChange={togglePageSelection}
+                    />
+                  </div>
+                </TableHead>
+              )}
+              {visibleColumns.map((c, ci) => {
                 const kind = filterKind(c);
                 const active = isFilterActive(c);
                 const cw = colWidths[c.key];
@@ -422,7 +644,11 @@ export function DataTable<T>({
                   <TableHead
                     key={c.key}
                     ref={(el) => { headRefs.current[ci] = el; }}
-                    style={cw ? { width: cw, maxWidth: cw } : undefined}
+                    style={{
+                      ...(cw ? { width: cw, maxWidth: cw } : {}),
+                      // 有勾選欄時凍結欄讓出 2.5rem，兩個 sticky 欄才不會疊在一起
+                      ...(c.freeze && selectable ? { left: "2.5rem" } : {}),
+                    }}
                     aria-sort={isSorted ? (sort!.dir === "asc" ? "ascending" : "descending") : undefined}
                     className={cn("relative select-none p-0", c.freeze && freezeFirst, c.headerClassName, crosshair && cross?.c === ci && xline)}
                   >
@@ -470,13 +696,28 @@ export function DataTable<T>({
             {paged.map((row, i) => (
               <TableRow
                 key={getRowKey(row, i)}
+                data-state={selectable && selectedSet.has(getRowKey(row, i)) ? "selected" : undefined}
                 className={cn(rowClassName?.(row), onRowClick && "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring")}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
                 role={onRowClick ? "button" : undefined}
                 tabIndex={onRowClick ? 0 : undefined}
                 onKeyDown={onRowClick ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onRowClick(row); } } : undefined}
               >
-                {columns.map((c, ci) => {
+                {selectable && (
+                  <TableCell
+                    className={cn("w-10 p-0", hasFreeze && freezeFirst, dense && "py-1")}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex items-center justify-center px-2">
+                      <Checkbox
+                        aria-label={L.selectRow(getRowKey(row, i))}
+                        checked={selectedSet.has(getRowKey(row, i))}
+                        onCheckedChange={() => toggleRowSelection(getRowKey(row, i))}
+                      />
+                    </div>
+                  </TableCell>
+                )}
+                {visibleColumns.map((c, ci) => {
                   const cls = typeof c.cellClassName === "function" ? c.cellClassName(row) : c.cellClassName;
                   const inRow = crosshair && cross?.r === i;
                   const inCol = crosshair && cross?.c === ci;
@@ -485,7 +726,10 @@ export function DataTable<T>({
                   return (
                     <TableCell
                       key={c.key}
-                      style={maxW ? { width: cw, maxWidth: maxW } : undefined}
+                      style={{
+                        ...(maxW ? { width: cw, maxWidth: maxW } : {}),
+                        ...(c.freeze && selectable ? { left: "2.5rem" } : {}),
+                      }}
                       onMouseEnter={crosshair ? () => setCross({ r: i, c: ci }) : undefined}
                       onTouchStart={crosshair ? () => setCross({ r: i, c: ci }) : undefined}
                       className={cn(
@@ -514,9 +758,14 @@ export function DataTable<T>({
           {hasTotals && (
             <TableFooter>
               <TableRow>
-                {columns.map((c, i) => (
-                  <TableCell key={c.key} className={cn(c.numeric && "text-right tabular-nums", c.freeze && freezeFirst)}>
-                    {c.total ? c.total(sorted) : i === 0 && !columns[0].total ? L.totalRow : null}
+                {selectable && <TableCell className={cn("w-10", hasFreeze && freezeFirst)} />}
+                {visibleColumns.map((c, i) => (
+                  <TableCell
+                    key={c.key}
+                    style={c.freeze && selectable ? { left: "2.5rem" } : undefined}
+                    className={cn(c.numeric && "text-right tabular-nums", c.freeze && freezeFirst)}
+                  >
+                    {c.total ? c.total(sorted) : i === 0 && !visibleColumns[0].total ? L.totalRow : null}
                   </TableCell>
                 ))}
               </TableRow>
@@ -665,21 +914,54 @@ export function DataTable<T>({
         document.body,
       )}
 
+      {/* 批次操作列：有選取才出現。sticky 在**容器內**置底——文件站內嵌時不能蓋到站台 UI。
+          role=toolbar＋方向鍵在列內移動焦點（蒸餾 shadcn-admin bulk-actions）。 */}
+      {selectable && bulkActions && selection.length > 0 && (
+        <div
+          role="toolbar"
+          aria-label={L.selectedCount(selection.length)}
+          onKeyDown={(e) => {
+            if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
+            const items = Array.from(
+              e.currentTarget.querySelectorAll<HTMLElement>("button:not([disabled]), a[href]"),
+            );
+            if (items.length === 0) return;
+            e.preventDefault();
+            const idx = items.indexOf(e.currentTarget.ownerDocument.activeElement as HTMLElement);
+            const next =
+              e.key === "Home" ? 0
+              : e.key === "End" ? items.length - 1
+              : e.key === "ArrowRight" ? (idx + 1 + items.length) % items.length
+              : (idx - 1 + items.length) % items.length;
+            items[next]?.focus();
+          }}
+          className="sticky bottom-2 z-30 mx-auto flex w-fit flex-wrap items-center gap-2 rounded-lg border bg-popover px-3 py-2 text-sm text-popover-foreground shadow-lg print-hidden"
+        >
+          <span aria-live="polite" className="tabular-nums text-muted-foreground">{L.selectedCount(selection.length)}</span>
+          <span className="h-4 w-px bg-border" aria-hidden />
+          {bulkActions({ selected: selectedRows, clear: () => update({ selection: [] }) })}
+          <span className="h-4 w-px bg-border" aria-hidden />
+          <Button variant="ghost" size="sm" className="h-7" onClick={() => update({ selection: [] })}>
+            {L.clearSelection}
+          </Button>
+        </div>
+      )}
+
       {showPager && (
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground print-hidden">
           <span>{L.rowsRange(page * size + 1, Math.min((page + 1) * size, sorted.length), sorted.length)}</span>
           <div className="flex items-center gap-2">
-            <Select value={String(size)} onValueChange={(v) => setSize(Number(v))}>
+            <Select value={String(size)} onValueChange={(v) => update({ pageSize: Number(v), page: 0 })}>
               <SelectTrigger className="h-7 w-24" aria-label={L.perPageLabel}><SelectValue /></SelectTrigger>
               <SelectContent>
                 {pageSizeOptions.map((n) => <SelectItem key={n} value={String(n)}>{L.perPage(n)}</SelectItem>)}
               </SelectContent>
             </Select>
-            <Button variant="outline" size="sm" className="tap-target h-7" disabled={page === 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>
+            <Button variant="outline" size="sm" className="tap-target h-7" disabled={page === 0} onClick={() => update({ page: Math.max(0, page - 1) })}>
               <ChevronLeft /> {L.prev}
             </Button>
             <span>{page + 1} / {pageCount}</span>
-            <Button variant="outline" size="sm" className="tap-target h-7" disabled={page >= pageCount - 1} onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}>
+            <Button variant="outline" size="sm" className="tap-target h-7" disabled={page >= pageCount - 1} onClick={() => update({ page: Math.min(pageCount - 1, page + 1) })}>
               {L.next} <ChevronRight />
             </Button>
           </div>

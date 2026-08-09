@@ -130,7 +130,7 @@
       "version": "0.12.0",
       "type": "registry:ui",
       "title": "DataTable 資料表",
-      "description": "搜尋・單欄篩選・排序・分頁・合計・凍結首欄・CSV 匯出。",
+      "description": "搜尋・篩選（表頭＋facet 鈕）・排序・分頁・合計・多選批次・欄位顯示・CSV 匯出・可同步網址。",
       "url": "https://kielchang.github.io/dooping-design-book/r/data-table.json"
     },
     {
@@ -404,6 +404,14 @@
       "title": "useSort 排序 hook",
       "description": "無→大到小→小到大 的三態排序。",
       "url": "https://kielchang.github.io/dooping-design-book/r/use-sort.json"
+    },
+    {
+      "name": "use-table-url-state",
+      "version": "0.12.0",
+      "type": "registry:lib",
+      "title": "useTableUrlState 網址同步",
+      "description": "表格狀態 ↔ 網址：預設值省略、條件變更回第 1 頁、adapter 可注入。",
+      "url": "https://kielchang.github.io/dooping-design-book/r/use-table-url-state.json"
     },
     {
       "name": "utils",

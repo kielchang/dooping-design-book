@@ -93,6 +93,22 @@ commit 本身記在 tag 描述裡，不會遺失。
 3. **為什麼改**：外殼是跨系統不一致成本最高的一塊；〈後台系統的資訊架構〉的
    規範從此有元件載體，行動版「分區順序不變」變成結構保證而不是紀律要求。
 
+### DataTable 強化＋狀態同步網址
+
+1. **改了什麼**：DataTable 新增四能力——`selectable`＋`bulkActions`（表頭勾選
+   只切當頁、選取跨頁保留、批次列 role=toolbar＋方向鍵）、`facets`（faceted 鈕
+   與表頭篩選共用同一份狀態、逐值計數排除本欄）、`columnVisibility`（配
+   Column.hideable/defaultHidden，凍結欄不可隱藏）、**逐鍵受控** `state`／
+   `onStateChange`。新增 `useTableUrlState`（框架無關：預設 history adapter
+   可注入、預設值不進網址、條件變更回第 1 頁、prefix 隔離同頁多表；
+   selection/hiddenColumns 依深連結判準不進網址）。useSort 加可選受控參數
+   （非破壞性）。
+2. **我需要做什麼**：不需要。全部是新增 props，預設行為與舊版完全相同；
+   已抄走 data-table 的取用端要吃新能力請重抄並比對自己的修改。
+3. **為什麼改**：shadcn-admin 最有價值的原創 pattern 是表格狀態進網址；
+   深連結規範（back-office-ia）從此在資料表上有落地實作，
+   「篩完的清單可以貼給同事」不再靠宿主自己刻。
+
 三個工作項的合併發佈（守衛基建＋元件無障礙修正＋文件體系雙軌強化）。
 **tokens 維持 0.6.0**——零新 token，不發 npm、不推 tokens tag。
 

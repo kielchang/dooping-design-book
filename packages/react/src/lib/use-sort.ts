@@ -17,8 +17,15 @@ export function useSort<T>(
   accessors: Record<string, (row: T) => number | string>,
   initial: SortState = null,
   locale = "zh-Hant",
+  /**
+   * 受控模式（可選、非破壞性）：給了 `value` 排序就由呼叫端管理（`null` 也算給了），
+   * `toggle` 只透過 `onChange` 通知。DataTable 的網址同步用這條路。
+   */
+  controlled?: { value?: SortState; onChange?: (next: SortState) => void },
 ) {
-  const [sort, setSort] = useState<SortState>(initial);
+  const [sortState, setSortState] = useState<SortState>(initial);
+  const isControlled = controlled !== undefined && controlled.value !== undefined;
+  const sort = isControlled ? (controlled.value as SortState) : sortState;
 
   const sorted = useMemo(() => {
     if (!sort) return rows;
@@ -35,8 +42,12 @@ export function useSort<T>(
     });
   }, [rows, sort, accessors, locale]);
 
-  const toggle = (key: string) =>
-    setSort((s) => (s && s.key === key ? (s.dir === "desc" ? { key, dir: "asc" } : null) : { key, dir: "desc" }));
+  const toggle = (key: string) => {
+    const next: SortState =
+      sort && sort.key === key ? (sort.dir === "desc" ? { key, dir: "asc" } : null) : { key, dir: "desc" };
+    if (!isControlled) setSortState(next);
+    controlled?.onChange?.(next);
+  };
 
   return { sorted, sort, toggle };
 }

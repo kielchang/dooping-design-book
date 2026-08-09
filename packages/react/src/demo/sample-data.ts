@@ -7,6 +7,8 @@
 // v0.2.1 之前這裡用的是一整套交易型系統的欄位，並自稱「中性商業情境」——
 // 其實只是把原本的領域換成了另一個領域（見 ADR-0006）。現在的欄位刻意不對應任何真實業務：
 // 甲乙丙丁只是標籤，`name` 的長短差異純粹是為了示範截斷與可調欄寬。
+import type { NavGroup } from "../lib/nav";
+
 export type RecordStatus = "draft" | "confirmed" | "done" | "void";
 
 export interface DemoRecord {
@@ -163,4 +165,48 @@ export const demoGraphEdges = [
   { id: "e2-4", source: "n2", target: "n4", label: "通過" },
   { id: "e3-4", source: "n3", target: "n4" },
   { id: "e4-5", source: "n4", target: "n5" },
+];
+
+/**
+ * 導覽示範（SidebarNav 與 CommandPalette 共用同一份——單一來源的活示範）。
+ * 分區與詞彙逐字取自模式章〈後台系統的資訊架構〉的工作節奏分區。
+ * icon 以 key 對映的方式留在 stories 端指定，資料本身不帶 UI 相依。
+ */
+export const demoNavGroups: NavGroup[] = [
+  {
+    title: "每日作業",
+    items: [
+      { title: "工作台", url: "/workbench" },
+      { title: "批次結算", url: "/settlement", badge: "routine" as const },
+      { title: "存量清查", url: "/stock-check" },
+    ],
+  },
+  {
+    title: "規劃與分析",
+    items: [{ title: "用量分析", url: "/usage-analysis", badge: "sandbox" as const }],
+  },
+  {
+    title: "報表",
+    items: [{ title: "報表中心", url: "/reports", badge: "routine" as const }],
+  },
+  {
+    title: "主檔與設定",
+    items: [
+      { title: "基本資料", url: "/master" },
+      {
+        title: "系統設定",
+        items: [
+          { title: "一般", url: "/settings" },
+          { title: "外觀", url: "/settings/appearance" },
+        ],
+      },
+    ],
+  },
+  {
+    title: "說明",
+    items: [
+      { title: "使用說明", url: "/help" },
+      { title: "操作手冊", url: "https://example.com/manual", external: true },
+    ],
+  },
 ];

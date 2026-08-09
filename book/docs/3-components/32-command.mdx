@@ -1,0 +1,59 @@
+---
+title: Command 指令面板
+---
+
+# Command 指令面板
+
+全站唯一的「用打字找東西」入口：⌘K／Ctrl+K 開啟，搜頁面、跑指令。
+
+<StoryLink id="元件-浮層-指令面板-command--對話框與快捷鍵" />
+
+## 用途
+
+兩層 API：
+
+| 元件 | 定位 |
+| --- | --- |
+| `Command` 家族 | 可過濾的指令清單（cmdk 薄封裝）＋對話框殼，自由組合 |
+| `CommandPalette` | 高階成品：吃 `NavGroup[]` 導覽資料＋自訂指令群，內建 ⌘K |
+
+**導覽資料單一來源**是重點：`CommandPalette` 與 `SidebarNav` 吃同一份
+`NavGroup[]`——側欄改名、加項目，指令面板自動跟上，兩邊永遠一致。
+
+## 何時不要用
+
+<Rules>
+  <Do><p>頁面多到側欄要捲、或熟手想跳過滑鼠時，提供指令面板當第二入口。</p></Do>
+  <Dont><p>不要拿它取代側邊欄。指令面板是<strong>熟手的快速通道</strong>，
+  新手依賴的是看得到的分區結構——兩者是互補，不是二選一。
+  也不要把業務操作（送出、作廢）塞進指令群：看不到後果預覽的動作不該一鍵執行。</p></Dont>
+</Rules>
+
+## 狀態
+
+- **執行即關閉**——選了項目卻留著面板，會讓人懷疑「到底有沒有生效」。
+- **兩層導覽項顯示成「父 › 子」**——搜「外觀」找得到「系統設定 › 外觀」。
+- 空結果顯示 `emptyText`（預設「查無符合的結果」），不顯示空白。
+- 快捷鍵預設 ⌘K／Ctrl+K，`hotkey={false}` 交還宿主；受控模式（`open`／`onOpenChange`）
+  可接宿主自己的狀態。
+
+面板內的項目是 option 不是連結——導航經 `onNavigate(url, item)` 回呼，
+SPA 宿主接 router、MPA 宿主 `location.assign` 皆可。
+
+## 無障礙
+
+- cmdk 提供 combobox 語意：輸入框 `aria-activedescendant` 指向目前項、
+  項目帶 `aria-selected`，↑↓ 走訪不移動 DOM 焦點。
+- 對話框殼組合本書的 [Dialog](/components/dialog)：焦點鎖定、Esc、標題描述
+  （sr-only）全部沿用——同一個系統只有一種對話框長相。
+- 指令項的 highlight 走狀態層已選強度，與 Select、DropdownMenu 同一條規則。
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/command-palette.json
+```
+
+`command-palette` 會自動帶入 `command`（cmdk 薄封裝）與 `nav`（NavGroup 型別）。
+注意 **cmdk 是大相依**：與 `@xyflow/react` 同級的隔離政策——它只住在
+`command.tsx` 一個檔案裡，其他程式碼依賴 `<Command>` 的 API 而不是 cmdk 本身。

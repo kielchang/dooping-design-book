@@ -25,6 +25,7 @@ const LIB_MODULES = {
   "lib/utils": "utils",
   "lib/use-sort": "use-sort",
   "lib/use-dialog-state": "use-dialog-state",
+  "lib/nav": "nav",
   "lib/csv": "csv",
   "lib/download": "download",
   "lib/forms/diff": "forms-diff",
@@ -37,6 +38,9 @@ const NPM_DEPS = [
   // 不在這份白名單裡的外部套件不會被寫進 registry item——取用端就裝不到，
   // 所以「收了新相依卻忘了加這裡」的症狀是 shadcn add 之後畫布整個沒樣式。
   { re: /from\s+["']@xyflow\/react["']/, name: () => "@xyflow/react" },
+  // Command 的隔離相依（同上，boundary 守衛保證只有 command.tsx import 它）。
+  // 漏了這行的症狀是取用端裝完指令面板直接渲染爆炸——比沒樣式更響，但一樣要防。
+  { re: /from\s+["']cmdk["']/, name: () => "cmdk" },
   { re: /from\s+["']lucide-react["']/, name: () => "lucide-react" },
   { re: /from\s+["']clsx["']/, name: () => "clsx" },
   { re: /from\s+["']tailwind-merge["']/, name: () => "tailwind-merge" },
@@ -118,6 +122,9 @@ const TITLES = {
   separator: ["Separator 分隔線", "水平／垂直分隔（Radix Separator），預設裝飾性。"],
   "confirm-dialog": ["ConfirmDialog 確認對話框", "破壞性操作確認：載入中鎖出口、可選硬確認輸入。"],
   "use-dialog-state": ["useDialogState 對話框開關", "多種對話框的集中開關：天然單開、同值再設即關。"],
+  nav: ["nav 導覽契約", "NavGroup 型別與 isNavActive()：側邊欄與指令面板共用的導覽資料形狀。"],
+  command: ["Command 指令清單", "可過濾的指令清單與對話框殼（cmdk 薄封裝，隔離相依）。"],
+  "command-palette": ["CommandPalette 指令面板", "全域搜尋：⌘K 開啟，導覽資料與側邊欄單一來源。"],
   csv: ["csv 序列化", "含 UTF-8 BOM 的 CSV 產出與解析。"],
   download: ["download 下載工具", "觸發瀏覽器下載 Blob。"],
   "forms-diff": ["forms/diff 欄位比對", "FieldSpec 驅動的變更偵測與顯示格式化。"],

@@ -32,6 +32,10 @@ export * from "./ui/dropdown-menu";
 export * from "./ui/collapsible";
 export * from "./ui/confirm-dialog";
 
+// 指令面板——cmdk 相依被隔離守衛關在 command.tsx 一個檔案裡
+export * from "./ui/command";
+export * from "./ui/command-palette";
+
 // 選擇
 export * from "./ui/seg-group";
 export * from "./ui/chips";
@@ -86,6 +90,7 @@ export * from "./form/use-record-diff";
 export * from "./lib/utils";
 export * from "./lib/use-sort";
 export * from "./lib/use-dialog-state";
+export * from "./lib/nav";
 export * from "./lib/csv";
 export * from "./lib/download";
 export * from "./lib/forms/diff";

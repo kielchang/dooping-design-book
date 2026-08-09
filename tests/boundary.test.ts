@@ -26,6 +26,7 @@ const ALLOWED_EXTERNAL = [
   "class-variance-authority",
   "@dooping/tokens",
   "@xyflow/react", // 只有 graph-canvas 能碰——見下方的隔離守衛
+  "cmdk", // 只有 command 能碰——見下方的隔離守衛
 ];
 
 /**
@@ -40,6 +41,10 @@ const ALLOWED_EXTERNAL = [
  */
 const QUARANTINED: Record<string, string[]> = {
   "@xyflow/react": ["packages/react/src/ui/graph-canvas.tsx"],
+  // cmdk 是指令面板的過濾引擎（ADR-0011）。它本身很小，但同一個理由成立：
+  // 其他元件與取用端依賴 <Command> 的 API，不依賴 cmdk 本身，
+  // 升級或抽換的成本永遠只在一個檔案裡。
+  cmdk: ["packages/react/src/ui/command.tsx"],
 };
 
 /** 明確禁止的相依類型（出現即代表元件庫被應用層污染）。 */

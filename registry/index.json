@@ -86,6 +86,22 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/collapsible.json"
     },
     {
+      "name": "command",
+      "version": "0.12.0",
+      "type": "registry:ui",
+      "title": "Command 指令清單",
+      "description": "可過濾的指令清單與對話框殼（cmdk 薄封裝，隔離相依）。",
+      "url": "https://kielchang.github.io/dooping-design-book/r/command.json"
+    },
+    {
+      "name": "command-palette",
+      "version": "0.12.0",
+      "type": "registry:ui",
+      "title": "CommandPalette 指令面板",
+      "description": "全域搜尋：⌘K 開啟，導覽資料與側邊欄單一來源。",
+      "url": "https://kielchang.github.io/dooping-design-book/r/command-palette.json"
+    },
+    {
       "name": "confirm-dialog",
       "version": "0.12.0",
       "type": "registry:ui",
@@ -220,6 +236,14 @@
       "title": "Mockup 文件示意積木",
       "description": "Placeholder／Spotlight／MockScreenFrame：零截圖文件示意。",
       "url": "https://kielchang.github.io/dooping-design-book/r/mockup.json"
+    },
+    {
+      "name": "nav",
+      "version": "0.12.0",
+      "type": "registry:lib",
+      "title": "nav 導覽契約",
+      "description": "NavGroup 型別與 isNavActive()：側邊欄與指令面板共用的導覽資料形狀。",
+      "url": "https://kielchang.github.io/dooping-design-book/r/nav.json"
     },
     {
       "name": "number-input",

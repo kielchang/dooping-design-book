@@ -24,6 +24,13 @@ export * from "./ui/select";
 export * from "./ui/dialog";
 export * from "./ui/tooltip";
 export * from "./ui/number-input";
+export * from "./ui/separator";
+
+// 浮層（Popover／DropdownMenu 自缺件表畢業，ADR-0011 批次收錄）
+export * from "./ui/popover";
+export * from "./ui/dropdown-menu";
+export * from "./ui/collapsible";
+export * from "./ui/confirm-dialog";
 
 // 選擇
 export * from "./ui/seg-group";
@@ -78,6 +85,7 @@ export * from "./form/use-record-diff";
 // 通用工具（隨元件庫一起發佈）
 export * from "./lib/utils";
 export * from "./lib/use-sort";
+export * from "./lib/use-dialog-state";
 export * from "./lib/csv";
 export * from "./lib/download";
 export * from "./lib/forms/diff";

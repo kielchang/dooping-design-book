@@ -97,7 +97,7 @@ title: 頁面總覽
 | 缺件 | 目前替代 | 用在 | 認領 |
 | --- | --- | --- | --- |
 | PageHeader／Breadcrumb | 頁首區照解剖規範手排 | 明細頁 | [提出](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml&piece=PageHeader%EF%BC%8FBreadcrumb) |
-| Drawer／Popover／DropdownMenu | `Dialog` 或就地展開 | 各頁 | [提出](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml&piece=Drawer%EF%BC%8FPopover%EF%BC%8FDropdownMenu) |
+| Drawer | `Dialog`（行動版側欄抽屜已由 Sidebar 內建） | 各頁 | [提出](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml&piece=Drawer) |
 
 （表單的下拉選項與這張表**逐字一致**——改表要同步改 `.github/ISSUE_TEMPLATE/missing-piece.yml`。）
 
@@ -106,6 +106,10 @@ v0.11.0 已收錄七件，替代方案功成身退：
 [Skeleton](/components/skeleton)（規範正本在〈載入中〉，`DataTable` 內建 `loading`）、
 [DateRange 期間選擇](/components/date-range)、
 Form 包裝 → `FormField`／`FieldError`（見 [Input 的錯誤態](/components/input)）。
+
+v0.12.0（[ADR-0011](/adr)，preview 評估中）再畢業兩件：
+[Popover／DropdownMenu](/components/popover-dropdown)——並同批收錄
+Collapsible、Separator、[ConfirmDialog](/components/confirm-dialog)。
 
 AppShell 與 Sidebar **不在此列**——外殼不收進元件庫是刻意決策，
 規範正本在[站台層](/patterns/back-office-ia)。

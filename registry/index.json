@@ -78,6 +78,22 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/coachmark.json"
     },
     {
+      "name": "collapsible",
+      "version": "0.12.0",
+      "type": "registry:ui",
+      "title": "Collapsible 摺疊區",
+      "description": "展開／收合容器（Radix Collapsible），無自帶視覺。",
+      "url": "https://kielchang.github.io/dooping-design-book/r/collapsible.json"
+    },
+    {
+      "name": "confirm-dialog",
+      "version": "0.12.0",
+      "type": "registry:ui",
+      "title": "ConfirmDialog 確認對話框",
+      "description": "破壞性操作確認：載入中鎖出口、可選硬確認輸入。",
+      "url": "https://kielchang.github.io/dooping-design-book/r/confirm-dialog.json"
+    },
+    {
       "name": "csv",
       "version": "0.12.0",
       "type": "registry:lib",
@@ -124,6 +140,14 @@
       "title": "download 下載工具",
       "description": "觸發瀏覽器下載 Blob。",
       "url": "https://kielchang.github.io/dooping-design-book/r/download.json"
+    },
+    {
+      "name": "dropdown-menu",
+      "version": "0.12.0",
+      "type": "registry:ui",
+      "title": "DropdownMenu 下拉選單",
+      "description": "動作選單與勾選項（Radix DropdownMenu），單層。",
+      "url": "https://kielchang.github.io/dooping-design-book/r/dropdown-menu.json"
     },
     {
       "name": "editable-field",
@@ -206,6 +230,14 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/number-input.json"
     },
     {
+      "name": "popover",
+      "version": "0.12.0",
+      "type": "registry:ui",
+      "title": "Popover 彈出面板",
+      "description": "錨定在觸發元素旁的浮層容器（Radix Popover）。",
+      "url": "https://kielchang.github.io/dooping-design-book/r/popover.json"
+    },
+    {
       "name": "radio-group",
       "version": "0.12.0",
       "type": "registry:ui",
@@ -228,6 +260,14 @@
       "title": "Select 下拉選單",
       "description": "單選下拉（Radix Select）。",
       "url": "https://kielchang.github.io/dooping-design-book/r/select.json"
+    },
+    {
+      "name": "separator",
+      "version": "0.12.0",
+      "type": "registry:ui",
+      "title": "Separator 分隔線",
+      "description": "水平／垂直分隔（Radix Separator），預設裝飾性。",
+      "url": "https://kielchang.github.io/dooping-design-book/r/separator.json"
     },
     {
       "name": "skeleton",
@@ -292,6 +332,14 @@
       "title": "Tooltip 提示泡泡",
       "description": "hover／鍵盤聚焦／長壓顯示，含邊緣防溢與截斷文字元件。",
       "url": "https://kielchang.github.io/dooping-design-book/r/tooltip.json"
+    },
+    {
+      "name": "use-dialog-state",
+      "version": "0.12.0",
+      "type": "registry:lib",
+      "title": "useDialogState 對話框開關",
+      "description": "多種對話框的集中開關：天然單開、同值再設即關。",
+      "url": "https://kielchang.github.io/dooping-design-book/r/use-dialog-state.json"
     },
     {
       "name": "use-record-diff",

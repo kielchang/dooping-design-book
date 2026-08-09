@@ -13,9 +13,10 @@ title: 元件總覽
 
 | 類 | 元件 |
 | --- | --- |
-| 基礎 | Button、Badge、Card、Callout |
+| 基礎 | Button、Badge、Card、Callout、Separator |
 | 表單 | Input、NumberInput、Label、Checkbox、Select、SegGroup、Chips |
-| 浮層 | Tooltip、Dialog |
+| 浮層 | Tooltip、Dialog、Popover、DropdownMenu、ConfirmDialog |
+| 結構 | Collapsible |
 | 資料 | Table、DataTable、TabPills、Delta、EmptyState、Stepper |
 | 進階表單 | EditableField、ChangeSummary |
 | 引導 | Coachmark |

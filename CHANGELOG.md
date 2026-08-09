@@ -57,6 +57,17 @@ commit 本身記在 tag 描述裡，不會遺失。
 3. **為什麼改**：外殼元件（見 ADR-0011）需要側欄表面的語意層；沿用 shadcn 命名
    讓上游 sidebar 生態的 class 逐字可用。
 
+### 浮層基座：Popover／DropdownMenu 自缺件表畢業＋ConfirmDialog
+
+1. **改了什麼**：新收六件——Popover、DropdownMenu（單層，勾選項預設不關閉）、
+   Collapsible、Separator、ConfirmDialog（確認不自動關、loading 鎖全部出口、
+   typeToConfirm 硬確認）、useDialogState（多對話框集中開關：天然單開、同值再設即關）。
+   缺件表「Drawer／Popover／DropdownMenu」列改「Drawer」單獨列（issue 表單同步）；
+   build-registry 加 lib/ 漏登錄防呆（未登錄 LIB_MODULES 直接 throw）。
+2. **我需要做什麼**：不需要。全部是新增，既有元件 API 零變更。
+3. **為什麼改**：缺件表對 Popover／DropdownMenu 已有場景證據；外殼與 DataTable
+   強化（同批後續工作項）都以它們為零件，先行落地。
+
 三個工作項的合併發佈（守衛基建＋元件無障礙修正＋文件體系雙軌強化）。
 **tokens 維持 0.6.0**——零新 token，不發 npm、不推 tokens tag。
 

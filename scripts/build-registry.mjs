@@ -24,6 +24,7 @@ const LIB_TARGET = (name) => `lib/dooping/${name}.ts`;
 const LIB_MODULES = {
   "lib/utils": "utils",
   "lib/use-sort": "use-sort",
+  "lib/use-dialog-state": "use-dialog-state",
   "lib/csv": "csv",
   "lib/download": "download",
   "lib/forms/diff": "forms-diff",
@@ -111,6 +112,12 @@ const TITLES = {
   "use-record-diff": ["useRecordDiff 變更追蹤", "草稿 vs 原始值的差異與還原 hook。"],
   utils: ["utils 通用工具", "cn 與數值／金額／百分比格式化。"],
   "use-sort": ["useSort 排序 hook", "無→大到小→小到大 的三態排序。"],
+  popover: ["Popover 彈出面板", "錨定在觸發元素旁的浮層容器（Radix Popover）。"],
+  "dropdown-menu": ["DropdownMenu 下拉選單", "動作選單與勾選項（Radix DropdownMenu），單層。"],
+  collapsible: ["Collapsible 摺疊區", "展開／收合容器（Radix Collapsible），無自帶視覺。"],
+  separator: ["Separator 分隔線", "水平／垂直分隔（Radix Separator），預設裝飾性。"],
+  "confirm-dialog": ["ConfirmDialog 確認對話框", "破壞性操作確認：載入中鎖出口、可選硬確認輸入。"],
+  "use-dialog-state": ["useDialogState 對話框開關", "多種對話框的集中開關：天然單開、同值再設即關。"],
   csv: ["csv 序列化", "含 UTF-8 BOM 的 CSV 產出與解析。"],
   download: ["download 下載工具", "觸發瀏覽器下載 Blob。"],
   "forms-diff": ["forms/diff 欄位比對", "FieldSpec 驅動的變更偵測與顯示格式化。"],
@@ -170,6 +177,12 @@ for (const abs of walk(SRC)) {
 
   const modKey = rel.replace(/\.tsx?$/, "");
   const isLib = modKey in LIB_MODULES;
+  // lib/ 檔案漏登錄 LIB_MODULES 的症狀很陰：item 會以 registry:ui 型別產出、
+  // 落點變 components/dooping/*.tsx，但其他檔改寫後的 import 指向 @/lib/dooping/*——
+  // 取用端裝完直接斷鏈，而本 repo 所有守衛照樣全綠。所以在產生端直接擋下。
+  if (rel.startsWith("lib/") && !isLib) {
+    throw new Error(`lib/ 下的 ${rel} 不在 LIB_MODULES 裡——新增 lib 模組必須同時登錄（否則取用端 import 斷鏈）`);
+  }
   const name = isLib ? LIB_MODULES[modKey] : basename(modKey);
   // 換行一律正規化成 LF。registry JSON 是**散佈產物**——內容是字串，
   // 換行會被逐字寫進 JSON 裡送給取用端。Windows 上 git 以 CRLF 簽出原始碼，

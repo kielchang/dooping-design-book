@@ -18,7 +18,7 @@ body:
       label: 哪一件
       options:
         - PageHeader／Breadcrumb
-        - Drawer／Popover／DropdownMenu
+        - Drawer
         - 其他（下方說明）
     validations:
       required: true

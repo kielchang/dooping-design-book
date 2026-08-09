@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dropdown-menu",
+  "version": "0.12.0",
+  "type": "registry:ui",
+  "title": "DropdownMenu 下拉選單",
+  "description": "動作選單與勾選項（Radix DropdownMenu），單層。",
+  "dependencies": [
+    "@dooping/tokens@^0.7.0",
+    "@radix-ui/react-dropdown-menu",
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+  ],
+  "files": [
+    {
+      "path": "dooping/ui/dropdown-menu.tsx",
+      "content": "import * as React from \"react\";\nimport * as DropdownMenuPrimitive from \"@radix-ui/react-dropdown-menu\";\nimport { Check } from \"lucide-react\";\nimport { cn } from \"@/lib/dooping/utils\";\n\n// 刻意只收一層選單：Trigger／Content／Item／CheckboxItem／Label／Separator／Group。\n// Sub* 三件與 RadioItem 不收——目前唯一的多層需求（側欄 icon 收合態的子選單）\n// 只有一層，投機性收錄是設計系統腐爛的第一步（收錄三原則）。\n\nconst DropdownMenu = DropdownMenuPrimitive.Root;\nconst DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;\nconst DropdownMenuGroup = DropdownMenuPrimitive.Group;\n\nconst DropdownMenuContent = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.Content>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>\n>(({ className, sideOffset = 4, ...props }, ref) => (\n  <DropdownMenuPrimitive.Portal>\n    <DropdownMenuPrimitive.Content\n      ref={ref}\n      sideOffset={sideOffset}\n      className={cn(\n        \"z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md\",\n        className,\n      )}\n      {...props}\n    />\n  </DropdownMenuPrimitive.Portal>\n));\nDropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;\n\n// 這裡的 `focus:` 是對的，**不要**換成 `focus-visible:`：Radix 把 DOM 焦點移到\n// 「目前被指向的那一項」，滑鼠移動與鍵盤方向鍵走的是同一條路（同 select.tsx）。\n// 強度拉到已選那一階：highlight 的意思是「按 Enter 會執行這個」。\nconst menuItemClass =\n  \"state-layer focus:[--state-layer-alpha:var(--state-selected-alpha)] relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0\";\n\nconst DropdownMenuItem = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.Item>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item>\n>(({ className, ...props }, ref) => (\n  <DropdownMenuPrimitive.Item ref={ref} className={cn(menuItemClass, className)} {...props} />\n));\nDropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName;\n\nconst DropdownMenuCheckboxItem = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.CheckboxItem>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem>\n>(({ className, children, checked, ...props }, ref) => (\n  <DropdownMenuPrimitive.CheckboxItem\n    ref={ref}\n    className={cn(menuItemClass, \"pl-8 pr-2\", className)}\n    checked={checked}\n    // 預設勾選後**不關閉**選單：勾選項的典型用途是連續切換多個開關\n    // （例如資料表的欄位顯示），每勾一下就關等於逼使用者重開 N 次。\n    // 要恢復「選了就關」的行為，傳自己的 onSelect 蓋掉即可（props 展開在後）。\n    onSelect={(e) => e.preventDefault()}\n    {...props}\n  >\n    <span className=\"absolute left-2 flex size-3.5 items-center justify-center\">\n      <DropdownMenuPrimitive.ItemIndicator>\n        <Check className=\"size-4\" />\n      </DropdownMenuPrimitive.ItemIndicator>\n    </span>\n    {children}\n  </DropdownMenuPrimitive.CheckboxItem>\n));\nDropdownMenuCheckboxItem.displayName = DropdownMenuPrimitive.CheckboxItem.displayName;\n\nconst DropdownMenuLabel = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.Label>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label>\n>(({ className, ...props }, ref) => (\n  <DropdownMenuPrimitive.Label\n    ref={ref}\n    className={cn(\"px-2 py-1.5 text-xs text-muted-foreground\", className)}\n    {...props}\n  />\n));\nDropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName;\n\nconst DropdownMenuSeparator = React.forwardRef<\n  React.ElementRef<typeof DropdownMenuPrimitive.Separator>,\n  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>\n>(({ className, ...props }, ref) => (\n  <DropdownMenuPrimitive.Separator ref={ref} className={cn(\"-mx-1 my-1 h-px bg-border\", className)} {...props} />\n));\nDropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName;\n\nexport {\n  DropdownMenu,\n  DropdownMenuTrigger,\n  DropdownMenuContent,\n  DropdownMenuItem,\n  DropdownMenuCheckboxItem,\n  DropdownMenuLabel,\n  DropdownMenuSeparator,\n  DropdownMenuGroup,\n};\n",
+      "type": "registry:ui",
+      "target": "components/dooping/dropdown-menu.tsx"
+    }
+  ]
+}

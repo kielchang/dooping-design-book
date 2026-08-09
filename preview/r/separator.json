@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "separator",
+  "version": "0.12.0",
+  "type": "registry:ui",
+  "title": "Separator 分隔線",
+  "description": "水平／垂直分隔（Radix Separator），預設裝飾性。",
+  "dependencies": [
+    "@dooping/tokens@^0.7.0",
+    "@radix-ui/react-separator"
+  ],
+  "registryDependencies": [
+    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+  ],
+  "files": [
+    {
+      "path": "dooping/ui/separator.tsx",
+      "content": "import * as React from \"react\";\nimport * as SeparatorPrimitive from \"@radix-ui/react-separator\";\nimport { cn } from \"@/lib/dooping/utils\";\n\n/**\n * 分隔線。`decorative` 預設 true——純視覺分隔對輔助技術隱形；\n * 只有在分隔本身承載語意（分開兩組獨立操作）時才設 false。\n */\nconst Separator = React.forwardRef<\n  React.ElementRef<typeof SeparatorPrimitive.Root>,\n  React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root>\n>(({ className, orientation = \"horizontal\", decorative = true, ...props }, ref) => (\n  <SeparatorPrimitive.Root\n    ref={ref}\n    decorative={decorative}\n    orientation={orientation}\n    className={cn(\n      \"shrink-0 bg-border\",\n      orientation === \"horizontal\" ? \"h-px w-full\" : \"h-full w-px\",\n      className,\n    )}\n    {...props}\n  />\n));\nSeparator.displayName = SeparatorPrimitive.Root.displayName;\n\nexport { Separator };\n",
+      "type": "registry:ui",
+      "target": "components/dooping/separator.tsx"
+    }
+  ]
+}

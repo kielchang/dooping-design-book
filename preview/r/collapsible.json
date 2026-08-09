@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "collapsible",
+  "version": "0.12.0",
+  "type": "registry:ui",
+  "title": "Collapsible 摺疊區",
+  "description": "展開／收合容器（Radix Collapsible），無自帶視覺。",
+  "dependencies": [
+    "@dooping/tokens@^0.7.0",
+    "@radix-ui/react-collapsible"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "dooping/ui/collapsible.tsx",
+      "content": "import * as CollapsiblePrimitive from \"@radix-ui/react-collapsible\";\n\n// Radix Collapsible 原樣輸出：它沒有自己的視覺，樣式由組合它的元件決定\n// （側欄群組的展開／收合、明細頁的區塊摺疊）。aria-expanded 與鍵盤行為由 Radix 保證。\nconst Collapsible = CollapsiblePrimitive.Root;\nconst CollapsibleTrigger = CollapsiblePrimitive.CollapsibleTrigger;\nconst CollapsibleContent = CollapsiblePrimitive.CollapsibleContent;\n\nexport { Collapsible, CollapsibleTrigger, CollapsibleContent };\n",
+      "type": "registry:ui",
+      "target": "components/dooping/collapsible.tsx"
+    }
+  ]
+}

@@ -4,6 +4,7 @@ import { within, expect, userEvent, waitFor, fn } from "@storybook/test";
 import { Button } from "./button";
 import { ConfirmDialog } from "./confirm-dialog";
 import { useDialogState } from "../lib/use-dialog-state";
+import { setInputValue } from "../demo/play";
 
 const meta: Meta = { title: "元件/浮層/確認對話框 ConfirmDialog" };
 export default meta;
@@ -76,9 +77,10 @@ export const 破壞性與硬確認: Story = {
     const confirm = within(dialog).getByRole("button", { name: "作廢" });
     await expect(confirm).toBeDisabled();
     const input = within(dialog).getByRole("textbox");
-    await userEvent.type(input, "R-240");
+    // setInputValue 是整段設值：第二次給完整目標值，不是接續打字
+    setInputValue(input, "R-240");
     await expect(confirm).toBeDisabled();
-    await userEvent.type(input, "3");
+    setInputValue(input, "R-2403");
     await waitFor(() => expect(confirm).toBeEnabled());
     await userEvent.keyboard("{Escape}");
     await waitFor(() => expect(body.queryByRole("dialog")).toBeNull());

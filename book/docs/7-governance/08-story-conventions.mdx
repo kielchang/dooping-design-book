@@ -177,7 +177,7 @@ aria 屬性有沒有連動。判準很簡單：**文件頁寫了行為規範的�
 把那條規範變成可執行的斷言**。對話框寫了「Esc 關閉、焦點回到觸發鈕」，play 就按一次
 Esc 驗一次；欄位錯誤寫了「aria-describedby 指向錯誤訊息」，play 就查那條連線。
 
-寫法慣例（現有八支都照這個模式）：
+寫法慣例（現有的 play 都照這個模式）：
 
 ```tsx
 import { within, expect, userEvent, waitFor } from "@storybook/test";
@@ -207,6 +207,26 @@ export const 對話框: Story = {
     play 跑完的畫面，殘留狀態會讓兩支守衛互相干擾。</p>
   </Dont>
 </Rules>
+
+### 對輸入框設值：用 setInputValue，不用 userEvent.type
+
+`userEvent.type`／`clear`／`paste` 的文字插入在部分 Chromium 環境
+（實測 Electron 內嵌瀏覽器）會經元素實例的 value descriptor 寫值，
+同步更新 React 的 value tracker——接著派發的 input 事件被 React 判定
+「值沒變」而吞掉 onChange。結果是**受控輸入的狀態不更新、play 在無頭 CI
+綠、真瀏覽器紅**：preview 評估期間任何人用瀏覽器開 Storybook 都會看到假性失敗。
+
+打字一律改用 `demo/play.ts` 的 `setInputValue`（prototype setter 繞過
+tracker，所有環境行為一致）；它是**一次設整段值**，要驗中間狀態就分次呼叫、
+每次給完整目標值。鍵盤與點擊不受影響，照常用 `userEvent.keyboard`／`click`。
+這條有守衛：`tests/play-conventions.test.ts` 掃描 stories，違規直接紅。
+
+### Play 的性質不能隨視窗寬度改變
+
+會依 media query 切換行為的元件（外殼、抽屜），story 要把 query 釘死：
+桌面版釘 `(max-width: 0px)`（永不成立＝強制桌面）、行動版釘
+`(min-width: 0px)`（恆成立＝強制行動）。不釘的話，觀看者的視窗寬度會改變
+play 驗的是哪一套行為——窄視窗下桌面斷言找不到地標，一樣是「CI 綠、真瀏覽器紅」。
 
 ## 兩道 Storybook 守衛（CI 自動跑）
 

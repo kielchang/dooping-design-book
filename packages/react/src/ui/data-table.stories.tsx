@@ -8,6 +8,7 @@ import { Button } from "./button";
 import { Delta } from "./delta";
 import { formatMoney, formatNumber } from "../lib/utils";
 import { useTableUrlState, type UrlStateAdapter } from "../lib/use-table-url-state";
+import { setInputValue } from "../demo/play";
 import { demoRecords, STATUS_LABEL, type DemoRecord } from "../demo/sample-data";
 import { makeRecords } from "../demo/generate";
 
@@ -316,10 +317,10 @@ export const 網址同步: Story = {
     await userEvent.click(canvas.getByRole("button", { name: /下一頁/ }));
     await waitFor(() => expect(url()).toContain("page=2"));
     const input = canvas.getByRole("textbox", { name: "搜尋關鍵字…" });
-    await userEvent.type(input, "甲");
+    setInputValue(input, "甲");
     // 條件變更自動回第 1 頁：page 參數消失、q 出現
     await waitFor(() => expect(url()).toContain("q="));
     await waitFor(() => expect(url()).not.toContain("page="));
-    await userEvent.clear(input);
+    setInputValue(input, "");
   },
 };

@@ -8,6 +8,7 @@ import {
 } from "./command";
 import { CommandPalette } from "./command-palette";
 import { demoNavGroups } from "../demo/sample-data";
+import { setInputValue } from "../demo/play";
 
 const meta: Meta = { title: "元件/浮層/指令面板 Command" };
 export default meta;
@@ -39,7 +40,7 @@ export const 清單模式: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const input = canvas.getByPlaceholderText("搜尋頁面…");
-    await userEvent.type(input, "報表");
+    setInputValue(input, "報表");
     await waitFor(() => {
       const options = canvas.getAllByRole("option");
       expect(options).toHaveLength(1);
@@ -81,7 +82,7 @@ export const 對話框與快捷鍵: Story = {
     await userEvent.keyboard("{Control>}k{/Control}");
     const input = await body.findByPlaceholderText("搜尋頁面或指令…");
     await waitFor(() => expect(doc.activeElement).toBe(input));
-    await userEvent.type(input, "批次");
+    setInputValue(input, "批次");
     await waitFor(() => expect(body.getAllByRole("option")).toHaveLength(1));
     await userEvent.keyboard("{Enter}");
     await expect(navigateSpy).toHaveBeenCalledWith("/settlement");

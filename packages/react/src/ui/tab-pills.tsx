@@ -21,14 +21,18 @@ export interface TabPillsProps {
 export function TabPills({ tabs, value, onChange, className, label }: TabPillsProps) {
   return (
     <div role="tablist" aria-label={label} className={cn("flex flex-wrap gap-1", className)}>
-      {tabs.map((t) => {
+      {tabs.map((t, i) => {
         const active = t.key === value;
+        // label 是空字串（或純空白）時按鈕沒有可及名稱——退一個序數當保底，
+        // 不能讓「這一頁沒有標題」變成「這顆按鈕沒有名字」。
+        const bare = typeof t.label === "string" && t.label.trim() === "";
         return (
           <button
             key={t.key}
             type="button"
             role="tab"
             aria-selected={active}
+            aria-label={bare ? `分頁 ${i + 1}` : undefined}
             data-tour={t.dataTour}
             onClick={() => onChange(t.key)}
             className={cn(

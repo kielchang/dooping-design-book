@@ -28,11 +28,11 @@ const SCAN = [
 /**
  * 示範資料的唯一來源。引用它的檔案才可以在本地宣告衍生結構（例如欄位定義）。
  *
- * 來源有兩種形態：sample-data（靜態典型值）與 generate（參數化衍生值，
- * playground 用）。兩者同屬單一來源——只用生成器的檔案不該被迫多 import
- * 一份用不到的靜態資料。
+ * 來源有三種形態：sample-data（靜態典型值）、generate（參數化衍生值，playground 用）、
+ * generate-stress（量產「不乖」資料，壓力測試用——見文件〈壓力測試 Story〉）。
+ * 三者同屬單一來源——只用生成器的檔案不該被迫多 import 一份用不到的靜態資料。
  */
-const SOURCE = /from\s+["'][^"']*demo\/(?:sample-data|generate)["']/;
+const SOURCE = /from\s+["'][^"']*demo\/(?:sample-data|generate-stress|generate)["']/;
 
 export interface Dataset {
   name: string;

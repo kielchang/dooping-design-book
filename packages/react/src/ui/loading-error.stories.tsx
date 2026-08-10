@@ -42,7 +42,7 @@ export const 載入的三種手段: Story = {
       <div className="max-w-xl space-y-8">
         <div>
           <p className="mb-1 text-sm font-medium">
-            1・首載＝骨架（版面已知不跳動）　2・重查＝就地變暗（舊資料仍可讀）
+            1・首載＝骨架（版面已知不跳動）　2・重查＝變暗＋列脈動（舊資料仍可讀）
           </p>
           <DataTable
             rows={phase === "first" ? [] : demoRecords.slice(0, 5)}
@@ -60,7 +60,7 @@ export const 載入的三種手段: Story = {
             onClick={() => setPhase("refetch")}
           >
             <RotateCw className="mr-1 size-3.5" aria-hidden />
-            重新查詢（看變暗態）
+            重新查詢（看變暗＋脈動態）
           </Button>
         </div>
         <div>

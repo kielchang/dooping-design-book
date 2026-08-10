@@ -175,7 +175,7 @@ export type DataTableProps<T> = {
   /**
    * 載入中。兩種長相，元件自己分（規範見文件〈載入中〉）：
    * 還沒有資料 → 骨架列（列數＝每頁筆數，上限 15——骨架超過一屏沒有意義）；
-   * 已有資料（重新查詢）→ 保留舊內容就地變暗＋ `aria-busy`，**不要**蓋骨架（會閃）。
+   * 已有資料（重新查詢）→ 保留舊內容就地變暗＋資料列脈動＋ `aria-busy`，**不要**蓋骨架（會閃）。
    */
   loading?: boolean;
   /** 工具列額外元素（期間選擇器、其他按鈕…），置於搜尋列右側 */
@@ -617,9 +617,12 @@ export function DataTable<T>({
           compact
         />
       ) : (
-        // 已有資料的重新查詢：保留舊內容就地變暗（仍可讀）＋鎖互動。
+        // 已有資料的重新查詢：保留舊內容就地變暗（仍可讀）＋鎖互動，
+        // 資料列再加骨架同一套脈動（表頭不動——呼應首載骨架「表頭是真的、列在閃」）。
+        // 只變暗會跟唯讀／禁用混淆；脈動借骨架的動畫語彙說「正在工作」。
         // 不蓋骨架——資料換一批就閃一次骨架，比「看著舊資料等新的」糟得多。
-        <div aria-busy={loading || undefined} className={cn(loading && "pointer-events-none opacity-60 transition-opacity")}>
+        // motion-reduce 停動畫，變暗與 aria-busy 仍在，語意不靠動畫。
+        <div aria-busy={loading || undefined} className={cn(loading && "pointer-events-none opacity-60 transition-opacity [&_tbody]:animate-pulse motion-reduce:[&_tbody]:animate-none")}>
         <Table ref={tableRef} zebra={zebra} maxHeight={maxHeight}>
           <TableHeader sticky={stickyHeader}>
             <TableRow onMouseLeave={() => crosshair && setCross(null)}>

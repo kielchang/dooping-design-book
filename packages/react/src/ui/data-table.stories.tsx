@@ -2,7 +2,7 @@ import * as React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { within, expect, userEvent, waitFor } from "@storybook/test";
 import { PackageOpen } from "lucide-react";
-import { DataTable, type Column } from "./data-table";
+import { DataTable, type Column, type DataTableState } from "./data-table";
 import { Badge } from "./badge";
 import { Button } from "./button";
 import { Delta } from "./delta";
@@ -322,5 +322,68 @@ export const 網址同步: Story = {
     await waitFor(() => expect(url()).toContain("q="));
     await waitFor(() => expect(url()).not.toContain("page="));
     setInputValue(input, "");
+  },
+};
+
+const REQUERY_INITIAL: DataTableState = {
+  page: 0, pageSize: 5, query: "", sort: null, filters: {}, hiddenColumns: [], selection: [],
+};
+
+function RequeryLoadingDemo() {
+  // 誠實的遠端模擬：條件變更先「凍結」目前狀態並開 loading，
+  // 900ms 後才套用新狀態——重查期間看到的是舊排序舊資料（變暗＋列脈動），
+  // 與真後端的時序一致。宿主接真 API 時把 setTimeout 換成請求即可。
+  // 必須**從頭全鍵受控**：半受控的話排序會走內部狀態立即生效，凍結不成立。
+  const [applied, setApplied] = React.useState<DataTableState>(REQUERY_INITIAL);
+  const [loading, setLoading] = React.useState(false);
+  const pending = React.useRef<DataTableState | null>(null);
+  const timer = React.useRef<number | undefined>(undefined);
+  React.useEffect(() => () => window.clearTimeout(timer.current), []);
+  return (
+    <div className="space-y-2">
+      <p className="text-tiny text-muted-foreground">
+        排序、篩選、搜尋任一變更 → 900ms 模擬查詢：舊資料保留、變暗＋列脈動，表頭與工具列不動。
+      </p>
+      <DataTable
+        rows={demoRecords}
+        columns={columns}
+        getRowKey={(r) => r.id}
+        pageSize={5}
+        facets={["status"]}
+        loading={loading}
+        state={applied}
+        onStateChange={(patch, next) => {
+          if ("sort" in patch || "filters" in patch || "query" in patch) {
+            pending.current = next;
+            setLoading(true);
+            window.clearTimeout(timer.current);
+            timer.current = window.setTimeout(() => {
+              if (pending.current) setApplied(pending.current);
+              setLoading(false);
+            }, 900);
+          } else {
+            setApplied(next); // 換頁等其餘變更即時生效，不進模擬
+          }
+        }}
+      />
+    </div>
+  );
+}
+
+export const 重新查詢載入模擬: Story = {
+  render: () => <RequeryLoadingDemo />,
+  // 契約：重查期間舊內容保留（列數不變、排序尚未生效）、容器宣告載入；
+  // 完成後載入收掉、新排序生效。變暗＋脈動是視覺語彙，語意靠 aria-busy 與 role="status"。
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const rowsBefore = canvas.getAllByRole("row").length;
+    await userEvent.click(canvas.getByRole("button", { name: "數量" }));
+    await waitFor(() => expect(canvas.getByRole("status")).toBeInTheDocument());
+    // 重查期間：舊內容與舊排序都還在
+    expect(canvas.getAllByRole("row").length).toBe(rowsBefore);
+    expect(canvas.getByRole("columnheader", { name: /數量/ })).not.toHaveAttribute("aria-sort");
+    // 模擬回應後：載入收掉、新排序生效（首次點擊＝降冪，見 use-sort）
+    await waitFor(() => expect(canvas.queryByRole("status")).toBeNull(), { timeout: 2500 });
+    expect(canvas.getByRole("columnheader", { name: /數量/ })).toHaveAttribute("aria-sort", "descending");
   },
 };

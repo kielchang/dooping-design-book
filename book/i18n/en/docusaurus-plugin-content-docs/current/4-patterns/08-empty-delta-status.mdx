@@ -1,0 +1,66 @@
+---
+title: Empty States, Deltas, and Status Badges
+---
+
+# Empty States, Deltas, and Status Badges
+
+These three small patterns share one rule: **color is never the only cue.**
+
+## Empty states: three kinds of empty
+
+| Situation | User question | Copy should answer |
+| --- | --- | --- |
+| There is no data yet | What should I do? | Guide the user to create the first record. |
+| A filter returned nothing | Did I filter incorrectly? | Show the active conditions and suggest broadening them. |
+| The user lacks permission | Is the system broken? | Explain why and who can grant access. |
+
+<Demo title="Three empty states need different copy">
+  <div className="grid gap-3 md:grid-cols-3">
+    <div className="rounded-lg border"><EmptyState compact title="No data yet" hint="Create the first record to see details and totals here." /></div>
+    <div className="rounded-lg border"><EmptyState compact title="No matching records" hint="Current filters: Unit = Northwind, Status = Complete. Try broadening one filter." /></div>
+    <div className="rounded-lg border"><EmptyState compact title="No view permission" hint="Only administrators can view this area. Contact your system administrator." /></div>
+  </div>
+</Demo>
+
+<Rules>
+  <Do><p>Give every empty state a <strong>next step</strong>. The user is stuck here.</p></Do>
+  <Dont><p>Do not use “No data” for all three situations.</p></Dont>
+</Rules>
+
+## Deltas: arrow, text, and color
+
+<Demo title="Triple encoding">
+  <div className="space-y-1 text-sm">
+    <p>Revenue: <Delta value={128400} posLabel="up " negLabel="down " /></p>
+    <p>Error count (lower is better): <Delta value={340} goodWhen="negative" posLabel="over " negLabel="under " /></p>
+    <p>Flat: <Delta value={0} /></p>
+  </div>
+</Demo>
+
+Whether a value is good is a business decision, not a mathematical one. Positive cost,
+latency, or return rates can be bad news, so the component does not assume that positive
+means green. The caller sets `goodWhen`.
+
+Zero displays as “— unchanged” rather than blank. A blank value looks like data has not loaded.
+
+## Status badges always include text
+
+<Demo title="Status badges">
+  <div className="flex flex-wrap gap-2">
+    <Badge variant="success">Complete</Badge>
+    <Badge variant="info">In review</Badge>
+    <Badge variant="warning">Needs information</Badge>
+    <Badge variant="danger">Returned</Badge>
+    <Badge variant="secondary">Draft</Badge>
+  </div>
+</Demo>
+
+## Shared acceptance test
+
+**Print the screen in grayscale.** If the meaning disappears, the work is not finished.
+Back-office reports are routinely printed and many printers are monochrome.
+
+<Rules>
+  <Do><p>Use color as the third cue. The first two are <strong>shape or symbol</strong> and <strong>text</strong>.</p></Do>
+  <Dont><p>Do not represent a state with a colored dot alone. It loses meaning in grayscale, color-vision differences, and low-saturation dark themes.</p></Dont>
+</Rules>

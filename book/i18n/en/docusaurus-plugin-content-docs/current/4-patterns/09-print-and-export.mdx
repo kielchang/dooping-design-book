@@ -1,0 +1,175 @@
+---
+title: Print and Export
+---
+
+# Print and Export
+
+## The problem
+
+Most teams design light and dark themes. A back-office system has a third theme: **the copy
+that gets printed**. Reports are printed for signatures, saved as PDFs, and sent to people
+who do not use the system.
+
+Without print rules, the sidebar fills half a page, status badges become white boxes, and a
+table splits in half with no header on the second page.
+
+## Print rules
+
+### 1. Backgrounds carry meaning
+
+```css
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+```
+
+Badges, callouts, and placeholders often rely on background color. Add a light border to
+elements that would otherwise be defined only by their fill, because some printer drivers
+still remove backgrounds.
+
+### 2. Hide controls
+
+Search fields, filter buttons, pagination, export buttons, sidebars, and navigation should
+not be part of the clean document. Components use the `print-hidden` class; the shell hides
+the rest of the site chrome.
+
+### 3. Do not split content across pages
+
+```css
+@media print {
+  thead { display: table-header-group; }
+  tfoot { display: table-footer-group; }
+  tr, img, svg, figure, .print-block { break-inside: avoid; }
+  h1, h2, h3, h4 { break-after: avoid; }
+  p { orphans: 3; widows: 3; }
+}
+```
+
+`break-inside: avoid` is best effort. Large blocks still need to be split into smaller
+units, such as one avoidable block per step.
+
+### 4. Unstick sticky elements
+
+```css
+@media print { .sticky-header { position: static !important; } }
+```
+
+Let `table-header-group` repeat a table header; a sticky header would cover the first page.
+
+### 5. Print a static spotlight
+
+```css
+@media print {
+  .spotlight-ring {
+    animation: none !important;
+    box-shadow: 0 0 0 3px hsl(var(--primary)), 0 0 0 6px hsl(var(--primary) / 0.3) !important;
+  }
+}
+```
+
+Replace animation with a static highlight rather than removing the spotlight completely.
+
+### 6. Set page margins and print-only headers
+
+```css
+@media print {
+  @page { margin: 14mm 12mm 16mm; }
+}
+```
+
+Show a print header with the document name, period, and generation time, and a footer with
+the page number and system version. Hide them on screen first, then reveal them in the print
+media query.
+
+The footer should include **system version, commit, and generation time**, for example:
+
+```
+Monthly summary  v1.4.2 · a3f9c21  generated 2026-07-29 14:20
+```
+
+Use the same version source as the rest of the application; see [Versioning](/governance/versioning).
+
+### 7. Let height follow content
+
+```css
+@media print {
+  html, body, #root, .app-shell {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+}
+```
+
+Reset `100vh` and `min-height` so a short document does not acquire an almost-empty final page.
+
+### 8. Label content that cannot print
+
+Interactive embeds, videos, maps, and lazy content may not exist on paper. Replace them with
+an explanatory box rather than an empty frame or silent omission.
+
+```css
+@media print {
+  .embed-frame { display: none !important; }
+  .embed-print-note { display: block !important; border: 1px dashed; }
+}
+```
+
+The note should say what was there and where the reader can open it.
+
+### 9. Expand collapsed and carousel content
+
+Paper must contain every step even when the screen shows one step at a time.
+
+```css
+.step { display: none; }
+.step.is-active { display: block; }
+
+@media print {
+  .step { display: block !important; break-inside: avoid; }
+  .step .step-caption { display: block !important; }
+  .carousel-controls, .carousel-counter { display: none !important; }
+}
+```
+
+Keep every step in the DOM, print each caption, and hide a counter such as “3 / 5” once all
+steps are visible. The on-screen “expand all” state should share these print styles.
+
+### 10. Remove external-link arrows
+
+```css
+@media print { a[target="_blank"]::after { content: ""; } }
+```
+
+Paper has no new-tab action, so the arrow looks like a stray character.
+
+## CSV export
+
+| Rule | Why |
+| --- | --- |
+| **Add a UTF-8 BOM** | Excel otherwise commonly opens non-ASCII text as mojibake. |
+| **Export the current screen** after filtering and sorting | Users expect the view they prepared, not every record. |
+| Escape quotes, commas, and newlines | Commas in names are normal. |
+| Use a meaningful filename such as `orders-2024-02.csv` | A downloads folder full of `export.csv` is not useful. |
+
+## Trade-offs
+
+Every new page needs a print decision. Reduce the cost by putting common rules in the token
+CSS layer (`.print-hidden`, `.print-block`, and `.print-only`) instead of repeating them per page.
+
+### Follow the theme or force white
+
+Following the current theme is closest to what users see, but dark pages consume ink and may
+become muddy. A forced white background saves ink and is predictable, but it must replace the
+whole surface-token layer, not only `body`. A white page with dark component surfaces and dark
+text is the least readable combination. Whichever strategy you choose, apply it consistently
+and add fallback borders to color-coded elements.
+
+## Rules
+
+<Rules>
+  <Do><p>Provide a page-level “Print this page” button so users know printing is supported.</p></Do>
+  <Dont><p>Do not build a separate print-only page. Two layouts will drift; use print media rules on the same page.</p></Dont>
+</Rules>

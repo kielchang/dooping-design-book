@@ -31,7 +31,7 @@ export interface StackedBarProps {
  */
 export function StackedBar({
   rows,
-  title = "堆疊長條",
+  title = "Stacked bar",
   valueFmt = defaultFmt,
   onSelectRow,
   selectedRow,
@@ -70,8 +70,8 @@ export function StackedBar({
         })}
       </div>
       <ChartDataTable
-        caption={`${title}（各列分段明細）`}
-        head={["項目", ...segNames, "合計"]}
+        caption={`${title} (segment details by row)`}
+        head={["Item", ...segNames, "Total"]}
         rows={rows.map((r, i) => [
           r.label,
           ...segNames.map((n) => {

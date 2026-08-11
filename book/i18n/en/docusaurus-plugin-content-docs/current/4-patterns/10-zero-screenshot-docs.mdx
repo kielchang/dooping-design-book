@@ -1,0 +1,78 @@
+---
+title: Screenshot-Free Documentation Demos
+---
+
+# Screenshot-Free Documentation Demos
+
+## The problem
+
+Screenshots in manuals start expiring on their first day. Move one button and every image
+needs to be recorded again. Eventually the manual tells the truth about an old version and
+looks polished enough that nobody notices.
+
+## Use real components to compose the illustration
+
+```
+Focused control  → real library component + <Spotlight>
+Other regions    → <Placeholder>
+Overall layout   → <MockScreenFrame>
+```
+
+<Demo title="The illustration uses real components">
+  <div className="overflow-x-auto rounded-lg border">
+    <MockScreenFrame>
+      <div className="flex items-center gap-2">
+        <TabPills value="confirmed" onChange={() => {}} tabs={[{ key: "all", label: "All" }, { key: "confirmed", label: "Confirmed" }]} />
+        <span className="ml-auto"><Spotlight label="1. Switch to Confirmed"><Badge variant="info">7 records</Badge></Spotlight></span>
+      </div>
+      <div className="mt-3"><Placeholder label="Search and filters" /></div>
+      <div className="mt-3"><Placeholder label="Results table" height={120} /></div>
+    </MockScreenFrame>
+  </div>
+</Demo>
+
+This page is compiled from the same components used by the application. It is not a picture
+of a component and cannot silently drift from the implementation.
+
+## Static illustrations and multi-step flows
+
+Use a static illustration when the reader needs to know what to click. Use a multi-step flow
+player when the reader needs to understand a sequence.
+
+The player should have these properties:
+
+- autoplay is a quiet orientation aid, not the only way to inspect a step;
+- hovering pauses autoplay so the reader can examine the current state;
+- reduced-motion users receive an expanded static view by default;
+- “expand all” shows every step, with its own caption, and stops autoplay;
+- every flow has a direct link to the corresponding application screen.
+
+The expand-all state and print CSS should be the same rule set. What a reader sees after
+choosing “expand all” is what they will receive on paper.
+
+## When to embed Storybook
+
+Static demos explain where to click, but not how a component feels when interacted with.
+Embed a real Storybook story for behavior such as opening, switching, typing, or live feedback:
+
+<StoryFrame id="components-data-data-table-datatable--full-featured" title="Data table: search, filter, sort, and paginate" height={460} />
+
+| What the reader needs | Use |
+| --- | --- |
+| What the screen looks like and where to click | Static illustration with Mockup blocks |
+| A sequence of steps | Multi-step player |
+| How a component behaves | Embedded Storybook story |
+| What production data looks like | Direct link to the application |
+
+Story embeds are string-keyed cross-file references, so they need a guard. The test suite
+scans every `StoryFrame` and compares its id with the ids derived from the stories. A renamed
+story then fails loudly instead of becoming a blank rectangle.
+
+When printing, replace the iframe with a note that explains it was an interactive demo and
+where to open it. See [Print and Export](/patterns/print-and-export).
+
+## Real components in the docs site
+
+The same technique can go one step further: compile and render the library source directly
+in the docs site. The demonstration above is a real React component. See [Drift Guards](/governance/drift-guards)
+for the build and test boundary.

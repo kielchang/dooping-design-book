@@ -19,7 +19,7 @@ export interface LineChartProps {
  */
 export function LineChart({
   points,
-  title = "累積分布",
+  title = "Cumulative distribution",
   diagonal = true,
   height = 220,
   className,
@@ -38,7 +38,7 @@ export function LineChart({
     <div className={className}>
       <svg
         role="img"
-        aria-label={`${title}，前 ${Math.round(at20.x * 100)}% 累積約 ${Math.round(at20.y * 100)}%`}
+        aria-label={`${title}, the first ${Math.round(at20.x * 100)}% accounts for about ${Math.round(at20.y * 100)}%`}
         viewBox={`0 0 ${W} ${height}`}
         className="block w-full"
         style={{ maxWidth: W }}
@@ -63,10 +63,10 @@ export function LineChart({
         />
       </svg>
       <ChartDataTable
-        caption={`${title}（累積比例）`}
-        head={["位置", "累積"]}
+        caption={`${title} (cumulative share)`}
+        head={["Position", "Cumulative"]}
         rows={sorted.map((p) => [
-          p.label ?? `前 ${Math.round(p.x * 100)}%`,
+          p.label ?? `First ${Math.round(p.x * 100)}%`,
           `${Math.round(p.y * 100)}%`,
         ])}
       />

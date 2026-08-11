@@ -1,0 +1,42 @@
+---
+title: Settings Page
+---
+
+# Settings Page
+
+## When to use it
+
+Use a settings page for durable rules that affect future work or multiple users. Keep one-off
+actions in the workflow where they belong instead of hiding them among settings.
+
+## Composition
+
+<StoryFrame id="pages-settings-page--typical-composition" title="Settings page: immediate, saved, and dangerous operations" height={880} />
+
+Group settings by the user's mental model, show scope and affected users, and separate routine
+values from dangerous operations. Explain defaults and current values before exposing controls.
+
+## Immediate versus saved changes
+
+An immediate setting needs a clear changed state, confirmation when the impact is broad, and an
+undo or recovery path when possible. A saved group needs a single explicit save action, dirty
+state, validation, pending feedback, and a clear success or failure result. Never make the same
+control behave immediately in one section and on-save in another without saying so.
+
+## Dangerous operations
+
+Place irreversible actions in a separated danger area. The confirmation names the target,
+scope, and consequence; it does not use a vague “Are you sure?” message. Require a deliberate
+confirmation for broad or destructive changes.
+
+## Leave an audit trail
+
+Show who changed a setting, when, and what changed. For high-impact values, include the previous
+value and a route to history or restore. The audit record is part of the setting's design, not
+an afterthought.
+
+## Accessibility, adoption, and missing pieces
+
+Use visible labels, grouped fieldsets, keyboard order, clear unsaved-change announcements, and
+text rather than color alone for status. Start with one coherent setting group and add a new
+pattern only when its scope, save semantics, or recovery behavior is reusable.

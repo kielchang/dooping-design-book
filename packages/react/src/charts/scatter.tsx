@@ -30,7 +30,7 @@ export interface ScatterProps {
  */
 export function Scatter({
   points,
-  title = "散布圖",
+  title = "Scatter plot",
   xLabel,
   yLabel,
   valueFmt = defaultFmt,
@@ -55,7 +55,7 @@ export function Scatter({
     <div className={className}>
       <svg
         role="img"
-        aria-label={`${title}，${points.length} 個點，橫軸 ${xLabel}、縱軸 ${yLabel}`}
+        aria-label={`${title}, ${points.length} points, horizontal axis ${xLabel}, vertical axis ${yLabel}`}
         viewBox={`0 0 ${W} ${height}`}
         className="block w-full"
         style={{ maxWidth: W }}
@@ -75,7 +75,7 @@ export function Scatter({
               onClick={onSelect ? () => onSelect(i, p) : undefined}
               className={cn(onSelect && "cursor-pointer")}
             >
-              <title>{`${p.label ?? `第 ${i + 1} 點`}：${xLabel} ${valueFmt(p.x)}、${yLabel} ${valueFmt(p.y)}`}</title>
+              <title>{`${p.label ?? `Point ${i + 1}`}: ${xLabel} ${valueFmt(p.x)}, ${yLabel} ${valueFmt(p.y)}`}</title>
             </circle>
           );
         })}
@@ -92,9 +92,9 @@ export function Scatter({
         </text>
       </svg>
       <ChartDataTable
-        caption={`${title}（各點座標）`}
-        head={["點", xLabel, yLabel]}
-        rows={points.map((p, i) => [p.label ?? `第 ${i + 1} 點`, valueFmt(p.x), valueFmt(p.y)])}
+        caption={`${title} (point coordinates)`}
+        head={["Point", xLabel, yLabel]}
+        rows={points.map((p, i) => [p.label ?? `Point ${i + 1}`, valueFmt(p.x), valueFmt(p.y)])}
         onSelect={onSelect ? (i) => onSelect(i, points[i]) : undefined}
         selectedIndex={selectedIndex}
       />

@@ -1,0 +1,54 @@
+---
+title: Form Page
+---
+
+# Form Page
+
+## When to use it
+
+Use a form page when users create or edit a coherent set of values that needs validation and a
+single save decision. For one independent field, prefer inline editing on a detail page.
+
+## Composition
+
+<StoryFrame id="pages-form-page--typical-composition" title="Form page: grouped cards, inline errors, and action area" height={760} />
+
+Organize the page into a context and title, grouped field sections, a summary or review area,
+and a clearly scoped action area. Group by the user's mental model, not database tables.
+
+## Field order
+
+Start with identity and required decisions, then details and optional values. Put dependent
+fields after the value that controls them. Preserve entered values when validation fails and
+show requiredness before submission.
+
+## Error placement
+
+Show the error beside the field, connect it with `aria-describedby`, and provide a summary when
+there are multiple errors. On submit, focus the summary or first invalid field. Do not rely on
+red borders or icons without text.
+
+## Action area
+
+The primary action names the result, such as “Save changes” or “Create record”. Keep cancel or
+back separate, warn about unsaved changes, and show disabled, pending, success, and failure
+states without moving the action unexpectedly.
+
+## Multi-step variant
+
+<StoryFrame id="pages-form-page--multi-step" title="Multi-step form: stepper, content, and final review" height={640} />
+
+Use steps only when the sequence reduces complexity. The stepper must expose the current step,
+completed steps, and what remains. Let users revisit completed steps, validate each step before
+advancing, and provide a complete final review before the irreversible action.
+
+## Accessibility
+
+Every control needs a visible label, programmatic name, keyboard access, and an error relation.
+Use fieldsets and legends for related controls. Do not disable the whole form while saving if
+users still need to inspect or correct values.
+
+## Adoption and missing pieces
+
+Start with grouped sections and the shared `FormField` behavior. Record new dependencies,
+conditional sections, and async validation as reusable additions; do not hide them in one page.

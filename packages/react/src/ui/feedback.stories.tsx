@@ -9,63 +9,66 @@ import { Badge } from "./badge";
 import { Button } from "./button";
 import { formatMoney } from "../lib/utils";
 
-const meta: Meta = { title: "元件/狀態/變異・空狀態・分頁・步驟" };
+const meta: Meta = { title: "Components/States/Deltas, empty states, tabs, and steps", id: "元件/狀態/變異・空狀態・分頁・步驟" };
 export default meta;
 type Story = StoryObj;
 
 export const 變異顯示: Story = {
+  name: "Deltas",
   render: () => (
     <div className="space-y-2 text-sm">
-      <p>本月營收與上月比較：<Delta value={128_400} posLabel="增加 " negLabel="減少 " format={formatMoney} /></p>
-      <p>誤差數（越少越好）：<Delta value={340} goodWhen="negative" posLabel="超出 " negLabel="短少 " /></p>
-      <p>交期落差：<Delta value={-3} goodWhen="negative" posLabel="延遲 " negLabel="提前 " format={(n) => `${n} 天`} /></p>
-      <p>與上期持平：<Delta value={0} /></p>
+      <p>Revenue versus last month: <Delta value={128_400} posLabel="up " negLabel="down " format={formatMoney} /></p>
+      <p>Error count (lower is better): <Delta value={340} goodWhen="negative" posLabel="over " negLabel="under " /></p>
+      <p>Schedule variance: <Delta value={-3} goodWhen="negative" posLabel="late " negLabel="early " format={(n) => `${n} days`} /></p>
+      <p>Flat versus last period: <Delta value={0} /></p>
       <p className="pt-2 text-xs text-muted-foreground">
-        三重編碼：箭頭 ▲▼ ＋ 文字 ＋ 顏色。把這段用灰階印出來，語意仍然完整——那才算過關。
+        Triple encoding: arrow ▲▼ + text + color. The meaning remains complete in grayscale print.
       </p>
     </div>
   ),
 };
 
 export const 三種空狀態: Story = {
+  name: "Three empty states",
   render: () => (
     <div className="grid gap-4 md:grid-cols-3">
       <div className="rounded-lg border">
         <EmptyState
           icon={<PackageOpen className="size-7" />}
-          title="還沒有任何資料"
-          hint="建立第一筆後，這裡會顯示明細與合計。"
-          action={<Button size="sm">新增一筆</Button>}
+          title="No data yet"
+          hint="Create the first record to see details and totals here."
+          action={<Button size="sm">Add a record</Button>}
         />
       </div>
       <div className="rounded-lg border">
         <EmptyState
           icon={<SearchX className="size-7" />}
-          title="查無符合的資料"
-          hint="目前篩選：單位＝乙單位、狀態＝已完成。試著放寬其中一項。"
-          action={<Button size="sm" variant="outline">清除篩選</Button>}
+          title="No matching records"
+          hint="Current filters: Unit B, Status = Complete. Try broadening one filter."
+          action={<Button size="sm" variant="outline">Clear filters</Button>}
         />
       </div>
       <div className="rounded-lg border">
-        <EmptyState icon={<ShieldOff className="size-7" />} title="沒有檢視權限" hint="此區資料僅限管理員檢視，請洽系統管理者。" />
+        <EmptyState icon={<ShieldOff className="size-7" />} title="No view permission" hint="Only administrators can view this area. Contact your system administrator." />
       </div>
     </div>
   ),
 };
 
 export const 分頁膠囊: Story = {
+  name: "Tab pills",
   render: function Render() {
     const [tab, setTab] = useState("all");
     return (
       <TabPills
-        label="處理狀態"
+        label="Processing status"
         value={tab}
         onChange={setTab}
         tabs={[
-          { key: "all", label: "全部" },
-          { key: "draft", label: "草稿", badge: <Badge variant="secondary">3</Badge> },
-          { key: "confirmed", label: "已確認", badge: <Badge variant="info">7</Badge> },
-          { key: "done", label: "已完成" },
+          { key: "all", label: "All" },
+          { key: "draft", label: "Draft", badge: <Badge variant="secondary">3</Badge> },
+          { key: "confirmed", label: "Confirmed", badge: <Badge variant="info">7</Badge> },
+          { key: "done", label: "Complete" },
         ]}
       />
     );
@@ -73,6 +76,7 @@ export const 分頁膠囊: Story = {
 };
 
 export const 步驟指示: Story = {
+  name: "Stepper",
   render: function Render() {
     const [cur, setCur] = useState("items");
     return (
@@ -82,10 +86,10 @@ export const 步驟指示: Story = {
           onStep={setCur}
           completed={{ unit: true }}
           steps={[
-            { key: "unit", label: "選擇單位", hint: "或建立新單位" },
-            { key: "items", label: "加入項目", hint: "數量與金額" },
-            { key: "extra", label: "補充資訊" },
-            { key: "review", label: "確認送出" },
+            { key: "unit", label: "Choose unit", hint: "Or create a new unit" },
+            { key: "items", label: "Add items", hint: "Quantity and amount" },
+            { key: "extra", label: "Additional information" },
+            { key: "review", label: "Review and submit" },
           ]}
         />
       </div>

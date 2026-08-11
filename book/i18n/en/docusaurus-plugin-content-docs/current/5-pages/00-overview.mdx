@@ -1,0 +1,56 @@
+---
+title: Page Overview
+---
+
+# Page Overview
+
+## Why a page layer is needed
+
+Foundations define tokens and components define parts. A page pattern defines how those parts
+answer a real work question. Without this layer, every team invents its own page header,
+action placement, loading state, and error behavior.
+
+## Three layers of responsibility
+
+| Layer | Decides | Does not decide |
+| --- | --- | --- |
+| Foundations | Color, type, spacing, motion, theme | Workflow and page structure |
+| Components | Reusable controls and their states | Which controls a task needs |
+| Pages | Information hierarchy, composition, and task flow | New token values for one page |
+
+## Six page types
+
+| Page | Primary question |
+| --- | --- |
+| List | Which records exist, and which one should I open? |
+| Detail | What is true about this record? |
+| Form | What information must I enter or change? |
+| Dashboard | What needs attention and what is changing? |
+| Settings | Which durable rules govern the system? |
+| Page anatomy | Where do shared structure and actions belong? |
+
+## Cross-page consistency rules
+
+- Page titles identify the object and the user's current task.
+- Primary actions occupy a predictable location and use the same verb everywhere.
+- Loading, empty, error, and locked states are designed before the happy path.
+- Destructive actions are separated from routine actions and explain their consequence.
+- Deep links preserve the selected tab or record when another person needs the same view.
+
+## Start new work with the page
+
+Before building components, write the page's primary question, the source of truth, the main
+action, and the states that can block completion. Then map existing components onto the answer.
+Only create a new component when an existing one cannot express the required state.
+
+## Inclusion threshold
+
+A page pattern belongs here when it occurs across products, has a stable information hierarchy,
+and prevents a recurring usability or implementation failure. One-off product flows belong in
+the product documentation and can link back to these rules.
+
+## Missing pieces
+
+When a page cannot be expressed with the current component set, record the missing state and
+the smallest reusable addition. The page chapter is a living catalog, not permission to grow a
+second component library.

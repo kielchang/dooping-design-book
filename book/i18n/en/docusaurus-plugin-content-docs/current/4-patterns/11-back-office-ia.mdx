@@ -1,0 +1,142 @@
+---
+title: Back-Office Information Architecture
+---
+
+# Back-Office Information Architecture
+
+:::note Scope
+This page covers the site layer: sidebar groups, global status, deep links, and a single
+entry point. The composition inside a page belongs to the [Page chapter](/pages).
+:::
+
+## The problem
+
+Back-office sidebars naturally become catalogs of database tables:
+
+```
+Documents
+People
+Categories
+Regions
+Tasks
+Reports
+Settings
+```
+
+Each item maps neatly to a table, but users are not trying to “look at a table”; they are
+trying to complete a job that usually crosses several tables. Multiple entrances to the same
+job make the problem worse: users must remember which nearly-identical route is authoritative.
+
+## Group by work rhythm
+
+Group the sidebar around the user's work rhythm rather than the data model:
+
+```
+Daily operations       ← done every day and time-sensitive
+  Workbench
+  Period close         [Routine]
+  Inventory check
+
+Planning and analysis  ← occasional, safe to explore
+  Usage analysis       [Sandbox]
+
+Reports                ← external deliverables
+  Report center        [Routine]
+
+Master and settings    ← infrequent, high impact
+  Master data
+  System settings
+
+Help                   ← when someone is stuck
+  Help center
+  User manual           [External]
+```
+
+The grouping answers “where is the thing I am doing now?” Frequency and consequence are
+better criteria than the data model:
+
+| Group | Frequency | Cost of a mistake |
+| --- | --- | --- |
+| Daily operations | Daily | Today's work stops. |
+| Planning and analysis | Weekly or monthly | Nothing formal changes; it is a sandbox. |
+| Reports | Each period | An external document is wrong. |
+| Master and settings | Quarterly | Company-wide calculations change. |
+
+<Rules>
+  <Do><p>Put the highest-radius settings at the bottom, where they are least easy to hit by accident.</p></Do>
+  <Dont><p>Do not put settings first because of alphabetic order, or merge a group simply because it has one item.</p></Dont>
+</Rules>
+
+## Routine and Sandbox labels
+
+Show whether a screen changes official data:
+
+| Label | Meaning |
+| --- | --- |
+| [Routine] | Official work; actions enter the formal record. |
+| [Sandbox] | Safe exploration; changes do not affect official data. |
+
+The sandbox only has value if users believe it is safe. Inside the screen, repeat the data
+status with a badge such as “Sandbox draft”, “Confirmed actual”, or “Historical actual”. The
+sidebar describes the screen; the badge describes the numbers currently shown.
+
+## Global health bar
+
+Keep a compact global bar visible at the top with two pieces of information:
+
+1. the number of pending validation items;
+2. the status of the current period, such as Confirmed or Unconfirmed.
+
+The number must be clickable and lead directly to the pending list. A message saying “3 items
+remain” without identifying those items creates anxiety instead of helping.
+
+## One outlet for one job
+
+Give an external-document workflow one authoritative home. Keep old entrances as redirects:
+
+```
+/flow/export  →  redirect  →  /reports
+/export       →  redirect  →  /reports
+```
+
+Before merging routes, inventory what each old entrance could do. “Almost the same” often
+means one route has an important capability the other does not. After the merge, preserve that
+capability in the single destination.
+
+## Deep links go to the target
+
+Put the selected tab and selected record into the URL:
+
+```
+/master?tab=records&id=C-1043
+```
+
+This makes tasks bookmarkable, shareable, and compatible with browser back navigation. Use
+human-readable names such as `tab=records`, not internal indexes such as `t=2`. Do not put
+transient expanded rows or scroll positions in the URL unless another person needs to see them.
+
+## Mobile: sidebar becomes a drawer
+
+On narrow screens, collapse the sidebar into a left-side drawer closed by the scrim. Keep the
+same groups and order. Mobile users are often the same people checking work away from their
+desk; a second navigation map makes them learn the system twice.
+
+## Trade-offs
+
+Sidebar structure becomes muscle memory, so changing it later is expensive. Decide the groups
+before people form habits and base them on stable criteria such as frequency and consequence.
+The same master record may appear in a daily workflow and in the master-data area; that is
+intentional, but both entrances must share locking and audit behavior. If they cannot, keep a
+single entry.
+
+## Rules
+
+<Rules>
+  <Do><p>Use words users would say out loud for every sidebar item.</p></Do>
+  <Dont><p>Do not expose internal module names as navigation labels.</p></Dont>
+</Rules>
+
+<Rules>
+  <Do><p>Send an unknown path to the most common work screen and explain where the user landed.</p></Do>
+  <Dont><p>Do not silently fall back to a blank home page.</p></Dont>
+</Rules>

@@ -25,11 +25,11 @@ export interface DateRangeValue {
 export type DateRangePreset = "today" | "7d" | "30d" | "month" | "custom";
 
 const PRESET_OPTIONS: { value: DateRangePreset; label: string }[] = [
-  { value: "today", label: "今日" },
-  { value: "7d", label: "近 7 日" },
-  { value: "30d", label: "近 30 日" },
-  { value: "month", label: "本月" },
-  { value: "custom", label: "自訂" },
+  { value: "today", label: "Today" },
+  { value: "7d", label: "Last 7 days" },
+  { value: "30d", label: "Last 30 days" },
+  { value: "month", label: "This month" },
+  { value: "custom", label: "Custom" },
 ];
 
 // 用本地年月日組字串——不能走 toISOString()，那是 UTC，會在時差邊界差一天
@@ -74,7 +74,7 @@ export function DateRange({
   value,
   onChange,
   initialPreset = "30d",
-  label = "期間",
+  label = "Date range",
   disabled,
   className,
 }: DateRangeProps) {
@@ -105,7 +105,7 @@ export function DateRange({
       {preset === "custom" && (
         <div className="flex flex-wrap items-end gap-2">
           <div className="space-y-1">
-            <Label htmlFor={fromId} className="text-xs">起</Label>
+            <Label htmlFor={fromId} className="text-xs">From</Label>
             <Input
               id={fromId}
               type="date"
@@ -118,7 +118,7 @@ export function DateRange({
           </div>
           <span className="pb-2 text-xs text-muted-foreground">～</span>
           <div className="space-y-1">
-            <Label htmlFor={toId} className="text-xs">迄</Label>
+            <Label htmlFor={toId} className="text-xs">To</Label>
             <Input
               id={toId}
               type="date"

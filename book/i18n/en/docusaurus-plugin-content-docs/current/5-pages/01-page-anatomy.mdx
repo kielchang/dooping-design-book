@@ -1,0 +1,45 @@
+---
+title: Page Anatomy
+---
+
+# Page Anatomy
+
+## Four zones
+
+<Demo title="Standard page skeleton illustrated with a list page">
+  <div className="space-y-3 rounded-lg border p-4">
+    <Placeholder label="Breadcrumbs" height={20} />
+    <div className="flex items-center justify-between gap-3"><h2 className="m-0 text-lg font-semibold">Records</h2><Button size="sm">Create record</Button></div>
+    <Placeholder label="Filters and view controls" height={44} />
+    <Placeholder label="Main content" height={180} />
+  </div>
+</Demo>
+
+1. **Context**: breadcrumb or location, so the user knows where they are.
+2. **Heading and actions**: the object, status, and primary next step.
+3. **Controls**: filters, tabs, or view changes that affect the content below.
+4. **Main content**: the table, form, dashboard, or detail sections.
+
+Keep these zones visually distinct without turning every boundary into a card.
+
+## Heading hierarchy
+
+Use one page-level `h1`. Use `h2` for major regions and `h3` for subsections. Do not choose a
+heading level for its font size; change visual scale through typography tokens.
+
+## Spacing rhythm
+
+Use the spacing scale between zones and a smaller step within a zone. Consistent rhythm helps
+users scan a page even when the content changes.
+
+## Sticky action areas
+
+A bottom action bar can help long forms, but it should not cover content or duplicate actions
+that are already visible. On desktop, keep it aligned to the content column. On mobile, make
+the primary action reachable without trapping keyboard or screen-reader focus.
+
+## Mobile
+
+Collapse secondary controls, keep the heading and primary action visible, and let tables scroll
+horizontally rather than shrinking labels below recognition. The information order stays the
+same; only the arrangement changes.

@@ -1,0 +1,88 @@
+---
+title: Feature Flags
+---
+
+# Feature Flags
+
+## The problem
+
+A feature can be implemented, tested, and runnable while still not being ready for users:
+its workflow is unfinished, its data is incomplete, or another acceptance task needs focus.
+Deleting it loses tests and boundaries. A long-lived branch drifts. Environment-based behavior
+means the build that was accepted is not the build users receive.
+
+## Use a pure boolean that hides only the entry point
+
+```ts
+export const FEATURES = {
+  /** Inventory checks: work screen, settings tab, and reference quantity in closeout. */
+  quantityCheck: false,
+  /** Task tracking: time split, cost, estimate, and workbench overage warning. */
+  taskTracking: false,
+} as const;
+```
+
+### 1. Hide the route, not the implementation
+
+Keep state slices, demo data, pure calculations, components, stories, schema fields, and
+existing data. The only removed path is the one a user can reach. This keeps the feature
+previewable and makes reopening a small decision rather than a rewrite.
+
+### 2. Keep the flag independent of the environment
+
+Use the same literal `true` or `false` in every environment. If a developer needs to inspect
+the feature, change the boolean locally and do not commit that change. Environment-dependent
+flags create two information architectures, one of which is never fully tested.
+
+### 3. List every gating point
+
+The sidebar is only one entrance:
+
+| Gating point | What happens if it is missed |
+| --- | --- |
+| Sidebar item | The feature is still advertised. |
+| Route itself | An old bookmark opens a half-built screen. |
+| Unknown-route fallback | A disabled default screen can produce a blank page. |
+| Cross-feature references | Workbench cards or report sections point at missing data. |
+| Settings tabs | Users can configure a feature they cannot use. |
+| Documentation | Users think they failed to find a screen that does not exist. |
+
+Use a repository-wide search for every feature reference and decide each gate explicitly.
+
+### 4. Prove core calculations have zero dependency
+
+Before disabling a feature, search calculations and selectors for its data. If core numbers
+change when the feature is hidden, this is not an entry-point flag; it changes behavior. Cut
+that dependency first or choose a different rollout design.
+
+### 5. Define the boundary precisely
+
+Same-named concepts are not necessarily the same feature. A free-text “task category” field in
+master data may remain useful after task tracking is disabled. Document what the flag does not
+include rather than gating every keyword match.
+
+### 6. Reopening means changing one boolean
+
+The acceptance test is simple: switching `false` to `true` restores the complete feature with
+no other edits. If it does not, some parts were deleted or hidden through unrelated conditions.
+
+## Trade-offs
+
+Disabled code still needs maintenance and flags accumulate. Every flag comment should record
+who decided it, why it exists, and what condition permits turning it on. Without an on-condition,
+a temporary flag is really a permanent deletion in disguise.
+
+The theoretical test matrix doubles, but if the core calculations have zero dependency, tests
+only need an additional case for correct navigation and routing while the flag is off.
+
+## Rules
+
+<Rules>
+  <Do><p>Set the flag granularity to <strong>one feature a user can recognize</strong>.</p></Do>
+  <Dont><p>Do not flag a single button or column. Decide those design questions directly.</p></Dont>
+</Rules>
+
+<Rules>
+  <Do><p>Keep disabled features previewable at the component layer through Storybook.</p></Do>
+  <Dont><p>Do not stop maintaining their stories and tests. Reopening should not reveal a component that drifted away from the current library.</p></Dont>
+</Rules>

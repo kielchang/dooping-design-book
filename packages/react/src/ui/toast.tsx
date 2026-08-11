@@ -57,7 +57,7 @@ const ToastCtx = createContext<ToastApi | null>(null);
 
 export function useToast(): ToastApi {
   const ctx = useContext(ToastCtx);
-  if (!ctx) throw new Error("useToast 必須在 <ToastProvider> 之內使用");
+  if (!ctx) throw new Error("useToast must be used inside <ToastProvider>");
   return ctx;
 }
 
@@ -146,7 +146,7 @@ function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: () => void
       </div>
       <button
         type="button"
-        aria-label="關閉通知"
+        aria-label="Close notification"
         onClick={onDismiss}
         className="state-layer tap-target -m-1 ml-auto flex shrink-0 items-center justify-center rounded p-1"
       >

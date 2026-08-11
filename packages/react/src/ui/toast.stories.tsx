@@ -4,7 +4,7 @@ import { Button } from "./button";
 import { ToastProvider, useToast } from "./toast";
 import { Skeleton, SkeletonText } from "./skeleton";
 
-const meta: Meta = { title: "元件/狀態/操作回饋與載入" };
+const meta: Meta = { title: "Components/States/Action feedback and loading", id: "元件/狀態/操作回饋與載入" };
 export default meta;
 type Story = StoryObj;
 
@@ -12,23 +12,24 @@ function PushButtons() {
   const { push } = useToast();
   return (
     <div className="flex flex-wrap gap-2">
-      <Button size="sm" onClick={() => push({ variant: "success", title: "已儲存", description: "12 個欄位已更新。" })}>
-        成功
+      <Button size="sm" onClick={() => push({ variant: "success", title: "Saved", description: "12 fields were updated." })}>
+        Success
       </Button>
-      <Button size="sm" variant="secondary" onClick={() => push({ variant: "info", title: "已加入排程", description: "匯出完成後會在這裡通知。" })}>
-        資訊
+      <Button size="sm" variant="secondary" onClick={() => push({ variant: "info", title: "Added to schedule", description: "You will be notified here when the export is ready." })}>
+        Info
       </Button>
-      <Button size="sm" variant="secondary" onClick={() => push({ variant: "warning", title: "部分項目已略過", description: "3 筆重複的紀錄未匯入。" })}>
-        警示
+      <Button size="sm" variant="secondary" onClick={() => push({ variant: "warning", title: "Some items skipped", description: "3 duplicate records were not imported." })}>
+        Warning
       </Button>
-      <Button size="sm" variant="destructive" onClick={() => push({ variant: "danger", title: "儲存失敗", description: "連線逾時，請再試一次。此訊息不會自動消失。" })}>
-        失敗（不自動消失）
+      <Button size="sm" variant="destructive" onClick={() => push({ variant: "danger", title: "Save failed", description: "The connection timed out. Try again. This message does not dismiss automatically." })}>
+        Failure (manual dismiss)
       </Button>
     </div>
   );
 }
 
 export const 操作回饋: Story = {
+  name: "Action feedback",
   render: () => (
     <ToastProvider>
       <div className="max-w-xl space-y-3">
@@ -45,10 +46,10 @@ export const 操作回饋: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const doc = within(canvasElement.ownerDocument.body);
-    await userEvent.click(canvas.getByRole("button", { name: "成功" }));
-    await expect(await doc.findByRole("status")).toHaveTextContent("已儲存");
-    await userEvent.click(canvas.getByRole("button", { name: "失敗（不自動消失）" }));
-    await expect(await doc.findByRole("alert")).toHaveTextContent("儲存失敗");
+    await userEvent.click(canvas.getByRole("button", { name: "Success" }));
+    await expect(await doc.findByRole("status")).toHaveTextContent("Saved");
+    await userEvent.click(canvas.getByRole("button", { name: "Failure (manual dismiss)" }));
+    await expect(await doc.findByRole("alert")).toHaveTextContent("Save failed");
   },
 };
 
@@ -60,10 +61,10 @@ function StressButtons() {
         size="sm"
         variant="secondary"
         onClick={() => {
-          for (let i = 1; i <= 10; i++) push({ variant: "info", title: `第 ${i} 則`, description: "連發測試——上限 3，最舊被擠出。" });
+          for (let i = 1; i <= 10; i++) push({ variant: "info", title: `Message ${i}`, description: "Burst test — maximum 3; oldest messages are removed." });
         }}
       >
-        連發 10 則
+        Send 10 messages
       </Button>
       <Button
         size="sm"
@@ -71,19 +72,20 @@ function StressButtons() {
         onClick={() =>
           push({
             variant: "warning",
-            title: "超長標題也不會把版面撐破，會自動折行而不是裁掉或推開其他訊息",
+            title: "A long title wraps instead of breaking the layout or pushing away other messages",
             description:
-              "說明文字同樣可以很長：匯入完成，共 4,820 筆；其中 96 筆因欄位格式不符已略過，明細已寫入匯入紀錄，可於清單頁以「已略過」篩選檢視。",
+              "Descriptions can be long too: import complete, 4,820 records; 96 were skipped because their field format was invalid. Details are in the import log and can be filtered on the list page.",
           })
         }
       >
-        超長文字
+        Long text
       </Button>
     </div>
   );
 }
 
 export const 回饋壓測: Story = {
+  name: "Feedback stress test",
   render: () => (
     <ToastProvider>
       <div className="max-w-xl space-y-3">
@@ -97,6 +99,7 @@ export const 回饋壓測: Story = {
 };
 
 export const 載入佔位: Story = {
+  name: "Loading placeholders",
   render: () => (
     <div className="grid max-w-2xl gap-4 md:grid-cols-2">
       <div aria-busy="true" className="space-y-3 rounded-lg border p-4">

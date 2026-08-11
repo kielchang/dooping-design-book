@@ -63,19 +63,19 @@ export interface CoachmarkLabels {
 }
 
 export const DEFAULT_COACHMARK_LABELS: CoachmarkLabels = {
-  skip: "略過",
-  prev: "上一步",
-  next: "下一步",
-  finish: "完成",
-  collapse: "縮小（騰出空間操作，之後可展開）",
-  expand: "展開",
-  guide: "導引",
-  keyboardHint: "· ← → 換步 · Esc 略過",
-  verdictTitle: "驗收此步：",
-  pass: "✅ 通過",
-  issue: "❌ 有問題",
-  notePlaceholder: "（選填）問題描述，會寫進驗收報告",
-  dialogLabel: "操作導引",
+  skip: "Skip",
+  prev: "Previous",
+  next: "Next",
+  finish: "Done",
+  collapse: "Collapse (make room to interact; expand later)",
+  expand: "Expand",
+  guide: "Tour",
+  keyboardHint: "· ← → change step · Esc skip",
+  verdictTitle: "Review this step:",
+  pass: "✅ Pass",
+  issue: "❌ Issue",
+  notePlaceholder: "(Optional) describe the issue; it will be added to the acceptance report",
+  dialogLabel: "Product tour",
 };
 
 const PAD = 12;

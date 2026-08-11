@@ -70,23 +70,23 @@ const preview: Preview = {
   },
   globalTypes: {
     theme: {
-      description: "淺色／深色版面",
+      description: "Light or dark appearance",
       defaultValue: "light",
       toolbar: {
-        title: "主題",
+        title: "Appearance",
         icon: "circlehollow",
         items: [
-          { value: "light", icon: "sun", title: "淺色" },
-          { value: "dark", icon: "moon", title: "深色" },
+          { value: "light", icon: "sun", title: "Light" },
+          { value: "dark", icon: "moon", title: "Dark" },
         ],
         dynamicTitle: true,
       },
     },
     colorTheme: {
-      description: "色相主題（宿主端設 data-color-theme 切換）",
+      description: "Hue theme (switch with data-color-theme)",
       defaultValue: DEFAULT_THEME,
       toolbar: {
-        title: "色相",
+        title: "Hue",
         icon: "paintbrush",
         items: COLOR_THEMES.map((t) => ({
           value: t.name,

@@ -19,7 +19,7 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { closeLabel?: string }
->(({ className, children, closeLabel = "關閉", ...props }, ref) => (
+>(({ className, children, closeLabel = "Close", ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content

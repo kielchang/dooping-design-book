@@ -44,7 +44,7 @@ export function FormField({ label, hint, error, required, children, className }:
       <Label htmlFor={controlId}>
         {label}
         {required && (
-          <span className="ml-0.5 text-danger" title="必填" aria-label="必填">
+          <span className="ml-0.5 text-danger" title="Required" aria-label="Required">
             *
           </span>
         )}

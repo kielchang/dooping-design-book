@@ -54,8 +54,8 @@ export interface GanttLabels {
 }
 
 export const DEFAULT_GANTT_LABELS: GanttLabels = {
-  today: "今天",
-  progressSuffix: (pct) => `，進度 ${pct}%`,
+  today: "Today",
+  progressSuffix: (pct) => `, ${pct}% complete`,
 };
 
 export interface GanttProps {
@@ -178,7 +178,7 @@ export function Gantt({
             const e = new Date(toDate(it.end).getTime() + DAY); // 含當天
             const selected = selectedId === it.id;
             const aria =
-              `${it.label}，${fmt(s)} 到 ${fmt(toDate(it.end))}` +
+              `${it.label}, ${fmt(s)} to ${fmt(toDate(it.end))}` +
               (it.progress != null ? L.progressSuffix(it.progress) : "");
             return (
               <Row

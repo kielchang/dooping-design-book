@@ -4,44 +4,45 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Badge } from "./badge";
 import { Button } from "./button";
 
-const meta: Meta = { title: "基礎/互動狀態層" };
+const meta: Meta = { title: "Foundations/Interaction state layers", id: "基礎/互動狀態層" };
 export default meta;
 type Story = StoryObj;
 
 // 靜態展示用：把偽類換成把 alpha 直接寫死，這樣 hover／pressed 能與一般態並排比較，
 // 也才截得到圖。實際元件上這三階是 `:hover` / `:active` / `[data-state=selected]`。
 const AS = {
-  一般: undefined,
+  default: undefined,
   hover: "var(--state-hover-alpha)",
   pressed: "var(--state-pressed-alpha)",
 } as const;
 
 export const 資料表列的三種狀態: Story = {
+  name: "Three table-row states",
   render: () => (
     <div className="max-w-3xl space-y-4">
       <Table zebra>
         <TableHeader>
           <TableRow>
-            <TableHead>狀態</TableHead>
-            <TableHead>項目</TableHead>
-            <TableHead>標記</TableHead>
-            <TableHead className="text-muted-foreground">次要文字</TableHead>
+            <TableHead>State</TableHead>
+            <TableHead>Item</TableHead>
+            <TableHead>Badge</TableHead>
+            <TableHead className="text-muted-foreground">Secondary text</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {[...Object.entries(AS), ...Object.entries(AS)].map(([label, a], i) => (
             <TableRow key={i} style={a ? ({ "--state-layer-alpha": a } as React.CSSProperties) : undefined}>
               <TableCell className="font-medium">{label}</TableCell>
-              <TableCell>{i < 3 ? "奇數列（無斑馬）" : "偶數列（斑馬底）"}</TableCell>
-              <TableCell><Badge variant="success">已完成</Badge></TableCell>
+              <TableCell>{i < 3 ? "Odd row (no zebra)" : "Even row (zebra)"}</TableCell>
+              <TableCell><Badge variant="success">Complete</Badge></TableCell>
               <TableCell className="text-muted-foreground">2024-02-05</TableCell>
             </TableRow>
           ))}
           <TableRow data-state="selected">
-            <TableCell className="font-medium">已選</TableCell>
+            <TableCell className="font-medium">Selected</TableCell>
             <TableCell>data-state=&quot;selected&quot;</TableCell>
-            <TableCell><Badge variant="success">已完成</Badge></TableCell>
-            <TableCell className="text-muted-foreground">次要文字自動改用正文色</TableCell>
+            <TableCell><Badge variant="success">Complete</Badge></TableCell>
+            <TableCell className="text-muted-foreground">Secondary text returns to foreground color</TableCell>
           </TableRow>
         </TableBody>
       </Table>
@@ -60,6 +61,7 @@ export const 資料表列的三種狀態: Story = {
 };
 
 export const 按鈕的三種狀態: Story = {
+  name: "Three button states",
   render: () => (
     <div className="space-y-4">
       <div className="grid max-w-2xl grid-cols-[5rem_repeat(3,1fr)] items-center gap-2 text-xs">
@@ -75,7 +77,7 @@ export const 按鈕的三種狀態: Story = {
                 size="sm"
                 style={a ? ({ "--state-layer-alpha": a } as React.CSSProperties) : undefined}
               >
-                套用
+                Apply
               </Button>
             ))}
           </React.Fragment>

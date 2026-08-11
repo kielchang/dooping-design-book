@@ -1,0 +1,28 @@
+---
+title: Staying Current
+---
+
+# Staying Current
+
+## Where signals come from
+
+Watch release tags, changelogs, RFCs, security notices, and the conformance ledger. A preview
+site or a casual screenshot is evidence of a possible change, not a supported release signal.
+
+## Decide whether to follow
+
+Ask whether the change fixes a product problem, affects a contract the product uses, and costs
+less to adopt now than later. Record a deliberate “not yet” with a reason; silence is not a
+versioning strategy.
+
+## Procedure by layer
+
+- Tokens: inspect semantic and contrast changes, update the package, and rerun light/dark checks.
+- Components: review API and state changes, update stories, and check keyboard behavior.
+- Patterns: compare the workflow and update the conformance ledger.
+- Docs: update examples and embedded story ids, then build both locales.
+
+## Development cadence
+
+Keep upgrade work small and regular. A reviewable diff with an explicit migration note is safer
+than a large catch-up branch that mixes unrelated redesigns.

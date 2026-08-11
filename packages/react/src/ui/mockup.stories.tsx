@@ -4,7 +4,7 @@ import { Button } from "./button";
 import { Badge } from "./badge";
 import { TabPills } from "./tab-pills";
 
-const meta: Meta = { title: "元件/文件示意/模擬畫面積木" };
+const meta: Meta = { title: "Components/Documentation demos/Mockup blocks", id: "元件/文件示意/模擬畫面積木" };
 export default meta;
 type Story = StoryObj;
 
@@ -12,12 +12,12 @@ export const 積木: Story = {
   render: () => (
     <div className="max-w-lg space-y-4">
       <div className="space-y-1">
-        <p className="text-xs text-muted-foreground">Placeholder：非重點區域留白</p>
-        <div className="flex gap-2"><Placeholder w={90} label="側欄" /><Placeholder /><Placeholder w={60} h={22} /></div>
+        <p className="text-xs text-muted-foreground">Placeholder: leave non-focused regions blank</p>
+        <div className="flex gap-2"><Placeholder w={90} label="Sidebar" /><Placeholder /><Placeholder w={60} h={22} /></div>
       </div>
       <div className="space-y-1">
-        <p className="text-xs text-muted-foreground">Spotlight：包住「真元件」，不是包住佔位塊</p>
-        <div className="py-4"><Spotlight label="從這裡匯出"><Button variant="outline" size="sm">匯出 CSV</Button></Spotlight></div>
+        <p className="text-xs text-muted-foreground">Spotlight: wrap the real component, not the placeholder</p>
+        <div className="py-4"><Spotlight label="Export from here"><Button variant="outline" size="sm">Export CSV</Button></Spotlight></div>
       </div>
     </div>
   ),
@@ -28,11 +28,11 @@ export const 一步操作示意: Story = {
     <div className="overflow-x-auto rounded-lg border">
       <MockScreenFrame>
         <div className="flex items-center gap-2">
-          <TabPills value="confirmed" onChange={() => {}} tabs={[{ key: "all", label: "全部" }, { key: "confirmed", label: "已確認" }]} />
-          <span className="ml-auto"><Spotlight label="① 先切到「已確認」"><Badge variant="info">7 筆</Badge></Spotlight></span>
+      <TabPills value="confirmed" onChange={() => {}} tabs={[{ key: "all", label: "All" }, { key: "confirmed", label: "Confirmed" }]} />
+      <span className="ml-auto"><Spotlight label="1. Switch to Confirmed"><Badge variant="info">7 records</Badge></Spotlight></span>
         </div>
         <MockRow />
-        <MockRow focus={<Spotlight><Button size="sm" variant="outline">排程處理</Button></Spotlight>} />
+      <MockRow focus={<Spotlight><Button size="sm" variant="outline">Schedule</Button></Spotlight>} />
         <MockRow />
       </MockScreenFrame>
     </div>

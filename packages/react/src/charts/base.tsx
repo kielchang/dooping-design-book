@@ -35,7 +35,7 @@ export function capItems(data: BarDatum[], max: number): BarDatum[] {
   const rest = data.filter((d) => !keep.has(d));
   return [
     ...kept,
-    { label: `其他（${rest.length} 項）`, value: rest.reduce((s, d) => s + d.value, 0) },
+    { label: `Other (${rest.length} items)`, value: rest.reduce((s, d) => s + d.value, 0) },
   ];
 }
 
@@ -171,7 +171,7 @@ export function ChartDataTable({
 export function ChartEmpty({ children }: { children?: ReactNode }) {
   return (
     <p className="py-6 text-center text-sm text-muted-foreground">
-      {children ?? "無資料"}
+      {children ?? "No data"}
     </p>
   );
 }

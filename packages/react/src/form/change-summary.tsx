@@ -20,16 +20,16 @@ export interface ChangeSummaryLabels {
 }
 
 export const DEFAULT_CHANGE_SUMMARY_LABELS: ChangeSummaryLabels = {
-  empty: "尚無變更",
-  title: (n) => `本次變更（${n}）`,
-  revertAll: "全部還原",
-  revertField: (l) => `還原 ${l}`,
-  revertFieldTitle: "還原此欄",
-  confirmRevert: "還原？",
-  cancel: "取消",
-  confirm: "確定",
-  allChanges: (n) => `${n} 項變更`,
-  allOriginal: "全部原始值",
+  empty: "No changes yet",
+  title: (n) => `Changes (${n})`,
+  revertAll: "Revert all",
+  revertField: (l) => `Revert ${l}`,
+  revertFieldTitle: "Revert this field",
+  confirmRevert: "Revert?",
+  cancel: "Cancel",
+  confirm: "Confirm",
+  allChanges: (n) => `${n} change${n === 1 ? "" : "s"}`,
+  allOriginal: "All original values",
 };
 
 function RevertConfirm({

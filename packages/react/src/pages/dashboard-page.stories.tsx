@@ -11,14 +11,14 @@ import { demoRecords, STATUS_LABEL, type DemoRecord, type RecordStatus } from ".
 
 // 儀表板的組成規格：KPI 磚列 → 圖表區，期間在頁首「一處控全頁」。
 // 儀表板唯讀：回答「狀況如何」，不放寫入動作（待辦是工作台的事）。
-const meta: Meta = { title: "頁面/儀表板" };
+const meta: Meta = { title: "Pages/Dashboard", id: "頁面/儀表板" };
 export default meta;
 type Story = StoryObj;
 
 const PERIODS = [
-  { value: "2024-01", label: "一月" },
-  { value: "2024-02", label: "二月" },
-  { value: "all", label: "全部" },
+  { value: "2024-01", label: "January" },
+  { value: "2024-02", label: "February" },
+  { value: "all", label: "All" },
 ];
 
 // 狀態 → 語意系列的對映（判斷樹第 1 層：維度是狀態就用語意色，不照序取分類色）
@@ -54,6 +54,7 @@ function Kpi({ label, value, delta }: { label: string; value: string; delta?: Re
 }
 
 export const 典型組成: Story = {
+  name: "Typical composition",
   render: function Render() {
     const [period, setPeriod] = useState("2024-02");
     const cur = metric(demoRecords.filter((r) => period === "all" || r.createdAt.startsWith(period)));
@@ -66,7 +67,7 @@ export const 典型組成: Story = {
     const buckets = new Map<string, number>();
     for (const r of demoRecords) {
       const day = Number(r.createdAt.slice(8, 10));
-      const label = `${Number(r.createdAt.slice(5, 7))}月${day <= 15 ? "上" : "下"}`;
+      const label = `${r.createdAt.slice(5, 7)}-${day <= 15 ? "01" : "16"}`;
       buckets.set(label, (buckets.get(label) ?? 0) + r.amount);
     }
     const trend = [...buckets.entries()].map(([label, value]) => ({ label, value }));
@@ -89,53 +90,53 @@ export const 典型組成: Story = {
         {/* 頁首區：標題＋期間切換。期間只在這裡出現一次，控整頁 */}
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-semibold">成效總覽</h1>
-            <p className="text-sm text-muted-foreground">資料期間：{periodLabel}・更新於 2024-02-07</p>
+            <h1 className="text-2xl font-semibold">Performance overview</h1>
+            <p className="text-sm text-muted-foreground">Period: {periodLabel} · Updated 2024-02-07</p>
           </div>
-          <SegGroup label="期間" options={PERIODS} value={period} onPick={setPeriod} />
+          <SegGroup label="Period" options={PERIODS} value={period} onPick={setPeriod} />
         </div>
 
         {/* KPI 磚列：數字＋期間標籤＋與上期的變異（三重編碼），一排 3–5 磚 */}
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Kpi
-            label={`總金額（${periodLabel}）`}
+            label={`Total amount (${periodLabel})`}
             value={formatMoney(cur.amount)}
-            delta={prev && <Delta value={cur.amount - prev.amount} posLabel="增加 " negLabel="減少 " format={formatMoney} />}
+            delta={prev && <Delta value={cur.amount - prev.amount} posLabel="up " negLabel="down " format={formatMoney} />}
           />
           <Kpi
-            label={`完成筆數（${periodLabel}）`}
+            label={`Completed records (${periodLabel})`}
             value={formatNumber(cur.done)}
-            delta={prev && <Delta value={cur.done - prev.done} posLabel="增加 " negLabel="減少 " format={(n) => `${formatNumber(n)} 筆`} />}
+            delta={prev && <Delta value={cur.done - prev.done} posLabel="up " negLabel="down " format={(n) => `${formatNumber(n)} records`} />}
           />
           <Kpi
-            label={`完成率（${periodLabel}）`}
+            label={`Completion rate (${periodLabel})`}
             value={formatPercent(cur.rate, 0)}
-            delta={prev && <Delta value={Math.round((cur.rate - prev.rate) * 100)} posLabel="上升 " negLabel="下降 " format={(n) => `${n} 個百分點`} />}
+            delta={prev && <Delta value={Math.round((cur.rate - prev.rate) * 100)} posLabel="up " negLabel="down " format={(n) => `${n} percentage points`} />}
           />
           <Kpi
-            label={`待處理（${periodLabel}）`}
+            label={`Pending (${periodLabel})`}
             value={formatNumber(cur.open)}
-            delta={prev && <Delta value={cur.open - prev.open} goodWhen="negative" posLabel="增加 " negLabel="減少 " format={(n) => `${formatNumber(n)} 筆`} />}
+            delta={prev && <Delta value={cur.open - prev.open} goodWhen="negative" posLabel="up " negLabel="down " format={(n) => `${formatNumber(n)} records`} />}
           />
         </div>
 
         {/* 圖表區：先問題、後圖表——每張圖回答一個寫得出來的問題 */}
         <div className="grid gap-6 lg:grid-cols-2">
           <div>
-            <p className="mb-1 text-sm font-medium">金額往哪個方向走？（全期）</p>
-            <TrendChart data={trend} title="各期金額" valueFmt={(n) => formatMoney(n)} />
+            <p className="mb-1 text-sm font-medium">Which direction is the amount moving? (All periods)</p>
+            <TrendChart data={trend} title="Amount by period" valueFmt={(n) => formatMoney(n)} />
           </div>
           <div>
-            <p className="mb-1 text-sm font-medium">哪個單位卡住了？（{periodLabel}）</p>
-            <StackedBar title="各單位狀態組成" rows={stacked} />
+            <p className="mb-1 text-sm font-medium">Which units need attention? ({periodLabel})</p>
+            <StackedBar title="Status by unit" rows={stacked} />
             <p className="mt-1 text-xs text-muted-foreground">
-              狀態維度用 STATUS_SERIES——「{STATUS_LABEL.done}」在這裡與徽章同一個綠。
+              Status uses STATUS_SERIES—“{STATUS_LABEL.done}” uses the same success color as its badge.
             </p>
           </div>
         </div>
 
         <p className="text-xs text-muted-foreground">
-          磚與圖是入口不是終點：點「待處理」應帶著同一組篩選條件進清單頁，數字才對得上。
+          Tiles and charts are entry points, not destinations: the Pending tile should open the list with the same filters so the numbers reconcile.
         </p>
       </div>
     );

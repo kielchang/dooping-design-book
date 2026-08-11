@@ -31,21 +31,21 @@ export interface EditableFieldLabels {
 }
 
 export const DEFAULT_EDITABLE_FIELD_LABELS: EditableFieldLabels = {
-  changed: "已變更",
-  undo: "還原",
-  undoTitle: "還原為原始值（會先確認）",
-  redo: "重做",
-  redoTitle: "重做（回到修改後的值，會先確認）",
-  confirmUndo: "還原？",
-  confirmRedo: "重做？",
-  cancel: "取消",
-  confirm: "確定",
-  done: "完成",
-  yes: "是",
-  no: "否",
-  locked: "已鎖定",
-  editHint: (label, display) => `${label}，目前 ${display}，按 Enter 編輯`,
-  more: (n) => `其他 ${n} 項`,
+  changed: "Changed",
+  undo: "Revert",
+  undoTitle: "Revert to the original value (confirmation required)",
+  redo: "Redo",
+  redoTitle: "Redo (restore the edited value; confirmation required)",
+  confirmUndo: "Revert?",
+  confirmRedo: "Redo?",
+  cancel: "Cancel",
+  confirm: "Confirm",
+  done: "Done",
+  yes: "Yes",
+  no: "No",
+  locked: "Locked",
+  editHint: (label, display) => `${label}, currently ${display}; press Enter to edit`,
+  more: (n) => `${n} more`,
 };
 
 export interface EditableFieldProps {

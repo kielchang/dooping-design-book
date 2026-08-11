@@ -31,7 +31,7 @@ export function Heatmap({
   rowLabels,
   colLabels,
   cells,
-  title = "熱圖",
+  title = "Heatmap",
   domain,
   fmt = defaultFmt,
   legend = true,
@@ -102,7 +102,7 @@ export function Heatmap({
               background: `linear-gradient(to right, color-mix(in srgb, ${PALETTE[0]} 8%, transparent), color-mix(in srgb, ${PALETTE[0]} 78%, transparent))`,
             }}
           />
-          淺 {fmt(lo)} → 深 {fmt(hi)}；灰＝無資料
+          Light {fmt(lo)} → dark {fmt(hi)}; gray = no data
         </p>
       )}
     </div>

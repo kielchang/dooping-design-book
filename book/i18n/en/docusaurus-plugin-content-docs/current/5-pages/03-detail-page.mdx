@@ -1,0 +1,54 @@
+---
+title: Detail Page
+---
+
+# Detail Page
+
+## When to use it
+
+Use a detail page when one record deserves attention: understanding its current state,
+reviewing history, or making a controlled change.
+
+## Composition
+
+<StoryFrame id="pages-detail-page--typical-composition" title="Detail page: header, tabs, and content sections" height={620} />
+
+The structure is a context trail, an identifying header, status and actions, optional tabs, and
+related sections. Put the most decision-relevant facts first.
+
+## The header is identity, status, and action
+
+The header should answer which record this is, whether it can be acted on, and what the primary
+next action is. Put destructive actions in a separated menu or danger area and explain their
+scope before confirmation.
+
+## Read-only first, edit one field at a time
+
+Default to a readable summary. Let users edit a field in place when the change is independent;
+show its validation, saving state, and cancellation next to the field. Use a full form when
+the fields depend on one another or need a coordinated submit.
+
+<StoryFrame id="pages-detail-page--inline-edit-and-change-summary" title="Inline editing and a change summary before submit" height={560} />
+
+## Tabs divide stable concerns
+
+Use tabs for sections users may revisit independently. The active tab should be represented in
+the URL when it is useful to share or restore the view. Do not hide a required task behind a tab
+that users cannot discover from the page heading.
+
+## Related lists
+
+Keep related records close to the detail context, but give each list its own loading, empty,
+filter, and pagination behavior. Link to the full list for bulk work.
+
+## Accessibility
+
+Give the record a single page heading, make status text available to assistive technology, and
+move focus to an inline error or confirmation after an edit. Tabs must use the standard keyboard
+pattern and expose the active panel.
+
+## Adoption and missing pieces
+
+Start read-only and add editing states deliberately. If the page needs a new relationship,
+timeline, or approval state, record it as a reusable pattern rather than adding hidden custom
+behavior to one detail screen.

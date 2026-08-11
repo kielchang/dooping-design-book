@@ -52,8 +52,8 @@ export const 欄位狀態: Story = {
     return (
       <div className="max-w-xl space-y-5">
         <p className="text-sm text-muted-foreground">
-          一格欄位可以<strong>同時</strong>是「被聚焦」「改過沒送」「不合格」。三件事走三個不同的通道，
-          疊起來互不干涉——<strong>聚焦環永遠是同一個顏色</strong>，邊框與底色管狀態。
+          One field can be<strong> simultaneously</strong> focused, changed but unsaved, and invalid.
+          Each state uses a separate channel, so they stack without interfering—<strong>the focus ring is always the same color</strong>, while borders and surfaces carry state.
         </p>
 
         <div className="space-y-3">
@@ -89,14 +89,14 @@ export const 欄位狀態: Story = {
         </div>
 
         <p className="text-xs text-muted-foreground">
-          用 Tab 鍵走過上面四格，注意<strong>聚焦環不隨狀態變色</strong>。
-          若環會跟著變紅，Tab 過三個必填空欄時每一格都會閃紅——那會訓練使用者忽略紅色。
-          環與邊框之間有一圈背景色（<code>ring-offset</code>）：少了它，環會直接畫在紅框上，
-          實測深色模式下兩者對比只有 <strong>1.04:1</strong>，聚焦環等於隱形。
+          Tab through the four fields above and notice that<strong> the focus ring does not change with state</strong>.
+          If it turned red, tabbing through three empty required fields would flash red on every field—teaching users to ignore red.
+          The ring has a background-color gap (<code>ring-offset</code>) from the border: without it, the ring would sit directly on the red border,
+          measuring only <strong>1.04:1</strong> contrast in dark mode and becoming effectively invisible.
         </p>
         <p className="text-xs text-muted-foreground">
-          「<strong>必填未填</strong>」是不合格的一種，但它的問題是<strong>時機</strong>不是顏色——
-          不該在使用者還沒碰過欄位時就標紅。慣例是 blur 或送出之後才標。
+          An<strong> empty required field</strong> is one kind of invalid state, but the problem is<strong> timing</strong>, not color—
+          do not mark it red before the user has touched it. Show it after blur or submission.
         </p>
       </div>
     );
@@ -193,8 +193,8 @@ export const 開關: Story = {
           <Switch id="sw-locked" checked disabled />
         </div>
         <p className="text-tiny text-muted-foreground">
-          開關＝<strong>切了立即生效</strong>（設定頁）；「送出才生效」的表單選項用 Checkbox。
-          所以開關沒有「已改動未送出」的琥珀態——立即生效的控制項不存在未送出狀態。
+          A switch means<strong> the change takes effect immediately</strong> (as on a settings page); use a checkbox for form choices that apply on submit.
+          Switches therefore have no amber “changed but unsaved” state—an immediately effective control has no unsaved state.
         </p>
       </div>
     );
@@ -242,8 +242,8 @@ export const 長文輸入: Story = {
           <Textarea id="ta-ro" defaultValue="Created twice; merged into the existing record." disabled />
         </div>
         <p className="text-tiny text-muted-foreground">
-          與 Input 同一套邊框／聚焦環／不合格態；只准直向調整大小（resize-y），
-          橫向拉寬會破壞表單欄寬對齊。
+          Textareas use the same border, focus-ring, and invalid states as Input; allow only vertical resizing (resize-y),
+          because horizontal resizing breaks form-column alignment.
         </p>
       </div>
     );
@@ -272,8 +272,8 @@ export const 單選群: Story = {
           ))}
         </RadioGroup>
         <p className="text-tiny text-muted-foreground">
-          選項長或含說明 → 單選群（垂直）；2–5 個短標籤 → 分段選擇；
-          超過 5 個或選項動態增減 → 下拉。整組只佔一個 Tab 停留點，方向鍵移動。
+          Long options or options with descriptions → vertical radio group; 2–5 short labels → segmented selection;
+          more than 5 options or a changing list → select. The group uses one Tab stop and arrow keys for movement.
         </p>
       </div>
     );
@@ -293,7 +293,7 @@ export const 多選標籤片: Story = {
           onToggle={(v) => setSel((s) => (s.includes(v) ? s.filter((x) => x !== v) : [...s, v]))}
         />
         <p className="text-tiny text-muted-foreground">
-          已選與未選同時看得見——多選下拉「選完就看不見選了什麼」是後台最常見的抱怨。
+          Selected and unselected options remain visible together—“I cannot see what I selected after closing the multi-select” is a common back-office complaint.
         </p>
       </div>
     );

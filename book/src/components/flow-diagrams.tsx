@@ -28,7 +28,7 @@ function Flow({ nodes, edges, height = 300, label }: {
       className="flex items-center justify-center rounded-md border text-sm text-muted-foreground"
       style={{ height }}
     >
-      流程圖載入中…
+      Loading flow diagram…
     </div>
   );
   return (
@@ -44,81 +44,81 @@ function Flow({ nodes, edges, height = 300, label }: {
   );
 }
 
-/** 取用方式選擇：非 React 走規範、React 新專案裝好裝滿、既有系統先只導 token。 */
+/** Adoption choice: read the spec for non-React hosts, use the full stack for new React projects, or start with tokens. */
 export function FlowThreeWays(): ReactNode {
   const nodes: GraphNode[] = [
-    { id: "start", label: "要統一設計語言", position: { x: 0, y: 130 } },
-    { id: "react", label: "宿主用 React？", position: { x: 200, y: 130 } },
-    { id: "spec", label: "方式一：只讀規範自行實作", position: { x: 430, y: 250 }, category: 1 },
-    { id: "fresh", label: "全新開發？", position: { x: 430, y: 70 } },
-    { id: "full", label: "方式二＋三：token 與元件一起上", position: { x: 660, y: 10 }, category: 2 },
-    { id: "token", label: "方式三：先只導 token", position: { x: 660, y: 140 }, category: 3 },
+    { id: "start", label: "Standardize the design language", position: { x: 0, y: 130 } },
+    { id: "react", label: "Does the host use React?", position: { x: 200, y: 130 } },
+    { id: "spec", label: "Approach 1: read the spec and implement", position: { x: 430, y: 250 }, category: 1 },
+    { id: "fresh", label: "New project?", position: { x: 430, y: 70 } },
+    { id: "full", label: "Approaches 2 + 3: adopt tokens and components", position: { x: 660, y: 10 }, category: 2 },
+    { id: "token", label: "Approach 3: start with tokens", position: { x: 660, y: 140 }, category: 3 },
   ];
   const edges: GraphEdge[] = [
     { id: "e1", source: "start", target: "react" },
-    { id: "e2", source: "react", target: "spec", label: "不是" },
-    { id: "e3", source: "react", target: "fresh", label: "是" },
-    { id: "e4", source: "fresh", target: "full", label: "新專案" },
-    { id: "e5", source: "fresh", target: "token", label: "既有系統" },
+    { id: "e2", source: "react", target: "spec", label: "No" },
+    { id: "e3", source: "react", target: "fresh", label: "Yes" },
+    { id: "e4", source: "fresh", target: "full", label: "New project" },
+    { id: "e5", source: "fresh", target: "token", label: "Existing system" },
   ];
-  return <Flow nodes={nodes} edges={edges} height={320} label="三種取用方式的選擇流程" />;
+  return <Flow nodes={nodes} edges={edges} height={320} label="Decision flow for three adoption approaches" />;
 }
 
-/** 導入三階段：token → 新畫面用元件 → 按需查模式；停在任何一階都合理。 */
+/** Three stages: tokens → components for new screens → patterns as needed; stopping at any stage is reasonable. */
 export function FlowAdoptionStages(): ReactNode {
   const nodes: GraphNode[] = [
-    { id: "s1", label: "階段一：只導 token", position: { x: 0, y: 60 }, category: 1 },
-    { id: "s2", label: "階段二：新畫面用元件", position: { x: 240, y: 60 }, category: 2 },
-    { id: "s3", label: "階段三：遇到問題查模式", position: { x: 500, y: 60 }, category: 3 },
-    { id: "stay", label: "就停在這裡，也完全合理", position: { x: 240, y: 180 } },
+    { id: "s1", label: "Stage 1: tokens only", position: { x: 0, y: 60 }, category: 1 },
+    { id: "s2", label: "Stage 2: components for new screens", position: { x: 240, y: 60 }, category: 2 },
+    { id: "s3", label: "Stage 3: consult patterns as problems arise", position: { x: 500, y: 60 }, category: 3 },
+    { id: "stay", label: "Stopping here is completely reasonable", position: { x: 240, y: 180 } },
   ];
   const edges: GraphEdge[] = [
-    { id: "e1", source: "s1", target: "s2", label: "團隊吃得下再前進" },
+    { id: "e1", source: "s1", target: "s2", label: "Move forward when the team is ready" },
     { id: "e2", source: "s2", target: "s3" },
     { id: "e3", source: "s1", target: "stay" },
   ];
-  return <Flow nodes={nodes} edges={edges} height={280} label="既有專案導入三階段的流程" />;
+  return <Flow nodes={nodes} edges={edges} height={280} label="Three adoption stages for an existing project" />;
 }
 
-/** 跟上新版：訊號 → 讀 CHANGELOG → 對照台帳 → 依差距決定跟進、延後或偏離。 */
+/** Staying current: signal → read the CHANGELOG → compare the ledger → follow, defer, or diverge. */
 export function FlowStayingCurrent(): ReactNode {
   const nodes: GraphNode[] = [
-    { id: "sig", label: "收到新版訊號", position: { x: 0, y: 130 } },
-    { id: "read", label: "讀 CHANGELOG 該則", position: { x: 190, y: 130 } },
-    { id: "act", label: "有要我做的動作？", position: { x: 420, y: 130 } },
-    { id: "done", label: "不需要動作", position: { x: 650, y: 250 } },
-    { id: "ledger", label: "台帳裡抄過受影響項目？", position: { x: 650, y: 70 } },
-    { id: "decide", label: "衡量差距與影響", position: { x: 920, y: 130 } },
-    { id: "follow", label: "跟進更新", position: { x: 1150, y: 30 }, category: 1 },
-    { id: "defer", label: "記台帳、延後跟進", position: { x: 1150, y: 130 }, category: 3 },
-    { id: "diverge", label: "刻意偏離並寫下原因", position: { x: 1150, y: 230 }, category: 4 },
+    { id: "sig", label: "New release signal", position: { x: 0, y: 130 } },
+    { id: "read", label: "Read the CHANGELOG entry", position: { x: 190, y: 130 } },
+    { id: "act", label: "Is there an action for me?", position: { x: 420, y: 130 } },
+    { id: "done", label: "No action needed", position: { x: 650, y: 250 } },
+    { id: "ledger", label: "Is the affected item in the ledger?", position: { x: 650, y: 70 } },
+    { id: "decide", label: "Assess gap and impact", position: { x: 920, y: 130 } },
+    { id: "follow", label: "Follow the update", position: { x: 1150, y: 30 }, category: 1 },
+    { id: "defer", label: "Record in ledger and defer", position: { x: 1150, y: 130 }, category: 3 },
+    { id: "diverge", label: "Intentionally diverge and record why", position: { x: 1150, y: 230 }, category: 4 },
   ];
   const edges: GraphEdge[] = [
     { id: "e1", source: "sig", target: "read" },
     { id: "e2", source: "read", target: "act" },
-    { id: "e3", source: "act", target: "done", label: "沒有" },
-    { id: "e4", source: "act", target: "ledger", label: "有" },
-    { id: "e5", source: "ledger", target: "done", label: "沒抄過" },
-    { id: "e6", source: "ledger", target: "decide", label: "抄過" },
-    { id: "e7", source: "decide", target: "follow", label: "踩到同一個問題" },
-    { id: "e8", source: "decide", target: "defer", label: "有用但不急" },
-    { id: "e9", source: "decide", target: "diverge", label: "不打算採用" },
+    { id: "e3", source: "act", target: "done", label: "No" },
+    { id: "e4", source: "act", target: "ledger", label: "Yes" },
+    { id: "e5", source: "ledger", target: "done", label: "Not recorded" },
+    { id: "e6", source: "ledger", target: "decide", label: "Recorded" },
+    { id: "e7", source: "decide", target: "follow", label: "Same problem encountered" },
+    { id: "e8", source: "decide", target: "defer", label: "Useful but not urgent" },
+    { id: "e9", source: "decide", target: "diverge", label: "Will not adopt" },
   ];
-  return <Flow nodes={nodes} edges={edges} height={340} label="收到新版訊號後的判斷流程" />;
+  return <Flow nodes={nodes} edges={edges} height={340} label="Decision flow after receiving a new release signal" />;
 }
 
-/** 新專案從頁面開始：列頁 → 標頁型 → 抄骨架與安裝集 → 照 Rules 驗收。 */
+/** Start a new project from its screens: list → label → copy → verify against the rules. */
 export function FlowPageFirstSteps(): ReactNode {
   const nodes: GraphNode[] = [
-    { id: "list", label: "列出所有畫面", position: { x: 0, y: 60 } },
-    { id: "type", label: "每頁標上頁型", position: { x: 200, y: 60 }, category: 1 },
-    { id: "copy", label: "抄骨架與最小安裝集", position: { x: 400, y: 60 }, category: 2 },
-    { id: "check", label: "照各頁 Rules 驗收", position: { x: 640, y: 60 }, category: 3 },
+    { id: "list", label: "List all screens", position: { x: 0, y: 60 } },
+    { id: "type", label: "Label each screen with its page type", position: { x: 200, y: 60 }, category: 1 },
+    { id: "copy", label: "Copy the skeleton and minimum install set", position: { x: 400, y: 60 }, category: 2 },
+    { id: "check", label: "Verify against the page rules", position: { x: 640, y: 60 }, category: 3 },
   ];
   const edges: GraphEdge[] = [
     { id: "e1", source: "list", target: "type" },
     { id: "e2", source: "type", target: "copy" },
     { id: "e3", source: "copy", target: "check" },
   ];
-  return <Flow nodes={nodes} edges={edges} height={220} label="新專案從頁面開始規劃的三步" />;
+  return <Flow nodes={nodes} edges={edges} height={220} label="Three steps to plan a new project from its screens" />;
 }

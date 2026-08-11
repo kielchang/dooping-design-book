@@ -42,11 +42,11 @@ export const 一步操作示意: Story = {
 export const 為什麼不用截圖: Story = {
   render: () => (
     <div className="max-w-xl space-y-2 text-sm">
-      <p>截圖第一天就開始過期。改一次按鈕位置，全手冊的圖都要重錄，於是沒人重錄，於是手冊開始說謊。</p>
-      <p>示意圖用<strong>元件庫的真元件</strong>排出來：元件改版，示意圖跟著改版，沒有人需要去重拍任何東西。</p>
+      <p>Screenshots start expiring on day one. Move one button and every illustration in the book needs to be recaptured; eventually nobody does it, and the book starts lying.</p>
+      <p>Mockups use<strong> real components from the library</strong>: when a component changes, the illustration changes with it, and nobody has to reshoot anything.</p>
       <p className="text-muted-foreground">
-        代價是示意圖不會百分百等於實際畫面（版面是簡化的）。這是刻意的取捨——
-        讀者需要的是「該點哪裡」，不是像素級復刻。
+        The tradeoff is that a mockup is not pixel-for-pixel identical to the real screen (the layout is simplified).
+        That is intentional—the reader needs to know “where to click,” not see a pixel-perfect replica.
       </p>
     </div>
   ),

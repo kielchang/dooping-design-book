@@ -35,9 +35,9 @@ export const 操作回饋: Story = {
       <div className="max-w-xl space-y-3">
         <PushButtons />
         <p className="text-tiny text-muted-foreground">
-          去向固定<strong>右下</strong>、堆疊上限 3（最舊被擠出）。success／info／warning
-          5 秒自動消失，hover／聚焦時暫停倒數；<strong>danger 一律手動關閉</strong>。
-          語彙與 Callout 同源：同一張圖示表、同一組淡底，不靠顏色單獨傳達。
+          Toasts stay in the<strong> bottom-right</strong> and stack up to 3 (the oldest is removed).
+          success/info/warning dismiss after 5 seconds and pause on hover or focus; <strong>danger always requires manual dismissal</strong>.
+          The vocabulary shares a source with Callout: one icon map and one set of subtle surfaces, never color alone.
         </p>
       </div>
     </ToastProvider>
@@ -91,7 +91,7 @@ export const 回饋壓測: Story = {
       <div className="max-w-xl space-y-3">
         <StressButtons />
         <p className="text-tiny text-muted-foreground">
-          連發不會疊出一面牆——上限 3 是硬的。重要到不能被擠出的訊息，該用 Dialog 不是 Toast。
+          Bursts do not build a wall—the limit of 3 is hard. A message too important to be pushed out belongs in a Dialog, not a Toast.
         </p>
       </div>
     </ToastProvider>
@@ -114,11 +114,11 @@ export const 載入佔位: Story = {
         <Skeleton className="h-8 w-24" />
       </div>
       <div className="space-y-2 text-xs text-muted-foreground">
-        <p>骨架必須<strong>保留真實版面的高度與形狀</strong>——載入完成的瞬間版面不跳動。</p>
-        <p>只用於首次載入；重新整理既有畫面時保留舊內容，不要把看得好好的資料閃成灰塊。</p>
+        <p>Skeletons must<strong> preserve the height and shape of the real layout</strong> so the page does not jump when loading completes.</p>
+        <p>Use them only for the first load; keep existing content during a refresh instead of flashing healthy data into gray blocks.</p>
         <p>
-          骨架本身 <code>aria-hidden</code>，載入語意掛在容器的 <code>aria-busy</code> 上；
-          脈動尊重 <code>prefers-reduced-motion</code>（自動停止）。
+          The skeleton itself is <code>aria-hidden</code>; the loading meaning belongs on the container's <code>aria-busy</code>.
+          The pulse respects <code>prefers-reduced-motion</code> and stops automatically.
         </p>
       </div>
     </div>

@@ -67,8 +67,8 @@ export const 完整表單與變更摘要: Story = {
           <ChangeSummary changes={changes} onRevertField={revertField} onRevertAll={revertAll} />
           <Button className="w-full" disabled={changes.length === 0}>Submit {changes.length > 0 && `(${changes.length} change${changes.length === 1 ? "" : "s"})`}</Button>
           <p className="text-tiny text-muted-foreground">
-            摘要的資料結構（Change[]）與寫入異動紀錄的 before/after 是同一份——
-            使用者送出前看到的，就是稽核紀錄之後會呈現的。
+            The Change[] structure and the before/after values written to the audit record are the same data—
+            what users see before submission is what the audit trail will show later.
           </p>
         </div>
       </div>

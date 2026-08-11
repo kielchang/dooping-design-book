@@ -20,7 +20,6 @@ function Swatch({ name, entry }: { name: string; entry: Entry }) {
       />
       <div className="min-w-0">
         <p className="truncate font-mono text-xs">--{name}</p>
-        {entry.desc && <p className="truncate text-tiny text-muted-foreground">{entry.desc}</p>}
       </div>
     </div>
   );
@@ -140,14 +139,15 @@ export const 色相主題: Story = {
             />
           </div>
           <p className="text-tiny text-muted-foreground">
-            <code>--primary</code> 維持中性近黑、狀態色色相鎖死、聚焦環中性。切色相時這一欄應該<strong>幾乎不動</strong>。
+            <code>--primary</code> stays a near-black neutral, status hues stay locked, and the focus ring stays neutral.
+            This column should<strong> barely change</strong> when the hue theme changes.
           </p>
         </div>
       </div>
       <p className="max-w-2xl text-tiny text-muted-foreground">
-        為什麼狀態色不跟著主題微調：往主題偏 15° 會讓淺色模式六組裡有四組的分類色守衛破掉；
-        只彎淡底層則讓藍紫系的 warning／danger 淡底收斂到 ΔE00 8.8——琥珀和紅都變粉橘。
-        整體感靠「四種提示共用同一條構成規則」加「坐在帶主題色相的中性表面上」，不靠彎色相。
+        Status colors do not follow the hue theme because shifting them by 15° breaks the categorical-color guard
+        in four of six light themes. Bending only the subtle surfaces collapses the violet warning/danger pair to ΔE00 8.8.
+        The cohesive result comes from one construction rule for all four alerts on hue-tinted neutral surfaces—not from bending status hues.
       </p>
     </div>
   ),

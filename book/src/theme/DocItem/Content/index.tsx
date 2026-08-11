@@ -19,12 +19,12 @@ export default function ContentWrapper(props: Props): React.ReactElement {
   const pageUrl = siteConfig.url + pathname;
   const reportHref =
     "https://github.com/kielchang/dooping-design-book/issues/new?template=bug.yml" +
-    `&title=${encodeURIComponent(`[規範頁] ${pathname}`)}` +
+    `&title=${encodeURIComponent(`[Documentation page] ${pathname}`)}` +
     `&page=${encodeURIComponent(pageUrl)}`;
   return (
     <>
       <div className="doc-print-bar">
-        <a href={reportHref} target="_blank" rel="noopener noreferrer" title="開 Bug 表單，自動帶入本頁網址">
+        <a href={reportHref} target="_blank" rel="noopener noreferrer" title="Open the bug form with this page URL prefilled">
           💬 Suggest an improvement
         </a>
         <button type="button" onClick={() => window.print()} title="Print or save as PDF">🖨 Print this page</button>

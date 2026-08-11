@@ -45,8 +45,8 @@ export const 三步導引: Story = {
           </CardContent>
         </Card>
         <p className="text-xs text-muted-foreground">
-          聚光洞可以點穿——導引是教人操作，不是代替他操作。卡片右上角可以縮小，
-          騰出空間做真正的操作後再展開。
+          The spotlight can be clicked through—this tour teaches the user, it does not act for them.
+          Collapse the card from its top-right corner to make room for the real action, then expand it again.
         </p>
         {open && (
           <Coachmark
@@ -85,7 +85,8 @@ export const 驗收模式: Story = {
           <CardContent><Button ref={anchor} variant="outline">Export CSV</Button></CardContent>
         </Card>
         <p className="text-xs text-muted-foreground">
-          同一個元件換一種用途：逐步標記「通過／有問題」＋備註，走完就是一份可交付的驗收報告。
+          The same component supports a different job: mark each step as “pass” or “issue” with a note.
+          When you finish, you have a handoff-ready acceptance report.
         </p>
         {open && (
           <Coachmark

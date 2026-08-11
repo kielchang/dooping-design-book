@@ -47,14 +47,12 @@ export const 資料表列的三種狀態: Story = {
         </TableBody>
       </Table>
       <p className="max-w-2xl text-xs text-muted-foreground">
-        三階都是<strong>疊</strong>在列自己的底色上，不是換一組底色——所以斑馬列被指到時
-        一樣是「深了一階」。改版前 hover 用 <code>--accent</code>、已選用{" "}
-        <code>--muted</code>，而這兩個 token 的值相同（斑馬列本來就是那個顏色），
-        實測一般→hover 只差 ΔE00 <strong>1.6</strong>。
-        已選那列的徽章<strong>顏色完全不受影響</strong>（實測填色像素與一般列逐一相符，
-        只有與底色交界的抗鋸齒像素不同）：疊加層落在背景層——在 <code>background-color</code>
-        之上、內容之下。若改用 <code>::after</code> 蓋在內容上，同一個徽章會被染成
-        <code>#abc4b4</code>。
+        All three layers<strong> stack</strong> on the row's own surface instead of swapping in a second surface—so a hovered zebra row is simply “one step darker.”
+        The old version used <code>--accent</code> for hover and <code>--muted</code> for selected, but those token values were identical,
+        making the measured ordinary-to-hover difference only ΔE00 <strong>1.6</strong>.
+        The selected row's badge<strong> is completely unaffected</strong> (fill pixels match the ordinary row; only antialiasing at the surface edge differs):
+        the layer sits above <code>background-color</code> and below content. If <code>::after</code> covered the content, the same badge would be tinted
+        <code>#abc4b4</code>.
       </p>
     </div>
   ),
@@ -84,10 +82,10 @@ export const 按鈕的三種狀態: Story = {
         ))}
       </div>
       <p className="max-w-2xl text-xs text-muted-foreground">
-        六個變體共用同一組強度。改版前每個變體各挑一個透明度（<code>/90</code>、
-        <code>/80</code>…），可見度從 ΔE00 <strong>0.6</strong>（secondary，等於沒有 hover）
-        到 <strong>7.4</strong>（default，太刻意）差了十倍；現在全部落在 <strong>2.6–4.5</strong>。
-        <code>link</code> 變體刻意不套——它是一段文字不是一塊表面。
+        All six variants share one intensity scale. The old version picked a different opacity for each variant (<code>/90</code>,
+        <code>/80</code>…), producing visibility from ΔE00 <strong>0.6</strong> (secondary, effectively no hover)
+        to <strong>7.4</strong> (default, too deliberate)—a tenfold spread. They now all sit between <strong>2.6–4.5</strong>.
+        The <code>link</code> variant intentionally has no layer: it is text, not a surface.
       </p>
     </div>
   ),

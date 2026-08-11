@@ -101,8 +101,8 @@ export const 欄位錯誤態: Story = {
         Invalid fields are marked in place; this summary does not replace their local messages.
       </Callout>
       <p className="text-xs text-muted-foreground">
-        聚焦錯誤欄位：danger 邊框（語意）與中性聚焦環（焦點）同框不打架——
-        提醒色辭典同框分工的欄位落地。
+        An invalid field can show a danger border for meaning and a neutral focus ring for focus without competing—
+        the alert-color vocabulary's separation of roles, applied to a field.
       </p>
     </div>
   ),
@@ -110,14 +110,14 @@ export const 欄位錯誤態: Story = {
   // 而且是改版時最容易安靜壞掉的部分（樣式看起來都對，讀屏卻接不到訊息）。
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const qty = canvas.getByLabelText(/數量/);
+    const qty = canvas.getByLabelText(/Quantity/);
     await expect(qty).toHaveAttribute("aria-invalid", "true");
     const describedBy = qty.getAttribute("aria-describedby");
     await expect(describedBy).toBeTruthy();
     const errorEl = canvasElement.querySelector(`#${CSS.escape(describedBy!.split(" ").pop()!)}`);
     await expect(errorEl).toHaveTextContent("Must be greater than 0");
     // 沒有錯誤的欄位不得帶 aria-invalid
-    const name = canvas.getByLabelText(/名稱/);
+    const name = canvas.getByLabelText(/Name/);
     await expect(name).not.toHaveAttribute("aria-invalid");
   },
 };

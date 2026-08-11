@@ -18,8 +18,8 @@ export const 檔位與自訂: Story = {
           Current value: {v.from} – {v.to} (preset: {p})
         </p>
         <p className="text-tiny text-muted-foreground">
-          檔位是一等公民——儀表板九成的期間需求是這四個檔位；「自訂」才展開起訖輸入。
-          切到「自訂」試試把「起」選到「迄」之後：另一端會自動夾到同一天，不跳錯誤訊息。
+          Presets are first-class controls—most dashboard requests use these four ranges; choose “Custom” to reveal the date inputs.
+          Try setting the start date after the end date: the other side clamps to the same day without showing an error.
         </p>
       </div>
     );

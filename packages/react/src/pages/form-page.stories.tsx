@@ -133,7 +133,7 @@ export const 多步驟: Story = {
     ];
     const [idx, setIdx] = useState(0);
     const [unit, setUnit] = useState(UNIT_OPTIONS[0]);
-    const [name, setName] = useState("甲案 第一階段");
+    const [name, setName] = useState("Alpha Phase 1");
     const [qty, setQty] = useState(120);
     const cur = steps[idx].key;
     return (

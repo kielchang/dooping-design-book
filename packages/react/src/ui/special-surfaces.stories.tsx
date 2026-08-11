@@ -24,13 +24,13 @@ export const 時間軸: Story = {
           aria-label="Timeline by item"
         />
         <p className="max-w-2xl text-xs text-muted-foreground">
-          列與資料表列<strong>同一套互動</strong>：hover 6%、按住 14%、已選 20% 狀態層，
-          已選的列日期文字自動換回正文色。長條顏色吃 <code>--chart-N</code>——
-          顏色編<strong>類別</strong>不編狀態，甲案在時間軸與其他圖表上永遠同色。
-          進度用「未完成段蓋一層背景色」表達：實色＝已完成、淡段＝剩餘，
-          不換色相，所以對任何分類色與深淺模式都成立。
-          今天線是<strong>中性</strong>的（前景色 50%）——結構標記不吃狀態色，
-          用 info 藍會被讀成「這裡有提示」。
+          Rows use<strong> the same interaction model as the data table</strong>: hover 6%, pressed 14%, selected 20% state layers,
+          with selected-row dates returning to body text color. Bars use <code>--chart-N</code>—
+          color encodes<strong> category</strong>, not status, so Alpha Phase 1 is always the same color across the timeline and charts.
+          Progress uses a background layer for the unfinished segment: solid means complete and tinted means remaining.
+          It never changes hue, so it works across categories and light/dark modes.
+          The today line is<strong> neutral</strong> (foreground at 50%): structural markers do not consume status colors,
+          because an info-blue line would read as “there is an alert here.”
         </p>
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           Delayed or attention-needed items <strong>do not turn the bar red</strong>; status uses a separate channel:
@@ -54,11 +54,11 @@ export const 節點畫布: Story = {
         aria-label="Phase progression flow"
       />
       <p className="max-w-2xl text-xs text-muted-foreground">
-        <code>@xyflow/react</code> 的薄封裝——相依被隔離守衛關在一個檔案裡，
-        其他元件與取用端只依賴 <code>&lt;GraphCanvas&gt;</code> 的領域 API。
-        畫布底與節點吃帶色調中性（跟主題），連線與 handle 中性，
-        已選＝狀態層 20%、鍵盤聚焦＝<code>--ring</code> 外環——兩者可疊加（ADR-0007）。
-        左側色條沿用 <code>--chart-N</code>：與時間軸同一批資料實體、同一組顏色。
+        <code>@xyflow/react</code> is wrapped thinly, with the dependency isolated behind one guarded file;
+        other components and consumers depend only on the <code>&lt;GraphCanvas&gt;</code> domain API.
+        The canvas and nodes use tinted neutrals that follow the theme, while connections and handles stay neutral.
+        Selected is a 20% state layer and keyboard focus is a <code>--ring</code> outline; they can stack (ADR-0007).
+        The left color rail uses <code>--chart-N</code>, keeping the same entities and colors as the timeline.
       </p>
     </div>
   ),
@@ -76,7 +76,8 @@ export const 節點畫布唯讀: Story = {
         aria-label="Phase progression flow (read-only)"
       />
       <p className="max-w-2xl text-xs text-muted-foreground">
-        <code>readOnly</code>：不能拖、不能連線，仍可選取與縮放。文件內嵌示意用這個模式。
+        <code>readOnly</code>: dragging and connecting are disabled, while selection and zoom remain available.
+        Embedded documentation illustrations use this mode.
       </p>
     </div>
   ),

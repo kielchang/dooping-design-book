@@ -23,14 +23,14 @@ export const 按鈕: Story = {
         <Button variant="destructive"><Trash2 /> Delete record</Button>
       </div>
       <p className="max-w-2xl text-xs text-muted-foreground">
-        用工具列的<strong>色相</strong>切主題：只有 <code>brand</code> 那顆會變，其餘全部不動。
-        資料密集的畫面上按鈕很多，全部吃主題色會讓高飽和色的<strong>出現面積</strong>失控
-        （色彩疲勞管的是面積與頻率，不是色相種類數）。切到<strong>石墨</strong>時 <code>brand</code>
-        會與 <code>default</code> 完全一樣——那一組刻意沒有品牌色。
+        Use the toolbar's<strong> hue</strong> control to switch themes: only the <code>brand</code> button changes; everything else stays put.
+        Dense screens have many buttons, so coloring every one with the theme hue makes the<strong> saturated area</strong> overwhelming
+        (color fatigue is about area and frequency, not the number of hues). In<strong> Graphite</strong>, <code>brand</code>
+        is identical to <code>default</code> by design because that theme has no brand color.
       </p>
 
       <div className="max-w-2xl space-y-2 rounded-md border border-l-4 border-l-danger bg-danger-subtle p-3 text-danger-subtle-foreground">
-        <p className="text-xs font-semibold">brand 不要用在確認／送出／儲存上</p>
+        <p className="text-xs font-semibold">Do not use brand for confirm, submit, or save</p>
         <div className="flex flex-wrap items-center gap-4">
           <span className="flex items-center gap-2 text-xs">
         <Button size="sm">Submit request</Button> Correct
@@ -40,10 +40,10 @@ export const 按鈕: Story = {
           </span>
         </div>
         <p className="text-xs leading-relaxed">
-          <code>--brand</code> 的職責是<strong>識別</strong>（這是誰的產品），確認按鈕的職責是
-          <strong>指示可供性</strong>（按下去會提交）。色相帶著既成慣例——綠＝通行、藍＝系統預設、
-          紅＝停止、灰＝停用；紫與洋紅<strong>沒有動作慣例</strong>，放在確認按鈕上會讀成裝飾。
-          把工具列切到藍紫或紫晶，比較上面兩顆就看得出來。
+          <code>--brand</code> identifies<strong> who the product is</strong>; a confirm button communicates<strong> what will happen</strong> when pressed.
+          Hues carry conventions—green means pass, blue is the system default, red means stop, and gray means disabled.
+          Purple and magenta<strong> have no action convention</strong>, so they read as decoration on a confirm button.
+          Switch the toolbar to Violet or Amethyst to compare the two buttons.
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
@@ -57,8 +57,8 @@ export const 按鈕: Story = {
         <Button disabled><Loader2 className="animate-spin" /> Processing…</Button>
       </div>
       <p className="text-xs text-muted-foreground">
-        「載入中」沒有獨立 variant：把按鈕設為 disabled、換上旋轉圖示、改文案即可。
-        多一個 variant 只會讓人猶豫該用哪個。
+        Loading has no dedicated variant: disable the button, add a spinner, and change the copy.
+        An extra variant would only make the choice harder.
       </p>
     </div>
   ),
@@ -81,14 +81,14 @@ export const 徽章: Story = {
         <Badge variant="edit">Unsaved changes</Badge>
       </div>
       <p className="max-w-2xl text-xs text-muted-foreground">
-        徽章一定要有文字。純色點在灰階列印與色覺障礙下等於消失。
-        四種狀態走<strong>淡底層</strong>，與提示框的低強度同一組 token——所以整排的構造與極性一致
-        （全部是「淡底＋同色相深墨」）。改版前 success／warning／info 是中明度實色配深字、
-        danger 是深實色配反白，<strong>一排裡有兩種極性</strong>、底色 L* 全距 23.5；
-        眼睛會把極性反轉讀成「不同種類」而不是「不同嚴重度」。現在全距收到 10。
+        Badges need text. A solid-color dot disappears in grayscale print and for people with color-vision differences.
+        The four states use<strong> subtle surfaces</strong> from the same tokens as low-intensity callouts, keeping polarity consistent
+        (a tinted surface plus dark text of the same hue). The previous version mixed medium-light solid fills with dark text
+        and dark danger with reversed text, creating<strong> two polarities in one row</strong> and a 23.5 L* background range.
+        The eye read that polarity reversal as different kinds rather than different severity; the range is now 10.
       </p>
       <div className="space-y-2 border-t pt-3">
-        <p className="text-xs font-semibold">intensity=&quot;high&quot; · 實色，只給必須喊的場合</p>
+        <p className="text-xs font-semibold">intensity=&quot;high&quot; · Solid fill, only when the message must interrupt</p>
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="success" intensity="high">Complete</Badge>
           <Badge variant="warning" intensity="high">Needs information</Badge>
@@ -96,9 +96,9 @@ export const 徽章: Story = {
           <Badge variant="danger" intensity="high">Returned</Badge>
         </div>
         <p className="max-w-2xl text-xs text-muted-foreground">
-          <strong>資料表裡不要用這一排。</strong>一頁上百個徽章全用實色，高飽和色的出現面積會失控
-          ——色彩疲勞管的是面積 × 頻率，不是色相種類數。這一排也正好是舊版的長相：
-          注意 danger 那顆的極性與左邊三顆相反。
+          <strong>Do not use this row in a data table.</strong> Hundreds of solid badges on one page overwhelm the saturated area
+          —color fatigue is area × frequency, not the number of hues. This row also shows the old appearance:
+          notice how the danger badge has the opposite polarity from the three on its left.
         </p>
       </div>
     </div>
@@ -110,24 +110,24 @@ export const 提示框: Story = {
   render: () => (
     <div className="grid max-w-4xl gap-5 lg:grid-cols-2">
       <div className="space-y-2">
-        <p className="text-xs font-semibold">低強度（預設）· 日常與次要提示</p>
+        <p className="text-xs font-semibold">Low intensity (default) · Everyday and secondary guidance</p>
         <Callout variant="success" title="All records are complete">12 records; the last completed on 2024-02-05.</Callout>
         <Callout variant="info" title="Tip" tag="TIP">Use a column filter to compare multiple units at once.</Callout>
         <Callout variant="warning" title="3 records need information">Complete the fields before moving to the next step.</Callout>
         <Callout variant="danger" title="Not enough quota to confirm" tag="E-104">Item “Plan C — First draft” has 2 available; 6 required.</Callout>
       </div>
       <div className="space-y-2">
-        <p className="text-xs font-semibold">高強度 · 阻斷式，必須停下來決定</p>
+        <p className="text-xs font-semibold">High intensity · Blocking; stop and decide</p>
         <Callout intensity="high" variant="success" title="All records are complete">12 records; the last completed on 2024-02-05.</Callout>
         <Callout intensity="high" variant="info" title="Tip" tag="TIP">Use a column filter to compare multiple units at once.</Callout>
         <Callout intensity="high" variant="warning" title="3 records need information">Complete the fields before moving to the next step.</Callout>
         <Callout intensity="high" variant="danger" title="Not enough quota to confirm" tag="E-104">Item “Plan C — First draft” has 2 available; 6 required.</Callout>
       </div>
       <p className="max-w-2xl text-xs text-muted-foreground lg:col-span-2">
-        豐富度來源是「同一語意色的<strong>兩種強度</strong>」，不是加色相——四種語意封頂，不再擴充。
-        <strong>有疑慮就用低強度</strong>：高強度出現頻率一高，色彩疲勞的預算會瞬間爆掉。
-        低強度的淡底是生成的 token（文字對它反解到 4.5:1），不是把實色壓 10% 疊上去——
-        後者的對比取決於底下是什麼表面，完全不可控。
+        The range comes from<strong> two intensities for each semantic color</strong>, not more hues—four meanings are the ceiling.
+        <strong>Use low intensity when in doubt</strong>: frequent high-intensity alerts quickly exhaust the color-fatigue budget.
+        Low-intensity surfaces are generated tokens with text solved to 4.5:1 contrast, not a solid fill simply layered at 10%—
+        that approach makes contrast depend on the surface underneath and is uncontrollable.
       </p>
     </div>
   ),

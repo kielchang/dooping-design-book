@@ -30,6 +30,11 @@ const translatedDocs = [
   "3-components/08-seg-group.mdx",
   "3-components/09-chips.mdx",
   "3-components/10-tooltip.mdx",
+  "3-components/11-dialog.mdx",
+  "3-components/12-table.mdx",
+  "3-components/14-tab-pills.mdx",
+  "3-components/15-delta.mdx",
+  "3-components/16-empty-state.mdx",
 ];
 
 describe("English translation coverage", () => {

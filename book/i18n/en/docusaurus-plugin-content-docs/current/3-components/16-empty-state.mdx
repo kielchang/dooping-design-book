@@ -1,0 +1,48 @@
+---
+title: EmptyState
+---
+
+# EmptyState
+
+What should the screen say when there is no data?
+
+<StoryLink id="元件-狀態-變異・空狀態・分頁・步驟--三種空狀態" />
+
+## Three kinds of empty are different
+
+This is where interfaces most often take a shortcut: everything says “no data.” But users are in three different situations.
+
+| Situation | User’s question | Copy should answer |
+| --- | --- | --- |
+| No data yet | What should I do? | Guide them to create the first record |
+| No results after filtering | Did I filter incorrectly? | Show the current conditions and suggest broadening them |
+| No permission | Is it broken? | Explain why and who to contact |
+
+<Demo title="Three empty states">
+  <div className="grid gap-4 md:grid-cols-3">
+    <div className="rounded-lg border"><EmptyState title="No data yet" hint="Create the first record to see details and totals here." action={<Button size="sm">Add record</Button>} /></div>
+    <div className="rounded-lg border"><EmptyState title="No matching data" hint="Current filters: unit = Hong Chang Industrial, status = complete. Try broadening one." action={<Button size="sm" variant="outline">Clear filters</Button>} /></div>
+    <div className="rounded-lg border"><EmptyState title="No permission to view" hint="Only administrators can view this data. Contact your system administrator." /></div>
+  </div>
+</Demo>
+
+<Rules>
+  <Do><p>An empty state needs a<strong> next step</strong>. Users are stuck here; they did not come to admire an illustration.</p></Do>
+  <Dont><p>Do not write only “No data.” It answers none of the three situations.</p></Dont>
+</Rules>
+
+## Loading is not empty
+
+“Still querying” and “the query finished with no results” are different states. Loading uses [a skeleton or in-place darkening](/foundations/color#loading-neutral-with-three-techniques-for-three-situations); the empty state comes only after the query finishes. Showing empty immediately makes users misread the one-second gap as “there really is none,” and the sudden arrival of data is worse than a slow response.
+
+## Do not use a large illustration
+
+An admin empty state can appear dozens of times a day—every filter can produce one. A large illustration is charming once and gets in the way by the fifth time. An icon and two lines are enough.
+
+Use `compact` for empty states inside cards or tables (half the vertical padding). They appear more often than full-page states, so the cost of taking space is higher.
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/empty-state.json
+```

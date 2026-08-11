@@ -1,0 +1,46 @@
+---
+title: Delta
+---
+
+# Delta
+
+Shows how far a value differs from its baseline.
+
+<StoryLink id="元件-狀態-變異・空狀態・分頁・步驟--變異顯示" />
+
+## Triple encoding
+
+**Arrow ▲▼ + text + color.** Color is the weakest of the three:
+
+- About 8% of men have red–green color-vision deficiency.
+- Admin reports are almost certainly printed and archived in grayscale.
+
+Arrows and text must **make the statement on their own**; color only speeds recognition.
+
+<Demo title="Delta">
+  <div className="space-y-2 text-sm">
+    <p>Revenue versus last month: <Delta value={128400} posLabel="Increase " negLabel="Decrease " /></p>
+    <p>Error count (lower is better): <Delta value={340} goodWhen="negative" posLabel="Over " negLabel="Short " /></p>
+    <p>Schedule variance: <Delta value={-3} goodWhen="negative" posLabel="Late " negLabel="Early " format={(n) => `${n} days`} /></p>
+    <p>Unchanged from the previous period: <Delta value={0} /></p>
+  </div>
+</Demo>
+
+## `goodWhen`: good and bad are business decisions, not math
+
+“Delta +100” can be good (more reserve) or bad (more accumulated error). The component does not guess; the caller explicitly says which direction is good.
+
+<Rules>
+  <Do><p>Every time you use Delta, ask: is a larger number good news or bad news for this user?</p></Do>
+  <Dont><p>Do not assume “positive = green.” Positive cost, delay, and return rates are bad news.</p></Dont>
+</Rules>
+
+## Zero still needs to speak
+
+`value === 0` renders “— unchanged,” not blank or `0`. Blank looks like missing data; `0` looks like a calculated result that may be wrong.
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/delta.json
+```

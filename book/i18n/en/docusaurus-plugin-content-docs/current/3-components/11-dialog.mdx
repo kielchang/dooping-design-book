@@ -1,0 +1,146 @@
+---
+title: Dialog
+---
+
+# Dialog
+
+Interrupts the user to request a decision.
+
+<StoryLink id="元件-浮層-提示泡泡・對話框--對話框" />
+
+## When not to use it
+
+<Rules>
+  <Do><p>Second confirmation for destructive actions and small forms that need focused attention.</p></Do>
+  <Dont><p>Do not put a large form or multi-step flow in it. Dialogs have no breadcrumbs, cannot be deep-linked, and are nearly unusable on phones. That content should be a page.</p></Dont>
+</Rules>
+
+<Demo title="Confirm a destructive action">
+  <Dialog>
+    <DialogTrigger asChild><Button variant="destructive">Void this record</Button></DialogTrigger>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Void R-2403?</DialogTitle>
+        <DialogDescription>Voiding releases reserved quota and writes to the change log. Completed items are not affected.</DialogDescription>
+      </DialogHeader>
+      <DialogFooter>
+        <DialogClose asChild><Button variant="outline">Back</Button></DialogClose>
+        <Button variant="destructive">Confirm void</Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+</Demo>
+
+## Put the question in the title and the answer in the buttons
+
+<Rules>
+  <Do><p>Title: “Void R-2403?”<br />Buttons: “Confirm void” / “Back”</p></Do>
+  <Dont><p>Title: “Confirm”; buttons: “Yes” / “No.” After losing the context, does “Yes” mean cancel or keep?</p></Dont>
+</Rules>
+
+Button text should be understandable **on its own**; many users read the button without rereading the title.
+
+## Three levels of destructive action
+
+“Destructive actions need confirmation” is too broad. **If every delete opens a confirmation, users close their eyes and confirm after three days.** Confirmation becomes ceremony and stops protecting them.
+
+Choose among three levels based on whether the consequence can be reversed:
+
+| Level | Criterion | Approach |
+| --- | --- | --- |
+| Low | Reversible, one record | **Execute directly** and offer Undo in place. No dialog. |
+| Medium | Irreversible, one record | Confirm in a dialog; name the target and consequence. |
+| High | Irreversible, multiple records or other people | Dialog + **type an identifier** (ID or code) before enabling confirmation. |
+
+<Rules>
+  <Do><p>Use “type the name to confirm” only for high risk. Its purpose is<strong> forced reading</strong>: to type the string correctly, the user must first understand what they are deleting.</p></Do>
+  <Dont><p>Do not use it for every deletion. Making everyone type a string teaches them the pattern and removes the protection, leaving only irritation.</p></Dont>
+</Rules>
+
+High-risk dialogs should list the **affected scope** (“12 confirmed items will be canceled”), not only say “this cannot be undone.” Users need to know what they will lose, not receive a threat.
+
+<Demo title="High risk: type the ID to confirm">
+  <Dialog>
+    <DialogTrigger asChild><Button variant="destructive">Cancel batch</Button></DialogTrigger>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Cancel this batch?</DialogTitle>
+        <DialogDescription>12 confirmed items will be canceled, their reservations released, and the change logged. This cannot be undone.</DialogDescription>
+      </DialogHeader>
+      <div className="space-y-1">
+        <Label htmlFor="confirm-batch">Type batch ID <code>B-2403</code> to confirm</Label>
+        <Input id="confirm-batch" placeholder="B-2403" />
+      </div>
+      <DialogFooter>
+        <DialogClose asChild><Button variant="outline">Back</Button></DialogClose>
+        <Button variant="destructive" disabled>Cancel 12 items</Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+</Demo>
+
+## On mobile, use a centered card, not full screen
+
+An admin dialog usually confirms one thing. Full screen removes the background context (which row was the user looking at?), so keep margins and preserve a centered card.
+
+## Scroll the content while title and buttons stay put
+
+Without a height limit, long content pushes the vertically centered dialog out of the viewport. The title and buttons disappear together, leaving only Esc—a key many users do not know.
+
+<Rules>
+  <Do><p>Limit the overall height so <strong>only the content area</strong> scrolls. Keep the title and buttons visible.</p></Do>
+  <Dont><p>Do not let the whole dialog scroll with the page. Users discover the button only at the bottom, after the title has disappeared.</p></Dont>
+</Rules>
+
+```tsx
+<DialogContent className="max-h-[85dvh] grid-rows-[auto_minmax(0,1fr)_auto]">
+  <DialogHeader>
+    <DialogTitle>Edit items in B-2403</DialogTitle>
+  </DialogHeader>
+
+  {/* Only this region scrolls */}
+  <div className="min-h-0 overflow-y-auto pr-1">
+    …long content…
+  </div>
+
+  <DialogFooter>…</DialogFooter>
+</DialogContent>
+```
+
+Three details matter:
+
+| Detail | Why |
+| --- | --- |
+| `dvh` instead of `vh` | Mobile browser chrome expands and contracts; `vh` can hide buttons behind the URL bar |
+| `min-h-0` | Grid/flex children default to content height; without it, `overflow` does nothing |
+| 85% instead of 100% | Leaves enough background visible to show where the user is and where closing returns them |
+
+Keep a visual cue (shadow or divider) at the top and bottom of the scroll area so users know more content exists. Do not cut content flush with the edge; it looks finished and users will not scroll.
+
+### If it needs a lot of scrolling, it should be a page
+
+This rule handles “a small form got a little longer,” not a page disguised as a dialog.
+
+<Rules>
+  <Do><p>More than about two viewport heights of scrolling → make it a page.</p></Do>
+  <Dont><p>Do not put a multi-step flow in a scrolling dialog. There are no breadcrumbs, no deep links, and leaving midway starts over.</p></Dont>
+</Rules>
+
+## Do not nest dialogs
+
+Opening a dialog from a dialog creates three simultaneous problems: Esc has ambiguous meaning, two focus traps fight, and two backdrops obscure the original context.
+
+<Rules>
+  <Do><p>For a second confirmation, <strong>replace the content of the same dialog</strong> (two steps at one layer), or close the first before opening the second.</p></Do>
+  <Dont><p>Do not stack them. Select and Tooltip are acceptable exceptions because they are non-modal and do not trap focus.</p></Dont>
+</Rules>
+
+## Accessibility
+
+Radix Dialog handles focus trapping, Esc close, `aria-modal`, and focus restoration. **Always provide `DialogTitle`**; a modal without a title is blank to a screen reader.
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/dialog.json
+```

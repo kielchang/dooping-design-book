@@ -1,0 +1,52 @@
+---
+title: Table
+---
+
+# Table
+
+Semantic table elements plus three practical extensions.
+
+<StoryLink id="基礎-互動狀態層--資料表列的三種狀態" />
+
+## When to use it and when to use DataTable
+
+<Rules>
+  <Do><p>Use Table for a fixed layout with few records and no search or sorting, such as a two-column specification comparison.</p></Do>
+  <Dont><p>As soon as users need to find a particular record, use <a href="/components/data-table">DataTable</a>. Adding search, sort, and pagination yourself produces three different tables after three screens.</p></Dont>
+</Rules>
+
+<Demo title="Basic table">
+  <Table zebra>
+    <TableHeader><TableRow><TableHead>ID</TableHead><TableHead>Unit</TableHead><NumHead>Amount</NumHead></TableRow></TableHeader>
+    <TableBody>
+      <TableRow><TableCell>SO-2401</TableCell><TableCell>Far East Trading</TableCell><NumCell>84,000</NumCell></TableRow>
+      <TableRow><TableCell>SO-2402</TableCell><TableCell>Hong Chang Industrial</TableCell><NumCell>156,400</NumCell></TableRow>
+      <TableRow><TableCell>R-2403</TableCell><TableCell>Tai-Hsing Machinery</TableCell><NumCell>213,000</NumCell></TableRow>
+    </TableBody>
+    <TableFooter><TableRow><TableCell colSpan={2}>Total</TableCell><NumCell>453,400</NumCell></TableRow></TableFooter>
+  </Table>
+</Demo>
+
+## Visual invariant: row rules only
+
+The table body has **no outer border, no vertical rules, and no cell borders**. One 1px `--border` rule between rows is the component’s only line. Zebra striping is opt-in with `zebra` (`muted` at 30%); the header has no separate fill (a sticky header is the page background so it covers scrolled content).
+
+The table is structured by whitespace and alignment. A full grid is host-style leakage; Docusaurus’s Infima styles, for example, draw a grid around a bare `<table>`. The live examples are checked by `npm run verify:book`; the mechanism is documented in ADR-0010.
+
+## Three extensions
+
+| Name | Job |
+| --- | --- |
+| `NumHead` / `NumCell` | Numeric columns: right alignment + tabular numbers |
+| `freezeFirst` | Frozen first column, preserving row identity during horizontal scroll |
+| `SortHead` | Sortable header with a three-state cycle and status arrow |
+
+## Disable sticky headers for printing
+
+`TableHeader sticky` automatically becomes `position: static` for print. Printed headers repeat through `display: table-header-group`; enabling both would overlay the first page’s content.
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/table.json
+```

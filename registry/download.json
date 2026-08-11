@@ -3,8 +3,8 @@
   "name": "download",
   "version": "0.11.1",
   "type": "registry:lib",
-  "title": "download 下載工具",
-  "description": "觸發瀏覽器下載 Blob。",
+  "title": "download",
+  "description": "Trigger a browser download from a Blob.",
   "dependencies": [
     "@dooping/tokens@^0.6.0"
   ],

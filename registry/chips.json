@@ -3,8 +3,8 @@
   "name": "chips",
   "version": "0.11.1",
   "type": "registry:ui",
-  "title": "Chips 多選標籤片",
-  "description": "已選與未選同時可見的多選控制項。",
+  "title": "Chips",
+  "description": "Multi-select control where selected and unselected options remain visible.",
   "dependencies": [
     "@dooping/tokens@^0.6.0",
     "lucide-react"

@@ -3,8 +3,8 @@
   "name": "change-summary",
   "version": "0.11.1",
   "type": "registry:component",
-  "title": "ChangeSummary 變更摘要",
-  "description": "送出前的舊值→新值清單，可逐欄還原。",
+  "title": "ChangeSummary",
+  "description": "Old-to-new list before submission, with field-level restore.",
   "dependencies": [
     "@dooping/tokens@^0.6.0",
     "lucide-react"

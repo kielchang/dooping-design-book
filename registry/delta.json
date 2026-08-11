@@ -3,8 +3,8 @@
   "name": "delta",
   "version": "0.11.1",
   "type": "registry:ui",
-  "title": "Delta 變異顯示",
-  "description": "箭頭＋文字＋顏色三重編碼的差異呈現。",
+  "title": "Delta",
+  "description": "Difference display with arrow, text, and color triple encoding.",
   "dependencies": [
     "@dooping/tokens@^0.6.0"
   ],

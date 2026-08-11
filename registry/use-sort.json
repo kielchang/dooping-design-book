@@ -3,8 +3,8 @@
   "name": "use-sort",
   "version": "0.11.1",
   "type": "registry:lib",
-  "title": "useSort 排序 hook",
-  "description": "無→大到小→小到大 的三態排序。",
+  "title": "useSort",
+  "description": "Three-state sorting: none, descending, ascending.",
   "dependencies": [
     "@dooping/tokens@^0.6.0"
   ],

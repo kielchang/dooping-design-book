@@ -3,8 +3,8 @@
   "name": "badge",
   "version": "0.11.1",
   "type": "registry:ui",
-  "title": "Badge 狀態徽章",
-  "description": "帶文字的狀態標記，不只靠顏色傳達語意。",
+  "title": "Badge",
+  "description": "Text-based status markers that do not rely on color alone.",
   "dependencies": [
     "@dooping/tokens@^0.6.0",
     "class-variance-authority"

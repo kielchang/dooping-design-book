@@ -3,8 +3,8 @@
   "name": "forms-diff",
   "version": "0.11.1",
   "type": "registry:lib",
-  "title": "forms/diff 欄位比對",
-  "description": "FieldSpec 驅動的變更偵測與顯示格式化。",
+  "title": "forms/diff",
+  "description": "FieldSpec-driven change detection and display formatting.",
   "dependencies": [
     "@dooping/tokens@^0.6.0"
   ],

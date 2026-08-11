@@ -3,8 +3,8 @@
   "name": "select",
   "version": "0.11.1",
   "type": "registry:ui",
-  "title": "Select 下拉選單",
-  "description": "單選下拉（Radix Select）。",
+  "title": "Select",
+  "description": "Single-select dropdown built on Radix Select.",
   "dependencies": [
     "@dooping/tokens@^0.6.0",
     "@radix-ui/react-select",

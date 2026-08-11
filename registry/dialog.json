@@ -3,8 +3,8 @@
   "name": "dialog",
   "version": "0.11.1",
   "type": "registry:ui",
-  "title": "Dialog 對話框",
-  "description": "模態對話框（Radix Dialog）。",
+  "title": "Dialog",
+  "description": "Modal dialog built on Radix Dialog.",
   "dependencies": [
     "@dooping/tokens@^0.6.0",
     "@radix-ui/react-dialog",

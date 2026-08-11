@@ -3,8 +3,8 @@
   "name": "callout",
   "version": "0.11.1",
   "type": "registry:ui",
-  "title": "Callout 提示框",
-  "description": "良好／警示／提醒／危險四種語意提示。",
+  "title": "Callout",
+  "description": "Success, warning, info, and danger messages with fixed semantics.",
   "dependencies": [
     "@dooping/tokens@^0.6.0",
     "lucide-react"

@@ -3,8 +3,8 @@
   "name": "mockup",
   "version": "0.11.1",
   "type": "registry:ui",
-  "title": "Mockup 文件示意積木",
-  "description": "Placeholder／Spotlight／MockScreenFrame：零截圖文件示意。",
+  "title": "Mockup",
+  "description": "Placeholder, Spotlight, and MockScreenFrame primitives for screenshot-free documentation.",
   "dependencies": [
     "@dooping/tokens@^0.6.0"
   ],

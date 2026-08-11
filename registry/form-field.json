@@ -3,8 +3,8 @@
   "name": "form-field",
   "version": "0.11.1",
   "type": "registry:component",
-  "title": "FormField 欄位包裝",
-  "description": "Label＋aria 連動＋錯誤態的固定寫法元件化，含 FieldError。",
+  "title": "FormField",
+  "description": "Fixed Label, ARIA wiring, and error-state pattern with FieldError.",
   "dependencies": [
     "@dooping/tokens@^0.6.0",
     "lucide-react"

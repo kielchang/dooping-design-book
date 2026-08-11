@@ -3,8 +3,8 @@
   "name": "editable-field",
   "version": "0.11.1",
   "type": "registry:component",
-  "title": "EditableField 唯讀逐欄編輯",
-  "description": "點擊才進編輯、改動標色、undo/redo 先確認。",
+  "title": "EditableField",
+  "description": "Click to edit, highlight changes, and confirm undo/redo.",
   "dependencies": [
     "@dooping/tokens@^0.6.0",
     "lucide-react"

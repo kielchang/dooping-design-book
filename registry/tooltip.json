@@ -3,8 +3,8 @@
   "name": "tooltip",
   "version": "0.11.1",
   "type": "registry:ui",
-  "title": "Tooltip 提示泡泡",
-  "description": "hover／鍵盤聚焦／長壓顯示，含邊緣防溢與截斷文字元件。",
+  "title": "Tooltip",
+  "description": "Hover, keyboard-focus, and long-press help with edge collision handling and truncation support.",
   "dependencies": [
     "@dooping/tokens@^0.6.0"
   ],

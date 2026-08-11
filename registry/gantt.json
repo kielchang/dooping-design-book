@@ -3,8 +3,8 @@
   "name": "gantt",
   "version": "0.11.1",
   "type": "registry:ui",
-  "title": "Gantt 時間軸",
-  "description": "檢視與選取用的精簡時間軸：分類色長條、進度、今天線、列選取。",
+  "title": "Gantt",
+  "description": "Compact timeline for viewing and selecting categorized bars, progress, today line, and rows.",
   "dependencies": [
     "@dooping/tokens@^0.6.0"
   ],

@@ -3,8 +3,8 @@
   "name": "button",
   "version": "0.11.1",
   "type": "registry:ui",
-  "title": "Button 按鈕",
-  "description": "主要／次要／破壞性動作按鈕，含 asChild 組合。",
+  "title": "Button",
+  "description": "Primary, secondary, and destructive action buttons with asChild composition.",
   "dependencies": [
     "@dooping/tokens@^0.6.0",
     "@radix-ui/react-slot",

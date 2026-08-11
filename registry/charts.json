@@ -3,8 +3,8 @@
   "name": "charts",
   "version": "0.11.1",
   "type": "registry:ui",
-  "title": "Charts 圖表",
-  "description": "後台閱讀型的八種零相依圖＋圖例＋色票工具，含文字與鍵盤等價。",
+  "title": "Charts",
+  "description": "Eight dependency-free reading-oriented charts with legends, palettes, text, and keyboard equivalents.",
   "dependencies": [
     "@dooping/tokens@^0.6.0"
   ],

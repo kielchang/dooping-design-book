@@ -42,6 +42,8 @@ const translatedDocs = [
   "3-components/20-coachmark.mdx",
   "3-components/21-mockup.mdx",
   "3-components/24-gantt.mdx",
+  "3-components/25-graph-canvas.mdx",
+  "3-components/26-form-controls.mdx",
   "3-components/27-toast.mdx",
   "3-components/28-skeleton.mdx",
   "3-components/29-date-range.mdx",

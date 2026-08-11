@@ -1,0 +1,68 @@
+---
+title: GraphCanvas
+---
+
+# GraphCanvas
+
+**A canvas for flow and relationship diagrams**: nodes, edges, drag, zoom, and minimap. It uses [React Flow](https://reactflow.dev) (`@xyflow/react`, MIT), but consumers depend on the domain API of `<GraphCanvas>`; that boundary is deliberate.
+
+<StoryFrame id="元件-特殊介面-時間軸・節點畫布--節點畫布" title="Node canvas: drag, connect, and select" height={430} />
+
+<StoryLink id="元件-特殊介面-時間軸・節點畫布--節點畫布-互動">Interactive playground—adjust node count and edge density</StoryLink>
+
+## Why a thin wrapper instead of React Flow directly
+
+`@xyflow/react` brings Zustand internally, while the [library boundary](/governance/drift-guards) forbids state management in the component library (“state belongs to the application layer”). Even without importing Zustand directly, whitelisting the whole package would silently violate the intent.
+
+Keep the dependency in one file: only `graph-canvas.tsx` may import `@xyflow/react`; `tests/boundary.test.ts` rejects a second importer. Consumers use GraphCanvas node and edge types, so replacing or upgrading React Flow remains a one-file change.
+
+The wrapper also contains three React Flow traps: stylesheet import, wrapper height (zero height makes the canvas invisible), and module-level `nodeTypes` (inline definitions remount nodes on every render).
+
+## Color: the token bridge
+
+React Flow supplies 43 `--xy-*` variables. The wrapper maps them to this system’s semantic tokens according to [ADR-0007](/adr):
+
+| Canvas element | Layer | Uses | Theme hue |
+| --- | --- | --- | --- |
+| Canvas and grid | Layout | `--background` / `--border` | ✅ tinted neutral |
+| Node frame, controls, minimap | Surface | `--card` family | ✅ tinted neutral |
+| Edges and handles | Structure | `--muted-foreground` / `--border` | ❌ neutral |
+| Hover / selected | Interaction | `state-layer` 6% / 20% | ❌ neutral |
+| Keyboard focus | Focus | `--ring` outer ring | ❌ neutral |
+| Node category bar | Data | `--chart-N` | Theme-independent; follows the entity |
+
+Because everything maps to existing tokens, light/dark and all six hue themes work automatically. Do not also enable React Flow’s `colorMode`; that is a parallel theme system and would overwrite the bridge.
+
+### Selected and focused are separate channels
+
+React Flow’s native selected state uses an outer shadow and hard-codes `outline: none` for focus. The wrapper restores the system rules:
+
+- **Selected** = 20% state layer on the node background.
+- **Keyboard focus** = `--ring` outer ring with an offset.
+
+Both can coexist—invalid + focus and selected + focus are valid combinations—which is why focus gets its own channel.
+
+## When not to use it
+
+- Hundreds of nodes: render a summary at the data layer first.
+- A static process illustration: use [screenshot-free mockups](/patterns/zero-screenshot-docs) or SVG.
+- A whiteboard with free text, sticky notes, and drawing: that is another product.
+
+## Read-only mode
+
+<StoryFrame id="元件-特殊介面-時間軸・節點畫布--節點畫布唯讀" title="Read-only: selectable and zoomable, not editable" height={370} />
+
+`readOnly` removes dragging and connecting but preserves selection and zoom. Use it for embedded documentation diagrams and audit review.
+
+## Accessibility
+
+- The outer element uses `role="img"` and `aria-label`; a canvas is an image to a screen reader. **Key information cannot live only on the canvas**—provide an equivalent list or table beside it, as with [chart accessibility](/components/charts).
+- Node categories use the color bar plus host-provided text, never color alone.
+
+## Install
+
+```bash
+npx shadcn add https://kielchang.github.io/dooping-design-book/r/graph-canvas.json
+```
+
+The registry item installs `@xyflow/react`, the only third-party UI package in the library. Requires tokens ≥ 0.6.0. Do not import `@xyflow/react` from another file after copying; copying the boundary guard along with it is best practice (see [drift protection](/governance/drift-guards)).

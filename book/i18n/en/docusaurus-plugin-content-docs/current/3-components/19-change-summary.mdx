@@ -1,0 +1,67 @@
+---
+title: ChangeSummary
+---
+
+import { demoChanges } from "@dooping/react/demo/sample-data";
+
+export const changes = demoChanges;
+
+# ChangeSummary
+
+Before submitting, show “what exactly did I change?”
+
+<StoryLink id="元件-表單-唯讀逐欄編輯--完整表單與變更摘要" />
+
+## Why make it a component
+
+Suppose a user changes three fields in a 30-column master form. Before submitting, the only thing they want to know is which three. Without this panel, they must rely on memory or scan the entire page again.
+
+<Demo title="Change summary (restore one field or all)">
+  <div className="max-w-md"><ChangeSummary changes={changes} onRevertField={() => {}} onRevertAll={() => {}} /></div>
+</Demo>
+
+## Key: share data with the audit record
+
+`Change[]` feeds three places:
+
+```
+FieldSpec[] declaration
+   ↓ diffRecord()
+Change[] ──┬─→ ChangeSummary (before submit)
+           ├─→ audit before/after (after submit)
+           └─→ undo data source
+```
+
+**What the user sees before submission is what the audit record will show later.** This is deliberate; two formatting implementations eventually disagree and users start comparing the audit record with the screen.
+
+## Explain the empty state
+
+With no changes, show a dashed “No changes yet” box instead of disappearing. Disappearing makes users think the feature is broken or their edits were not detected.
+
+## Many changes: limit height, scroll inside, keep the total visible
+
+After **8 changes**, constrain the list and scroll inside it while the frame and heading stay put.
+
+<Rules>
+  <Do><p>Always show the count in the heading (“24 changes this time”). It is the most important number before submission and must not be hidden below a scroll.</p></Do>
+  <Dont><p>Do not let the summary grow forever. It pushes the submit button away, forcing the user to scroll twice when they came specifically to review before submitting.</p></Dont>
+</Rules>
+
+Eight is the threshold because it is roughly the number of rows visible without scrolling. Beyond that, users are reading line by line rather than scanning, and internal scrolling is easier than one long list.
+
+### More than 20 changed fields usually means the flow is wrong
+
+<Rules>
+  <Do><p>Split a large form into themed sections that submit separately. The summary stays short, review cost stays low, and the error scope is smaller.</p></Do>
+  <Dont><p>Do not make “change everything and submit once” the default. Users will not read a 24-item summary; they will submit immediately and the summary will have done no work.</p></Dont>
+</Rules>
+
+## Undo must confirm too
+
+Both field-level and bulk undo show “current value → restored value” and execute only after confirmation. See [EditableField](/components/editable-field#undo-and-redo-both-confirm-first).
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/change-summary.json
+```

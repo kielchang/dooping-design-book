@@ -1,0 +1,65 @@
+---
+title: Stepper
+---
+
+# Stepper
+
+Shows progress through a multi-step flow.
+
+<Demo title="Stepper (previous steps are clickable)">
+  <div className="max-w-2xl">
+    <Stepper current="items" onStep={() => {}} completed={{ customer: true }} steps={[
+      { key: "customer", label: "Choose unit", hint: "Or create a new unit" },
+      { key: "items", label: "Add items", hint: "Quantity and amount" },
+      { key: "shipping", label: "Add information" },
+      { key: "review", label: "Review and submit" },
+    ]} />
+  </div>
+</Demo>
+
+<StoryLink id="元件-狀態-變異・空狀態・分頁・步驟--步驟指示" />
+
+## Visual invariant: transparent buttons without borders
+
+Each step is a **transparent, borderless** button. State is expressed only by the circle’s `border-2` outline (todo uses 30% `muted-foreground`), the completed ✓, and the connector’s background fill (not a border).
+
+A gray background or raised border means the host has not provided the component’s style base and native button styling leaked through. The live example is checked by `npm run verify:book`; see ADR-0010.
+
+## Steps must let users go back
+
+The common multi-step-form frustration is “I want to check what I entered in step 2, but I can only cancel and start over.”
+
+<Rules>
+  <Do><p>Completed and previously visited steps remain clickable, with data preserved.</p></Do>
+  <Dont><p>Do not make the flow one-way. Going back is normal, not misuse.</p></Dont>
+</Rules>
+
+## Use a checkmark for completion, not only green
+
+`state === "done"` shows a ✓. A green circle alone merges with the current step in grayscale and for users with color-vision deficiency.
+
+## When not to use it
+
+<Rules>
+  <Do><p>Use it for <strong>3–6 steps</strong> with meaningful order when users need to know how much remains.</p></Do>
+  <Dont><p>Two steps need no Stepper; a heading is enough. More than six should be split into pages or groups—nobody feels good in an eight-step form.</p></Dont>
+</Rules>
+
+## What happens above the recommended limit
+
+Some flows cannot be split (regulation or an external system’s fixed gates), so the failure mode must be explicit. With ten steps, widths become equal and labels truncate, connectors become more prominent than circles, and step 7 sits in the visual center as if the user were halfway through.
+
+<Rules>
+  <Do><p>If splitting is impossible, <strong>group the steps</strong>: show three phases in the Stepper and use page headings for the smaller steps.</p></Do>
+  <Dont><p>Do not make the Stepper horizontally scroll. Users must scroll to learn where they are—the one reason the component exists.</p></Dont>
+</Rules>
+
+### Write step labels as verbs, not nouns
+
+“Choose unit,” “Add items,” and “Review and submit” tell users **what to do**. “Unit,” “Items,” and “Review” only name topics; by step 7, users ask what they are supposed to do.
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/stepper.json
+```

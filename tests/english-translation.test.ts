@@ -35,6 +35,11 @@ const translatedDocs = [
   "3-components/14-tab-pills.mdx",
   "3-components/15-delta.mdx",
   "3-components/16-empty-state.mdx",
+  "3-components/17-stepper.mdx",
+  "3-components/18-editable-field.mdx",
+  "3-components/19-change-summary.mdx",
+  "3-components/20-coachmark.mdx",
+  "3-components/21-mockup.mdx",
 ];
 
 describe("English translation coverage", () => {

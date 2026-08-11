@@ -1,0 +1,112 @@
+---
+title: EditableField
+---
+
+# EditableField
+
+**Read-only by default; one click turns the value into an input.**
+
+<StoryLink id="元件-表單-唯讀逐欄編輯--單一欄位">Storybook: Single field</StoryLink> <StoryLink id="元件-表單-唯讀逐欄編輯--互動">Interactive playground—nine field types</StoryLink>
+
+## Why reverse the default
+
+Users of an admin master-record form spend 90% of their time looking and only 10% editing. A wall of inputs creates two problems:
+
+1. It is impossible to distinguish fields that have changed; every field looks the same.
+2. A stray mouse wheel can change data, especially in numeric fields.
+
+Read-only first solves both at the cost of one extra click. For master-record forms, this is a worthwhile trade.
+
+<Demo title="Click a value to edit">
+  <div className="max-w-sm space-y-4">
+    <EditableField label="Credit limit" kind="money" value={1650000} original={1500000} onChange={() => {}} onRevert={() => {}} help="Changed fields turn amber and show an undo button." />
+    <EditableField label="Unit code (locked)" kind="text" value="U-1042" original="U-1042" onChange={() => {}} disabled lockHint="Codes cannot change after creation" />
+  </div>
+</Demo>
+
+## Supported field types
+
+| `kind` | Editing state |
+| --- | --- |
+| `text` / `date` | Input |
+| `number` / `money` / `rate` | Right-aligned numeric input |
+| `select` | Dropdown (opens on click) |
+| `radio` / `checkbox` | Segmented choice via [SegGroup](/components/seg-group) |
+| `multiselect` | Chips via [Chips](/components/chips) |
+
+`rate` tells the user “%” but stores a ratio—multiply by 100 while editing and divide by 100 on submit. Do not make users perform that conversion; every system eventually receives a bug report about it.
+
+## Three display rules for numbers
+
+### 1. Thousands separators, tabular digits, right alignment
+
+All three matter together: right alignment lines up magnitudes, tabular digits make each place the same width, and separators remove the need to count zeroes.
+
+### 2. Do not round for display
+
+<Rules>
+  <Do><p>Display the stored value as-is. <code>168.5</code> displays as <code>168.5</code>.</p></Do>
+  <Dont><p>Do not round for visual tidiness. Users compare the on-screen value with another system and blame the data when it does not match, not the display.</p></Dont>
+</Rules>
+
+If rounding is really needed, do it in the data layer and tell the user the rule. Showing one value while storing another is the beginning of distrust.
+
+### 3. Accounting parentheses + red for negative money
+
+`money` displays `($2,000)`, not `-$2,000`. A minus sign is only a few pixels and disappears in a column; parentheses change the whole outline and are easy to scan. Red is a second cue, while parentheses remain effective in grayscale. (`number` does not use accounting parentheses because a negative temperature, delta, or coordinate is normal.)
+
+## `unit` belongs to the display layer
+
+```tsx
+<EditableField label="Total weight" kind="number" value={168.5} unit="kg" … />
+```
+
+Read-only displays `168.5 kg`; editing shows only `168.5`.
+
+<Rules>
+  <Do><p>Use the <code>unit</code> prop. The value is always a pure number.</p></Do>
+  <Dont><p>Do not put the unit in the value (`"168.5 kg"`). It can no longer be sorted, summed, or compared, and someone will eventually store `"168.5kg"` without a space.</p></Dont>
+</Rules>
+
+The editing state hides the unit so users do not think they must type it.
+
+## Changed but not submitted = amber
+
+When value ≠ original, the entire field uses amber (border + surface + text + “Changed” label). This is a [reserved color](/foundations/color), not a general highlight.
+
+## Undo and redo both confirm first
+
+Show “old value → new value” and execute only after confirmation. **Undo is itself a data change** and must not be silent.
+
+## Discoverability: a quiet pencil
+
+Read-only fields show a faint pencil on the right that darkens on hover. On touch devices it stays slightly visible because hover does not exist. Without this cue, users do not know the value is clickable.
+
+## Locked state
+
+Use `disabled` + `lockHint`: show a lock icon, remain focusable so screen readers can announce why, and include the reason in `aria-label`. Pair with [hard lock mode](/patterns/hard-lock).
+
+## Extreme values must fit
+
+In a responsive grid, a field is often about 288px wide. Long text truncates with a Tooltip in read-only state and scrolls horizontally while editing; it does not wrap. Long labels may wrap. Thirteen-digit amounts keep their separators and scroll horizontally; do not shrink the font. Twenty-four multi-select options wrap into multiple rows because users need to see their choices. Six long single-select labels wrap; switch to `select` because a wrapped [SegGroup](/components/seg-group) loses its point.
+
+<Rules>
+  <Do><p>Test the longest real value in the narrowest real field.</p></Do>
+  <Dont><p>Do not validate only with demo data. Demo names are always three or four characters; real data always has a twenty-character record.</p></Dont>
+</Rules>
+
+## Create mode
+
+```tsx
+<EditableField alwaysEdit trackChanges={false} … />
+```
+
+Always render as an input and do not mark the whole form as changed. During creation every field differs from its nonexistent original; otherwise the whole form turns amber and the signal becomes useless.
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/editable-field.json
+```
+
+Further reading: [Pattern → Inline field editing](/patterns/inline-field-editing)

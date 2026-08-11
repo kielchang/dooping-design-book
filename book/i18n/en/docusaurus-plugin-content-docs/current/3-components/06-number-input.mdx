@@ -1,0 +1,41 @@
+---
+title: NumberInput
+---
+
+# NumberInput
+
+Accepts numeric values. It looks like `type="number"`, but omitting three small details will cause trouble.
+
+<StoryLink id="元件-表單-輸入控制項--文字與數值" />
+
+## Three small details
+
+1. **`inputMode="numeric"`** — opens the numeric keyboard directly on phones.
+2. **`tabular-nums`** — tabular digits align vertically so magnitudes are easy to compare.
+3. **Right alignment** — numbers are easier to compare when aligned to the right.
+
+Use `.field-editable` so this field looks like other editable fields.
+
+<Demo title="Numeric input">
+  <div className="space-y-2">
+    <Label>Order quantity</Label>
+    <NumberInput value={120} onChange={() => {}} min={0} step={10} aria-label="Order quantity" />
+  </div>
+</Demo>
+
+## When not to use it
+
+<Rules>
+  <Do><p>Values such as quantities, amounts, and ratios that will be <strong>used in calculations</strong>.</p></Do>
+  <Dont><p>Do not use it for values that look numeric but are actually codes (IDs, registration numbers, phone numbers). Those are strings: <code>type="number"</code> removes leading zeroes, permits <code>e</code> and minus signs, and lets the mouse wheel change the value accidentally.</p></Dont>
+</Rules>
+
+## Wheel changes are a trap
+
+When focused, `type="number"` changes its value as the page scrolls, often without the user noticing. In long forms, hosts should add `onWheel={(e) => e.currentTarget.blur()}`.
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/number-input.json
+```

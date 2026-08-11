@@ -1,0 +1,57 @@
+---
+title: Tooltip
+---
+
+# Tooltip
+
+Provides supporting information or reveals the full text behind a truncation.
+
+<StoryLink id="元件-浮層-提示泡泡・對話框--提示泡泡" />
+
+## When not to use it
+
+<Rules>
+  <Do><p>For supporting information (field definitions or the full text behind <code>…</code>).</p></Do>
+  <Dont><p>Do not put <strong>necessary</strong> information in it. Touch users need a long press, and keyboard users need to Tab to it. Anything users must know to use the interface belongs directly on the screen.</p></Dont>
+</Rules>
+
+<Demo title="Hints and truncation">
+  <div className="space-y-6 py-6">
+    <p className="text-sm">
+      Processing status
+      <Tooltip content="Confirmed means the price and quantity are locked, but processing has not started." className="ml-1">
+        <span className="cursor-help underline decoration-dotted underline-offset-2">Confirmed</span>
+      </Tooltip>
+    </p>
+    <div className="max-w-[220px] rounded-md border p-2">
+      <TruncatedText text="Industrial bearing 6204 / deep groove / double shield / 20mm inner diameter" />
+    </div>
+  </div>
+</Demo>
+
+## All three triggers are required
+
+| Device | Trigger |
+| --- | --- |
+| Desktop | hover |
+| Keyboard | focus (requires `focusable`) |
+| Touch | **Long press for about 0.35 seconds**, then keep it briefly after release |
+
+Mobile devices have no hover. Without long-press support, every piece of information delegated to a tooltip effectively does not exist on a phone.
+
+## Prevent edge overflow
+
+After mounting, measure the tooltip: clamp it horizontally when it would overflow the viewport, and flip it below when there is not enough room above. Without this, a tooltip on a right-side field is cut in half.
+
+## Boundaries of `focusable`
+
+<Rules>
+  <Do><p>Use it for non-interactive content that is truncated, such as a table cell.</p></Do>
+  <Dont><p>Do not use it inside an element that is already interactive. Nested focusable elements make keyboard users press Tab once more before they can leave.</p></Dont>
+</Rules>
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/tooltip.json
+```

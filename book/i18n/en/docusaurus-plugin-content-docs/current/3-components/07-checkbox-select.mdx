@@ -1,0 +1,50 @@
+---
+title: Checkbox and Select
+---
+
+# Checkbox and Select
+
+Thin wrappers around two Radix primitives.
+
+<StoryLink id="元件-表單-輸入控制項--勾選與下拉" />
+
+<Demo title="Checkbox and Select">
+  <div className="max-w-sm space-y-4">
+    <div className="flex items-center gap-2">
+      <Checkbox id="c1" defaultChecked />
+      <Label htmlFor="c1">Enable this unit</Label>
+    </div>
+    <div className="space-y-1">
+      <Label>Tier</Label>
+      <Select defaultValue="gold">
+        <SelectTrigger><SelectValue /></SelectTrigger>
+        <SelectContent>
+          <SelectItem value="bronze">Bronze</SelectItem>
+          <SelectItem value="silver">Silver</SelectItem>
+          <SelectItem value="gold">Gold</SelectItem>
+          <SelectItem value="platinum">Platinum</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  </div>
+</Demo>
+
+## When not to use Select
+
+<Rules>
+  <Do><p>Use Select for <strong>six or more</strong> options, or when options change dynamically.</p></Do>
+  <Dont><p>For 2–5 short, fixed labels, use <a href="/components/seg-group">SegGroup</a>. Select requires two clicks (open, choose) before all options are visible; a segmented group is visible and complete in one click.</p></Dont>
+</Rules>
+
+For multiple selection, use [Chips](/components/chips), not a multi-select dropdown. After choosing, users should still be able to see what they chose; losing that visibility is one of the most common admin complaints.
+
+## A Checkbox always needs a Label
+
+`<Label htmlFor>` makes the text clickable too, which is especially important on touch devices (a 16px box versus an entire row).
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/checkbox.json
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/select.json
+```

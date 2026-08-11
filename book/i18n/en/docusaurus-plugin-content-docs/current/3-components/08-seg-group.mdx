@@ -1,0 +1,50 @@
+---
+title: SegGroup
+---
+
+# SegGroup
+
+Small sets of mutually exclusive options that are visible and selectable at a glance.
+
+<StoryLink id="元件-表單-輸入控制項--分段選擇" />
+
+## When to use it and when not to
+
+<Rules>
+  <Do><p>Use it for <strong>2–5 options</strong> with short, fixed labels.</p></Do>
+  <Dont><p>For more than five options, long labels, or options that change dynamically, use <a href="/components/checkbox-select">Select</a>. Once a segmented row wraps, it loses its “visible at a glance” advantage and becomes more confusing than a dropdown.</p></Dont>
+</Rules>
+
+<Demo title="States">
+  <div className="space-y-4">
+    <SegGroup label="Tier" value="gold" onPick={() => {}} options={[
+      { value: "bronze", label: "Bronze" }, { value: "silver", label: "Silver" },
+      { value: "gold", label: "Gold" }, { value: "platinum", label: "Platinum" },
+    ]} />
+    <div>
+      <p className="mb-1 text-xs text-muted-foreground">Changed but not submitted</p>
+      <SegGroup label="Tier (changed)" value="silver" onPick={() => {}} changed options={[
+        { value: "bronze", label: "Bronze" }, { value: "silver", label: "Silver" }, { value: "gold", label: "Gold" },
+      ]} />
+    </div>
+    <div>
+      <p className="mb-1 text-xs text-muted-foreground">Locked (focusable; hover explains why)</p>
+      <SegGroup label="Tier (locked)" value="gold" onPick={() => {}} disabled lockHint="This record is closed; unlock it first" options={[
+        { value: "silver", label: "Silver" }, { value: "gold", label: "Gold" },
+      ]} />
+    </div>
+  </div>
+</Demo>
+
+## Accessibility is the point
+
+- `role="radiogroup"` with each option as `role="radio"` and `aria-checked`.
+- **Roving tabindex:** the group has only **one** Tab stop. Giving four options four stops makes keyboard users press Tab four times to leave one field.
+- Arrow keys move between options; Space/Enter selects; Esc cancels.
+- The selected option uses both a checkmark and a fill, not color alone.
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/seg-group.json
+```

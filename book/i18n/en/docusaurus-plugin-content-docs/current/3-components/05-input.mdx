@@ -1,0 +1,63 @@
+---
+title: Input
+---
+
+# Input
+
+Single-line text input.
+
+<StoryLink id="元件-表單-輸入控制項--文字與數值">Storybook: Text and numbers</StoryLink> <StoryLink id="元件-表單-輸入控制項--欄位狀態">Storybook: Field states</StoryLink>
+
+## When not to use it
+
+<Rules>
+  <Do><p>Short text that users need to enter freely.</p></Do>
+  <Dont><p>Use <a href="/components/number-input">NumberInput</a> for numbers. In a master-record form, the default should be <a href="/components/editable-field">EditableField</a> (read-only first), not a wall of inputs.</p></Dont>
+</Rules>
+
+<Demo title="States">
+  <div className="max-w-sm space-y-3">
+    <div><Label htmlFor="d1">Unit name</Label><Input id="d1" defaultValue="Unit A (abstract demo name)" /></div>
+    <div><Label htmlFor="d2">Unit code</Label><Input id="d2" placeholder="Example: U-1042" /></div>
+    <div><Label htmlFor="d3">Created date (disabled)</Label><Input id="d3" defaultValue="2019-04-01" disabled /></div>
+    <div><Label htmlFor="d4">Editable-field semantics</Label><Input id="d4" className="field-editable" defaultValue="Edit me" /></div>
+  </div>
+</Demo>
+
+## The height is 36px; do not change it
+
+Input, Select, and EditableField are all 36px (`--size-control`). When three controls share a row, any 1–2px difference is visible—and admin forms inevitably put them in rows.
+
+## A placeholder is not a label
+
+<Rules>
+  <Do><p>Always provide a <code>&lt;Label&gt;</code>. Use the placeholder for a <strong>format example</strong> (“Example: U-1042”).</p></Do>
+  <Dont><p>Do not use a placeholder as a label. It disappears as soon as the user types, and the user forgets what belongs in the field. This loses both accessibility and usability.</p></Dont>
+</Rules>
+
+## Error state: FormField wires the fixed pattern
+
+Field errors are **field-level semantic events**: `aria-invalid` turns the border `--danger`, while a short error message and icon appear below the field (three cues: color + icon + text). The focus ring remains neutral—**color carries semantics and neutral carries focus**—so both can share the frame. See the [Alert Color Dictionary](/foundations/alert-colors).
+
+Do **not** tint the whole invalid field red. The primary signal is border and text; a subtle full-surface fill spends too much high-saturation area and can push dark-mode border contrast below the threshold.
+
+`FormField` packages the fixed “Label + `aria-describedby` + `aria-invalid` + error text” pattern. IDs are connected automatically, so consumers do not hand-write three ARIA attributes and accidentally omit one:
+
+<Demo title="Focus the error field: danger border (semantics) and neutral ring (focus)">
+  <div className="max-w-sm space-y-4">
+    <FormField label="Name" hint="2–20 characters" required>
+      <Input placeholder="Enter a name" />
+    </FormField>
+    <FormField label="Quantity" required error="Must be greater than 0">
+      <Input defaultValue="0" inputMode="numeric" />
+    </FormField>
+  </div>
+</Demo>
+
+For multiple errors, the **summary** belongs to a section-level [Callout](/components/callout) (`live`). It reports “several fields need attention” without repeating every message; the two layers have different jobs.
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/input.json
+```

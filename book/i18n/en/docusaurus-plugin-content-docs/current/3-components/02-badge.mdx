@@ -1,0 +1,96 @@
+---
+title: Badge
+---
+
+# Badge
+
+Marks the current state of a record.
+
+<StoryLink id="元件-基礎-按鈕・徽章・提示・卡片--徽章" />
+
+## When not to use it
+
+<Rules>
+  <Do><p>Represent a <strong>state</strong> (complete, pending review, returned) or a <strong>count</strong> (3 unread).</p></Do>
+  <Dont><p>Do not use it as a clickable filter. It looks like a label but performs an action when pressed, so users have to try it to learn that fact. Use a button or <a href="/components/chips">Chips</a>.</p></Dont>
+</Rules>
+
+<Demo title="Semantic variants">
+  <div className="flex flex-wrap items-center gap-2">
+    <Badge>Default</Badge>
+    <Badge variant="secondary">Secondary</Badge>
+    <Badge variant="outline">Outline</Badge>
+    <Badge variant="success">Complete</Badge>
+    <Badge variant="warning">More info needed</Badge>
+    <Badge variant="info">Under review</Badge>
+    <Badge variant="danger">Returned</Badge>
+    <Badge variant="edit">Changed, not submitted</Badge>
+  </div>
+</Demo>
+
+## The hard rule: a badge always has text
+
+Solid dots and swatches disappear in these situations:
+
+- Grayscale printing (admin reports **will** be printed and archived).
+- Red–green color-vision deficiency (about 8% of men).
+- Low-saturation colors in dark mode.
+
+<Rules>
+  <Do><p><code>&lt;Badge variant="danger"&gt;Returned&lt;/Badge&gt;</code></p></Do>
+  <Dont><p><code>&lt;span className="size-2 rounded-full bg-danger" /&gt;</code>—on a printed report and to a user with color-vision deficiency, that red dot is just a gray dot.</p></Dont>
+</Rules>
+
+## Subtle by default; solid only for exceptions
+
+The four status variants use **subtle surfaces** (`--{status}-subtle` + `--{status}-subtle-foreground`), the same tokens as [low-intensity Callout](/components/callout). Pass `intensity="high"` only when the message needs to call out with a solid fill.
+
+**Use the default in data tables.** A page with hundreds of solid badges spends the entire high-saturation area budget; color fatigue is area × frequency, not the number of hues.
+
+Previously all four variants were solid. That row had two problems:
+
+| | Surface L* | Text |
+| --- | --- | --- |
+| success / warning / info | 66 / 72 / 63 | Dark same-hue ink |
+| **danger** | **49** | **White** |
+
+Two polarities in one row and a 23.5 L* range made the eye read “different kinds” rather than “different severity.” The red badge jumped out while the yellow badge disappeared. Subtle surfaces reduce the range to 10 and keep polarity consistent.
+
+`edit` is the only variant with a deliberately **visible border**: it marks the reserved meaning “changed but not submitted” ([ADR-0002](/adr)) and must remain distinct from ordinary status.
+
+`npm test` guards against solid fills in the default status styles.
+
+## Suggested state mapping
+
+| Semantic | variant | Example |
+| --- | --- | --- |
+| Complete / passed | `success` | Complete, approved |
+| In progress / neutral | `info` | Under review, processing |
+| Needs attention, not blocking | `warning` | More info needed, expiring soon |
+| Abnormal / failed | `danger` | Returned, canceled |
+| Draft / inactive | `secondary` | Draft, archived |
+
+## Badge text must be short enough to scan
+
+“A badge always has text” does not say **how long**. Badges are scanned rather than read: users sweep down a status column to find the exceptions. Once text needs a pause to read, a badge has become a sentence with a background.
+
+<Rules>
+  <Do><p>Keep it to <strong>2–6 words</strong>: “Complete,” “More info needed,” “Under review.” Put reasons in a <a href="/components/tooltip">Tooltip</a> and keep the badge short.</p></Do>
+  <Dont><p>Do not put a full sentence such as “Processing is paused because attachment information is incomplete.” It wraps in narrow columns and stretches every table row; a taller row looks broken, and a whole table becomes twice as long.</p></Dont>
+</Rules>
+
+### When you need more words, change components
+
+| What you want to say | Use |
+| --- | --- |
+| What state is this (2–6 words) | Badge |
+| Why is it in this state (one sentence) | Badge + [Tooltip](/components/tooltip) |
+| This whole area has a persistent problem | [Callout](/components/callout) |
+
+Badges neither wrap nor truncate to `…`: a truncated state (“Retur…”) is worse than a long one because it looks like a real state value. **If you cannot shorten it, change components.**
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/badge.json
+```

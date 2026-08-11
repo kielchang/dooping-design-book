@@ -20,6 +20,16 @@ const translatedDocs = [
   "2-foundations/06-theming.mdx",
   "2-foundations/07-choosing-a-palette.mdx",
   "2-foundations/08-alert-colors.mdx",
+  "3-components/01-button.mdx",
+  "3-components/02-badge.mdx",
+  "3-components/03-callout.mdx",
+  "3-components/04-card.mdx",
+  "3-components/05-input.mdx",
+  "3-components/06-number-input.mdx",
+  "3-components/07-checkbox-select.mdx",
+  "3-components/08-seg-group.mdx",
+  "3-components/09-chips.mdx",
+  "3-components/10-tooltip.mdx",
 ];
 
 describe("English translation coverage", () => {
@@ -43,7 +53,8 @@ describe("English translation coverage", () => {
       join(EN_I18N, "docusaurus-plugin-content-docs/current.json"),
     ].flatMap((file) => Object.values(JSON.parse(readFileSync(file, "utf8")) as Record<string, { message: string }>).map((entry) => entry.message));
 
-    for (const content of [...docs, ...translations]) {
+    const visibleDocs = docs.map((content) => content.replace(/<StoryLink\s+id="[^"]*"\s*\/?>(?:<\/StoryLink>)?/gu, ""));
+    for (const content of [...visibleDocs, ...translations]) {
       expect(content).not.toMatch(cjk);
     }
   });

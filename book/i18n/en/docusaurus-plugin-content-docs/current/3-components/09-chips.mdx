@@ -1,0 +1,92 @@
+---
+title: Chips
+---
+
+# Chips
+
+Multiple selection where **selected and unselected options remain visible together**.
+
+<StoryLink id="元件-表單-輸入控制項--多選標籤片" />
+
+## Why not a multi-select dropdown?
+
+The biggest problem with a multi-select dropdown is that the choices disappear after selection. In an admin system, users almost always want to confirm what they selected before submitting.
+
+<Rules>
+  <Do><p>Use it for a<strong> fixed, small set (≤12)</strong> where users need to compare choices while selecting.</p></Do>
+  <Dont><p>For hundreds of options (all records, for example), use a searchable multi-select panel rather than scattering 100 chips across the screen.</p></Dont>
+</Rules>
+
+<Demo title="Multiple selection">
+  <div className="max-w-md">
+    <Chips
+      label="Order channels"
+      selected={["web", "phone"]}
+      onToggle={() => {}}
+      options={[
+        { value: "web", label: "Online" }, { value: "phone", label: "Phone" },
+        { value: "email", label: "Email" }, { value: "onsite", label: "On-site sales" },
+      ]}
+    />
+  </div>
+</Demo>
+
+## Show all four states together
+
+Chips has four states, and their differences are **visible only side by side**. When shown separately, each looks like “just a chip.”
+
+<Demo title="Four states together">
+  <div className="max-w-md space-y-4">
+    <div>
+      <p className="mb-1 text-xs text-muted-foreground">Default</p>
+      <Chips label="Order channels" selected={["web", "phone"]} onToggle={() => {}} options={[
+        { value: "web", label: "Online" }, { value: "phone", label: "Phone" },
+        { value: "email", label: "Email" }, { value: "onsite", label: "On-site sales" },
+      ]} />
+    </div>
+    <div>
+      <p className="mb-1 text-xs text-muted-foreground">Changed but not submitted (amber)</p>
+      <Chips label="Order channels" selected={["email"]} onToggle={() => {}} changed options={[
+        { value: "web", label: "Online" }, { value: "phone", label: "Phone" },
+        { value: "email", label: "Email" }, { value: "onsite", label: "On-site sales" },
+      ]} />
+    </div>
+    <div>
+      <p className="mb-1 text-xs text-muted-foreground">Locked (focusable; hover explains why)</p>
+      <Chips label="Order channels" selected={["web"]} onToggle={() => {}} disabled
+        lockHint="This record is closed; unlock it first" options={[
+        { value: "web", label: "Online" }, { value: "phone", label: "Phone" },
+      ]} />
+    </div>
+    <div>
+      <p className="mb-1 text-xs text-muted-foreground">No options available</p>
+      <Chips label="Order channels" selected={[]} onToggle={() => {}} options={[]}
+        emptyHint="No channel options have been created" />
+    </div>
+  </div>
+</Demo>
+
+**This is a component specification, not a layout preference.** When the four states are shown separately, nobody notices that locked and changed borders differ by only one brightness step in dark mode. Side by side, the difference is immediate. [SegGroup](/components/seg-group) already follows this rule; Chips should match it.
+
+## Empty options should explain themselves
+
+When `options` is an empty array, the component renders `emptyHint` rather than disappearing.
+
+<Rules>
+  <Do><p>Use <code>emptyHint</code> to say <strong>why</strong> there are no options and, when possible, guide the user: “No channel options have been created.”</p></Do>
+  <Dont><p>Do not hide the field. Users assume the form is broken or that they lack permission; both guesses become support calls.</p></Dont>
+</Rules>
+
+This is the small-component version of the [EmptyState](/components/empty-state) rule: **empty things must explain why they are empty.**
+
+## Accessibility
+
+- A `role="group"` contains `role="checkbox"` items (**not** a radiogroup; selection is multiple).
+- Roving tabindex; arrow keys move, Space/Enter toggles, Esc collapses.
+- Selected items use both a checkmark and a fill.
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/chips.json
+```

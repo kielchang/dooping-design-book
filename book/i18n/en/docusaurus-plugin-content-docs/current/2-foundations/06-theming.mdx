@@ -1,0 +1,152 @@
+---
+title: Light and Dark Themes
+---
+
+# Light and Dark Themes
+
+## Support both host hooks
+
+```css
+.dark,
+[data-theme="dark"] {
+  --background: 222 22% 8%;
+  /* … */
+}
+```
+
+- `.dark` class — the convention in the Tailwind / shadcn ecosystem
+- `[data-theme="dark"]` attribute — the convention in Docusaurus, most documentation sites, and some admin frameworks
+
+Supporting both costs one extra CSS selector and makes the token system usable by an entire additional class of hosts. This documentation site uses the `[data-theme]` hook.
+
+## Toggle the theme on `documentElement`
+
+```ts
+document.documentElement.classList.toggle("dark", isDark);
+document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+```
+
+<Rules>
+  <Do>
+    <p>Put the theme class on <code>&lt;html&gt;</code>.</p>
+  </Do>
+  <Dont>
+    <p>Do not put it only on a wrapper <code>&lt;div&gt;</code>. Dialog, Select, and Tooltip use portals attached to <code>&lt;body&gt;</code>; they cannot see a class inside the wrapper. The result is a popover that is always light and difficult to diagnose.</p>
+  </Dont>
+</Rules>
+
+## Dark mode is designed, not calculated
+
+Dark tokens are **not** an inversion of light tokens:
+
+| Approach | Result |
+| --- | --- |
+| Mechanically invert brightness | `background` and `card` collide; the interface loses its layers |
+| Keep the hue, lower saturation, and establish surface elevations | A calm ink-colored base with clear hierarchy |
+
+This token set keeps the cool indigo hue of light mode, reduces saturation from 84% to 16–22%, and establishes five surface elevations. Every value is rechecked against the actual dark background; light-mode numbers are not reused blindly.
+
+:::warning Validate contrast on the real background
+The comparison background often used in palette studies (for example `#020817`) has a different brightness from the actual page background (`#101319`). When the background changes, contrast must be rechecked. This is a real failure mode.
+:::
+
+## Chart palettes are two independent sets of values
+
+A categorical palette that is safe on a light background is not automatically safe on a dark one—the important point is **not just to validate twice, but not to share values**.
+
+For one color to reach 3:1 against both white and a dark background, OKLCH lightness can only occupy `[0.49, 0.67]`, a 0.17-wide band. If eight colors share one set of values, they are forced into middle lightness; people with red–green color-vision deficiency lose hue discrimination and retain lightness. Sharing values gives up the only dimension they can still use.
+
+```ts
+import { chartColors } from "@dooping/tokens";
+
+chartColors("light"); // 8 colors, L* in 30–62
+chartColors("dark");  // another 8 colors, L* in 49–86 — none shared with light mode
+```
+
+`npm run verify:color` has a dedicated guard: any shared light/dark value fails validation. The previous version shared 6 of 8 colors; [Color semantics](/foundations/color) documents the failure.
+
+## Multi-hue themes
+
+Light/dark is a **lightness** dimension; color themes are another dimension. They are orthogonal and can be combined freely.
+
+```html
+<html data-theme="dark" data-color-theme="indigo">
+```
+
+- `data-theme` / `.dark` — lightness; the existing mechanism remains unchanged
+- `data-color-theme` — hue; **omitting it selects the default Graphite theme**, whose output is identical to the system without this feature
+
+### Which tokens themes affect
+
+Each theme has 16 tokens per mode, split into two groups:
+
+| Category | Tokens | What changes |
+| --- | --- | --- |
+| **Theme color** (4) | `--brand`, `--brand-foreground`, `--brand-subtle`, `--brand-subtle-foreground` | Fully regenerated with contrast back-solving |
+| **Tinted neutrals** (12) | `--background`, `--card`, `--popover`, `--muted`, `--secondary`, `--accent`, `--border`, `--input`, `--field-border`, `--field-editable`, `--field-readonly`, `--muted-foreground` | **Hue only**; lightness and chroma stay fixed |
+
+**Theme-independent:** `--primary` (near-black neutral used by most controls), **`--ring` (neutral focus ring—[ADR-0007](/adr) moved it back from theme hue)**, all status colors, all chart palettes, and every `--{status}-subtle` alert surface.
+
+### Hue budget: theme hue belongs only to the identity layer
+
+The whitelist above follows one memorable rule (see [ADR-0007](/adr) for the decision record and measurements):
+
+| Interface layer | Uses theme hue? | Carrier |
+| --- | --- | --- |
+| Large layout surfaces | ✅ (hue only) | 12 tinted neutrals |
+| Menus, selected navigation, brand emphasis | ✅ | `--brand` family, including the `Button` `brand` variant for non-submit entry points |
+| Actions (confirm, submit, save) | ❌ | Near-black neutral `--primary` |
+| Interaction (hover, pressed, selected) | ❌ | `currentColor` overlay; hue-free mechanism |
+| Focus ring | ❌ | Neutral `--ring`, consistent across themes |
+| Status and alert colors | ❌ | Fixed semantics; see [Alert color dictionary](/foundations/alert-colors) |
+| Data (eight chart colors) | ❌ | Shared across themes |
+
+The focus ring is neutral for a direct reason: a field alert (amber = changed, red = invalid) and the focus ring can appear **on the same input**. If the ring carries theme hue, that combination changes with every theme. Once neutral, “color = meaning, neutral = focus” remains true everywhere.
+
+### Why neutrals carry the theme hue
+
+These tokens have only 0.007–0.023 chroma; a single swatch barely reveals it, but they cover the largest 60% of the screen.
+
+If neutrals stay cool blue (248–267°) while the primary color is teal or moss, the interface feels like “two systems bolted together”: the brand is warm green, but its surfaces are cool blue.
+
+```
+Teal      muted #f0f6f6   border #deeaea
+Moss      muted #f3f6f1   border #e4e9e1
+Amethyst  muted #f5f3f8   border #e9e5ee
+```
+
+**Hue alone changes; lightness and chroma never do**, so light/dark hierarchy, surface elevation, and contrast relationships remain intact. The only exception is `--muted-foreground`: after hue rotation, its contrast against `--muted` can drop (the measured worst case is 4.25:1), so that value is back-solved to 4.5:1 against the theme’s muted surface rather than merely rotated.
+
+This is also what lets alerts inherit a theme automatically: their subtle surfaces sit on these tinted neutrals without needing their hues bent.
+
+### Six default themes
+
+| Name | `data-color-theme` | OKLCH hue |
+| --- | --- | --- |
+| Graphite (default) | `graphite` | 265° (**no brand color**; `--brand` mirrors `--primary`) |
+| Indigo | `indigo` | 272° |
+| Violet | `violet` | 292° |
+| Amethyst | `amethyst` | 305° |
+| Teal | `teal` | 195° |
+| Moss | `moss` | 135° |
+
+Graphite deliberately has no brand color. Its purpose is to preserve the current output when no theme is selected—and the current system has no `--brand`. Forcing a near-neutral fill would collide with the disabled visual position; see [Color semantics → the boundary of brand](/foundations/color).
+
+### Hue space is already partitioned by status colors
+
+New themes cannot choose a hue at random. Status colors occupy ranges; if a brand hue sits too close, users stop reading that color as a status.
+
+```
+danger 17.7°  destructive 25.3°  warning 70.6°
+edit 83.9°    success 162.4°     info 238.1°
+```
+
+The `info` hue at 238° has the largest consequence: **the traditional enterprise-blue range is occupied by a status color**. Choosing a classic enterprise blue around 245° requires moving `info`, which would affect existing screens.
+
+To add a theme, update `THEMES` in `packages/tokens/scripts/generate-theme.mjs`, run `npm run build:theme`, then run `npm run verify:color`. One of the guards checks that the brand hue is far enough from the nearest status color.
+
+## Printing is a third theme
+
+Most teams think only about light and dark. Admin systems have a third output: **the printed copy**.
+
+See [Modes → Print and export](/patterns/print-and-export).

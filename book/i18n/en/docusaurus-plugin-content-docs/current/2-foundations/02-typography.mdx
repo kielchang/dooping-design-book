@@ -1,0 +1,79 @@
+---
+title: Type Scale and Typography
+---
+
+# Type Scale and Typography
+
+**There are only seven sizes, deliberately.**
+
+High-density admin interfaces create hierarchy with weight and color, not an explosion of font sizes. When five sizes appear on one screen, users feel noise rather than structure.
+
+| Token | Value | Use |
+| --- | --- | --- |
+| `micro` | 10px | Badge text, extremely minor notes |
+| `tiny` | 11px | Field help, legends |
+| `xs` | 12px | Secondary table columns, labels |
+| `sm` | **14px** | **Default UI size** |
+| `base` | 16px | Body copy |
+| `lg` | 18px | Card headings |
+| `xl` | 24px | Page headings |
+
+<Demo title="Seven type sizes">
+  <div className="space-y-2">
+    <p style={{ fontSize: "var(--font-size-xl)" }} className="font-semibold">24px — Page heading</p>
+    <p style={{ fontSize: "var(--font-size-lg)" }} className="font-semibold">18px — Card heading</p>
+    <p style={{ fontSize: "var(--font-size-base)" }}>16px — Body copy</p>
+    <p style={{ fontSize: "var(--font-size-sm)" }}>14px — Default UI size for tables and forms</p>
+    <p style={{ fontSize: "var(--font-size-xs)" }} className="text-muted-foreground">12px — Labels and secondary fields</p>
+    <p style={{ fontSize: "var(--font-size-tiny)" }} className="text-muted-foreground">11px — Field help</p>
+    <p style={{ fontSize: "var(--font-size-micro)" }} className="text-muted-foreground">10px — Badge text</p>
+  </div>
+</Demo>
+
+## Why the default is 14px instead of 16px
+
+An admin table often has ten columns. At 16px, the table needs horizontal scrolling, the number-one killer of admin-interface usability. 14px is the measured balance between readability and fitting a row on screen.
+
+Content-heavy pages such as documentation and announcements still use 16px because they do not need to fit ten columns.
+
+## Numbers are always tabular
+
+```jsx
+<td className="text-right tabular-nums">1,284,000</td>
+```
+
+<Rules>
+  <Do>
+    <p>Right-align numeric columns and use <strong>tabular numbers (`tabular-nums`)</strong>. Aligned digits let users recognize the order of magnitude without reading every value.</p>
+  </Do>
+  <Dont>
+    <p>Do not left-align numbers or use proportional widths. Under proportional widths, <code>1,284,000</code> and <code>984,000</code> have similar lengths and are easy to misread at a glance.</p>
+  </Dont>
+</Rules>
+
+## Use accounting parentheses for negative values
+
+Display a negative amount as `($2,000)`, not `-$2,000`. Red is useful reinforcement, not the only clue—the parentheses communicate the negative value even in grayscale print.
+
+<Demo title="Currency formatting">
+  <div className="space-y-1 text-sm tabular-nums">
+    <p>Normal: <code>$1,284,000</code></p>
+    <p>Negative: <code className="text-danger">($2,000)</code></p>
+    <p>Difference: <Delta value={-12800} posLabel="Increase " negLabel="Decrease " /></p>
+  </div>
+</Demo>
+
+## Do not round for display
+
+Formatting functions always use `maximumFractionDigits: 10`; the display layer must not silently round values.
+
+If the display layer rounds on its own, users reconcile against the number on screen, discover that it does not match, and spend an afternoon hunting a bug that does not exist. If rounding is required, make it explicit in the calculation layer.
+
+## Font stack
+
+```css
+--font-family-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+                    "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+```
+
+Use the system font stack instead of loading a custom font. For an admin system, first-screen speed matters more than typographic personality, and custom Chinese fonts can add several megabytes—often disastrous on an intranet.

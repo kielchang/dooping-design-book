@@ -1,0 +1,132 @@
+---
+title: Alert Color Dictionary
+---
+
+# Alert Color Dictionary
+
+This page is a **normative dictionary**. Each alert color has a section answering “what is it, where is it used, and why?” [Color semantics](/foundations/color) explains the principles and design process; this page is the reference for usage and extension. When adding or adjusting an alert color, follow this format so every reader can interpret the same fields.
+
+**The governing rule for alert colors:** semantics stay fixed while themes change. Switch the hue theme or light/dark mode and `danger` is still that red—the semantic space of alerts is **independent of the theme** ([ADR-0007](/adr)). The focus ring is neutral for the same reason: color carries meaning, neutral carries focus, and both can appear on the same input without competing.
+
+## Summary
+
+| Semantic | Token family | One-line definition | Main carriers |
+| --- | --- | --- | --- |
+| `success` | `--success` + `-foreground` / `--success-subtle` + `-subtle-foreground` | Good / complete / passed | Badge, Callout, completed Stepper state, Delta |
+| `warning` | Same structure | Needs attention, but does not block | Badge, Callout |
+| `info` | Same structure | Neutral hint / additional context | Badge, Callout |
+| `danger` | Same structure | Abnormal / error / failed (**describes data**) | Badge, Callout, Delta, row markers |
+| `destructive` | `--destructive` + `-foreground` | Pressing it will delete something (**describes an action**) | `destructive` Button variant |
+| `edit` | `--edit` / `--edit-bg` / `--edit-foreground` | **Changed but not submitted** (reserved color) | EditableField, ChangeSummary, change markers in Badge/Chips/SegGroup |
+| `field-editable` | `--field-editable` + `--field-border` | You can edit this cell | Form fields, editable table columns |
+| `field-readonly` | `--field-readonly` | This cell is calculated / read-only | Form fields, calculated table columns |
+
+## Four status colors: success / warning / info / danger
+
+### Definitions and scenarios
+
+| | Definition | Use (scenarios) | Do not use (counterexamples) |
+| --- | --- | --- | --- |
+| `success` | Good, complete, passed | Completion badges, passed messages, completed Stepper steps, the “good” direction in Delta | Do not use it to imply “can be pressed”—button availability comes from `primary`, not green |
+| `warning` | Needs attention, but does not block the flow | Near expiry, close to a limit, risk that can still be accepted | Do not use it for “a minor error”—anything that blocks belongs to `danger`; do not weaken it with yellow |
+| `info` | Neutral hint, additional context | Instructions, background information, notifications that do not change state | Do not use decorative blue—without a message, there should be no info surface |
+| `danger` | Abnormal data, error, failed | Validation errors, abnormal row markers, the “bad” direction in Delta | Do not use it for delete buttons—that is `destructive`’s job |
+
+### Every status color is a four-piece set with two intensities
+
+```
+--{status}                    Solid fill (high intensity)
+--{status}-foreground         Text on the solid fill
+--{status}-subtle             Subtle surface (low intensity, default)
+--{status}-subtle-foreground  Text on the subtle surface (dark tint of the same hue)
+```
+
+**Use the subtle surface by default; reserve solid fills for blocking messages.** Richness comes from two intensities of one semantic color, not from adding more hues:
+
+| Intensity | Style | Timing |
+| --- | --- | --- |
+| Low (default) | `-subtle` surface + dark same-hue text | Everyday hints, badges, row markers—many can appear without becoming harsh |
+| High (`intensity="high"`) | Solid fill + high-contrast text | Blocking messages that require a decision; use rarely to avoid fatigue |
+
+`Badge` and `Callout` use this vocabulary. **Do not use high intensity in data tables**: table status is normal information, not an alert; a row of solid badges spends the entire 10% high-saturation budget.
+
+### Why these hues
+
+Hue carries established conventions, so status colors stay within conventional ranges with only small perceptual adjustments:
+
+| Status | OKLCH hue | Convention |
+| --- | --- | --- |
+| `danger` | 17.7° | Red = stop, error |
+| `warning` | 70.6° | Yellow-orange = caution |
+| `success` | 162.4° | Green = proceed, complete |
+| `info` | 238.1° | Blue = neutral system message |
+
+These hues are **reserved ranges**. Theme hues and chart categories must keep their distance (`verify:color` enforces two guardrails), or users will stop reading these colors as status signals.
+
+### Contrast guarantees (generated, not hand-picked)
+
+| Item | Threshold | Guarantee |
+| --- | --- | --- |
+| Text on solid fill | 4.5:1 | The generator back-solves: dark foregrounds for light states, deeper red fills with white text |
+| Text on subtle surface | 4.5:1 | Foreground is back-solved against its own subtle surface, not measured after picking |
+| Four subtle surfaces against one another | Distinguishable | Equal tint amount (the ΔE00 ratio against card is ≤1.3), not equal chroma |
+| Color surface against page background | 3:1 | Non-text component threshold (WCAG 1.4.11) |
+
+Values are produced by `generate-theme.mjs`. **Change the generator parameters and rerun `npm run build:theme`; do not edit `tokens.json` by hand.**
+
+## destructive: action red, not data red
+
+| | `destructive` | `danger` |
+| --- | --- | --- |
+| Describes | **Action:** pressing it will delete something | **Data:** this record has a problem |
+| Carrier | `Button variant="destructive"` | Badge, Callout, row, Delta |
+| Coexistence | A red abnormal row with a red delete button on the right—**both commonly appear together** | |
+
+They are separate so red retains its meaning. The hues are deliberately offset (`destructive` 25.3° vs `danger` 17.7°), but **do not depend on users distinguishing eight degrees**: semantics come from the carrier and text; hue difference is supporting evidence.
+
+## edit: reserved amber (83.9°)
+
+The `--edit` set has **one job**: mark “the user changed this, but has not submitted it.”
+
+- Carriers: changed `EditableField` cells, `ChangeSummary` lists, and `edit` / `changed` styles in `Badge`, `Chips`, and `SegGroup`
+- The visual is a three-part set (border + surface + text) **plus a “Changed” text label**—color is not the only cue
+- **Do not repurpose it** for highlights, “new feature” markers, or any other emphasis. Once amber has a second meaning, the signal “what did I change?” is diluted, and that dilution cannot be undone. Repurposing amber requires overturning [ADR-0002](/adr).
+- Guard: the component library forbids raw `amber-*` scale literals to prevent incidental amber highlights
+
+## Field colors: only two semantics
+
+| Token | Meaning | Visual |
+| --- | --- | --- |
+| `--field-editable` + `--field-border` | You can edit this cell | Subtle **cool** surface + clear border |
+| `--field-readonly` | This cell is calculated / read-only | Muted, with no invitation to edit |
+
+Editable fields deliberately use a cool color to separate them from warm status semantics (`warning` / `danger`) and amber (changed). Fields do **not** use three colors for “input / assumption / formula”: that is a spreadsheet convention; users only need to know whether they can edit the cell. [ADR-0002](/adr) records the lesson that three warm subtle surfaces were not distinguishable in practice.
+
+With `edit`, a field’s full lifecycle has three states: editable → changed but not submitted → (after submission) editable.
+
+## Same-frame interaction: alert color × focus ring × selection layer
+
+An input can show at most three visual signals at once. Each has a separate job and does not share the hue space:
+
+| Layer | Color | What it communicates |
+| --- | --- | --- |
+| Alert (`edit` amber / `danger` red) | **Colored, semantic** | The data state of this field |
+| Focus ring (`--ring`) | **Neutral, consistent across themes** | Where keyboard focus is |
+| Selection (`.state-layer` overlay) | **`currentColor`, hue-free** | This cell is selected |
+| Field error (`aria-invalid`) | **`danger` border + text + icon** (surface unchanged) | This field is invalid; `FormField` wires up the ARIA state |
+
+Status colors in **charts** follow the same semantics (status stacks and good/bad variance scales); see the decision tree and `STATUS_SERIES` palette in [Chart color strategy](/components/charts).
+
+This separation directly motivated [ADR-0007](/adr): when the ring used theme hue, “an amber field with focus” looked amber-and-purple under Amethyst but amber-and-teal under Teal. The same state combination changed with every theme, and the focus ring could be mistaken for another alert. With a neutral ring, “color = semantic, neutral = focus” stays true everywhere.
+
+## Extension process: alert colors are a finite enum
+
+Four statuses × two intensities is a **ceiling**, not a starting point. Before adding a color, answer these questions in order:
+
+1. **Can the existing four statuses and intensity levels cover it?** Most requests for a new color are really a request for a higher or lower intensity. Use text and icons for detail, not another hue.
+2. **If not, file an [RFC](/governance/rfc) (use the [direct form](https://github.com/kielchang/dooping-design-book/issues/new?template=rfc.yml)).** Alert colors are a system-wide contract; adding one changes the standard.
+3. **If approved, add parameters to `generate-theme.mjs`**, not hand-entered hex values. The four-piece set (solid + foreground + subtle + subtle foreground) is generated by one rule so contrast is guaranteed.
+4. **Add guards to `verify:color`:** the new hue must stay out of existing reserved ranges; update perceptual distance from the six existing alert colors, equal subtle-surface tint amount, and theme/chart distance constraints.
+5. **Test the guard in reverse:** change the values back to a bad candidate and confirm every new threshold fails. That is the repository’s guardrail rule.
+
+Deleting a color or changing its semantics also requires an RFC; a released alert color is already an established fact in every consuming screen.

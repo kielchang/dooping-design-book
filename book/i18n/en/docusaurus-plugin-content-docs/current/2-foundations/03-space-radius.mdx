@@ -1,0 +1,68 @@
+---
+title: Spacing and Radius
+---
+
+# Spacing and Radius
+
+## Spacing: a 4px baseline
+
+Every spacing value is a multiple of 4px. The reason is not aesthetics but **predictability**: when everyone uses the same numbers, layouts align naturally without local nudging.
+
+| Token | Value | Typical use |
+| --- | --- | --- |
+| `0.5` / `1` | 2px / 4px | Between icons and text |
+| `1.5` / `2` | 6px / 8px | Between elements, compact table padding |
+| `2.5` / `3` | 10px / 12px | Spacing between card sections |
+| `4` / `6` | 16px / 24px | Card padding, section spacing |
+| `8` / `12` | 32px / 48px | Between page sections |
+
+<Demo title="Spacing scale">
+  <div className="space-y-2">
+    {["0.25rem","0.5rem","0.75rem","1rem","1.5rem","2rem"].map((v) => (
+      <div key={v} className="flex items-center gap-3 text-xs">
+        <span className="h-3 bg-primary/70" style={{ width: v }} />
+        <code className="text-muted-foreground">{v}</code>
+      </div>
+    ))}
+  </div>
+</Demo>
+
+## Radius: one variable controls the whole site
+
+```css
+--radius: 0.5rem;              /* baseline */
+--radius-sm: calc(var(--radius) - 4px);
+--radius-md: calc(var(--radius) - 2px);
+--radius-lg: var(--radius);
+```
+
+Change one `--radius` value to move the entire site from square to rounded. This is one of the most common brand adjustments, so it is deliberately a single switch.
+
+<Demo title="Radius scale">
+  <div className="flex flex-wrap items-end gap-3">
+    {[
+      ["sm", "var(--radius-sm)"],
+      ["md", "var(--radius-md)"],
+      ["lg", "var(--radius-lg)"],
+      ["full", "9999px"],
+    ].map(([name, v]) => (
+      <div key={name} className="text-center">
+        <div className="size-16 border-2 border-primary/40 bg-primary/10" style={{ borderRadius: v }} />
+        <p className="mt-1 text-xs text-muted-foreground">{name}</p>
+      </div>
+    ))}
+  </div>
+</Demo>
+
+## Control sizes
+
+| Token | Value | Use |
+| --- | --- | --- |
+| `control-sm` | 32px | Controls inside dense tables |
+| `control` | **36px** | Default input and field height |
+| `control-lg` | 40px | Primary buttons |
+| `tap-target` | **44px** | Minimum touch target for coarse pointers |
+
+Input, Select, and EditableField are all 36px. That is not a coincidence: when the three controls share a row, any 1–2px difference is visible.
+
+The 44px touch target applies only under `@media (pointer: coarse)`: phones and tablets get larger controls while desktops stay compact. See [Accessibility](/accessibility/principles).

@@ -12,9 +12,17 @@ const translatedDocs = [
   "1-start/01-what-is-this.md",
   "1-start/02-three-ways.mdx",
   "1-start/03-adoption-checklist.mdx",
+  "2-foundations/01-color.mdx",
+  "2-foundations/02-typography.mdx",
+  "2-foundations/03-space-radius.mdx",
+  "2-foundations/04-elevation.mdx",
+  "2-foundations/05-motion.mdx",
+  "2-foundations/06-theming.mdx",
+  "2-foundations/07-choosing-a-palette.mdx",
+  "2-foundations/08-alert-colors.mdx",
 ];
 
-describe("English translation proof of concept", () => {
+describe("English translation coverage", () => {
   it("declares English alongside the original Traditional Chinese locale", () => {
     expect(CONFIG).toContain('locales: ["zh-Hant", "en"]');
     expect(CONFIG).toContain('type: "localeDropdown"');
@@ -26,7 +34,7 @@ describe("English translation proof of concept", () => {
     }
   });
 
-  it("does not leave CJK characters in the translated proof-of-concept pages", () => {
+  it("does not leave CJK characters in translated pages or visible messages", () => {
     const cjk = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/u;
     const docs = translatedDocs.map((relativePath) => readFileSync(join(EN_DOCS, relativePath), "utf8"));
     const translations = [

@@ -1,0 +1,183 @@
+---
+title: Choosing a Categorical Palette
+---
+
+# Choosing a Categorical Palette
+
+[Color Semantics](/foundations/color) describes the **approved palette**: eight colors, ordered around the hue wheel, with the hardest pair under color-vision simulation split across the ends of the array.
+
+This page explains **how to reach that decision**. The conclusion cannot be copied: when the brand changes, the client specifies a primary color, or another product line needs its own palette, you need a process rather than someone else’s eight hex values.
+
+## The problem
+
+“Pick eight colors that look different” sounds like a ten-minute task. In practice, a palette chosen by eye fails in four places, and **all four are discovered only after launch**:
+
+| When it fails | Symptom |
+| --- | --- |
+| Someone prints in grayscale | Two bars become the same gray |
+| A user with color-vision deficiency reads a report | Two lines overlap from start to finish |
+| The interface switches to dark mode | One color disappears into the background while another becomes painfully bright |
+| A ninth category appears | Nobody knows which color to add, so someone picks one at random |
+
+The common point in the first three is that **the decision-maker cannot see the problem**. This cannot be solved by visual inspection; it needs a validator.
+
+## Process: candidates → validation → ordering → decision
+
+### 1. Make several candidate sets and compare them side by side
+
+Make at least 5–7 sets, each with a **style description** (“calm enterprise,” “high-saturation dashboard,” “soft and friendly”), using the **same data, the same charts, and light/dark modes side by side**.
+
+Candidates can come from existing palettes, a brand mood board, or a public palette library. First accept one fact: **no set is ready to use as-is**. Mood boards usually have 4–6 colors selected to make one poster attractive, not eight categories distinguishable. They provide direction (hue families and saturation levels), not an answer.
+
+<Rules>
+  <Do><p>Keep candidate sets and their validation results<strong> in the docs or a story</strong>, including the sets that were rejected. Six months later, when someone asks “why not that blue?”, the answer should be findable.</p></Do>
+  <Dont><p>Do not make one set and put it to a vote. A single candidate has no comparison baseline; every set seems acceptable if you stare at it long enough, and the meeting ends with “let’s just use this.”</p></Dont>
+</Rules>
+
+### 2. Four validator checks: run code, not your eyes
+
+Each check blocks a different failure. Omit one and an entire class of problems can escape.
+
+| Check | Question | Consequence of failure |
+| --- | --- | --- |
+| **Lightness band** | Do adjacent colors occupy the same lightness range? | They become indistinguishable in grayscale, on monochrome printers, and for people with low vision |
+| **Chroma** | Is any color unusually gray or fluorescent? | An outlier is read as “this category matters more”—categorical colors must not create a hierarchy |
+| **Color-vision ΔE separation** | After simulating three types of color-vision deficiency, what is the minimum distance between any pair? | Below the floor, about 8% of men see the pair as the same color |
+| **Contrast** | Does every color reach ≥3:1 against the **actual page surface**? | A failing swatch can only be interpreted with a label; it cannot carry meaning alone |
+
+```js
+// Validator output: one report per candidate and per mode
+// { lightnessBand: pass, chroma: pass, cvdSeparation: warn(ΔE 11.4 floor), contrast: pass }
+//
+// Record three details or the result cannot be reproduced:
+//   1. Which background value was used
+//   2. The ΔE floor
+//   3. Which colors only barely passed (they are the first to fail after tuning)
+for (const mode of ["light", "dark"]) {
+  report[mode] = validate(palette[mode], { background: SURFACE[mode].bg, deltaEFloor: 10 });
+}
+```
+
+<Rules>
+  <Do><p>Validate against the<strong> real page surfaces</strong> (card and table backgrounds), not white and pure black. This is the same rule as principle 3 in the [four accessibility principles](/accessibility/principles).</p></Do>
+  <Dont><p>Do not validate against the comparison background from a palette study and stop there. Study white is often brighter than the real card; a color that passes there can lose 0.3 contrast points in the real interface.</p></Dont>
+</Rules>
+
+**The validator’s coverage must exactly match the guarantee you claim.** This sounds obvious, but the source project learned it the hard way: it checked one object while assuming it had checked an entire class. See the second round below.
+
+### 3. Snap to passing: tune; do not start over
+
+When one color barely fails, **keep its hue and tune lightness and chroma until it just passes** instead of choosing a new hue.
+
+Hue carries brand emotion (“this is that blue”); lightness and chroma carry distinguishability. Changing hue throws away the sourcing work, while tuning lightness does not.
+
+Only move hue when two hues are genuinely too close (for example, 11° and read as the same brown). In that case, push both colors apart rather than moving one alone, or the moved color will drift too far from its source.
+
+### 4. Ordering is a design decision, not registration order
+
+A palette is an array, and array **adjacency** becomes chart adjacency: the first two categories, neighboring segments in a stacked chart, and the first two lines drawn.
+
+Two rules:
+
+1. **Order around the hue wheel** (blue → cyan → green → gold → orange → pink → red → purple). This makes neighboring series predictable and makes the approximate hue of “color 5” guessable.
+2. **Put the least-safe verified pair at the two ends of the array.** A hue wheel is a circle and always has one seam; place the seam at the most dangerous pair because `PALETTE[0]` and `PALETTE[7]` are never adjacent series.
+
+<Rules>
+  <Do><p>Keep <code>PALETTE[0]</code> <strong>stable</strong>. It is the default color for a single-series chart with no explicit color; changing it changes every single-series chart in the site.</p></Do>
+  <Dont><p>Do not use the naming order of palette sources as array order. That order is designed to sound pleasant, not to separate the third and fourth lines.</p></Dont>
+</Rules>
+
+### 5. Decision = change token values only
+
+Changing a palette should not touch any line that consumes it—that is the purpose of the names in [Color Semantics](/foundations/color).
+
+**One exception must be explicit: reordering affects hard-coded indices.** Any `PALETTE[3]` maps to a different hue after reordering. Nothing breaks, errors, or turns a test red; it silently changes color, often in a stacked chart whose segment was intentionally green.
+
+<Rules>
+  <Do><p>When reordering a palette, list and visually inspect<strong> every hard-coded index</strong> as an acceptance item.</p></Do>
+  <Dont><p>Do not assume “it is only a color change.” Users remember chart colors; when yesterday’s category was green and today it is orange, their first thought is “the data is wrong.”</p></Dont>
+</Rules>
+
+## A hard fact: background changes invalidate every result
+
+Three of the four checks (lightness band, contrast, and the perception of color-vision separation) depend on the background. Whenever the background changes—dark-mode surfaces are redesigned or a card is brightened by one step—**rerun validation for every palette**.
+
+This rule is easy to skip because background redesign is “theme work” and palette validation is “chart work,” often done in different changes by different people.
+
+<Callout variant="warning" title="Real case: expired validation nobody noticed">
+  The source project missed this step. Dark background values changed when surface elevation was redesigned, but only the live palette was revalidated. The dark-mode results for six candidate sets stayed in the docs under the old background.
+  They looked like complete validation data that could be switched on immediately, but none could actually be used safely. That is worse than having no numbers: without numbers, people know they must validate.
+</Callout>
+
+Record the **background values used for validation next to the results**, and add “rerun palette validation” to the checklist for background-token changes. The first makes stale results visible; the second keeps them from becoming stale.
+
+## Four rounds from this book
+
+The process above was not derived in a vacuum. The categorical palette changed four times between `v0.3.0` and `v0.6.0`, and each change forced one rule out of the validator. The full record is in the [CHANGELOG](https://github.com/kielchang/dooping-design-book/blob/main/CHANGELOG.md); these are the process lessons.
+
+### Round one: validate light and dark separately
+
+Before the redesign, **6 of 8 colors shared one hex value** across modes. A color that passed on a light background needed its contrast and lightness band recomputed on a dark background; sharing a value validated only half the claim. The result was two independent sets of eight.
+
+As §2 says: **“one report per mode” is a coverage requirement, not a formatting requirement.**
+
+### Round two: checking one object means not checking the class
+
+Categories must separate from one another and from status colors, or a user reads a category as an alert. The old guard checked only `danger`, producing these dark-mode collisions:
+
+| Collision | ΔE00 | Floor |
+| --- | --- | --- |
+| `chart-5` ↔ `warning` | **7.3** | 10 |
+| `chart-1` ↔ `info` | **7.9** | 10 |
+
+Both were below the palette’s own “not practically distinguishable” floor, while CI stayed green. The guard existed and ran; its coverage was simply smaller than its name implied.
+
+The output of this round was checking **all six status colors** and the rule that coverage must exactly match the guarantee.
+
+### Round three: when tightening one constraint, relax an aesthetic one
+
+After “stay away from status colors” was added, palette quality **dropped**:
+
+| | Before guard | Guard only | Guard + relaxed aesthetics |
+| --- | --- | --- | --- |
+| Worst ΔE00 (light / dark) | 12.2 / 11.8 | **10.1 / 9.4** | **13.1 / 11.3** |
+
+The dark result in the middle column even contained two pairs below the color-vision floor of 10. The reason is straightforward: each hard constraint reduces the feasible space, so an optimizer searches for an equally good solution in a smaller region.
+
+**Do not relax the color-vision threshold**—it is an accessibility threshold. Relax the aesthetic constraints instead: hue spacing from 30° to 22°, and the lightness band by 0.02. The result was better than before the guard was added.
+
+<Callout variant="info" title="Why the first two defensive additions had negative returns">
+  Two earlier “defense in depth” changes reduced quality because they tightened constraints without giving the optimizer room. When adding a hard constraint, make space by relaxing a soft one; otherwise you search a smaller space for the same quality.
+</Callout>
+
+The priority is now fixed: accessibility thresholds (contrast and color-vision ΔE00) must not be relaxed for aesthetics. When the space is too tight, relax aesthetic constraints (lightness band, chroma limits, hue spacing).
+
+### Round four: tidy numbers do not mean tidy perception
+
+The same round corrected four status subtle surfaces. The old parameters were fixed lightness + fixed chroma, neat numerically but not perceptually. Tint amount measured info 11.0 / danger 12.6 / warning 14.1 / success **18.5**—a 1.69× difference (2.13× in dark mode), in reverse order: green “complete” drew more attention than red “could not confirm.”
+
+The root cause is that the sRGB gamut is **not hue-symmetric**. At high lightness, green and yellow support more chroma than blue and red, so info and danger were clipped while success was not. Fixed tint amount (equal “how much color was added,” not equal chroma values) reduced the ratio to 1.04×.
+
+As §1 says: **the validator must measure perception, not parameters.** Neat parameters make implementation convenient; perceptual consistency is what users receive.
+
+## Trade-offs
+
+**Cost one: a full round takes half a day to a day.** Generate candidates, validate, tune, validate again, order, and inspect.
+
+Whether it is worthwhile depends on how long the palette will live. A palette is the foundation of every chart, and foundation problems collect monthly interest as manual color overrides in every chart.
+
+**Cost two: a palette that passes may not be the prettiest.** Highly saturated sets often pass all four checks but feel loud; soft sets can look beautiful and fail contrast everywhere in light mode.
+
+The order of judgment is **pass validation first, then discuss style**. A slightly less beautiful palette is only less beautiful; a failing palette makes some users unable to read the data.
+
+## Counterexamples
+
+<Rules>
+  <Do><p>Keep validator results<strong> with their warnings</strong>, and record the compensating restriction (for example, “this color may only be used with labels or detail tables”).</p></Do>
+  <Dont><p>Do not treat warn as pass. Warn means “this color cannot carry meaning alone”; it is a<strong> usage restriction</strong>, not a reminder that can be ignored.</p></Dont>
+</Rules>
+
+<Rules>
+  <Do><p>When eight colors are not enough, <strong>merge tail categories</strong> into “Other” and provide detail elsewhere.</p></Do>
+  <Dont><p>Do not say “just add two more colors.” Eight is the practical limit at which the validator can satisfy all four checks at once. Colors 9 and 10 will collide with an existing color under simulation—and the person adding them will not see the collision.</p></Dont>
+</Rules>

@@ -1,0 +1,62 @@
+---
+title: Shadows and Elevation
+---
+
+# Shadows and Elevation
+
+Shadows represent **surface elevation**, not decoration. That is why there are only three levels.
+
+| Token | Meaning | Use |
+| --- | --- | --- |
+| `shadow-sm` | Grounded | Cards, inputs |
+| `shadow-md` | Raised | Dropdowns |
+| `shadow-lg` | Floating | Dialogs, guide cards |
+
+<Demo title="Three shadow levels">
+  <div className="flex flex-wrap gap-6 p-4">
+    {["sm","md","lg"].map((s) => (
+      <div key={s} className={`flex size-24 items-center justify-center rounded-lg border bg-card shadow-${s}`}>
+        <code className="text-xs">{s}</code>
+      </div>
+    ))}
+  </div>
+</Demo>
+
+## Dark mode uses surface brightness, not shadows
+
+Shadows are almost invisible on a dark background. Dark-mode hierarchy therefore comes from **surface brightness**:
+
+```
+background (8%)  <  card (12%)  <  popover (15%)  <  muted (18%)  <  border (22%)
+```
+
+That is why dark tokens are **not** a mechanical inversion of light tokens. A mechanically inverted interface makes `background` and `card` the same value, flattening the interface until elevated surfaces are impossible to distinguish.
+
+<Demo title="Five dark-mode surfaces (switch this document to dark mode to compare)">
+  <div className="space-y-2">
+    {[
+      ["background", "Page background"],
+      ["card", "Card"],
+      ["popover", "Popover"],
+      ["muted", "Muted section"],
+    ].map(([t, label]) => (
+      <div key={t} className="flex items-center gap-3 rounded-md border p-3" style={{ background: `hsl(var(--${t}))` }}>
+        <code className="text-xs">--{t}</code>
+        <span className="text-xs text-muted-foreground">{label}</span>
+      </div>
+    ))}
+  </div>
+</Demo>
+
+## z-index layers
+
+z-index is not a token, but the following ranges are reserved:
+
+| Range | Use |
+| --- | --- |
+| 10 | Sticky headers, frozen first columns |
+| 50 | Dropdowns, dialogs, popovers |
+| 55–60 | Table column-filter panels (above frozen columns) |
+| 200 | Guide spotlight layer (above everything) |
+
+The deliberately large gaps leave room to insert a layer without renumbering everything.

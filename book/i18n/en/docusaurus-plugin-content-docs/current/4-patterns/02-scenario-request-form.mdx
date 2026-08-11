@@ -1,0 +1,45 @@
+---
+title: Scenario-Based Request Form
+---
+
+# Scenario-Based Request Form
+
+## Problem
+
+Master forms often expose 40 editable fields. Users must know which three fields belong to “promote a unit,” audits record before/after but not intent, and every operator develops a different sequence.
+
+## Approach
+
+**Choose a scenario, then fill its fields.**
+
+```
+① Choose scenario       ② Show only its fields          ③ Require reason
+   Promote unit      →    Tier, rate, credit limit    →   Why promote?
+   Pause account     →    Status, effective date     →   Why pause?
+   Update contact    →    Contact, phone, address    →   (not sensitive)
+                                  ↓
+                         Audit with scenario + reason
+```
+
+| Benefit | Meaning |
+| --- | --- |
+| No missed fields | The scenario defines what changes |
+| Intent in the audit | The record contains why, not only what |
+| Scenario-level permissions | “Who can promote?” matches business language better than field permissions |
+
+The request writes directly to the existing audit record with two extra fields: `scenario` and `reason`. Keep one source of truth; do not create a second request table that must be reconciled.
+
+## Trade-off
+
+Scenarios must be defined in advance. Keep an “Other change” scenario with a required, specific reason. If “Other” is used 20 times, that is a signal to add a formal scenario.
+
+<Rules>
+  <Do><p>Keep the list to<strong> 6–10 scenarios</strong>, each corresponding to a real operation.</p></Do>
+  <Dont><p>Do not create one scenario per field (“change phone,” “change address,” “change extension”). That is a 40-field form split into 40 smaller forms.</p></Dont>
+</Rules>
+
+## Implementation notes
+
+- Store scenario → fields as configuration (`Record<Scenario, FieldKey[]>`), not 40 `if` statements.
+- Make reason required and reject fewer than five characters; “fix” and “update” are not reasons.
+- Always audit sensitive scenarios (amount and status changes); non-sensitive contact changes may omit reason but still need an audit record.

@@ -1,0 +1,65 @@
+---
+title: Inline Field Editing
+---
+
+# Inline Field Editing
+
+## Problem
+
+A master form has 30 fields, but users usually open it to change one. A wall of inputs makes changed fields hard to identify, lets a mouse wheel accidentally modify numbers, and makes active data look like an unfinished draft.
+
+## Approach
+
+**Read-only by default; open one field at a time.**
+
+```
+Read-only (looks like a value, with a faint pencil)
+   ↓ click
+Editing (real input, auto-focused)
+   ↓ change value
+Changed (amber field + “Changed” label + undo)
+   ↓ Esc / blur
+Read-only (amber remains)
+```
+
+| Requirement | Why |
+| --- | --- |
+| Discoverable read-only cue (faint pencil) | Users know the value is editable |
+| Mark the whole field when changed | A scan reveals every changed field |
+| Field-level restore | One mistake does not require restarting the form |
+| Confirm undo/redo from old → new | Restore is itself a data change |
+
+Pair it with the [pre-submit ChangeSummary](/components/change-summary) for the complete loop.
+
+<Demo title="Four states together (second field is changed)">
+  <div className="max-w-sm space-y-4">
+    <EditableField label="Unit name" kind="text" value="Hong Chang Industrial Ltd." original="Hong Chang Industrial Ltd." onChange={() => {}} help="Read-only: a value with a faint pencil." />
+    <EditableField label="Credit limit" kind="money" value={1650000} original={1500000} onChange={() => {}} onRevert={() => {}} help="Changed: the whole field is amber and has undo." />
+    <EditableField label="Payment terms" kind="select" value="net30" options={[{ value: "net30", label: "Net 30 days" }, { value: "net60", label: "Net 60 days" }]} original="net30" onChange={() => {}} help="Select opens on click." />
+    <EditableField label="Unit code" kind="text" value="U-1042" original="U-1042" onChange={() => {}} disabled lockHint="Codes cannot change after creation" help="Locked: show a lock and reason, not an unclickable gray box." />
+  </div>
+</Demo>
+
+:::note This is a real component
+This is not a screenshot; the docs site compiles `packages/react` directly. Component changes appear here immediately. Try the [EditableField component](/components/editable-field).
+:::
+
+## Trade-off
+
+The cost is one extra click. That is worthwhile in a master form that is mostly read, but not in a create form that is filled from top to bottom. Create mode turns it off with `alwaysEdit` + `trackChanges={false}` so every new field does not turn amber.
+
+## Counterexamples
+
+<Rules>
+  <Do><p>View and edit are the<strong> same screen</strong>; only the individual field changes state. The user’s model is “I am editing this field.”</p></Do>
+  <Dont><p>Do not switch the whole page between “view mode” and “edit mode.” It forces an Edit → change → Save transaction boundary onto the interface.</p></Dont>
+</Rules>
+
+<Rules>
+  <Do><p>Use the<strong> reserved amber</strong> to mark changes; it has one meaning everywhere.</p></Do>
+  <Dont><p>Do not make an illuminated Save button the only cue. Users know something changed but not which field—especially after a five-minute interruption.</p></Dont>
+</Rules>
+
+## Implementation
+
+Use [EditableField](/components/editable-field) + [ChangeSummary](/components/change-summary) + `useRecordDiff`. One `FieldSpec[]` declaration drives comparison, display formatting, and audit records.

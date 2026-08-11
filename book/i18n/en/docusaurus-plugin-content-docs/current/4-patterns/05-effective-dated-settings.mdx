@@ -1,0 +1,53 @@
+---
+title: Effective-Dated Settings
+---
+
+# Effective-Dated Settings
+
+## Problem
+
+When a parameter changes, should historical data change too? If a fee rate moves from 3% to 3.5% and reports recalculate with today’s rate, last month’s closed numbers suddenly change. The reconciliation report no longer agrees tomorrow.
+
+## Approach
+
+**A parameter is a sequence of versions with effective dates.**
+
+```ts
+type Versioned<T> = { effectiveFrom: string; value: T }[];
+
+function resolve<T>(versions: Versioned<T>, period: string, fallback: T): T {
+  const hit = versions.filter((v) => v.effectiveFrom <= period).at(-1);
+  return hit?.value ?? fallback;
+}
+```
+
+```
+2024-01 → 3.0%
+2024-07 → 3.5%
+
+March report → 3.0%   (history stays stable)
+August report → 3.5%
+```
+
+## Three implementation rules
+
+1. **The calculation layer receives a resolved value**, not the version list. `calculate(input, { feeRate: 0.03 })` stays a pure, independently testable function.
+2. **Every consumer resolves by period:** reports, simulations, exports, and charts all use the same `resolve()`.
+3. **Inline editing adds a version:** the effective date must be later than the last locked period. Do not edit a version whose interval already covers locked history; that silently rewrites the past. Guide users to “Add effective version” instead.
+
+## Trade-off
+
+Versioned settings add a concept users must understand, so use them only when necessary:
+
+| Setting | Version it? |
+| --- | --- |
+| Used in historical calculations (fees, tax, coefficients) | ✅ Required |
+| Changes current display only (page size, default sort) | ❌ No |
+| Affects future non-retroactive behavior (notification rules) | ❌ Usually no |
+
+Failing to version what needs it is a data-correctness problem; versioning everything only adds clicks.
+
+<Rules>
+  <Do><p>Provide a compatibility mirror: `settings.feeRate` always equals the latest value for places such as create-form defaults.</p></Do>
+  <Dont><p>Do not force every read through `resolve()` for cleanliness. Most screens need the latest value and do not need another abstraction.</p></Dont>
+</Rules>

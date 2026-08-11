@@ -1,0 +1,33 @@
+---
+title: Guided Tours and Acceptance Marks
+---
+
+# Guided Tours and Acceptance Marks
+
+## Problem
+
+A first-time admin user sees twelve sidebar items and a twenty-column table. They will not read a manual or remember a video. The effective approach is to walk them through the real screen.
+
+Common custom-tour failures are a card covering the button it names, a backdrop covering the target so it cannot be used, and keyboard users being unable to finish.
+
+## Approach
+
+1. **Click-through spotlight:** a large `box-shadow` covers the outside while the transparent hole uses `pointer-events: none`. The guide teaches; it does not click for the user.
+2. **Collapsible card:** when the user must open a dialog or switch tabs, collapse to a lower-right pill and expand again for the next step. Provide a clear “− / ⤢” control, not only Close.
+3. **Keyboard and screen reader:** ←/→ change steps, Esc skips, Enter advances, focus moves into the card, `aria-live="polite"` announces, and `aria-modal="false"` keeps the background usable.
+4. **Missing anchors degrade gracefully:** if a target is absent because a tab is closed or permission is missing, `targetRect = null` shows a centered card instead of crashing the tour.
+
+## The same component can mark acceptance
+
+Add “✅ Passed / ❌ Issue + note” per step. Completing the tour creates an acceptance report. One component serves onboarding and verification without a second maintenance path.
+
+## Trade-off
+
+Tour content expires as screens change. Use semantic anchors (`data-tour="export-button"`) instead of CSS selectors, fall back to a centered card when missing, and keep tours to **3–7 steps**.
+
+<Rules>
+  <Do><p>Cover<strong> one complete critical path</strong>, from entry to finishing one task.</p></Do>
+  <Dont><p>Do not introduce every button. If explaining a page takes 12 steps, fix the page; a tour only delays “I do not understand.”</p></Dont>
+</Rules>
+
+Implementation: [Coachmark](/components/coachmark).

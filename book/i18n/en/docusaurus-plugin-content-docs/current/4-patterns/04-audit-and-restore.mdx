@@ -1,0 +1,64 @@
+---
+title: Audit and Restore
+---
+
+# Audit and Restore
+
+## Problem
+
+“This field was different last week. Who changed it?” Most audit logs answer only half: time, actor, and “updated unit U-1042,” but not what changed or whether it can be restored.
+
+## Approach
+
+### 1. Structured before / after
+
+An audit record is a structure, not a sentence:
+
+```ts
+{
+  action: "update",
+  target: { kind: "customer", id: "U-1042" },
+  scenario: "tier-upgrade",
+  reason: "Annual volume reached the upgrade threshold",
+  before: { tier: "silver", creditLimit: 1_000_000 },
+  after:  { tier: "gold",   creditLimit: 1_500_000 },
+  restoreKind: "customer",
+}
+```
+
+`before` and `after` come from the same `Change[]` used by [ChangeSummary](/components/change-summary), so the pre-submit view and later audit record agree.
+
+### 2. Derive restore capability from the data
+
+```
+before/after + restoreKind → restorable
+neither                  → not restorable
+```
+
+| Operation | Restorable? | Why |
+| --- | --- | --- |
+| Field update | ✅ | Explicit previous value |
+| Full-list update | ✅ | Store a complete snapshot |
+| Create | ❌ | Restoring a create is deletion, another action |
+| Delete | ❌ | Cascading effects are hard to reconstruct |
+| Batch action | ❌ | Partial success has no single restore point |
+| Confirm / unlock | ❌ | State transition, not data change |
+
+Let the data structure decide whether to show Restore. Do not maintain a hard-coded list that becomes stale when a new action is added.
+
+### 3. Restore is audited too
+
+Write restore as a new audit record with `restoredFrom: <original record id>`. Otherwise the data changes mysteriously and the log cannot explain it.
+
+### 4. Restore obeys the lock
+
+Locked data cannot be restored; [hard lock](/patterns/hard-lock) has no back door.
+
+## Trade-off
+
+Storing before/after uses more space than operation-only logs. Field-level diffs are small and can be limited to sensitive entities. The real cost is remembering every mutation, so put auditing in shared update functions rather than relying on discipline.
+
+<Rules>
+  <Do><p>An audit record answers who, when, which field, from what to what, and why.</p></Do>
+  <Dont><p>Do not record only “User A updated data.” That exists only to give an audit report something to print.</p></Dont>
+</Rules>

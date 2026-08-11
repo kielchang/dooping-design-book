@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "app-shell",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "type": "registry:ui",
   "title": "AppShell 外殼容器",
   "description": "側欄＋頂列＋主內容的佈局容器，刻意小到宿主可自行重寫。",

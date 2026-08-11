@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">Gantt 時間軸 | Dooping Design Book</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://kielchang.github.io/dooping-design-book/preview/components/gantt/"><meta data-rh="true" property="og:locale" content="zh_Hant"><meta data-rh="true" name="docusaurus_locale" content="zh-Hant"><meta data-rh="true" name="docsearch:language" content="zh-Hant"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Gantt 時間軸 | Dooping Design Book"><meta data-rh="true" name="description" content="檢視與選取用的精簡時間軸：左欄項目、右欄長條，加上刻度、格線與今天線。"><meta data-rh="true" property="og:description" content="檢視與選取用的精簡時間軸：左欄項目、右欄長條，加上刻度、格線與今天線。"><link data-rh="true" rel="icon" href="/dooping-design-book/preview/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://kielchang.github.io/dooping-design-book/preview/components/gantt/"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/preview/components/gantt/" hreflang="zh-Hant"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/preview/components/gantt/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"元件 Components","item":"https://kielchang.github.io/dooping-design-book/preview/components"},{"@type":"ListItem","position":2,"name":"Gantt 時間軸","item":"https://kielchang.github.io/dooping-design-book/preview/components/gantt"}]}</script><link rel="stylesheet" href="/dooping-design-book/preview/assets/css/styles.87fb2520.css">
-<script src="/dooping-design-book/preview/assets/js/runtime~main.ba26a118.js" defer="defer"></script>
+<script src="/dooping-design-book/preview/assets/js/runtime~main.2c58e5e8.js" defer="defer"></script>
 <script src="/dooping-design-book/preview/assets/js/main.d72e36f6.js" defer="defer"></script>
 </head>
 <body>
@@ -36,11 +36,13 @@
 <div class="rule-grid"><div class="rule-do"><strong>✅ 這樣做</strong><p>延誤、待補件這類狀態走<strong>獨立通道</strong>：列尾放狀態徽章，或左欄加圖示。</p></div><div class="rule-dont"><strong>🚫 不要這樣</strong><p>不要把長條染紅表達延誤。長條顏色一旦身兼狀態，「這一類是紅色」與「這一筆出事了」
 就分不開；而且紅色面積是有預算的——保留給真正的警報。</p></div></div>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="狀態">狀態<a href="#狀態" class="hash-link" aria-label="狀態的直接連結" title="狀態的直接連結" translate="no">​</a></h2>
-<table><thead><tr><th>狀態</th><th>表現</th></tr></thead><tbody><tr><td>hover</td><td>狀態層 6%（整列，含左欄與時間軸）</td></tr><tr><td>pressed</td><td>狀態層 14%</td></tr><tr><td>已選</td><td>狀態層 20%；<strong>次要文字換回正文色</strong>（20% 疊加下 <code>--muted-foreground</code> 會低於 4.5:1）</td></tr><tr><td>focus-visible</td><td>2px 聚焦環＋2px 偏移（列是 <code>&lt;button&gt;</code>，只在有 <code>onSelect</code> 時）</td></tr></tbody></table>
+<table><thead><tr><th>狀態</th><th>表現</th></tr></thead><tbody><tr><td>hover</td><td>狀態層 6%（整列，含左欄與時間軸）</td></tr><tr><td>pressed</td><td>狀態層 14%</td></tr><tr><td>已選</td><td>狀態層 20%；<strong>次要文字換回正文色</strong>（20% 疊加下 <code>--muted-foreground</code> 會低於 4.5:1）</td></tr><tr><td>focus-visible</td><td>2px 聚焦環＋2px 偏移（列是 <code>&lt;button&gt;</code>，只在有 <code>onSelect</code> 時）</td></tr><tr><td>空</td><td><code>items</code> 為空時顯示內建<a class="" href="/dooping-design-book/preview/components/empty-state/">空狀態</a>，不畫空刻度——文案與行動用 <code>empty</code> 客製（與資料表同形），省略時用 <code>labels.emptyTitle</code></td></tr></tbody></table>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="刻度與粒度">刻度與粒度<a href="#刻度與粒度" class="hash-link" aria-label="刻度與粒度的直接連結" title="刻度與粒度的直接連結" translate="no">​</a></h2>
 <p>跨度 ≤21 天出<strong>日</strong>刻度、≤120 天出<strong>週一</strong>刻度、更長出<strong>月初</strong>刻度。
 刻意不做縮放切換——檢視用的時間軸，粒度自動選對就好；要縮放的是編輯器。</p>
-<p>視窗省略時由資料推導，前後各留 5% 邊距。今天線只在落於視窗內時出現。</p>
+<p>視窗省略時由資料推導，前後各留 5% 邊距。今天線只在落於視窗內時出現。
+<code>items</code> 為空時沒有視窗可推導，也不畫刻度——直接顯示內建空狀態
+（沒有列的刻度表看起來像壞掉，而不是「還沒有資料」）。</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="無障礙">無障礙<a href="#無障礙" class="hash-link" aria-label="無障礙的直接連結" title="無障礙的直接連結" translate="no">​</a></h2>
 <ul>
 <li class="">有 <code>onSelect</code> 時每列是真的 <code>&lt;button&gt;</code>：Tab 可及、<code>aria-pressed</code> 表達選取。</li>

@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "popover",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "type": "registry:ui",
   "title": "Popover 彈出面板",
   "description": "錨定在觸發元素旁的浮層容器（Radix Popover）。",

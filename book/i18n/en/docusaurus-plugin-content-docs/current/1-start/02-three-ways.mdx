@@ -1,0 +1,101 @@
+---
+title: Three ways to adopt it
+---
+
+# Three ways to adopt it
+
+All three are valid. They can be combined. **You do not have to choose all or nothing**—that is exactly why this book is divided into three layers.
+
+<FlowThreeWays />
+
+The diagram is only a guide; the details and decision criteria are below. Combining the approaches is completely valid.
+
+## Approach one: read the specification (zero dependencies)
+
+The lightest option. Read [Foundations](../../foundations), [Patterns](../../patterns), and [Accessibility](../../accessibility), then implement them with your own stack. This is a good fit when:
+
+- You already have a component library and only want to standardize interaction logic.
+- You are not using React (Vue, Svelte, Blazor, or plain HTML/CSS).
+- You want to solve one specific problem, such as the shape of a change summary before submission.
+
+Every pattern is written as “problem → approach → trade-offs → counterexample,” so it can be used directly as a specification.
+
+## Approach two: copy components from the registry (recommended)
+
+Copy the **source code** into your project. From that point on, it is your code: you can change it without affecting anyone else, and upgrades will not wake you up with a breaking change.
+
+```bash
+# Install one item
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/data-table.json
+
+# Dependencies are installed automatically (DataTable brings table / input / button / select / tooltip / utils...)
+```
+
+After installation:
+
+```
+src/
+├── components/dooping/    ← components
+└── lib/dooping/           ← utilities (cn, useSort, csv, download, forms-diff)
+```
+
+:::note Prerequisites
+Your project needs a `components.json` file (the shadcn configuration) and an `@/*` path alias. If it does not have them yet, run `npx shadcn@latest init` first.
+:::
+
+<Demo title="This is what the registry installs">
+  <div className="flex flex-wrap items-center gap-2">
+    <Button>Primary action</Button>
+    <Badge variant="success">Complete</Badge>
+    <Delta value={12800} posLabel="Increase " negLabel="Decrease " />
+  </div>
+</Demo>
+
+## Approach three: install the token package (the only recommended hard dependency)
+
+```bash
+npm install @dooping/tokens
+```
+
+```js title="tailwind.config.js"
+module.exports = {
+  presets: [require("@dooping/tokens/tailwind-preset")],
+  content: ["./src/**/*.{ts,tsx}"],
+};
+```
+
+```css title="your global CSS"
+@import "@dooping/tokens/tokens.css";
+```
+
+You do not need Tailwind—`tokens.css` is plain CSS variables that any host can consume:
+
+```css
+.my-alert {
+  background: hsl(var(--danger) / 0.1);
+  border: 1px solid hsl(var(--danger) / 0.35);
+  color: hsl(var(--danger));
+}
+```
+
+If you need the values in JavaScript (Canvas charts, server-side PDF generation, or a Figma plugin):
+
+```ts
+import { semanticColors, chartColors } from "@dooping/tokens";
+
+const palette = chartColors("dark");   // ["#2a5ae5", "#0e9488", …]
+const colors = semanticColors();        // { primary: "222.2 47.4% 11.2%", … }
+```
+
+## Which approach should you choose?
+
+<Rules>
+  <Do>
+    <p>New project, React, moving quickly → <strong>Approach two + Approach three</strong>. Tokens keep theming consistent; the registry gives you working components.</p>
+  </Do>
+  <Dont>
+    <p>Do not replace an existing production system all at once just to make it “consistent.” Start with tokens so both old and new screens share the same colors, then migrate gradually.</p>
+  </Dont>
+</Rules>
+
+For existing systems, see [Governance → three-stage adoption](../../governance/adoption). For a brand-new project, install the tokens and components, then start planning screens from the [Pages](../../pages) chapter. To keep your implementation aligned over time, see [Staying current](../../governance/staying-current).

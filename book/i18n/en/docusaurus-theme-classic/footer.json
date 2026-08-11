@@ -1,0 +1,30 @@
+{
+  "link.title.回饋": {
+    "message": "Feedback",
+    "description": "The title of the footer links column with title=回饋 in the footer"
+  },
+  "link.title.版本": {
+    "message": "Version",
+    "description": "The title of the footer links column with title=版本 in the footer"
+  },
+  "link.item.label.提出建議（三分流表單）": {
+    "message": "Suggest an improvement (choose a path)",
+    "description": "The label of footer link with label=提出建議（三分流表單） linking to https://github.com/kielchang/dooping-design-book/issues/new/choose"
+  },
+  "link.item.label.回饋與 RFC 流程": {
+    "message": "Feedback and RFC process",
+    "description": "The label of footer link with label=回饋與 RFC 流程 linking to /governance/rfc"
+  },
+  "link.item.label.CHANGELOG": {
+    "message": "CHANGELOG",
+    "description": "The label of footer link with label=CHANGELOG linking to https://github.com/kielchang/dooping-design-book/blob/main/CHANGELOG.md"
+  },
+  "link.item.label.Releases（訂閱新版通知）": {
+    "message": "Releases (subscribe to updates)",
+    "description": "The label of footer link with label=Releases（訂閱新版通知） linking to https://github.com/kielchang/dooping-design-book/releases"
+  },
+  "copyright": {
+    "message": "Dooping Design Book · Design language and patterns · MIT",
+    "description": "The footer copyright"
+  }
+}

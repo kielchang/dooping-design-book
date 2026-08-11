@@ -1,0 +1,96 @@
+---
+title: Mockup
+---
+
+# Mockup
+
+**A documentation tool, not a product component.**
+
+<StoryLink id="元件-文件示意-模擬畫面積木--積木" />
+
+## Screenshots start expiring on day one
+
+Move a button once and every screenshot in the handbook needs to be retaken. Nobody retakes them, so the handbook starts lying in a way that is hard to notice: the image looks professional but no longer matches the product.
+
+## Build mockups with real components
+
+- Important controls → **real library components** wrapped in `<Spotlight>`.
+- Everything else → `<Placeholder>` for blank space.
+- Overall layout → `<MockScreenFrame>`.
+
+When components change, the mockup changes with them. No one needs to take a new screenshot.
+
+<Demo title="One-step operation">
+  <div className="overflow-x-auto rounded-lg border">
+    <MockScreenFrame>
+      <div className="flex items-center gap-2">
+        <TabPills value="confirmed" onChange={() => {}} tabs={[{ key: "all", label: "All" }, { key: "confirmed", label: "Confirmed" }]} />
+        <span className="ml-auto"><Spotlight label="① Switch to Confirmed"><Badge variant="info">7 records</Badge></Spotlight></span>
+      </div>
+      <MockRow />
+      <MockRow focus={<Spotlight><Button size="sm" variant="outline">Schedule</Button></Spotlight>} />
+      <MockRow />
+    </MockScreenFrame>
+  </div>
+</Demo>
+
+## Usage rule
+
+<Rules>
+  <Do>Wrap important controls in <code>Spotlight</code> (real components); use <code>Placeholder</code> everywhere else.</Do>
+  <Dont>Do not use Placeholder to pretend to be a real component. That is an expired screenshot, only uglier.</Dont>
+</Rules>
+
+## Initial state must not depend on browser environment
+
+The documentation site is statically generated; **the first render happens without a browser**. Any component that reads browser state for its initial value risks hydration mismatch:
+
+```tsx
+// ✗ No matchMedia on the server; server false and browser true mismatch
+const [expanded, setExpanded] = useState(
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches
+);
+
+// ✓ Fixed initial value; apply preference after mounting
+const [expanded, setExpanded] = useState(false);
+useEffect(() => {
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) setExpanded(true);
+}, []);
+```
+
+The same rule covers theme preference, viewport width, touch capability, and reduced motion. The symptom is a flash or React hydration warning visible only after production build; development mode often does not reproduce it.
+
+## Spotlight shares one visual language
+
+`<Spotlight>` uses the same `.spotlight-ring` as [Coachmark](/components/coachmark), so readers see the same “look here” cue in docs and product. Amber remains reserved for “changed but not submitted” and must not be used for spotlighting.
+
+## Player component rules
+
+A multi-step player that strings mockups into a flow is not yet part of the library, but its component rules are settled:
+
+- With reduced motion, show the **fully expanded static version**; do not autoplay without transitions. The preference means “do not let anything move on its own.”
+- Use text buttons such as “‹ Previous” and “Next ›” at 36px desktop height. Dots may be 10px visually but need a 28px hit area; touch controls grow to 44px with `tap-target`.
+- Put captions on their own line above the controls so changing caption length does not move the buttons.
+- On narrow screens, let the mockup scroll horizontally inside its step container (`overflow-x: auto`, `min-width: 460px`); do not make the whole page scroll horizontally.
+- Start each caption with `①`, `②`, `③` and one action sentence. The final caption should say “After completion you will see: …” so the reader has an acceptance condition.
+
+<Rules>
+  <Do><p>Use at most<strong> one spotlight per mockup</strong>. Show secondary information with a badge or callout.</p></Do>
+  <Dont><p>Do not circle three places in one image. Three highlights mean no highlight, and readers start wondering whether they missed a fourth.</p></Dont>
+</Rules>
+
+## Trade-off
+
+A mockup is not pixel-identical to the product; the simplification is deliberate. Readers need to know where to click, not receive a pixel-perfect replica.
+
+## Printing
+
+`.mock-placeholder` adds a faint border in print styles because some printers remove background fills. The border preserves shape and labels. See [Print and export](/patterns/print-and-export).
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/mockup.json
+```
+
+Further reading: [Pattern → Screenshot-free documentation mockups](/patterns/zero-screenshot-docs)

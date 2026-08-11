@@ -32,7 +32,7 @@ export interface TrendChartProps {
  */
 export function TrendChart({
   data,
-  title = "趨勢折線",
+  title = "Trend line",
   zeroBased = true,
   valueFmt = defaultFmt,
   onSelect,
@@ -60,7 +60,7 @@ export function TrendChart({
     <div className={cn("overflow-x-auto", className)}>
       <svg
         role="img"
-        aria-label={`${title}，${data.length} 期，${first.label} ${valueFmt(first.value)} 到 ${last.label} ${valueFmt(last.value)}`}
+        aria-label={`${title}, ${data.length} periods, from ${first.label} ${valueFmt(first.value)} to ${last.label} ${valueFmt(last.value)}`}
         viewBox={`0 0 ${W} ${height}`}
         width={W}
         height={height}
@@ -100,8 +100,8 @@ export function TrendChart({
         })}
       </svg>
       <ChartDataTable
-        caption={`${title}（各期數值）`}
-        head={["期別標籤", "數值"]}
+        caption={`${title} (values by period)`}
+        head={["Period", "Value"]}
         rows={data.map((d) => [d.label, valueFmt(d.value)])}
         onSelect={onSelect ? (i) => onSelect(i, data[i]) : undefined}
         selectedIndex={selectedIndex}

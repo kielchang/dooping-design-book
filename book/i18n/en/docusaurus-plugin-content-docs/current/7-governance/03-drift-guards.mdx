@@ -1,0 +1,37 @@
+---
+title: Drift Guards
+---
+
+# Drift Guards
+
+## The problem
+
+Shared rules drift when the only enforcement is a review comment. A new export can be forgotten,
+a token copy can go stale, or a documentation embed can become a blank frame after a story rename.
+
+## Three layers of defense
+
+1. **Compiler**: make invalid dependencies and types impossible.
+2. **Lint**: block common escape routes such as raw palette colors.
+3. **Tests**: encode structural contracts that static typing cannot see.
+
+The guards in this repository cover package boundaries, barrel exports, token parity, domain
+vocabulary, raw colors, generated copies, documentation hooks, and deployment paths.
+
+### Structural tests
+
+- Components may not depend on application pages.
+- Every component must be reachable from the intended public export.
+- Light and dark tokens, CSS output, and source data stay synchronized.
+- Domain-specific vocabulary does not leak back into the generic library.
+- Documentation `StoryFrame` and `StoryLink` references point to existing stories.
+- The application and docs site build only when their own paths are affected.
+
+The docs site also renders real component source, so the build is a drift check in addition to
+being a publishing step.
+
+## When to add a guard
+
+Add a guard when a failure is structural, likely to recur, and cheap to detect automatically.
+Do not add a test for a one-time typo or replace judgment about visual quality with a snapshot.
+Code review remains necessary; it simply should not be the only defense.

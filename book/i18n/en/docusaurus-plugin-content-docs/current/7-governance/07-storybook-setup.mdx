@@ -1,0 +1,34 @@
+---
+title: Storybook Setup
+---
+
+# Storybook Setup
+
+## Put theme switching on `documentElement`
+
+The theme class belongs on `document.documentElement`, matching the application token scope.
+Putting it on a story wrapper can make portals, dialogs, and tooltips render with the wrong theme.
+
+## Keep preview decorators free of application state
+
+Decorators should provide tokens, layout, and small test context only. Do not inject a router,
+global store, or product fixture that makes a component story pass for the wrong reason.
+
+## `viteFinal` has three deliberate responsibilities
+
+Resolve the workspace package aliases, expose the token CSS, and preserve the same asset and
+environment assumptions as the library build. Keep those additions explicit so a Storybook
+upgrade cannot silently change the boundary.
+
+## Sort every top-level category
+
+`storySort` should cover foundations, components, pages, and stress stories. A new category must
+have a predictable place rather than appearing at the bottom by accident.
+
+## One title convention
+
+Use one stable title form for each package area. The title is part of the documentation hook,
+so renaming it requires updating embeds and the guard test.
+
+Storybook belongs in governance because it is the executable catalog of component states and the
+place where disabled features remain previewable.

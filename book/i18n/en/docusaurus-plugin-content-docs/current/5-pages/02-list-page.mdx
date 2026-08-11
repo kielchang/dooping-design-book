@@ -1,0 +1,50 @@
+---
+title: List Page
+---
+
+# List Page
+
+## When to use it
+
+Use a list page when the user needs to scan, search, compare, filter, or select records. If
+the user is focused on one record, link to a detail page instead.
+
+## Composition
+
+<StoryFrame id="pages-list-page--typical-composition" title="List page: header, view switcher, and data table" height={640} />
+
+The page consists of context and title, a primary action, search and filters, an optional view
+switcher, and the standard data table. Put result count and active-filter state near the table.
+
+## Behavior rules
+
+- Search all appropriate text columns and preserve the query in the URL when it is shareable.
+- Combine values within a column with OR and different column filters with AND.
+- Sort with the shared three-state behavior and show the active direction.
+- Keep totals based on the complete filtered result, not only the current page.
+- Export the current filtered and sorted result with a meaningful filename.
+- Preserve selection when it remains valid, and clear it when filters exclude the selected row.
+
+## Empty and loading states
+
+<StoryFrame id="pages-list-page--empty-and-loading" title="First-use empty state and loading state" height={560} />
+
+Distinguish no records, no matching records, no permission, and loading. A first-use empty
+state should explain the primary action; a filtered empty state should expose the active filter
+and offer a reset.
+
+## Accessibility
+
+The table needs a caption or accessible name, keyboard access to sorting and filters, visible
+focus, and row selection that is not communicated by color alone. Announce result-count changes
+when filtering changes the available rows.
+
+## Adoption
+
+Start with the standard `DataTable` and its column configuration. Add a custom view only when
+the task has a different question, not because a table has a different color or column order.
+
+## Missing pieces
+
+Record unsupported requirements such as tree rows, grouped totals, or bulk actions as reusable
+extensions. Do not bypass the shared empty, loading, and export behavior to ship a one-off table.

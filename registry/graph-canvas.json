@@ -3,8 +3,8 @@
   "name": "graph-canvas",
   "version": "0.11.1",
   "type": "registry:ui",
-  "title": "GraphCanvas 節點畫布",
-  "description": "@xyflow/react 的薄封裝：token 橋接、狀態層選取、中性聚焦環。",
+  "title": "GraphCanvas",
+  "description": "Thin @xyflow/react wrapper with token bridge, state-layer selection, and neutral focus ring.",
   "dependencies": [
     "@dooping/tokens@^0.6.0",
     "@xyflow/react"

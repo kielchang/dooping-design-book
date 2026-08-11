@@ -1,0 +1,45 @@
+---
+title: Versioning Strategy
+---
+
+# Versioning Strategy
+
+Versioning is a communication contract, not a number attached after a build. A version tells a
+downstream team what changed, whether it must act, and which source produced an artifact.
+
+## What counts as a release
+
+A release is a reviewed change to the supported contract. A preview deployment is not a release:
+it proves the site can build, but it does not promise a stable token or component API.
+
+Use two outward signals: a tagged package or registry artifact for machines, and a changelog or
+release note for people. Both must point to the same commit.
+
+## SemVer mapping
+
+| Change | Version |
+| --- | --- |
+| Breaking token or component contract | Major |
+| Backward-compatible capability | Minor |
+| Bug fix or documentation correction | Patch |
+
+Keep token and component versions independent when their contracts change independently. A
+documentation site build may show both versions and the source commit.
+
+## Release flow
+
+1. Propose the change and state its compatibility impact.
+2. Review the implementation, stories, tests, and migration note.
+3. The maintainer confirms the version and creates the tag on GitHub.
+4. CI publishes the artifact from that tag and records its commit.
+5. Update the changelog and docs mapping.
+
+Do not release for private refactors, an unpublished preview, or a change that has not passed
+its relevant guards.
+
+## Changelog and provenance
+
+Write release notes for the person deciding whether to upgrade: what changed, who is affected,
+and what they should do. Print and export output should include version, commit, and generation
+time so a paper copy can be traced to a build. Local builds should say `dev` rather than pretend
+to be a released artifact.

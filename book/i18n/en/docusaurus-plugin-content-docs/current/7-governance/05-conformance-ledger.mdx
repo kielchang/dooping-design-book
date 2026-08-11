@@ -1,0 +1,40 @@
+---
+title: Conformance Ledger
+---
+
+# Conformance Ledger
+
+## The problem
+
+Teams need to know which shared rules a product follows, which are intentionally different, and
+which are not implemented yet. Without a ledger, the same conversation repeats during every
+review.
+
+## One ledger, three states
+
+Record each rule as **conformant**, **exception**, or **not yet adopted**, with an owner, evidence
+link, and next review date. An exception names the reason and expiry rather than becoming a
+permanent undocumented fork.
+
+## Read-only source of truth
+
+Downstream products consume the shared specification; they do not edit it in place. A proposed
+upstream change travels through an issue or RFC, then a pull request, then a merge. Implementation
+starts after the contract is accepted.
+
+## Two ledgers
+
+Keep the shared design-system ledger separate from the product conformance ledger. The former
+records what the system promises; the latter records how one product applies it. Do not duplicate
+the same decision in both places.
+
+## Updates and offline summaries
+
+An upstream update is not automatically applied to a product. Review the diff, assess exceptions,
+run the product checks, and record the adoption commit. An offline summary may carry the key rules
+for a constrained environment, but it must link back to the authoritative source when possible.
+
+## Trade-off
+
+The ledger costs maintenance, but makes deliberate divergence visible and gives upgrades a finite
+checklist instead of relying on memory.

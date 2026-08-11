@@ -1,0 +1,62 @@
+{
+  "version.label": {
+    "message": "Next",
+    "description": "The label for version current"
+  },
+  "sidebar.book.category.開始使用": {
+    "message": "Getting started",
+    "description": "The label for category '開始使用' in sidebar 'book'"
+  },
+  "sidebar.book.category.開始使用.link.generated-index.description": {
+    "message": "What this book is, how to use it, and when to adopt it.",
+    "description": "The generated-index page description for category '開始使用' in sidebar 'book'"
+  },
+  "sidebar.book.category.基礎 Foundations": {
+    "message": "Foundations",
+    "description": "The label for category '基礎 Foundations' in sidebar 'book'"
+  },
+  "sidebar.book.category.基礎 Foundations.link.generated-index.description": {
+    "message": "Semantic color, type, spacing, radius, elevation, motion, and themes—the common foundation for every component.",
+    "description": "The generated-index page description for category '基礎 Foundations' in sidebar 'book'"
+  },
+  "sidebar.book.category.元件 Components": {
+    "message": "Components",
+    "description": "The label for category '元件 Components' in sidebar 'book'"
+  },
+  "sidebar.book.category.元件 Components.link.generated-index.description": {
+    "message": "The purpose, anti-use cases, states, accessibility, and live examples for every component.",
+    "description": "The generated-index page description for category '元件 Components' in sidebar 'book'"
+  },
+  "sidebar.book.category.模式 Patterns": {
+    "message": "Patterns",
+    "description": "The label for category '模式 Patterns' in sidebar 'book'"
+  },
+  "sidebar.book.category.模式 Patterns.link.generated-index.description": {
+    "message": "Reusable interaction logic across systems. This is the most valuable chapter: components can be rewritten, but patterns are hard to rethink.",
+    "description": "The generated-index page description for category '模式 Patterns' in sidebar 'book'"
+  },
+  "sidebar.book.category.頁面 Pages": {
+    "message": "Pages",
+    "description": "The label for category '頁面 Pages' in sidebar 'book'"
+  },
+  "sidebar.book.category.頁面 Pages.link.generated-index.description": {
+    "message": "Composition rules for five common page types: learn the interaction model once and reuse it everywhere.",
+    "description": "The generated-index page description for category '頁面 Pages' in sidebar 'book'"
+  },
+  "sidebar.book.category.無障礙 Accessibility": {
+    "message": "Accessibility",
+    "description": "The label for category '無障礙 Accessibility' in sidebar 'book'"
+  },
+  "sidebar.book.category.無障礙 Accessibility.link.generated-index.description": {
+    "message": "Touch targets, keyboard interaction, contrast, and cues beyond color.",
+    "description": "The generated-index page description for category '無障礙 Accessibility' in sidebar 'book'"
+  },
+  "sidebar.book.category.治理 Governance": {
+    "message": "Governance",
+    "description": "The label for category '治理 Governance' in sidebar 'book'"
+  },
+  "sidebar.book.category.治理 Governance.link.generated-index.description": {
+    "message": "Versioning, feedback, the rule of three, drift protection, and three-stage adoption.",
+    "description": "The generated-index page description for category '治理 Governance' in sidebar 'book'"
+  }
+}

@@ -1,0 +1,58 @@
+---
+title: Acceptance Checklist
+---
+
+# Acceptance Checklist
+
+Run this before release. Every item can be checked in ten seconds.
+
+## Keyboard
+
+- [ ] Keyboard alone completes the main flow (create → edit → submit).
+- [ ] Tab order follows visual order (top-to-bottom, left-to-right).
+- [ ] Focus ring is visible; no `outline: none` shortcut.
+- [ ] Esc closes every overlay and exits every editing state.
+- [ ] One option group (segmented or chips) has one Tab stop.
+- [ ] Dialog focus enters on open and returns on close.
+
+## Screen readers
+
+- [ ] Every icon-only button has `aria-label`.
+- [ ] Every dialog has `DialogTitle`.
+- [ ] Sort headers expose `aria-sort`.
+- [ ] Locked fields are focusable and their `aria-label` explains why.
+- [ ] Dynamic content (guide steps, validation messages) uses `aria-live`.
+- [ ] Form controls have an associated `<Label htmlFor>`.
+- [ ] Every `role="img"` graphic has a text equivalent (summary `aria-label`, and an `sr-only` table when needed).
+- [ ] Graphic data is not announced twice; use `aria-hidden` when values are already visible nearby.
+
+## Visual
+
+- [ ] Normal text contrast ≥4.5:1, validated separately in light and dark.
+- [ ] UI boundaries contrast ≥3:1.
+- [ ] Every color-coded state has a second cue.
+- [ ] Grayscale print still communicates the complete meaning.
+
+## Devices
+
+- [ ] Mobile targets are ≥44px.
+- [ ] Forms become one column on narrow screens without page-level horizontal scrolling.
+- [ ] Tooltips can be long-pressed on touch devices.
+- [ ] Tables scroll horizontally on narrow screens while the first column stays frozen.
+
+## Motion
+
+- [ ] Reduced motion falls back to a static version rather than disappearing.
+- [ ] No interaction transition exceeds 300ms.
+- [ ] No autoplay animation lacks a stop mechanism.
+
+## Copy
+
+- [ ] Errors explain the reason and next step, not only “operation failed.”
+- [ ] Empty states distinguish no data, no results, and no permission.
+- [ ] Dialog buttons make sense on their own, not “Yes / No.”
+- [ ] Lock hints explain how to unlock.
+
+## Automation
+
+Anything that can be a test should not depend on manual checking. See [Drift protection](/governance/drift-guards) for patterns.

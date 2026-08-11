@@ -15,8 +15,8 @@ export function Rules({ children }: { children: ReactNode }) {
   return <div className="rule-grid">{children}</div>;
 }
 export function Do({ children }: { children: ReactNode }) {
-  return <div className="rule-do"><strong>✅ 這樣做</strong>{children}</div>;
+  return <div className="rule-do"><strong>✅ Do this</strong>{children}</div>;
 }
 export function Dont({ children }: { children: ReactNode }) {
-  return <div className="rule-dont"><strong>🚫 不要這樣</strong>{children}</div>;
+  return <div className="rule-dont"><strong>🚫 Avoid this</strong>{children}</div>;
 }

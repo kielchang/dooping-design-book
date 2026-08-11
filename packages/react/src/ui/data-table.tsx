@@ -78,39 +78,38 @@ export interface DataTableLabels {
   resizeHint: string;
 }
 
-/** 預設文案（繁體中文）。宿主要換語言時整包覆寫，不必改元件。 */
+/** Default English copy. Hosts can replace the full label set for another locale. */
 export const DEFAULT_DATA_TABLE_LABELS: DataTableLabels = {
-  search: "搜尋關鍵字…",
-  exportCsv: "匯出 CSV",
-  filterOf: (h) => `篩選 ${h}`,
-  activeFilters: "篩選條件：",
-  clearAll: "全部清除",
-  clear: "清除",
-  done: "完成",
-  remove: (w) => `移除 ${w}`,
-  rangeTitle: "數值範圍",
-  rangeMin: "最小",
-  rangeMax: "最大",
-  selectTitle: "選取值（多選）",
-  selectSearch: "搜尋值…",
-  selectAll: "全選",
-  selectNone: "取消全選",
-  noMatchingValues: "無符合的值",
-  textTitle: "包含文字（可多筆，符合任一即列出）",
-  textPlaceholder: "輸入關鍵字，Enter 加入…",
-  suggestions: "推薦（點擊快速加入）",
-  emptyTitle: "尚無資料",
-  noResultTitle: "查無符合的資料",
-  noResultHint: "請調整關鍵字或欄位篩選。",
-  loading: "載入中…",
-  rowsRange: (f, t, n) => `第 ${f}–${t} ／ 共 ${n} 筆`,
-  perPage: (n) => `每頁 ${n}`,
-  // combobox 的可及名稱不能取自內容文字（值不是名稱）——觸發鈕必須另給程式可及標籤
-  perPageLabel: "每頁筆數",
-  prev: "上一頁",
-  next: "下一頁",
-  totalRow: "合計",
-  resizeHint: "拖曳調整欄寬，雙擊自適應內容",
+  search: "Search keywords…",
+  exportCsv: "Export CSV",
+  filterOf: (h) => `Filter ${h}`,
+  activeFilters: "Filters:",
+  clearAll: "Clear all",
+  clear: "Clear",
+  done: "Done",
+  remove: (w) => `Remove ${w}`,
+  rangeTitle: "Numeric range",
+  rangeMin: "Minimum",
+  rangeMax: "Maximum",
+  selectTitle: "Select values (multi-select)",
+  selectSearch: "Search values…",
+  selectAll: "Select all",
+  selectNone: "Select none",
+  noMatchingValues: "No matching values",
+  textTitle: "Contains text (multiple values use OR)",
+  textPlaceholder: "Enter a keyword and press Enter…",
+  suggestions: "Suggestions (click to add)",
+  emptyTitle: "No data yet",
+  noResultTitle: "No matching records",
+  noResultHint: "Adjust the keyword or column filters.",
+  loading: "Loading…",
+  rowsRange: (f, t, n) => `${f}–${t} of ${n} records`,
+  perPage: (n) => `${n} per page`,
+  perPageLabel: "Records per page",
+  prev: "Previous page",
+  next: "Next page",
+  totalRow: "Total",
+  resizeHint: "Drag to resize; double-click to fit content",
 };
 
 type ColFilter = { texts: string[]; min: string; max: string; values: string[] };
@@ -217,11 +216,11 @@ export function DataTable<T>({
       const parts: string[] = [];
       if (f.min !== "") parts.push(`≥ ${f.min}`);
       if (f.max !== "") parts.push(`≤ ${f.max}`);
-      return `${head}：${parts.join("、")}`;
+      return `${head}: ${parts.join(", ")}`;
     }
     const vals = filterKind(c) === "select" ? f.values : f.texts;
     const shown = vals.slice(0, 2).join("、");
-    return `${head}：${shown}${vals.length > 2 ? ` 等 ${vals.length} 項` : ""}`;
+    return `${head}: ${shown}${vals.length > 2 ? ` and ${vals.length - 2} more` : ""}`;
   };
 
   const filtered = useMemo(() => {

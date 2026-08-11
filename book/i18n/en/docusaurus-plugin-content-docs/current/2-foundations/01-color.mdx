@@ -1,0 +1,427 @@
+---
+title: Color Semantics
+---
+
+# Color Semantics
+
+**This chapter is not about swatches. It is about meaning.**
+
+Token names say “what does this color represent?” rather than “what color is this?” That is why there is no `--blue-500`, only `--primary`, `--danger`, and `--field-editable`. When the brand color changes, change its value—not every line of code that uses it. See [ADR-0001](/adr).
+
+## Four semantic groups with non-overlapping jobs
+
+### 1. Surfaces and text (structure)
+
+| Token | Meaning |
+| --- | --- |
+| `--background` / `--foreground` | Page background and primary text |
+| `--card` / `--card-foreground` | Card surface |
+| `--popover` / `--popover-foreground` | Popover surfaces (dropdowns, bubbles, filter panels) |
+| `--muted` / `--muted-foreground` | Muted surfaces and secondary text |
+| `--accent` / `--accent-foreground` | Hovered or targeted surfaces |
+| `--border` / `--input` / `--ring` | Dividers, control borders, keyboard focus ring |
+
+In dark mode these surfaces form the **elevation ladder**: `background < card < popover < muted < border`. Dark mode is not a light-mode inversion; an inversion makes the interface too flat to distinguish layers.
+
+### 2. Actions (controls)
+
+| Token | Use |
+| --- | --- |
+| `--primary` | Primary actions (near-black neutral, **independent of theme hue**) |
+| `--secondary` | Secondary actions |
+| `--brand` | Theme hue: the one key action per page and brand emphasis |
+| `--brand-subtle` | Subtle theme surface: selected navigation and tab underline areas |
+| `--destructive` | **Destructive-action controls** (delete buttons) |
+
+:::tip Why separate `primary` and `brand`?
+Brand colors are usually bright and saturated for visual energy, while admin screens contain many buttons. Sharing one token lets the **area** of high-saturation color get out of control—color fatigue is driven by area and frequency, not by the number of hues.
+
+Keep `--primary` near-black neutral for most controls. Let `--brand` carry the theme hue only for the one key action on a page. Changing themes then does not make the whole interface noisy. See [Light and dark themes → Multi-hue themes](/foundations/theming).
+:::
+
+### 3. Status (messages and data)
+
+| Token | Meaning |
+| --- | --- |
+| `--success` | Good / complete / passed |
+| `--warning` | Needs attention, but does not block |
+| `--info` | Neutral hint / additional context |
+| `--danger` | Abnormal / error / failed |
+
+See the [Alert Color Dictionary](/foundations/alert-colors) for each alert color’s definition, scenarios, counterexamples, and extension process.
+
+:::tip Why separate `destructive` and `danger`?
+One means “pressing this will delete something”; the other means “this record has a problem.” Both commonly appear on the same screen: an abnormal red row beside a red delete button. Mixing them makes red lose its meaning.
+:::
+
+### 4. Fields (editable vs. read-only)
+
+| Token | Meaning |
+| --- | --- |
+| `--field-editable` + `--field-border` | You can edit this cell |
+| `--field-readonly` | This cell is calculated / read-only |
+| `--edit` / `--edit-bg` / `--edit-foreground` | **Changed but not submitted** (reserved color) |
+
+Field colors and `edit` are also defined in the [Alert Color Dictionary](/foundations/alert-colors).
+
+<Demo title="Fields have only two semantics">
+  <div className="grid max-w-lg gap-3 sm:grid-cols-3">
+    <div>
+      <p className="mb-1 text-xs font-medium">Editable</p>
+      <div className="field-editable rounded-md border px-3 py-2 text-sm">1,500,000</div>
+    </div>
+    <div>
+      <p className="mb-1 text-xs font-medium">Read-only / calculated</p>
+      <div className="field-readonly rounded-md border px-3 py-2 text-sm">1,380,000</div>
+    </div>
+    <div>
+      <p className="mb-1 text-xs font-medium">Changed but not submitted</p>
+      <div className="rounded-md border border-edit bg-edit-bg px-3 py-2 text-sm text-edit-foreground">1,650,000</div>
+    </div>
+  </div>
+</Demo>
+
+<Rules>
+  <Do>
+    <p>Fields have only <strong>two</strong> semantics: editable and read-only. Add “changed but not submitted” and there are three states total—easy to understand at a glance.</p>
+  </Do>
+  <Dont>
+    <p>Do not create three colors for “input / assumption / formula.” That is a spreadsheet-cell convention. Web-form users do not care whether a cell is backed by a formula; they care whether they can edit it. This is a real failure mode; see <a href="/adr">ADR-0002</a>.</p>
+  </Dont>
+</Rules>
+
+## The boundary of brand: keep it off confirmation buttons
+
+Separating `--brand` and `--primary` leaves one question: **where should brand appear?**
+
+Do **not** use it for submit-like actions such as confirm, submit, or save. The reason is the same as separating `destructive` and `danger: the jobs are different.
+
+| | Job |
+| --- | --- |
+| `--brand` | **Identity:** this is whose product |
+| Confirmation button | **Affordance:** pressing it submits |
+
+One token doing both creates visual tension. Hue also carries conventions:
+
+| Hue | Convention | On a confirmation button |
+| --- | --- | --- |
+| Green | Proceed, complete | Aligned |
+| Blue | Default system action (macOS and Windows defaults are blue) | Aligned |
+| **Purple / magenta** | **No action convention** | Reads as decoration, not a control |
+| Red | Stop | Direct conflict; reserved for alerts |
+| Gray | **Disabled** | Against convention |
+
+| Use `brand` | Use `primary` |
+| --- | --- |
+| Logo area and brand emphasis | **Confirm, submit, save, apply** |
+| Non-submit entry points such as “Start a new workflow” | General operations |
+| Selected navigation (`--brand-subtle`) | Cancel, back |
+
+**Use `--primary` for submit actions in every theme.** Hue then never conflicts with action semantics. That is why all six hues remain available: the problem is putting brand in the wrong place, not using hue itself.
+
+:::warning Near-neutral colors must not be used as solid fills
+`Button` uses `disabled:opacity-50`, so disabled looks like `--primary` composited at 50% over the background. A near-neutral theme color used as a filled button lands in the same visual position.
+
+The default Graphite theme used to do exactly this: a formula-generated blue-gray with chroma 0.030 measured only **ΔE00 8.5** from the disabled appearance (below 10 is practically indistinguishable). The button looked disabled.
+
+The fix is not to add more color but to **acknowledge that Graphite has no brand color**: Graphite’s `--brand` mirrors `--primary`. `npm run verify:color` enforces `ΔE00(brand, disabled appearance) ≥ 12`.
+:::
+
+## Red and yellow must trigger instant recognition while themes retain identity
+
+This is the common color-system conflict: status colors work by being recognized instantly; theme colors work by appearing everywhere.
+
+**There is no conflict once three dimensions are separated.** Red makes people stop not only because of its hue, but because it is rare and visually dominant. A theme does not need to avoid looking red; it needs to avoid red’s **position** and **share of the surface area**.
+
+### 1. Hue: the alert gamut is reserved
+
+The four status colors occupy the warm range: `danger 18°`, `destructive 25°`, `warning 71°`, and `edit 83°`. Scanning the standard-lightness brand around the hue wheel leaves only three regions at least 25° from every status color:
+
+| Available range | Family | Width |
+| --- | --- | --- |
+| 109°–137° | Green | 28° |
+| 188°–213° | Cyan | 25° |
+| 264°–352° | Blue-violet → magenta | 88° |
+
+**Not one degree remains from 0°–95°.** That is why enterprise systems overwhelmingly use blue, indigo, and cyan: it is not just fashion; those are the remaining safe regions.
+
+An orange or gold theme may be perceptually separate from `warning` in an isolated swatch because lightness increases ΔE00, but it spends the “instant reaction” channel on branding. When the screen is warm everywhere, red no longer stands out.
+
+### 2. Saturation: alerts must be the most saturated things on screen
+
+| | OKLCH chroma |
+| --- | --- |
+| `--danger` | **0.223** |
+| `--destructive` | 0.208 |
+| `--warning` / `--edit` | 0.165 / 0.164 |
+| `--brand` (most saturated theme) | 0.151 |
+| `--primary` (most controls) | **0.040** |
+
+`danger` has 1.5× the saturation of brand and 5.6× that of primary. **Reverse this order and red falls from “most noticeable” to “one more colored thing.”**
+
+### 3. Area: rarity creates power
+
+60% neutral / 30% structure / 10% high-saturation emphasis—the key colors in alerts and charts share that 10%.
+
+That is why `--primary` stays near-black neutral. Most buttons do not consume theme color, so a red error is the only saturated object on the screen. If every button used the theme color, red would have to compete with a row of colorful controls.
+
+`npm run verify:color` checks all three dimensions when a theme is added: hue distance, saturation ordering, and perceptual distance from status colors. It has rejected **Terracotta 45°** (only 20° from `destructive`) and **Pine 178°** (only 16° from `success`).
+
+:::tip If the client’s brand color is red or orange
+Choose one: **red as the brand, or red as the alert—not both.**
+
+Most admin systems keep brand red in the logo and sign-in page, then use a safe hue for `--brand` inside the product. In a system that handles exceptions every day, “red = needs attention” is more valuable than “red = our company.”
+:::
+
+## Alerts: use intensity levels, not more colors
+
+The four semantic colors (`success` / `warning` / `info` / `danger`) are the ceiling; do **not** add more hues. Richness comes from two intensities of one semantic color:
+
+| Intensity | Style | Use |
+| --- | --- | --- |
+| `low` (default) | `--{status}-subtle` surface + **same-color** left border + icon + `--{status}-subtle-foreground` | Everyday and secondary hints; many can appear without becoming harsh |
+| `high` | Solid `--{status}` fill + inverse `--{status}-foreground` text | **Blocking** messages that require a decision |
+
+**When in doubt, use `low`.** Frequent high-intensity alerts exhaust the color budget: fatigue is high-saturation **area × frequency**, not the number of hues. Alert key colors and chart emphasis share the same budget.
+
+:::warning Do not build subtle surfaces with a 10% solid overlay
+The contrast of `bg-danger/10` is **uncontrolled** because it depends on the surface beneath it. The previous version used this approach; measured text contrast across four variants in light mode was only **1.97–3.98:1**, all below 4.5, with no build failure.
+
+The generated solid tokens now back-solve text contrast to 4.5:1, and `npm run verify:color` checks each one.
+:::
+
+### The four subtle surfaces must remain distinguishable
+
+`--{status}-subtle` deliberately does **not** harmonize toward the theme hue. Pulling it 12° toward a blue-violet theme made `warning-subtle` and `danger-subtle` converge to ΔE00 8.8: amber and red became pink-orange, and “caution” and “error” looked identical.
+
+Alerts feel like one system for two reasons, neither of which bends their hues: all four share one construction rule, and they sit on [neutrals tinted with the theme hue](/foundations/theming).
+
+### Equal layer means equal tint amount, not equal parameters
+
+The subtle-surface parameter is **tint amount** (`ΔE00(subtle surface, card surface)`), not chroma.
+
+The previous version used fixed lightness + fixed chroma. The numbers were neat but perception was not, because **sRGB is not hue-symmetric**: at high lightness, green and yellow support much more chroma than blue and red. `info` and `danger` were gamut-clipped while `success` was not:
+
+| | info | danger | warning | success | Strongest / weakest |
+| --- | --- | --- | --- | --- | --- |
+| Old (fixed chroma) | 11.0 | 12.6 | 14.1 | **18.5** | **1.69×** |
+| Current (fixed tint amount) | 14.5 | 15.1 | 15.0 | 14.8 | **1.04×** |
+
+The old order was backwards: green “complete” was more prominent than red “could not confirm.” When four alerts stack in a column, this is obvious but hard to name—that is one source of visual jarring.
+
+The rule has two parts: **all four share one lightness** so they look like a family, while each hue’s chroma is back-solved to the same tint amount. Chroma cannot also be fixed because blue is inherently less visible on a dark neutral surface; in dark mode, `info` needs roughly 3.3× the chroma to keep up. That difference compensates for perceptual asymmetry; it is not inconsistency.
+
+`npm run verify:color` requires the maximum/minimum tint-amount ratio to stay below **1.3**.
+
+### Use the text color for the left border, not the solid status color
+
+The low-intensity left border is `border-l-current`, the same color as the text (`--{status}-subtle-foreground`), not the fully saturated status color. There are two measured reasons:
+
+1. A saturated border against its own subtle surface ranges from **1.60–5.43:1**; four of eight combinations (four variants × two modes) fall below the 3:1 non-text threshold (1.4.11). Text color produces **4.50–4.54:1** because it was already back-solved to 4.5:1 against the subtle surface.
+2. The subtle surface has roughly 0.03–0.08 chroma, while the solid border has 0.134–0.223 (**3–6×** more). That jump feels jarring. Text color is about 0.100 chroma and keeps the jump within 2×.
+
+## Field states: three layers, three jobs
+
+A field can be focused, changed-but-not-submitted, and invalid at the same time. These use three independent channels:
+
+| Layer | Meaning | Mechanism |
+| --- | --- | --- |
+| Focus ring | Keyboard focus is here (control semantics) | `--ring`, **always the same color** |
+| Border + surface | The field’s state (status semantics) | One of three values, with priority |
+| Icon + text | Why | `aria-invalid` + `aria-describedby` |
+
+| State | Border | Surface | Priority |
+| --- | --- | --- | --- |
+| Read-only / calculated | — | `--field-readonly` | — |
+| Editable | `--field-border` | `--field-editable` | 0 |
+| Changed but not submitted | `--edit` | `--edit-bg` | 1 |
+| **Invalid** | `--danger` | **Unchanged (do not tint the whole field red)** | 2 (highest) |
+
+When a field is both changed and invalid, the border shows `--danger` because the blocking state wins. “Changed” remains visible in the change summary and undo button; one channel does not communicate two things.
+
+Keeping the invalid state on the border instead of the whole surface is measured: a full `--danger-subtle` fill leaves only **2.42:1** contrast between the dark-mode danger border and that surface, below the 3:1 non-text threshold. Ten invalid fields would also create ten red surfaces and spend the saturation budget immediately. The primary error signal is border + icon + text ([FormField](/components/input) provides the fixed pattern); `verify:color` checks the border against both field surfaces.
+
+<Rules>
+  <Do><p>Keep the focus ring the same color everywhere. Users can find focus by looking for the same thing.</p></Do>
+  <Dont><p>Do not recolor the focus ring for validation. Three states can coexist, and a changing ring requires a priority table nobody remembers. If every required empty field flashes red as the user tabs through them, users learn to ignore red.</p></Dont>
+</Rules>
+
+:::tip A focus ring always needs `ring-offset`
+Without an offset, the ring is drawn directly against the component border, so its contrast is measured against that border. Measured contrast against a `--danger` border in dark mode was only **1.04:1**—the ring disappeared when the field became invalid.
+
+With an offset, the background separates the two and the ring is measured against the background, where 3:1 holds. `npm test` guards against components that use `ring-ring` without `ring-offset`.
+:::
+
+“Required but empty” is a type of invalid state, but the problem is **timing**, not color: do not mark a field red before the user has touched it. The convention is to validate on blur or submit.
+
+## Color logic for interaction states
+
+One principle is enough:
+
+> **Every color change must correspond to something the user needs to know. Its intensity should match how long that fact persists.**
+
+This blocks two failures. If there is no fact to communicate, do not change color just to animate. If there is a fact, give it enough strength to be seen. Intensity follows **duration**, not importance: a brief response should be light; a persistent state deserves a visible color.
+
+### State ladder
+
+| State | Duration | Communicates | Channel |
+| --- | --- | --- | --- |
+| hover | While the pointer is over it | This is interactive | Neutral state layer **6%** |
+| pressed | Moment of press | The system received it | Neutral state layer **14%** |
+| focus | Until focus moves | The keyboard is here | **Ring** (does not touch the surface) |
+| selected | Until another choice | You selected this | Neutral state layer **20%** |
+| disabled | Until conditions change | It cannot be used now | **Reduce**, do not add color (`opacity-50`) |
+| changed but not submitted | Until submit | It is not saved | Amber semantic color |
+| invalid | Until fixed | This value cannot be used | Red semantic color |
+
+Four decisions deserve emphasis:
+
+1. **All three interaction states are neutral and do not consume theme hue.** Hover disappears as soon as the pointer leaves; spending brand color on it is expensive.
+2. **Focus uses the independent ring channel and does not touch the surface.** It can therefore coexist with every state: invalid + focus and selected + focus both work.
+3. **Disabled removes affordance rather than adding information**, so it reduces contrast instead of adding color. A permanently translucent control is read as unavailable.
+4. **Selected rows must not use muted text.** A 20% overlay drops `--muted-foreground` to **2.77:1** in light mode and **2.96:1** in dark mode. The rule is to redefine selected-row `--muted-foreground` as `--foreground`.
+
+### A state layer is an overlay, not a replacement surface
+
+The old version used `--accent` for hover and `--muted` for selected. Those three tokens (`--accent`, `--muted`, and `--secondary`) currently share a value, so targeted rows, zebra rows, and read-only areas looked identical. Measured differences were only 1.6 ΔE00 from normal to hover in light mode and 2.5 in dark mode.
+
+The root cause was the mechanism, not the chosen colors: a solid token replaces a surface and cannot compose with the component’s existing background. A state layer instead makes “one step darker” work on every surface:
+
+| Surface | Hover Δ | Selected Δ |
+| --- | --- | --- |
+| Page background | 3.0 | 10.8 |
+| Card | 3.0 | 10.8 |
+| `--muted` (zebra row) | 3.0 | 10.7 |
+| Popover | 3.0 | 10.8 |
+
+The overlay uses the component’s own `currentColor`, not a universal `--foreground`. In dark mode `--foreground` and `--primary` are both near-white, so using it over a solid button produced **ΔE00 0.0**—no hover feedback—while surface checks still passed. `currentColor` automatically gives dark surfaces a light overlay and light surfaces a dark one.
+
+The six inconsistent opacity values were also reduced to one set. The old `/90`, `/80`, `/50`, `/40`, `/20`, and `/15` values ranged from ΔE00 0.6 to 7.4. The shared intensities now land at 2.6–4.5.
+
+### Why validate the upper bound too
+
+One of the four guardrails is an **upper bound**: selected state may not exceed ΔE00 16 on any surface. “Too obvious” is a defect just like “not visible.” The dark page background was the limiting case; the original 22% reached 16.1 there, so it was reduced to 20%.
+
+All four guardrails are checked on every surface, not only cards. The state-layer mechanism matters precisely because it must work everywhere. `npm test` also rejects `hover:bg-accent` / `hover:bg-muted` and rejects `transition-colors` alongside `state-layer`, because that shorthand overrides the state-layer transition.
+
+:::tip The only consumer-side trap
+The `background` shorthand resets `background-image` to `none`, which makes the state layer disappear. Always use `background-color`; Tailwind’s `bg-*` utilities produce `background-color` and are safe.
+:::
+
+## Loading: neutral, with three techniques for three situations
+
+Loading is **not status semantics**. It stays neutral (`--muted` skeletons and darkened overlays). As above, intensity follows duration; loading is a transient state that will soon be replaced.
+
+| Situation | Technique | Why |
+| --- | --- | --- |
+| First load with a known layout (list, cards, initial table) | **Skeleton** that reflects the real layout | Prevents layout shift and previews content shape |
+| Existing content, refreshed query (filter, pagination) | **Darken in place and keep old content** (`aria-busy`) | Old data remains readable; replacing it with a skeleton flashes |
+| Submitting (button) | Disable + swap icon + change label | [Buttons have no loading variant](/components/button) by deliberate decision |
+
+<Rules>
+  <Do><p>Make skeletons <strong>reflect the real layout</strong> (row count = page size, height = actual line height). <code>DataTable</code> already switches between these two appearances with <code>loading</code>.</p></Do>
+  <Dont><p>Do not cover existing data with a skeleton. Flashing a skeleton on every refresh is worse than watching old data while new data loads.</p></Dont>
+</Rules>
+
+For accessibility, announce loading once on the **container** (`aria-busy` plus an sr-only `role="status"` message). Skeleton blocks are `aria-hidden`: they carry no information, so a screen reader must not read every gray rectangle. [Loading is not empty](/components/empty-state): empty means the query finished with no results.
+
+## Reserved color: amber means changed but not submitted
+
+The `--edit` amber set has **one job**: mark “the user changed this, but has not submitted it.” Do not repurpose it for highlights, new-feature markers, or any other emphasis. Once amber has a second meaning, the key signal “what did I change?” is diluted. See [ADR-0002](/adr) for the rationale and rejected alternatives.
+
+## Categorical palettes are independent from status semantics
+
+The eight chart category colors (`--chart-1` … `--chart-8`) do **not** carry status meaning. Swapping the chart palette must not make “red = abnormal” follow it. Category colors also do not follow the hue theme: color follows the data entity, so the same item keeps the same color across charts and themes.
+
+The separation is two-way. When the dimension itself is a status (for example, a stacked chart of status composition), the chart **must** use status colors rather than taking categorical colors by index. If badges teach users “complete = green,” a chart cannot turn it blue. See [Chart color strategy](/components/charts) for the decision tree.
+
+### Why categorical colors look “louder” than semantic colors
+
+The difference between the two token palettes is real and intentional. The semantic system encodes importance with saturation:
+
+```
+danger 0.223 > warning 0.165 > edit 0.164 > success/info 0.148
+       > brand ≤0.151 > primary 0.040 > neutrals ≤0.013
+```
+
+Most semantic tokens are achromatic (background 0.000, `muted` 0.007, `border` 0.013), with only about ten saturated values. It reads as “a gray page with a few highlights,” which is right for an admin interface.
+
+Categorical colors have no such order: all eight are similarly light and saturated because the categories are equal peers. Making series 3 more saturated than series 5 would falsely imply importance. Both palettes are correct because they answer different questions: semantic colors say “how important is this?” and category colors say “which category is this?” The key requirement is that categories must not be misread as statuses.
+
+### Categorical colors must stay away from every status color
+
+A normal data series that happens to look like `danger` makes users think that line is in trouble. The old guard checked only `danger`, so in dark mode `chart-5` was only **7.3 ΔE00** from `warning`, and `chart-1` was **7.9** from `info`; both were below the practical separation threshold of 10 while CI stayed green. The current guard checks all six status colors. A pair passes when either:
+
+- hue distance is **≥20°**, or
+- perceptual distance is **ΔE00 ≥18**
+
+Hue alone is insufficient for near-neutrals, while ΔE00 alone permits same-hue colors with different lightness that still trigger the “red = abnormal” association.
+
+:::tip Give the optimizer room when tightening constraints
+Two earlier attempts tightened guardrails without relaxing aesthetic constraints and reduced the worst pair from 12.2 to 10.1. The current change similarly dropped the worst light/dark pair from 12.2/11.8 to 10.1/9.4 until hue spacing was relaxed from 30° to 22° and the lightness range by 0.02. The result improved to 13.1/11.3.
+
+Accessibility thresholds do not move for aesthetics. When a hard constraint is added, make room by relaxing a soft aesthetic constraint.
+:::
+
+### Order is a safety order
+
+The palette is ordered by **farthest-point insertion**, not around the hue wheel: chart 1 is anchored in blue, then each next color is the one perceptually farthest from the selected colors. Consumers can take `--chart-1` … `--chart-k` and get an approximately best k-color subset for any k.
+
+| Colors used | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Worst pair (minimum ΔE00 with color-vision simulation) | 57 | 32 | 25 | 17 | 16 | 14 | 12 |
+
+The palette degrades gracefully: more series means more crowding, but nothing suddenly breaks at one particular k.
+
+### Light and dark are independent values
+
+For one color to reach 3:1 against both white and a dark background, OKLCH L can occupy only `[0.49, 0.67]`, a width of 0.17. Eight shared values would force every color into middle lightness. People with red–green color-vision deficiency lose hue discrimination but retain lightness, so shared values give up the only dimension they have left. Generate one set for each mode and use each mode’s full lightness range (L* span 31–37).
+
+:::warning This book made this mistake itself
+The previous version shared one hex value for six of eight colors across light and dark. Its L* span was only 26, and the worst pair under red–green simulation was **2.6 ΔE00**—effectively the same color. Splitting the hardest blue↔purple pair to opposite ends only protected adjacent series, which is not enough for lines, scatter plots, or grouped bars where any two series may be compared. The current version is generated by `npm run build:theme` and checked by `npm run verify:color`; insufficient pairwise distance blocks a PR.
+:::
+
+<Demo title="Categorical palette (8 colors)">
+  <div className="flex flex-wrap gap-2">
+    {[1,2,3,4,5,6,7,8].map((n) => (
+      <div key={n} className="flex items-center gap-2 rounded-md border px-2 py-1 text-xs">
+        <span className="size-4 rounded" style={{ background: `var(--chart-${n})` }} />
+        <code>--chart-{n}</code>
+      </div>
+    ))}
+  </div>
+</Demo>
+
+## Contrast requirements
+
+Thresholds use the strict WCAG 2.2 values and **do not round**:
+
+| Use | Threshold | Basis |
+| --- | --- | --- |
+| Normal text (button labels, badge text) | 4.5:1 | 1.4.3 |
+| Large text (≥18.66px bold / ≥24px) | 3:1 | 1.4.3 |
+| **Chart swatches, borders, focus rings** | **3:1** | **1.4.11 non-text contrast** |
+
+The third row is often incorrectly written as 4.5:1. Auditing against the wrong threshold can reject a compliant categorical palette and push someone toward colors that are harder to distinguish.
+
+Validate light and dark independently, using the least favorable surface in each mode—not just the page background. A focus ring can appear on cards and popovers; checking only the page background misses those cases.
+
+:::warning Validate the **actual rendered colors**
+Two details are easy to miss:
+
+1. Validate after quantization. A floating-point result can pass and then fall below the threshold after rounding to 8-bit values.
+2. Validate against the actual foreground token, not ideal white. `--destructive-foreground` is `210 40% 98%`, a slightly blue white; that 2% can decide whether a calculated value passes.
+
+Both are real failure modes that the generator has made and the acceptance script caught.
+:::
+
+## Color is never the only cue
+
+This rule runs through the entire book:
+
+- Status badges need **text**.
+- Variance numbers need **arrows ▲▼ and text**.
+- Selected states need a **checkmark**.
+- Alerts need an **icon**.
+
+Print the interface in grayscale. If the meaning disappears, the design is not finished.

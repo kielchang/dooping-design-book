@@ -6,59 +6,61 @@ import {
   Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose,
 } from "./dialog";
 
-const meta: Meta = { title: "元件/浮層/提示泡泡・對話框" };
+const meta: Meta = { title: "Components/Overlays/Tooltip and dialog", id: "元件/浮層/提示泡泡・對話框" };
 export default meta;
 type Story = StoryObj;
 
 export const 提示泡泡: Story = {
+  name: "Tooltips",
   render: () => (
     <div className="space-y-6 py-8">
       <p className="text-sm">
-        處理狀態
-        <Tooltip content="「已確認」代表已鎖定內容與數量，尚未進入處理。" className="ml-1">
-          <span className="cursor-help underline decoration-dotted underline-offset-2">已確認</span>
+        Processing status
+        <Tooltip content="Confirmed means the content and quantity are locked but processing has not started." className="ml-1">
+          <span className="cursor-help underline decoration-dotted underline-offset-2">Confirmed</span>
         </Tooltip>
       </p>
       <div className="max-w-[220px] rounded-md border p-2">
-        <TruncatedText text="工業級軸承 6204 / 深溝球 / 雙面防塵蓋 / 內徑 20mm" />
-        <p className="mt-1 text-tiny text-muted-foreground">截斷文字：hover 或長壓看完整內容。</p>
+        <TruncatedText text="Industrial bearing 6204 / deep-groove ball / double shield / 20mm inner diameter" />
+        <p className="mt-1 text-tiny text-muted-foreground">Truncated text: hover or long-press to see the full value.</p>
       </div>
       <div className="flex justify-end">
-        <Tooltip content="靠右的泡泡會自動夾回視窗內，不會被切掉。">
-          <span className="cursor-help rounded border px-2 py-1 text-xs">邊緣測試</span>
+          <Tooltip content="A right-aligned tooltip stays inside the viewport instead of being clipped.">
+          <span className="cursor-help rounded border px-2 py-1 text-xs">Edge positioning</span>
         </Tooltip>
       </div>
       <p className="text-tiny text-muted-foreground">
-        行動裝置沒有 hover：長壓約 0.35 秒顯示。不處理長壓＝所有靠泡泡補充的資訊在手機上等於不存在。
+        Mobile devices have no hover: long-press for about 0.35 seconds to show the tooltip. Without long-press support, tooltip-only information does not exist on mobile.
       </p>
     </div>
   ),
   // 泡泡的行為契約：hover 顯示 role=tooltip、移開消失（顯示時機規範的可驗部分）
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const trigger = canvas.getByText("已確認");
+    const trigger = canvas.getByText("Confirmed");
     await userEvent.hover(trigger);
     const tip = await canvas.findByRole("tooltip");
-    await expect(tip).toHaveTextContent("已鎖定內容與數量");
+    await expect(tip).toHaveTextContent("content and quantity are locked");
     await userEvent.unhover(trigger);
     await waitFor(() => expect(canvas.queryByRole("tooltip")).toBeNull());
   },
 };
 
 export const 對話框: Story = {
+  name: "Dialog",
   render: () => (
     <Dialog>
-      <DialogTrigger asChild><Button variant="destructive">作廢這筆</Button></DialogTrigger>
+      <DialogTrigger asChild><Button variant="destructive">Void this record</Button></DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>確定要作廢 R-2403？</DialogTitle>
+          <DialogTitle>Void R-2403?</DialogTitle>
           <DialogDescription>
-            作廢後將釋放已保留的配額，且此動作會寫入異動紀錄。已完成的項目不受影響。
+            Voiding releases the reserved quota and is added to the audit log. Completed items are unaffected.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose asChild><Button variant="outline">返回</Button></DialogClose>
-          <Button variant="destructive">確定作廢</Button>
+          <DialogClose asChild><Button variant="outline">Cancel</Button></DialogClose>
+          <Button variant="destructive">Confirm void</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -68,7 +70,7 @@ export const 對話框: Story = {
   play: async ({ canvasElement }) => {
     const doc = canvasElement.ownerDocument;
     const body = within(doc.body);
-    const trigger = within(canvasElement).getByRole("button", { name: "作廢這筆" });
+    const trigger = within(canvasElement).getByRole("button", { name: "Void this record" });
     await userEvent.click(trigger);
     const dialog = await body.findByRole("dialog");
     await waitFor(() => expect(dialog.contains(doc.activeElement)).toBe(true));

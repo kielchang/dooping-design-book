@@ -1,0 +1,48 @@
+---
+title: TabPills
+---
+
+# TabPills
+
+Switches between views within one region.
+
+<StoryLink id="元件-狀態-變異・空狀態・分頁・步驟--分頁膠囊" />
+
+## Its only reason to exist is convergence
+
+Tab rows are often hand-built as `<button>` elements in each screen. Once scattered, style changes require a site-wide search, and `role="tablist"` semantics inevitably go missing.
+
+<Rules>
+  <Do><p>Use TabPills for every tab switch.</p></Do>
+  <Dont><p>Do not hand-build a tab row such as <code>&lt;div&gt;&lt;button&gt;…&lt;/button&gt;&lt;/div&gt;</code>.</p></Dont>
+</Rules>
+
+<Demo title="Tab pills (with badges)">
+  <TabPills label="Processing status" value="confirmed" onChange={() => {}} tabs={[
+    { key: "all", label: "All" },
+    { key: "draft", label: "Draft", badge: <Badge variant="secondary">3</Badge> },
+    { key: "confirmed", label: "Confirmed", badge: <Badge variant="info">7</Badge> },
+    { key: "shipped", label: "Complete" },
+  ]} />
+</Demo>
+
+## When not to use it
+
+<Rules>
+  <Do><p>Use it for <strong>2–6</strong> mutually exclusive tabs when switching does not change the URL’s primary meaning.</p></Do>
+  <Dont><p>More than six tabs is navigation and belongs in the sidebar. If a view needs to be shared as a deep link, use a route or at least sync to the query string.</p></Dont>
+</Rules>
+
+## Sync the current tab to the URL
+
+Use `?tab=confirmed`. Users will want to send the current view to a colleague; state that lives only in memory means the link can never reopen what they saw.
+
+## Accessibility
+
+Use `role="tablist"`, each item as `role="tab"` with `aria-selected`, and apply `tap-target-y` to touch targets.
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/tab-pills.json
+```

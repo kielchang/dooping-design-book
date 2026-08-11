@@ -3,8 +3,8 @@
   "name": "tab-pills",
   "version": "0.11.1",
   "type": "registry:ui",
-  "title": "TabPills 分頁膠囊",
-  "description": "分頁切換的統一元件，含 tablist 語意。",
+  "title": "TabPills",
+  "description": "Unified tab switching with tablist semantics.",
   "dependencies": [
     "@dooping/tokens@^0.6.0"
   ],

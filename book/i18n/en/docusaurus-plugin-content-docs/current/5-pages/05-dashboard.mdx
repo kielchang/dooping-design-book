@@ -1,0 +1,46 @@
+---
+title: Dashboard
+---
+
+# Dashboard
+
+## When to use it
+
+Use a dashboard when users need a quick read of health, change, and work requiring attention.
+It is not a decorative collection of charts and should not replace the detailed workflow.
+
+## Composition
+
+<StoryFrame id="pages-dashboard--typical-composition" title="Dashboard: KPI tiles, charts, and one period control" height={780} />
+
+Begin with the question the dashboard answers, then show a KPI row, the main trend or
+comparison, supporting breakdowns, and an attention queue. Put one period selector in control
+of the whole page and show the active period near the title.
+
+## Start with the question, then choose the chart
+
+A chart is justified only when it makes comparison, trend, distribution, or relationship easier
+to see. State the takeaway in a heading or caption and provide an accessible text equivalent.
+Use a table when exact values matter more than shape.
+
+## KPI tiles
+
+Each tile has a label, value, period, and optional delta with text and direction. Do not show a
+large number without its unit or comparison baseline. Link a KPI to the detail list that can
+explain it.
+
+## One period controls the page
+
+Changing the period updates every tile and chart, and the loading state makes that relationship
+clear. Do not let each card silently use a different date range.
+
+## Empty and loading states
+
+Explain whether data is unavailable, not yet collected, or excluded by the current period.
+Skeletons should preserve the eventual layout and not imply precision before the values arrive.
+
+## Accessibility, adoption, and missing pieces
+
+Provide a reading order that makes sense without the chart, keyboard-accessible filters, and
+text alternatives for graphical values. Start with the question and the smallest useful set of
+metrics. Record new visualization needs as patterns, not as ad hoc card implementations.

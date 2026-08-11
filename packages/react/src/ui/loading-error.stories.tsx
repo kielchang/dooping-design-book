@@ -12,17 +12,18 @@ import { FormField, FieldError } from "../form/form-field";
 import { formatNumber } from "../lib/utils";
 import { demoRecords, type DemoRecord } from "../demo/sample-data";
 
-const meta: Meta = { title: "元件/狀態/載入與錯誤" };
+const meta: Meta = { title: "Components/States/Loading and errors", id: "元件/狀態/載入與錯誤" };
 export default meta;
 type Story = StoryObj;
 
 const cols: Column<DemoRecord>[] = [
-  { key: "id", header: "編號", cell: (r) => r.id },
-  { key: "unit", header: "單位", cell: (r) => r.unit },
-  { key: "qty", header: "數量", numeric: true, cell: (r) => formatNumber(r.qty) },
+  { key: "id", header: "ID", cell: (r) => r.id },
+  { key: "unit", header: "Unit", cell: (r) => r.unit },
+  { key: "qty", header: "Quantity", numeric: true, cell: (r) => formatNumber(r.qty) },
 ];
 
 export const 載入的三種手段: Story = {
+  name: "Three loading strategies",
   render: () => {
     // 模擬「首載 3 秒後資料到」與「重查 2 秒」——展示兩種長相怎麼切換
     const [phase, setPhase] = useState<"first" | "loaded" | "refetch">("first");
@@ -42,7 +43,7 @@ export const 載入的三種手段: Story = {
       <div className="max-w-xl space-y-8">
         <div>
           <p className="mb-1 text-sm font-medium">
-            1・首載＝骨架（版面已知不跳動）　2・重查＝就地變暗（舊資料仍可讀）
+            1 · First load = skeleton (known layout, no jump)　2 · Refresh = dim in place (old data stays readable)
           </p>
           <DataTable
             rows={phase === "first" ? [] : demoRecords.slice(0, 5)}
@@ -60,18 +61,18 @@ export const 載入的三種手段: Story = {
             onClick={() => setPhase("refetch")}
           >
             <RotateCw className="mr-1 size-3.5" aria-hidden />
-            重新查詢（看變暗態）
+            Refresh (see dimmed state)
           </Button>
         </div>
         <div>
-          <p className="mb-1 text-sm font-medium">3・提交中＝disabled＋圖示＋文案（按鈕沒有 loading 變體）</p>
+          <p className="mb-1 text-sm font-medium">3 · Submitting = disabled + icon + copy (the button has no loading variant)</p>
           <Button disabled>
             <RotateCw className="mr-1.5 size-4 animate-spin" aria-hidden />
-            處理中…
+            Processing…
           </Button>
         </div>
         <div>
-          <p className="mb-1 text-sm font-medium">骨架積木（Skeleton／SkeletonText）</p>
+          <p className="mb-1 text-sm font-medium">Skeleton blocks (Skeleton / SkeletonText)</p>
           <div className="max-w-sm space-y-3 rounded-lg border p-4">
             <Skeleton className="h-5 w-2/5" />
             <SkeletonText />
@@ -83,24 +84,25 @@ export const 載入的三種手段: Story = {
 };
 
 export const 欄位錯誤態: Story = {
+  name: "Field errors",
   render: () => (
     <div className="max-w-sm space-y-5">
-      <FormField label="名稱" hint="2–20 個字" required>
-        <Input placeholder="輸入名稱" />
+      <FormField label="Name" hint="2–20 characters" required>
+        <Input placeholder="Enter a name" />
       </FormField>
-      <FormField label="數量" required error="必須大於 0">
+      <FormField label="Quantity" required error="Must be greater than 0">
         <NumberInput value={0} onChange={() => {}} />
       </FormField>
-      <FormField label="備註（獨立 FieldError 的長相）">
+      <FormField label="Notes (standalone FieldError)">
         <Input defaultValue="！！！" aria-invalid />
       </FormField>
-      <FieldError>含有不允許的字元</FieldError>
-      <Callout variant="danger" title="有 2 個欄位需要修正" live>
-        錯誤欄位已就地標示——這一層是彙總，不取代欄位下的訊息。
+      <FieldError>Contains an unsupported character</FieldError>
+      <Callout variant="danger" title="2 fields need attention" live>
+        Invalid fields are marked in place; this summary does not replace their local messages.
       </Callout>
       <p className="text-xs text-muted-foreground">
-        聚焦錯誤欄位：danger 邊框（語意）與中性聚焦環（焦點）同框不打架——
-        提醒色辭典同框分工的欄位落地。
+        An invalid field can show a danger border for meaning and a neutral focus ring for focus without competing—
+        the alert-color vocabulary's separation of roles, applied to a field.
       </p>
     </div>
   ),
@@ -108,14 +110,14 @@ export const 欄位錯誤態: Story = {
   // 而且是改版時最容易安靜壞掉的部分（樣式看起來都對，讀屏卻接不到訊息）。
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const qty = canvas.getByLabelText(/數量/);
+    const qty = canvas.getByLabelText(/Quantity/);
     await expect(qty).toHaveAttribute("aria-invalid", "true");
     const describedBy = qty.getAttribute("aria-describedby");
     await expect(describedBy).toBeTruthy();
     const errorEl = canvasElement.querySelector(`#${CSS.escape(describedBy!.split(" ").pop()!)}`);
-    await expect(errorEl).toHaveTextContent("必須大於 0");
+    await expect(errorEl).toHaveTextContent("Must be greater than 0");
     // 沒有錯誤的欄位不得帶 aria-invalid
-    const name = canvas.getByLabelText(/名稱/);
+    const name = canvas.getByLabelText(/Name/);
     await expect(name).not.toHaveAttribute("aria-invalid");
   },
 };

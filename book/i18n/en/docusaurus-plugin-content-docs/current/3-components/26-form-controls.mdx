@@ -1,0 +1,72 @@
+---
+title: Switch, Textarea, and RadioGroup
+---
+
+# Switch, Textarea, and RadioGroup
+
+Three basic form controls that complete the set. All use the existing field vocabulary: the same border (`--input`), focus ring (`--ring` + offset), and invalid state (`aria-invalid` → `--danger`).
+
+<StoryLink id="元件-表單-輸入控制項--開關">Storybook: Switch</StoryLink> <StoryLink id="元件-表單-輸入控制項--單選群">Storybook: RadioGroup</StoryLink> <StoryLink id="元件-表單-輸入控制項--長文輸入">Storybook: Long text</StoryLink>
+
+## Switch: changes apply immediately
+
+<Demo title="Switch (settings context)">
+  <div className="max-w-sm space-y-4">
+    <div className="flex items-center justify-between gap-2"><Label htmlFor="doc-sw-a">Auto-save</Label><Switch id="doc-sw-a" defaultChecked /></div>
+    <div className="flex items-center justify-between gap-2"><Label htmlFor="doc-sw-b">Dense list</Label><Switch id="doc-sw-b" /></div>
+    <div className="flex items-center justify-between gap-2"><Label htmlFor="doc-sw-c">Weekly report (admin controlled)</Label><Switch id="doc-sw-c" defaultChecked disabled /></div>
+  </div>
+</Demo>
+
+**Switch and Checkbox differ in semantics, not appearance:**
+
+<Rules>
+  <Do><p>Use Switch for settings that take effect<strong> immediately</strong> (settings-page toggles and list display modes).</p></Do>
+  <Dont><p>Do not use Switch for a form option that applies only on submit; users think it was already saved. Use Checkbox and submit it with the form.</p></Dont>
+</Rules>
+
+Switch deliberately has no amber “changed but not submitted” state: an immediately effective control has no unsent state. Always pair it with a visible text label (`<Label htmlFor>`); on/off must not rely on position or color alone, and the label enlarges a 20px track into a full-row hit target.
+
+## Textarea: mirror Input
+
+<Demo title="Multiline text (including invalid state)">
+  <div className="max-w-xl space-y-4">
+    <div className="space-y-1"><Label htmlFor="doc-ta-a">Notes</Label><Textarea id="doc-ta-a" placeholder="Additional context (optional)" rows={3} /></div>
+    <div className="space-y-1"><Label htmlFor="doc-ta-b">Invalid example</Label><Textarea id="doc-ta-b" defaultValue="***" aria-invalid /></div>
+  </div>
+</Demo>
+
+Textarea mirrors [Input](/components/input): border, focus ring, `aria-invalid`, and disabled state all share the same source. Allow vertical resize only (`resize-y`) so a wider textarea cannot break form-column alignment. Minimum height is about three lines; shorter free text belongs in Input.
+
+There is deliberately no character counter yet. When a limit is needed, the host should use `aria-invalid` + an error message; add a counter after three real use cases require it.
+
+## RadioGroup: vertical, with descriptions
+
+<Demo title="RadioGroup (one description per option)">
+  <div className="max-w-md">
+    <RadioGroup defaultValue="all" aria-label="Notification scope">
+      <div className="flex items-start gap-2"><RadioGroupItem value="all" id="doc-rg-a" className="mt-0.5" /><Label htmlFor="doc-rg-a" className="font-normal"><span className="block text-sm">All activity</span><span className="block text-tiny text-muted-foreground">Notify me about every change</span></Label></div>
+      <div className="flex items-start gap-2"><RadioGroupItem value="important" id="doc-rg-b" className="mt-0.5" /><Label htmlFor="doc-rg-b" className="font-normal"><span className="block text-sm">Important only</span><span className="block text-tiny text-muted-foreground">Notify only when action is needed</span></Label></div>
+      <div className="flex items-start gap-2"><RadioGroupItem value="none" id="doc-rg-c" className="mt-0.5" /><Label htmlFor="doc-rg-c" className="font-normal"><span className="block text-sm">Pause notifications</span><span className="block text-tiny text-muted-foreground">Check the in-app list yourself</span></Label></div>
+    </RadioGroup>
+  </div>
+</Demo>
+
+The selected option uses a solid dot as well as color, so grayscale printing and color-vision deficiency still communicate the choice. Keyboard behavior matches [SegGroup](/components/seg-group): one Tab stop for the group and arrow-key navigation.
+
+### Four single-choice carriers
+
+| Situation | Use |
+| --- | --- |
+| 2–5 short labels, all visible | [SegGroup](/components/seg-group) |
+| Long labels or a description per option | **RadioGroup** (vertical) |
+| More than five or dynamically changing options | [Select](/components/checkbox-select) |
+| Read-only ↔ edit field context | `radio` kind of [EditableField](/components/editable-field) |
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/switch.json
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/textarea.json
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/radio-group.json
+```

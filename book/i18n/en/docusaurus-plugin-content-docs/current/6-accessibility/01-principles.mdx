@@ -1,0 +1,98 @@
+---
+title: Four Principles
+---
+
+# Four Principles
+
+Accessibility is often deferred in admin systems. But admin users are **people who use the product eight hours a day**—they need keyboard operation most, tire most easily, and are most likely to include colleagues who use assistive technology.
+
+## 1. Touch targets ≥44px on coarse pointers
+
+```css
+@media (pointer: coarse) {
+  .tap-target   { min-height: 44px; min-width: 44px; }
+  .tap-target-y { min-height: 44px; }
+}
+```
+
+Apply this only to coarse pointers: phones and tablets get larger targets while desktops keep their compact density. Making every target 44px cuts desktop information density in half. `tap-target-y` increases height only, for content-sized elements such as tab pills and chips.
+
+## 2. Keyboard users can complete the whole flow
+
+| Rule | Meaning |
+| --- | --- |
+| **Roving tabindex** | One group of options has **one** Tab stop; arrow keys move inside it |
+| **Esc always exits** | Expanded edits, overlays, and guides respond to Esc |
+| **focus-visible** | The ring appears for keyboard focus, not mouse clicks |
+| **Focus never disappears** | When an element is removed, return focus to a sensible place |
+
+<Rules>
+  <Do><p>Four segmented options = <strong>one</strong> Tab stop.</p></Do>
+  <Dont><p>Do not give four options four Tab stops. A 30-column form would take hundreds of key presses to cross.</p></Dont>
+</Rules>
+
+## 3. Contrast: WCAG AA, validated separately for light and dark
+
+- Normal text **4.5:1**; large text **3:1**.
+- UI component boundaries **3:1**.
+- Validate dark mode separately; low-saturation colors often fall below 3:1 on dark surfaces.
+- Use the **actual page surface**, not a comparison background from a palette study.
+
+## 4. Color is never the only cue
+
+| Component | Second cue |
+| --- | --- |
+| Status badge | Text |
+| Delta | ▲▼ arrow + text |
+| Selected state | ✓ checkmark |
+| Callout | Fixed icon |
+| Negative money | Accounting parentheses `($2,000)` |
+| Locked field | Lock icon |
+
+Acceptance test: **print the screen in grayscale**. If meaning disappears, the work is not finished.
+
+## Extra: locked elements remain focusable
+
+```tsx
+<div role="group" tabIndex={0} aria-disabled aria-label="Credit limit, $1,500,000 (locked: this record is closed)">
+```
+
+Native `disabled` elements cannot receive focus. Screen-reader users skip them without knowing they exist or why they cannot edit them. Use `aria-disabled`, `tabIndex={0}`, and put the reason in `aria-label`.
+
+## Extra: text equivalents for graphics
+
+Anything drawn with SVG that carries information—charts, process diagrams, progress rings, status distributions—needs a text equivalent because the graphic is opaque to screen readers.
+
+### `role="img"` is not neutral
+
+It both identifies the node as an image and hides its child tree from assistive technology. Text rendered inside SVG (`<text>` category names, values, and axis labels) is therefore not read. Adding `role="img"` is a promise: **replace the hidden information with text**. Without that promise, the content disappears entirely for screen-reader users. This is WCAG 1.1.1, Level A.
+
+<Rules>
+  <Do><p>Whenever you add <code>role="img"</code>, also add <code>aria-label</code> summarizing the subject, scope, and most important result (for example, “Quantity by unit, six units, highest is Unit A at 1,240”).</p></Do>
+  <Dont><p>Do not write only <code>aria-label="Chart"</code>. It carries no information and can make an audit checklist look complete.</p></Dont>
+</Rules>
+
+### Use a table for exact values, not SVG focus management
+
+A summary can communicate a trend but not exact values. A hidden table with `<caption>` and `scope` is the recommended equivalent: table semantics and screen readers’ table navigation are universal. Making every SVG data point focusable is inconsistent across browsers and readers, expensive, and still less useful than a table.
+
+<Rules>
+  <Do><p>The same table output also serves<strong> keyboard users</strong> and<strong> printed copies</strong>, who cannot access hover values either.</p></Do>
+  <Dont><p>Never let a number exist<strong> only inside the graphic</strong>. Hover is unreliable for keyboard, touch, and screen-reader use.</p></Dont>
+</Rules>
+
+### Hide graphics when nearby text already contains the data
+
+If values are already visible beside a stacked bar, Bullet, or table, mark the graphic `aria-hidden` so the same values are not announced twice. The rule is simple: **one data point appears once in the accessibility tree**.
+
+| Situation | Approach |
+| --- | --- |
+| Information exists only in the graphic | `role="img"` + summary + `sr-only` table |
+| Values are visible nearby | `aria-hidden` on the graphic |
+| The component is already a table | Correct table semantics (`caption`, `scope`, row headers) |
+
+Do not use `aria-hidden` as an escape hatch; it means “no new information here,” not “I do not want to handle this information.”
+
+### Document known limitations
+
+If hover and click drill-down work only with a mouse because points lack `tabIndex` / `onKeyDown`, that is WCAG 2.1.1, Level A. Record it as a known limitation instead of implying the interaction is keyboard accessible. The recommended fix is to let the equivalent table trigger the same drill-down action.

@@ -1,0 +1,74 @@
+---
+title: Coachmark
+---
+
+# Coachmark
+
+Highlights an element and explains what it is.
+
+<StoryLink id="元件-引導-聚光導引-coachmark--三步導引" />
+
+## This is a presentation component
+
+The target rectangle, content, step state, and callbacks all come from outside. Coachmark does not know how many steps exist, which step is current, or how to find an anchor; those belong to the host application.
+
+That boundary lets the same component serve onboarding, feature announcements, and acceptance checklists.
+
+## Three key decisions
+
+### 1. The spotlight hole is click-through
+
+Use `pointer-events: none` so users can still click the highlighted control. **A guide teaches; it does not operate the screen for the user.**
+
+### 2. It can collapse
+
+When the user must interact (open a dialog or switch tabs), collapse the guide into a small pill in the lower right so the screen becomes usable. The most common complaint is a guide card that covers the button it tells users to press.
+
+<Rules>
+  <Do><p>The guide must be able to collapse or move, and the affordance must be discoverable.</p></Do>
+  <Dont><p>Do not offer only Next and Close. When users need to operate the screen, closing becomes the only path and they never reopen the guide.</p></Dont>
+</Rules>
+
+### 3. Keyboard users can complete it
+
+← and → change steps, Esc skips, Enter advances. Move focus into the card on each step and announce new content with `aria-live`.
+
+## Acceptance mode
+
+Pass `showVerdict` to add “✅ Passed / ❌ Issue + note” to each step. Completing the tour produces a deliverable acceptance report.
+
+## Four shapes, not four optional props
+
+| Shape | When |
+| --- | --- |
+| **Centered card without an anchor** (`targetRect = null`) | Opening and closing, when no element should be highlighted |
+| **Interaction required** (`actionHint`) | The user must act before the tour can continue |
+| **State warning** (`warning`) | A prerequisite is missing and following the step would fail |
+| **Link to the next tour** (`secondaryAction`) | One tour ends and another begins |
+
+Opening and closing copy belongs to the tour, not to a random button or heading, so pass `targetRect = null` and center the card.
+
+For steps that require action—opening a dialog, switching tabs, entering a value—use `actionHint` (“👆 Click the highlighted area to continue”) and let the real action advance the tour. Do not leave only a Next button and expect users to click the highlighted element; people press the visible button, and that is not their fault.
+
+If a prerequisite is missing, use `warning` on the step card to explain the current state, why the action is blocked, and where to unlock it. Do not let users follow the guide into an unexplained error; they lose trust in both guide and system.
+
+At the final step, `secondaryAction` can link to another short tour (“Next: … →”). Keep each tour about one task (3–7 steps); the primary action remains Complete because leaving should always be easier than continuing.
+
+## When not to use it
+
+<Rules>
+  <Do><p>Use it for a first-use critical path (3–7 steps) or a new-feature announcement (1–2 steps).</p></Do>
+  <Dont><p>Do not use a tour to rescue a bad interface. If a screen needs 12 steps of explanation, the problem is the screen; the tour only delays “I do not understand” by three minutes.</p></Dont>
+</Rules>
+
+## Interactive example
+
+Coachmark needs the measured position of real elements, so a static documentation page is not a useful demonstration. See Storybook under “Components / Guidance / Coachmark.”
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/coachmark.json
+```
+
+Further reading: [Pattern → Guided tours and acceptance marks](/patterns/guided-tour)

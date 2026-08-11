@@ -8,43 +8,45 @@ import { Button } from "../ui/button";
 import { demoProfile, TIER_OPTIONS, CHANNEL_OPTIONS, type DemoProfile } from "../demo/sample-data";
 import { makeOptions } from "../demo/generate";
 
-const meta: Meta = { title: "元件/表單/唯讀逐欄編輯" };
+const meta: Meta = { title: "Components/Forms/Read-only inline editing", id: "元件/表單/唯讀逐欄編輯" };
 export default meta;
 type Story = StoryObj;
 
 const SPECS: FieldSpec[] = [
-  { key: "name", label: "單位名稱", kind: "text" },
-  { key: "code", label: "單位代號", kind: "text" },
-  { key: "tier", label: "等級", kind: "select", format: (v) => TIER_OPTIONS.find((o) => o.value === v)?.label ?? String(v) },
-  { key: "quota", label: "上限額度", kind: "money" },
-  { key: "adjustRate", label: "調整率", kind: "rate" },
-  { key: "channels", label: "聯絡管道", kind: "multiselect" },
-  { key: "active", label: "啟用中", kind: "checkbox" },
-  { key: "contact", label: "聯絡方式", kind: "text" },
-  { key: "since", label: "建立日期", kind: "date" },
+  { key: "name", label: "Unit name", kind: "text" },
+  { key: "code", label: "Unit code", kind: "text" },
+  { key: "tier", label: "Tier", kind: "select", format: (v) => TIER_OPTIONS.find((o) => o.value === v)?.label ?? String(v) },
+  { key: "quota", label: "Quota", kind: "money" },
+  { key: "adjustRate", label: "Adjustment rate", kind: "rate" },
+  { key: "channels", label: "Contact channels", kind: "multiselect" },
+  { key: "active", label: "Active", kind: "checkbox" },
+  { key: "contact", label: "Contact", kind: "text" },
+  { key: "since", label: "Created", kind: "date" },
 ];
 
 export const 單一欄位: Story = {
+  name: "Single field",
   render: function Render() {
     const [v, setV] = useState<string | number | boolean | string[] | null | undefined>(1_500_000);
     return (
       <div className="max-w-sm space-y-6">
         <EditableField
-          label="上限額度"
+          label="Quota"
           kind="money"
           value={v}
           original={1_500_000}
           onChange={setV}
           onRevert={() => setV(1_500_000)}
-          help="點一下值就能編輯；改過的欄位會標成琥珀色，並出現還原鈕。"
+          help="Click the value to edit; changed fields use the edit color and show a revert button."
         />
-        <EditableField label="單位代號（鎖定）" kind="text" value="U-1042" original="U-1042" onChange={() => {}} disabled lockHint="代號建立後不可變更" />
+        <EditableField label="Unit code (locked)" kind="text" value="U-1042" original="U-1042" onChange={() => {}} disabled lockHint="The code cannot be changed after creation" />
       </div>
     );
   },
 };
 
 export const 完整表單與變更摘要: Story = {
+  name: "Full form and change summary",
   render: function Render() {
     const [draft, setDraft] = useState<DemoProfile>(demoProfile);
     const { changes, revertField, revertAll } = useRecordDiff(demoProfile, draft, setDraft, SPECS);
@@ -52,21 +54,21 @@ export const 完整表單與變更摘要: Story = {
     return (
       <div className="grid max-w-4xl gap-6 md:grid-cols-[1fr_320px]">
         <div className="grid gap-3 sm:grid-cols-2">
-          <EditableField label="單位名稱" kind="text" value={draft.name} original={demoProfile.name} onChange={set("name")} onRevert={() => revertField("name")} />
-          <EditableField label="單位代號" kind="text" value={draft.code} original={demoProfile.code} onChange={set("code")} onRevert={() => revertField("code")} />
-          <EditableField label="等級" kind="select" options={TIER_OPTIONS} value={draft.tier} original={demoProfile.tier} onChange={set("tier")} onRevert={() => revertField("tier")} />
-          <EditableField label="上限額度" kind="money" value={draft.quota} original={demoProfile.quota} onChange={set("quota")} onRevert={() => revertField("quota")} />
-          <EditableField label="調整率" kind="rate" value={draft.adjustRate} original={demoProfile.adjustRate} onChange={set("adjustRate")} onRevert={() => revertField("adjustRate")} help="畫面顯示 %，存的是比值。" />
-          <EditableField label="啟用中" kind="checkbox" value={draft.active} original={demoProfile.active} onChange={set("active")} onRevert={() => revertField("active")} />
-          <EditableField label="聯絡管道" kind="multiselect" options={CHANNEL_OPTIONS} value={draft.channels} original={demoProfile.channels} onChange={set("channels")} onRevert={() => revertField("channels")} className="sm:col-span-2" />
-          <EditableField label="聯絡方式" kind="text" value={draft.contact} original={demoProfile.contact} onChange={set("contact")} onRevert={() => revertField("contact")} className="sm:col-span-2" />
+          <EditableField label="Unit name" kind="text" value={draft.name} original={demoProfile.name} onChange={set("name")} onRevert={() => revertField("name")} />
+          <EditableField label="Unit code" kind="text" value={draft.code} original={demoProfile.code} onChange={set("code")} onRevert={() => revertField("code")} />
+          <EditableField label="Tier" kind="select" options={TIER_OPTIONS} value={draft.tier} original={demoProfile.tier} onChange={set("tier")} onRevert={() => revertField("tier")} />
+          <EditableField label="Quota" kind="money" value={draft.quota} original={demoProfile.quota} onChange={set("quota")} onRevert={() => revertField("quota")} />
+          <EditableField label="Adjustment rate" kind="rate" value={draft.adjustRate} original={demoProfile.adjustRate} onChange={set("adjustRate")} onRevert={() => revertField("adjustRate")} help="Displayed as %, stored as a ratio." />
+          <EditableField label="Active" kind="checkbox" value={draft.active} original={demoProfile.active} onChange={set("active")} onRevert={() => revertField("active")} />
+          <EditableField label="Contact channels" kind="multiselect" options={CHANNEL_OPTIONS} value={draft.channels} original={demoProfile.channels} onChange={set("channels")} onRevert={() => revertField("channels")} className="sm:col-span-2" />
+          <EditableField label="Contact" kind="text" value={draft.contact} original={demoProfile.contact} onChange={set("contact")} onRevert={() => revertField("contact")} className="sm:col-span-2" />
         </div>
         <div className="space-y-2">
           <ChangeSummary changes={changes} onRevertField={revertField} onRevertAll={revertAll} />
-          <Button className="w-full" disabled={changes.length === 0}>送出 {changes.length > 0 && `（${changes.length} 項變更）`}</Button>
+          <Button className="w-full" disabled={changes.length === 0}>Submit {changes.length > 0 && `(${changes.length} change${changes.length === 1 ? "" : "s"})`}</Button>
           <p className="text-tiny text-muted-foreground">
-            摘要的資料結構（Change[]）與寫入異動紀錄的 before/after 是同一份——
-            使用者送出前看到的，就是稽核紀錄之後會呈現的。
+            The Change[] structure and the before/after values written to the audit record are the same data—
+            what users see before submission is what the audit trail will show later.
           </p>
         </div>
       </div>
@@ -75,17 +77,18 @@ export const 完整表單與變更摘要: Story = {
 };
 
 export const 新增模式: Story = {
+  name: "Create mode",
   render: function Render() {
     const [draft, setDraft] = useState({ name: "", code: "", tier: "bronze" });
     const set = (k: string) => (v: unknown) => setDraft((d) => ({ ...d, [k]: v }));
     return (
       <div className="max-w-sm space-y-3">
         <p className="text-xs text-muted-foreground">
-          新增時 `alwaysEdit` ＋關閉 `trackChanges`：欄位恆為輸入態，也不會整張表單都被標成「已變更」。
+          In create mode, use `alwaysEdit` and disable `trackChanges`: fields remain editable without marking the whole form as changed.
         </p>
-        <EditableField label="單位名稱" kind="text" value={draft.name} onChange={set("name")} alwaysEdit trackChanges={false} placeholder="輸入單位名稱" />
-        <EditableField label="單位代號" kind="text" value={draft.code} onChange={set("code")} alwaysEdit trackChanges={false} placeholder="例：U-1042" />
-        <EditableField label="等級" kind="radio" options={TIER_OPTIONS} value={draft.tier} onChange={set("tier")} alwaysEdit trackChanges={false} />
+        <EditableField label="Unit name" kind="text" value={draft.name} onChange={set("name")} alwaysEdit trackChanges={false} placeholder="Enter unit name" />
+        <EditableField label="Unit code" kind="text" value={draft.code} onChange={set("code")} alwaysEdit trackChanges={false} placeholder="Example: U-1042" />
+        <EditableField label="Tier" kind="radio" options={TIER_OPTIONS} value={draft.tier} onChange={set("tier")} alwaysEdit trackChanges={false} />
       </div>
     );
   },
@@ -95,8 +98,8 @@ export const 新增模式: Story = {
 // 改 args 時 value state 必須 remount 重置——否則多選的 value 會停在
 // 已不存在的選項上，所以用「內部 Demo 元件＋key」的寫法。
 const KIND_BY_LABEL = {
-  文字: "text", 數值: "number", 金額: "money", 比率: "rate", 日期: "date",
-  下拉: "select", 單選: "radio", 多選: "multiselect", 是否: "checkbox",
+  Text: "text", Number: "number", Money: "money", Rate: "rate", Date: "date",
+  Select: "select", Radio: "radio", Multiselect: "multiselect", Checkbox: "checkbox",
 } as const satisfies Record<string, FieldKind>;
 
 function originalOf(kind: FieldKind, opts: { value: string; label: string }[]): EditableFieldValue {
@@ -108,67 +111,68 @@ function originalOf(kind: FieldKind, opts: { value: string; label: string }[]): 
     case "select": case "radio": return opts[0]?.value ?? null;
     case "multiselect": return opts.slice(0, 2).map((o) => o.value);
     case "checkbox": return true;
-    default: return "甲案 第一階段";
+    default: return "Plan A — Phase 1";
   }
 }
 
-type 互動Args = {
-  欄位型別: keyof typeof KIND_BY_LABEL;
-  選項數: number;
-  鎖定: boolean;
-  鎖定原因: string;
-  恆為輸入態: boolean;
-  追蹤變更: boolean;
-  說明文字: string;
+type InteractiveArgs = {
+  fieldType: keyof typeof KIND_BY_LABEL;
+  optionCount: number;
+  locked: boolean;
+  lockReason: string;
+  alwaysEdit: boolean;
+  trackChanges: boolean;
+  helpText: string;
 };
 
-export const 互動: StoryObj<互動Args> = {
+export const 互動: StoryObj<InteractiveArgs> = {
+  name: "Interactive playground",
   args: {
-    欄位型別: "金額",
-    選項數: 4,
-    鎖定: false,
-    鎖定原因: "此筆已結案，需先解除鎖定",
-    恆為輸入態: false,
-    追蹤變更: true,
-    說明文字: "",
+    fieldType: "Money",
+    optionCount: 4,
+    locked: false,
+    lockReason: "This record is closed; unlock it first",
+    alwaysEdit: false,
+    trackChanges: true,
+    helpText: "",
   },
   argTypes: {
-    欄位型別: { control: "select", options: Object.keys(KIND_BY_LABEL) },
+    fieldType: { control: "select", options: Object.keys(KIND_BY_LABEL) },
     // Storybook 的 if 條件只有 eq/neq/exists/truthy，表達不了「三選一才顯示」，
     // 所以恆顯示、用描述講清楚適用範圍
-    選項數: { control: { type: "range", min: 0, max: 24, step: 1 }, description: "只影響 下拉／單選／多選" },
-    鎖定: { control: "boolean" },
-    鎖定原因: { control: "text", if: { arg: "鎖定" } },
-    恆為輸入態: { control: "boolean" },
-    追蹤變更: { control: "boolean" },
-    說明文字: { control: "text" },
+    optionCount: { control: { type: "range", min: 0, max: 24, step: 1 }, description: "Affects select, radio, and multiselect" },
+    locked: { control: "boolean" },
+    lockReason: { control: "text", if: { arg: "locked" } },
+    alwaysEdit: { control: "boolean" },
+    trackChanges: { control: "boolean" },
+    helpText: { control: "text" },
   },
   render: (a) => {
-    const kind = KIND_BY_LABEL[a.欄位型別];
-    const opts = makeOptions(a.選項數);
+    const kind = KIND_BY_LABEL[a.fieldType];
+    const opts = makeOptions(a.optionCount);
     const original = originalOf(kind, opts);
     const Demo = () => {
       const [v, setV] = useState<EditableFieldValue>(original);
       return (
         <EditableField
-          label="示範欄位"
+          label="Demo field"
           kind={kind}
           value={v}
           original={original}
           onChange={setV}
           onRevert={() => setV(original)}
           options={opts}
-          disabled={a.鎖定}
-          lockHint={a.鎖定 ? a.鎖定原因 : undefined}
-          alwaysEdit={a.恆為輸入態}
-          trackChanges={a.追蹤變更}
-          help={a.說明文字 || undefined}
+          disabled={a.locked}
+          lockHint={a.locked ? a.lockReason : undefined}
+          alwaysEdit={a.alwaysEdit}
+          trackChanges={a.trackChanges}
+          help={a.helpText || undefined}
         />
       );
     };
     return (
       <div className="max-w-sm">
-        <Demo key={`${kind}-${a.選項數}-${a.恆為輸入態}`} />
+        <Demo key={`${kind}-${a.optionCount}-${a.alwaysEdit}`} />
       </div>
     );
   },

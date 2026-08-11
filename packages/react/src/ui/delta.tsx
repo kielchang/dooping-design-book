@@ -29,7 +29,7 @@ export function Delta({
   posLabel = "",
   negLabel = "",
   format = formatNumber,
-  zeroLabel = "持平",
+  zeroLabel = "unchanged",
   className,
 }: DeltaProps) {
   if (value === 0) {

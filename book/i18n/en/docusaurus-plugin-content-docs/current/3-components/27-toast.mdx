@@ -1,0 +1,82 @@
+---
+title: Toast
+---
+
+import { useToast } from "@dooping/react";
+
+export function PushRow() {
+  const { push } = useToast();
+  return (
+    <div className="flex flex-wrap gap-2">
+      <Button size="sm" onClick={() => push({ variant: "success", title: "Saved", description: "12 fields updated." })}>Success</Button>
+      <Button size="sm" variant="secondary" onClick={() => push({ variant: "info", title: "Added to schedule", description: "You will be notified here when the export finishes." })}>Info</Button>
+      <Button size="sm" variant="secondary" onClick={() => push({ variant: "warning", title: "Some items skipped", description: "3 duplicate records were not imported." })}>Warning</Button>
+      <Button size="sm" variant="destructive" onClick={() => push({ variant: "danger", title: "Save failed", description: "The connection timed out. Try again. This message will not disappear automatically." })}>Failure</Button>
+    </div>
+  );
+}
+
+# Toast
+
+“Did the action you just took succeed?” A floating message that answers one question.
+
+The page-level rule is that action feedback has one destination everywhere; this page defines it. Change the destination or duration here first, then update component constants—do not invent behavior per screen.
+
+<Demo title="Action feedback (try the buttons; danger stays visible)">
+  <ToastProvider><PushRow /></ToastProvider>
+</Demo>
+
+<StoryLink id="元件-狀態-操作回饋與載入--操作回饋" />
+
+## The site-wide standard
+
+| Rule | Value | Why |
+| --- | --- | --- |
+| Location | **Bottom right** | Does not cover header actions or sidebar navigation; the end of the reading path |
+| Maximum stack | 3; oldest is displaced | Repeated actions do not create a wall; messages that cannot be displaced need a Dialog |
+| Auto-dismiss | `success` / `info` / `warning` for 5 seconds; hover/focus pauses | Success needs no manual action; pausing helps someone who is reading |
+| **danger** | **Never auto-dismiss; close manually** | Errors must still be visible when a user returns |
+| Semantics | Same source as [Callout](/components/callout): same icons and subtle surfaces | One semantic has one face everywhere, without relying on color alone |
+| Screen readers | Normal `status` / `polite`; danger `alert` / `assertive` | Success does not interrupt; errors announce immediately |
+| Layer | `z-[70]` | Above Dialog (`z-50`) and filter panels (`z-[60]`) |
+
+## What not to use Toast for
+
+<Rules>
+  <Do><p>Action results: saved, exported, added to schedule, or failed to save.</p></Do>
+  <Dont><p><strong>Form validation errors do not go in Toast.</strong> Keep the error beside the field (`aria-describedby`) and summarize multiple errors in an in-page Callout. A disappearing message cannot support the comparison needed to fix a form.</p></Dont>
+</Rules>
+
+<Rules>
+  <Do><p>Finish in one sentence: one-line title, at most two-line description.</p></Do>
+  <Dont><p>Do not put links or multiple actions in it. A result that needs navigation belongs in a Callout or on a page; a disappearing link is a question with no time to answer.</p></Dont>
+</Rules>
+
+## Division of labor with Callout
+
+Both share the same semantic surfaces (`STATUS_SUBTLE_SURFACE`); only location and lifetime differ:
+
+| | Toast | Callout |
+| --- | --- | --- |
+| Location | Fixed bottom right, floating | In place, scrolls with content |
+| Lifetime | Seconds (danger is the exception) | Persistent |
+| Use | Action feedback | Rules, field summaries, messages users need to compare |
+
+An in-place `Callout live` remains correct for persistent feedback such as a saved result at the top of a form; transient feedback moves to Toast.
+
+## Install and mount
+
+```tsx
+// Wrap once at the application root; the provider supplies the viewport.
+<ToastProvider><App /></ToastProvider>
+
+// Inside any component
+const { push } = useToast();
+push({ variant: "success", title: "Saved" });
+```
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/toast.json
+```
+
+Toast content is portaled directly under `body`; a host’s style baseline must cover portal content (see [ADR-0010](/adr/demo-host-baseline-contract)).

@@ -1,0 +1,42 @@
+---
+title: Hard Lock and Explicit Unlock
+---
+
+# Hard Lock and Explicit Unlock
+
+## Problem
+
+Can a record be edited after confirmation? If the answer is not explicit, teams eventually ship one of three behaviors: nothing can change, editing silently unconfirms it (the most dangerous), or editing requires an explicit unlock. This pattern chooses the third.
+
+## Approach
+
+**Confirmation freezes data. To edit, explicitly unconfirm first.**
+
+```
+Unconfirmed ──confirm──→ Confirmed (frozen)
+                              │
+                              └──explicit “unconfirm”──→ Unconfirmed (editable)
+```
+
+Three guards are required:
+
+1. **Data layer (authoritative):** every write checks lock state and no-ops when locked. If this catches a UI leak, preserving data matters more than returning an error.
+2. **UI preflight:** stop the action before it begins and explain “This record is confirmed; unconfirm it before editing.”
+3. **Visual state:** show a lock while remaining focusable so screen readers can announce why.
+
+## Trade-off
+
+Unlocking adds a step by design. “I am changing approved data” becomes a deliberate decision rather than an accidental click.
+
+<Rules>
+  <Do><p>Make unlock an explicit, audited action: who, when, and why.</p></Do>
+  <Dont><p>Do not let “Edit” silently unconfirm. A user who only wanted to inspect editability can roll back downstream closing and billing without realizing it.</p></Dont>
+</Rules>
+
+When unlocking, also handle derived data such as frozen snapshots; rebuild it on reconfirm. Do not only flip a status flag and leave an old report snapshot behind.
+
+## Implementation notes
+
+- Put lock logic in one function (`isLocked(period)`) shared by data and UI layers.
+- Make it the first guard in every mutation.
+- Test every mutation against locked data and assert that nothing changes.

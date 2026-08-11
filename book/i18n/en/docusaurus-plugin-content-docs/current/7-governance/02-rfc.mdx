@@ -1,0 +1,33 @@
+---
+title: Feedback and RFC Process
+---
+
+# Feedback and RFC Process
+
+## Three kinds of feedback
+
+- A bug report describes behavior that violates an existing contract.
+- A usage question asks how to apply an existing rule.
+- A proposal changes the contract and needs an RFC.
+
+## Five questions an RFC must answer
+
+1. What problem is recurring, and for whom?
+2. What evidence shows it is worth a shared change?
+3. What is the proposed contract?
+4. Which alternatives were considered and rejected?
+5. What are the migration, implementation, and maintenance costs?
+
+The “rule of three” is useful evidence: a pattern seen in three independent places may belong
+in the shared system. It is a signal, not permission to generalize without checking differences.
+
+## Decision and state machine
+
+An RFC moves from Draft to Open, Discussion, Accepted or Rejected, and finally Implemented or
+Superseded. Record the decision and owner. An accepted RFC becomes an ADR when it is a durable
+architectural choice.
+
+## Deprecation is also a process
+
+Removing a pattern needs evidence, a replacement, a migration path, and a date. Do not silently
+delete a component or route that another team may have adopted.

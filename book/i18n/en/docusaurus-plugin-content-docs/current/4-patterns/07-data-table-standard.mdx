@@ -1,0 +1,115 @@
+---
+title: Data Table Standard
+---
+
+import { demoRecords, STATUS_LABEL } from "@dooping/react/demo/sample-data";
+
+export const rows = demoRecords.slice(0, 7);
+
+export const nt = (n) => n.toLocaleString("en-US");
+
+export const columns = [
+  { key: "id", header: "ID", freeze: true, cell: (r) => r.id, sortValue: (r) => r.id, filterText: (r) => r.id },
+  { key: "unit", header: "Unit", cell: (r) => r.unit, sortValue: (r) => r.unit, filterText: (r) => r.unit, filter: "select" },
+  { key: "name", header: "Item", truncate: 160, cell: (r) => r.name, sortValue: (r) => r.name, filterText: (r) => r.name },
+  { key: "qty", header: "Quantity", numeric: true, cell: (r) => nt(r.qty), sortValue: (r) => r.qty, total: (rs) => nt(rs.reduce((s, r) => s + r.qty, 0)) },
+  { key: "amount", header: "Amount", numeric: true, cell: (r) => `$${nt(r.amount)}`, sortValue: (r) => r.amount, total: (rs) => `$${nt(rs.reduce((s, r) => s + r.amount, 0))}` },
+  { key: "status", header: "Status", cell: (r) => STATUS_LABEL[r.status], sortValue: (r) => STATUS_LABEL[r.status], filterText: (r) => STATUS_LABEL[r.status], filter: "select" },
+];
+
+# Data Table Standard
+
+## The problem
+
+Tables are the main surface of a back-office system and the easiest one to let drift.
+Build three tables by hand and you get three search-box positions, three sort indicators,
+three empty-state messages, and often three different total calculations. One of them may
+only total the current page without anyone noticing.
+
+## One column configuration drives everything
+
+```tsx
+{
+  key: "amount",
+  header: "Amount",
+  numeric: true,                        // right aligned and tabular
+  cell: (r) => formatMoney(r.amount),
+  sortValue: (r) => r.amount,           // sortable when present
+  filterText: (r) => String(r.amount),  // included in keyword search
+  filter: "range",                      // column filter type
+  total: (rows) => formatMoney(sum(rows)),
+  freeze: true,                         // freeze the first column
+}
+```
+
+The configuration below produces the table. All nine standards are driven by the column
+definition rather than being implemented separately.
+
+<Demo title="Search, sort, filter, and resize the columns">
+  <DataTable
+    rows={rows}
+    columns={columns}
+    getRowKey={(r) => r.id}
+    initialSort={{ key: "amount", dir: "desc" }}
+    pageSize={5}
+    csv={{
+      headers: ["ID", "Unit", "Item", "Quantity", "Amount", "Status"],
+      row: (r) => [r.id, r.unit, r.name, r.qty, r.amount, STATUS_LABEL[r.status]],
+      fileName: "records.csv",
+    }}
+  />
+</Demo>
+
+:::note This is a real component
+The docs site compiles the source in `packages/react`; this is not a screenshot.
+See the [DataTable component page](/components/data-table) for the API.
+:::
+
+## Nine standards
+
+| # | Standard | Why |
+| --- | --- | --- |
+| 1 | **Keyword search** across all text columns | The first action is usually “find that record.” |
+| 2 | **Column filters**: contains, numeric range, or multi-select | Finding and filtering are different tasks. |
+| 3 | Multiple values in one column use **OR**; columns combine with **AND** | This matches how people describe a desired result. |
+| 4 | Three-state sorting: none → descending → ascending | The first click often means “show the largest”; users must be able to restore source order. |
+| 5 | **Threshold pagination**: hide the pager when there is only one page | “Page 1 of 1” is noise. |
+| 6 | **Totals use all filtered rows**, not only the current page | Page totals are an accounting trap. |
+| 7 | **Freeze the first column** | After horizontal scrolling, users still need to know which row they are reading. |
+| 8 | **Export follows the screen** after filtering and sorting | A filtered view should not unexpectedly export every record. |
+| 9 | Distinguish **no data** from **no filter results** | The next action is different in each case. |
+
+## Three row states must be distinguishable
+
+Hover and selection answer two basic questions: “which row am I pointing at?” and “which
+rows did I select?” Use current-color state layers of 6%, 14%, and 20% so the difference
+survives both ordinary and zebra-striped rows.
+
+When a row is selected, promote secondary text back to the foreground color. With a 20%
+overlay, muted text can otherwise fall below a readable contrast ratio. During multi-select,
+the checkbox remains the primary cue; color is supporting information, never the only cue.
+
+## Extras: crosshair and resizable columns
+
+- **Crosshair highlighting** highlights the row and column under the pointer, reducing mistakes in wide tables.
+- **Resizable columns** support dragging and double-click auto-fit. Fixed widths rarely suit names of very different lengths.
+
+## Trade-off
+
+The column configuration is more abstract than hand-written `<td>` elements, so the first
+table takes longer. The return usually arrives with the second table. More importantly,
+consistent behavior lets users learn one table and use them all.
+
+## Rules
+
+<Rules>
+  <Do><p>Use the standard table for every list where a user needs to find a particular record.</p></Do>
+  <Dont><p>Do not hand-build a table just because it has five rows today. It will grow, and adding search and sorting later costs more than starting with the standard.</p></Dont>
+</Rules>
+
+<Rules>
+  <Do><p>Pass <strong>all filtered rows</strong> to the total calculation.</p></Do>
+  <Dont><p>Do not pass only the current page. This error raises no exception; it simply makes a later reconciliation wrong.</p></Dont>
+</Rules>
+
+See the [DataTable component](/components/data-table) for implementation details.

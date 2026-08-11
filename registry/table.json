@@ -3,8 +3,8 @@
   "name": "table",
   "version": "0.11.1",
   "type": "registry:ui",
-  "title": "Table 表格基礎件",
-  "description": "表格語意元素＋數字欄／凍結首欄／可排序表頭。",
+  "title": "Table",
+  "description": "Semantic table elements with numeric columns, frozen first column, and sortable headers.",
   "dependencies": [
     "@dooping/tokens@^0.6.0",
     "lucide-react"

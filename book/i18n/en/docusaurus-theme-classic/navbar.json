@@ -1,0 +1,18 @@
+{
+  "title": {
+    "message": "Dooping Design Book",
+    "description": "The title in the navbar"
+  },
+  "item.label.Storybook ↗": {
+    "message": "Storybook ↗",
+    "description": "Navbar item with label Storybook ↗"
+  },
+  "item.label.提出建議 ↗": {
+    "message": "Suggest an improvement ↗",
+    "description": "Navbar item with label 提出建議 ↗"
+  },
+  "item.label.GitHub ↗": {
+    "message": "GitHub ↗",
+    "description": "Navbar item with label GitHub ↗"
+  }
+}

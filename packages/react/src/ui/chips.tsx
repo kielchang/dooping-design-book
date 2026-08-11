@@ -29,7 +29,7 @@ export interface ChipsProps {
  */
 export function Chips({
   options, selected, onToggle, label, autoFocus, onEscape, disabled, lockHint,
-  changed = false, emptyHint = "（無選項）", className,
+  changed = false, emptyHint = "(No options)", className,
 }: ChipsProps) {
   const btns = useRef<(HTMLButtonElement | null)[]>([]);
 

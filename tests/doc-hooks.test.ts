@@ -52,11 +52,12 @@ function collectStoryIds(): Set<string> {
   for (const abs of walk(KIT, (n) => n.endsWith(".stories.tsx"))) {
     const src = readFileSync(abs, "utf8");
 
-    // 只認 meta 的 title。stories 內文也會出現 `title:`（那是元件的 prop，
-    // 例如 EmptyState 的標題），拿它當 kind 會憑空生出不存在的 id。
+    // Prefer an explicit stable id when a story's visible title is localized. Otherwise use
+    // the title. Stories' inner `title:` props are not meta and must not become the kind.
     const metaAt = src.indexOf("const meta");
     if (metaAt < 0) continue;
-    const title = src.slice(metaAt).match(/title:\s*"([^"]+)"/)?.[1];
+    const metaText = src.slice(metaAt);
+    const title = metaText.match(/id:\s*"([^"]+)"/)?.[1] ?? metaText.match(/title:\s*"([^"]+)"/)?.[1];
     if (!title) continue;
 
     for (const [, name] of src.matchAll(/^export const ([^\s:=]+)\s*[:=]/gm)) {

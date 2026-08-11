@@ -66,27 +66,27 @@ const preview: Preview = {
         ],
       },
     },
-    options: { storySort: { order: ["基礎", "元件", ["基礎", "表單", "資料", "特殊介面", "狀態", "浮層", "引導", "文件示意"], "頁面"] } },
+    options: { storySort: { order: ["Foundations", "Components", ["Primitives", "Forms", "Data", "Special surfaces", "States", "Overlays", "Guidance", "Documentation demos"], "Pages"] } },
   },
   globalTypes: {
     theme: {
-      description: "淺色／深色版面",
+      description: "Light or dark appearance",
       defaultValue: "light",
       toolbar: {
-        title: "主題",
+        title: "Appearance",
         icon: "circlehollow",
         items: [
-          { value: "light", icon: "sun", title: "淺色" },
-          { value: "dark", icon: "moon", title: "深色" },
+          { value: "light", icon: "sun", title: "Light" },
+          { value: "dark", icon: "moon", title: "Dark" },
         ],
         dynamicTitle: true,
       },
     },
     colorTheme: {
-      description: "色相主題（宿主端設 data-color-theme 切換）",
+      description: "Hue theme (switch with data-color-theme)",
       defaultValue: DEFAULT_THEME,
       toolbar: {
-        title: "色相",
+        title: "Hue",
         icon: "paintbrush",
         items: COLOR_THEMES.map((t) => ({
           value: t.name,

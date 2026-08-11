@@ -1,0 +1,38 @@
+---
+title: Story Conventions
+---
+
+# Story Conventions
+
+## At least three stories per component
+
+Show the default state, a meaningful edge or disabled state, and an interaction or composition
+that proves the contract. Add more when the component has distinct loading, error, empty, or
+responsive behavior.
+
+## Put states side by side
+
+A state matrix is easier to review than a series of stories that hide differences behind tabs.
+Use the same fixture when comparing states so the state, not the data, is the variable.
+
+## Interactive playgrounds
+
+Keep controls useful for exploration while mapping labels to the component's actual props. If a
+playground needs hooks, put the stateful wrapper in a small component rather than calling hooks
+inside a story configuration object.
+
+## Naming
+
+Names describe the user-visible state or task: `Default`, `Disabled`, `Loading`, `WithError`,
+and `FullFeatured` are preferable to implementation names. Stable names protect docs embeds.
+
+## Stories are specification evidence
+
+The story should make the contract visible: realistic content, keyboard behavior, focus, and
+responsive boundaries. If a state matters, give it a story and a test.
+
+## Visual and behavioral checks
+
+Screenshot checks compare against explicit expectations and should cover light/dark themes and
+relevant viewports. A `play` function verifies required behavior such as opening, selecting,
+submitting, or showing an error. The repository's Storybook guards run these checks in CI.

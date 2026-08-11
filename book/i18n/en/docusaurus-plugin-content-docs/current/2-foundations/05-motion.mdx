@@ -1,0 +1,49 @@
+---
+title: Motion
+---
+
+# Motion
+
+**Animation in an admin system has one purpose: make state changes visible.** It is not there merely to look good.
+
+| Token | Value | Use |
+| --- | --- | --- |
+| `duration-instant` | 0ms | Reduced-motion fallback |
+| `duration-fast` | **150ms** | Color and opacity feedback (hover, focus) |
+| `duration-normal` | 200ms | Popover entry, expand and collapse |
+| `duration-slow` | 1500ms | Looping guide pulse (the only permitted long animation) |
+
+<Rules>
+  <Do>
+    <p>Use <strong>150ms</strong> for interaction feedback. When users see a response within 150ms of pressing a button, it feels immediate.</p>
+  </Do>
+  <Dont>
+    <p>Do not use transitions longer than 300ms. An admin system may be clicked hundreds of times a day; an extra 200ms per click becomes several minutes of waiting and creates the impression that the system is slow.</p>
+  </Dont>
+</Rules>
+
+## The only long animation: the spotlight pulse
+
+The `.spotlight-ring` shared by guides and documentation demos is a 1.5-second breathing halo. It **loops** because its job is to keep directing attention to “look here,” not to provide one-time feedback.
+
+<Demo title="Spotlight ring">
+  <div className="py-6">
+    <Spotlight label="Export from here"><Button variant="outline" size="sm">Export CSV</Button></Spotlight>
+  </div>
+</Demo>
+
+## prefers-reduced-motion is required, not a bonus
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  .spotlight-ring {
+    animation: none;
+    /* Fall back to a static ring—the message stays, only the motion goes. */
+    box-shadow: 0 0 0 3px hsl(var(--primary)), 0 0 0 6px hsl(var(--primary) / 0.3);
+  }
+}
+```
+
+Notice the fallback: **do not remove the effect; replace it with a static version**. If you only set `animation: none` without adding static styling, users who request reduced motion cannot see what is highlighted. An accessibility setting would make the interface unusable, which is the worst possible outcome.
+
+Printing follows the same principle: animation cannot be printed, so print styles should print the static ring.

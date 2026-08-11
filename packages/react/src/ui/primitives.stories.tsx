@@ -5,98 +5,100 @@ import { Badge } from "./badge";
 import { Callout } from "./callout";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./card";
 
-const meta: Meta = { title: "元件/基礎/按鈕・徽章・提示・卡片" };
+const meta: Meta = { title: "Components/Primitives/Buttons, badges, callouts, and cards", id: "元件/基礎/按鈕・徽章・提示・卡片" };
 export default meta;
 type Story = StoryObj;
 
 export const 按鈕: Story = {
+  name: "Buttons",
   render: () => (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <Button>主要動作</Button>
-        <Button variant="brand">開始新流程</Button>
-        <Button variant="secondary">次要動作</Button>
-        <Button variant="outline">外框</Button>
-        <Button variant="ghost">淡化</Button>
-        <Button variant="link">連結樣式</Button>
-        <Button variant="destructive"><Trash2 /> 刪除這筆</Button>
+        <Button>Primary action</Button>
+        <Button variant="brand">Start new flow</Button>
+        <Button variant="secondary">Secondary action</Button>
+        <Button variant="outline">Outline</Button>
+        <Button variant="ghost">Ghost</Button>
+        <Button variant="link">Link style</Button>
+        <Button variant="destructive"><Trash2 /> Delete record</Button>
       </div>
       <p className="max-w-2xl text-xs text-muted-foreground">
-        用工具列的<strong>色相</strong>切主題：只有 <code>brand</code> 那顆會變，其餘全部不動。
-        資料密集的畫面上按鈕很多，全部吃主題色會讓高飽和色的<strong>出現面積</strong>失控
-        （色彩疲勞管的是面積與頻率，不是色相種類數）。切到<strong>石墨</strong>時 <code>brand</code>
-        會與 <code>default</code> 完全一樣——那一組刻意沒有品牌色。
+        Use the toolbar's<strong> hue</strong> control to switch themes: only the <code>brand</code> button changes; everything else stays put.
+        Dense screens have many buttons, so coloring every one with the theme hue makes the<strong> saturated area</strong> overwhelming
+        (color fatigue is about area and frequency, not the number of hues). In<strong> Graphite</strong>, <code>brand</code>
+        is identical to <code>default</code> by design because that theme has no brand color.
       </p>
 
       <div className="max-w-2xl space-y-2 rounded-md border border-l-4 border-l-danger bg-danger-subtle p-3 text-danger-subtle-foreground">
-        <p className="text-xs font-semibold">brand 不要用在確認／送出／儲存上</p>
+        <p className="text-xs font-semibold">Do not use brand for confirm, submit, or save</p>
         <div className="flex flex-wrap items-center gap-4">
           <span className="flex items-center gap-2 text-xs">
-            <Button size="sm">送出申請</Button> 正確
+        <Button size="sm">Submit request</Button> Correct
           </span>
           <span className="flex items-center gap-2 text-xs">
-            <Button size="sm" variant="brand">送出申請</Button> 錯誤
+        <Button size="sm" variant="brand">Submit request</Button> Incorrect
           </span>
         </div>
         <p className="text-xs leading-relaxed">
-          <code>--brand</code> 的職責是<strong>識別</strong>（這是誰的產品），確認按鈕的職責是
-          <strong>指示可供性</strong>（按下去會提交）。色相帶著既成慣例——綠＝通行、藍＝系統預設、
-          紅＝停止、灰＝停用；紫與洋紅<strong>沒有動作慣例</strong>，放在確認按鈕上會讀成裝飾。
-          把工具列切到藍紫或紫晶，比較上面兩顆就看得出來。
+          <code>--brand</code> identifies<strong> who the product is</strong>; a confirm button communicates<strong> what will happen</strong> when pressed.
+          Hues carry conventions—green means pass, blue is the system default, red means stop, and gray means disabled.
+          Purple and magenta<strong> have no action convention</strong>, so they read as decoration on a confirm button.
+          Switch the toolbar to Violet or Amethyst to compare the two buttons.
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Button size="sm">小</Button>
-        <Button>預設</Button>
-        <Button size="lg">大</Button>
-        <Button size="icon" aria-label="新增"><Plus /></Button>
+        <Button size="sm">Small</Button>
+        <Button>Default</Button>
+        <Button size="lg">Large</Button>
+        <Button size="icon" aria-label="Add"><Plus /></Button>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Button disabled>停用</Button>
-        <Button disabled><Loader2 className="animate-spin" /> 處理中…</Button>
+        <Button disabled>Disabled</Button>
+        <Button disabled><Loader2 className="animate-spin" /> Processing…</Button>
       </div>
       <p className="text-xs text-muted-foreground">
-        「載入中」沒有獨立 variant：把按鈕設為 disabled、換上旋轉圖示、改文案即可。
-        多一個 variant 只會讓人猶豫該用哪個。
+        Loading has no dedicated variant: disable the button, add a spinner, and change the copy.
+        An extra variant would only make the choice harder.
       </p>
     </div>
   ),
 };
 
 export const 徽章: Story = {
+  name: "Badges",
   render: () => (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
-        <Badge>預設</Badge>
-        <Badge variant="secondary">次要</Badge>
-        <Badge variant="outline">外框</Badge>
+        <Badge>Default</Badge>
+        <Badge variant="secondary">Secondary</Badge>
+        <Badge variant="outline">Outline</Badge>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Badge variant="success">已完成</Badge>
-        <Badge variant="warning">待補件</Badge>
-        <Badge variant="info">審核中</Badge>
-        <Badge variant="danger">已退回</Badge>
-        <Badge variant="edit">已改動未送出</Badge>
+        <Badge variant="success">Complete</Badge>
+        <Badge variant="warning">Needs information</Badge>
+        <Badge variant="info">In review</Badge>
+        <Badge variant="danger">Returned</Badge>
+        <Badge variant="edit">Unsaved changes</Badge>
       </div>
       <p className="max-w-2xl text-xs text-muted-foreground">
-        徽章一定要有文字。純色點在灰階列印與色覺障礙下等於消失。
-        四種狀態走<strong>淡底層</strong>，與提示框的低強度同一組 token——所以整排的構造與極性一致
-        （全部是「淡底＋同色相深墨」）。改版前 success／warning／info 是中明度實色配深字、
-        danger 是深實色配反白，<strong>一排裡有兩種極性</strong>、底色 L* 全距 23.5；
-        眼睛會把極性反轉讀成「不同種類」而不是「不同嚴重度」。現在全距收到 10。
+        Badges need text. A solid-color dot disappears in grayscale print and for people with color-vision differences.
+        The four states use<strong> subtle surfaces</strong> from the same tokens as low-intensity callouts, keeping polarity consistent
+        (a tinted surface plus dark text of the same hue). The previous version mixed medium-light solid fills with dark text
+        and dark danger with reversed text, creating<strong> two polarities in one row</strong> and a 23.5 L* background range.
+        The eye read that polarity reversal as different kinds rather than different severity; the range is now 10.
       </p>
       <div className="space-y-2 border-t pt-3">
-        <p className="text-xs font-semibold">intensity=&quot;high&quot; · 實色，只給必須喊的場合</p>
+        <p className="text-xs font-semibold">intensity=&quot;high&quot; · Solid fill, only when the message must interrupt</p>
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="success" intensity="high">已完成</Badge>
-          <Badge variant="warning" intensity="high">待補件</Badge>
-          <Badge variant="info" intensity="high">審核中</Badge>
-          <Badge variant="danger" intensity="high">已退回</Badge>
+          <Badge variant="success" intensity="high">Complete</Badge>
+          <Badge variant="warning" intensity="high">Needs information</Badge>
+          <Badge variant="info" intensity="high">In review</Badge>
+          <Badge variant="danger" intensity="high">Returned</Badge>
         </div>
         <p className="max-w-2xl text-xs text-muted-foreground">
-          <strong>資料表裡不要用這一排。</strong>一頁上百個徽章全用實色，高飽和色的出現面積會失控
-          ——色彩疲勞管的是面積 × 頻率，不是色相種類數。這一排也正好是舊版的長相：
-          注意 danger 那顆的極性與左邊三顆相反。
+          <strong>Do not use this row in a data table.</strong> Hundreds of solid badges on one page overwhelm the saturated area
+          —color fatigue is area × frequency, not the number of hues. This row also shows the old appearance:
+          notice how the danger badge has the opposite polarity from the three on its left.
         </p>
       </div>
     </div>
@@ -104,43 +106,45 @@ export const 徽章: Story = {
 };
 
 export const 提示框: Story = {
+  name: "Callouts",
   render: () => (
     <div className="grid max-w-4xl gap-5 lg:grid-cols-2">
       <div className="space-y-2">
-        <p className="text-xs font-semibold">低強度（預設）· 日常與次要提示</p>
-        <Callout variant="success" title="這批資料已全部完成">共 12 筆，最後一筆於 2024-02-05 完成。</Callout>
-        <Callout variant="info" title="小提醒" tag="TIP">可以用欄位篩選一次比對多個單位。</Callout>
-        <Callout variant="warning" title="有 3 筆缺少必要資訊">未填寫前無法進入下一步。</Callout>
-        <Callout variant="danger" title="配額不足，無法確認" tag="E-104">項目「丙案 初版」可用量 2，需求 6。</Callout>
+        <p className="text-xs font-semibold">Low intensity (default) · Everyday and secondary guidance</p>
+        <Callout variant="success" title="All records are complete">12 records; the last completed on 2024-02-05.</Callout>
+        <Callout variant="info" title="Tip" tag="TIP">Use a column filter to compare multiple units at once.</Callout>
+        <Callout variant="warning" title="3 records need information">Complete the fields before moving to the next step.</Callout>
+        <Callout variant="danger" title="Not enough quota to confirm" tag="E-104">Item “Plan C — First draft” has 2 available; 6 required.</Callout>
       </div>
       <div className="space-y-2">
-        <p className="text-xs font-semibold">高強度 · 阻斷式，必須停下來決定</p>
-        <Callout intensity="high" variant="success" title="這批資料已全部完成">共 12 筆，最後一筆於 2024-02-05 完成。</Callout>
-        <Callout intensity="high" variant="info" title="小提醒" tag="TIP">可以用欄位篩選一次比對多個單位。</Callout>
-        <Callout intensity="high" variant="warning" title="有 3 筆缺少必要資訊">未填寫前無法進入下一步。</Callout>
-        <Callout intensity="high" variant="danger" title="配額不足，無法確認" tag="E-104">項目「丙案 初版」可用量 2，需求 6。</Callout>
+        <p className="text-xs font-semibold">High intensity · Blocking; stop and decide</p>
+        <Callout intensity="high" variant="success" title="All records are complete">12 records; the last completed on 2024-02-05.</Callout>
+        <Callout intensity="high" variant="info" title="Tip" tag="TIP">Use a column filter to compare multiple units at once.</Callout>
+        <Callout intensity="high" variant="warning" title="3 records need information">Complete the fields before moving to the next step.</Callout>
+        <Callout intensity="high" variant="danger" title="Not enough quota to confirm" tag="E-104">Item “Plan C — First draft” has 2 available; 6 required.</Callout>
       </div>
       <p className="max-w-2xl text-xs text-muted-foreground lg:col-span-2">
-        豐富度來源是「同一語意色的<strong>兩種強度</strong>」，不是加色相——四種語意封頂，不再擴充。
-        <strong>有疑慮就用低強度</strong>：高強度出現頻率一高，色彩疲勞的預算會瞬間爆掉。
-        低強度的淡底是生成的 token（文字對它反解到 4.5:1），不是把實色壓 10% 疊上去——
-        後者的對比取決於底下是什麼表面，完全不可控。
+        The range comes from<strong> two intensities for each semantic color</strong>, not more hues—four meanings are the ceiling.
+        <strong>Use low intensity when in doubt</strong>: frequent high-intensity alerts quickly exhaust the color-fatigue budget.
+        Low-intensity surfaces are generated tokens with text solved to 4.5:1 contrast, not a solid fill simply layered at 10%—
+        that approach makes contrast depend on the surface underneath and is uncontrollable.
       </p>
     </div>
   ),
 };
 
 export const 卡片: Story = {
+  name: "Cards",
   render: () => (
     <Card className="max-w-sm">
       <CardHeader>
-        <CardTitle>本月資料</CardTitle>
-        <CardDescription>2024 年 2 月，截至今日</CardDescription>
+        <CardTitle>This month's data</CardTitle>
+        <CardDescription>February 2024, through today</CardDescription>
       </CardHeader>
       <CardContent className="text-3xl font-semibold tabular-nums">1,284</CardContent>
       <CardFooter className="gap-2">
-        <Button size="sm">查看明細</Button>
-        <Button size="sm" variant="outline">匯出</Button>
+        <Button size="sm">View details</Button>
+        <Button size="sm" variant="outline">Export</Button>
       </CardFooter>
     </Card>
   ),

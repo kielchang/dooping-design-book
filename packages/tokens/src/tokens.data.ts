@@ -575,7 +575,7 @@ export default {
   },
   "themes": {
     "graphite": {
-      "$label": "石墨",
+      "$label": "Graphite",
       "$hue": 265,
       "light": {
         "background": {
@@ -699,7 +699,7 @@ export default {
       }
     },
     "indigo": {
-      "$label": "靛藍",
+      "$label": "Indigo",
       "$hue": 272,
       "light": {
         "background": {
@@ -823,7 +823,7 @@ export default {
       }
     },
     "violet": {
-      "$label": "藍紫",
+      "$label": "Violet",
       "$hue": 292,
       "light": {
         "background": {
@@ -947,7 +947,7 @@ export default {
       }
     },
     "amethyst": {
-      "$label": "紫晶",
+      "$label": "Amethyst",
       "$hue": 305,
       "light": {
         "background": {
@@ -1071,7 +1071,7 @@ export default {
       }
     },
     "teal": {
-      "$label": "青玉",
+      "$label": "Teal",
       "$hue": 195,
       "light": {
         "background": {
@@ -1195,7 +1195,7 @@ export default {
       }
     },
     "moss": {
-      "$label": "苔綠",
+      "$label": "Moss",
       "$hue": 135,
       "light": {
         "background": {

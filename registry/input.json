@@ -3,8 +3,8 @@
   "name": "input",
   "version": "0.11.1",
   "type": "registry:ui",
-  "title": "Input 輸入框",
-  "description": "文字輸入，高度對齊控制項尺寸 token。",
+  "title": "Input",
+  "description": "Text input aligned to the control-size token.",
   "dependencies": [
     "@dooping/tokens@^0.6.0"
   ],

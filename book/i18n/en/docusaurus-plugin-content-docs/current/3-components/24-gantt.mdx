@@ -1,0 +1,62 @@
+---
+title: Gantt
+---
+
+# Gantt
+
+**A compact timeline for viewing and selecting**: item labels on the left, bars on the right, with scale, grid, and today line. It deliberately does not support drag-to-reschedule; it answers “which items run when, and how far along are they?”
+
+<StoryFrame id="元件-特殊介面-時間軸・節點畫布--時間軸" title="Timeline: category-colored bars, progress, row selection" height={420} />
+
+<StoryLink id="元件-特殊介面-時間軸・節點畫布--時間軸-互動">Interactive playground—adjust item count and timespan</StoryLink>
+
+## When not to use it
+
+- Need drag-to-reschedule, dependency lines, or recurring rules? Use a scheduling editor.
+- More than one or two hundred rows? This renders each row; group or paginate first.
+- Only showing a date range? Use text. A timeline costs a whole region of the screen.
+
+## How to reschedule
+
+Select a row and edit dates in the adjacent form, following the [inline field editing](/patterns/inline-field-editing) pattern: changed values turn amber and the [change summary](/components/change-summary) is reviewed before submit. Dragging is intuitive, but hides a data change inside a gesture without confirmation or audit trail.
+
+## Color layers
+
+| Element | Uses | Why |
+| --- | --- | --- |
+| Bar | `--chart-N` (`category` 1–8) | Color encodes category, not status; an item keeps its color across timeline, chart, and canvas |
+| Progress | Unfinished segment overlays `--background/45%` | Solid = complete, subtle = remaining; hue stays the same |
+| Today line | `--foreground/50%` (neutral) | Structural marker, not a status signal ([ADR-0007](/adr)) |
+| Row interaction | `state-layer` 6% / 14% / 20% | Same system as [table rows](/patterns/data-table-standard) |
+
+<Rules>
+  <Do><p>Put delay or “more information needed” on an independent channel: a status badge at the row end or an icon in the label column.</p></Do>
+  <Dont><p>Do not turn delayed bars red. Bar color already means category; adding status makes “this category is red” and “this record has a problem” indistinguishable. Red area is reserved for alerts.</p></Dont>
+</Rules>
+
+## States
+
+| State | Appearance |
+| --- | --- |
+| hover | 6% state layer across the row |
+| pressed | 14% state layer |
+| selected | 20% state layer; secondary text returns to body color |
+| focus-visible | 2px focus ring + 2px offset (rows are buttons when `onSelect` is provided) |
+
+## Scale and granularity
+
+Spans ≤21 days use day ticks, ≤120 days use Monday-week ticks, and longer spans use month-start ticks. The view is not an editor, so it does not provide zoom controls. The window derives from the data with 5% margins; the today line appears only when it is inside the window.
+
+## Accessibility
+
+- With `onSelect`, each row is a real `<button>` with Tab access and `aria-pressed`.
+- Each `aria-label` contains the full name, start, end, and progress percentage.
+- Color is never the only cue: category has a text label, progress has a number, and status has badge text.
+
+## Install
+
+```bash
+npx shadcn add https://kielchang.github.io/dooping-design-book/r/gantt.json
+```
+
+No external dependencies; it uses `@dooping/tokens`. Row interaction requires the `.state-layer` token from tokens ≥ 0.6.0.

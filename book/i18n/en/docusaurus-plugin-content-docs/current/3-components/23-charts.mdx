@@ -1,0 +1,157 @@
+---
+title: Charts
+---
+
+# Charts
+
+**A set of dependency-free SVG charts**: no charting library, just token-based palettes. Eight chart types answer eight questions; needs outside those questions are deliberately out of scope.
+
+<Demo title="All eight charts are real components">
+  <div className="grid gap-4 md:grid-cols-2">
+    <BarChart title="Quantity by unit" data={[{ label: "Unit A", value: 420 }, { label: "Unit B", value: 250 }, { label: "Unit C", value: 610 }, { label: "Unit D", value: 180 }]} showValues />
+    <Bullet label="Current progress (target = limit)" value={640} target={800} />
+  </div>
+</Demo>
+
+<StoryLink id="元件-資料-圖表-charts--互動">Interactive playground—switch chart type and point count</StoryLink>
+
+## Boundary: what this set is not for
+
+These are **reading-oriented admin charts**: understand the current state at a glance and optionally click through to a detail list. They are intended for data in the low hundreds.
+
+Do not use them for analytical interaction such as zoom, brush selection, crosshair readouts, or repeated drill-down. None of those are implemented; adding them would create half a chart library. Use a mature charting library when those features are required.
+
+| Limit | Meaning |
+| --- | --- |
+| Data volume | SVG renders every point as a DOM node; above roughly 500 points, aggregate in the data layer or use canvas |
+| Interaction | Hover tooltip and `onSelect` only; no zoom, brush, drag, or in-chart editing |
+| Axes | Necessary baselines and endpoint values only; no complete tick system or dual Y axis (Pareto’s cumulative line is the one defined exception) |
+| Live data | No streaming or transition animation; changed data redraws |
+
+This narrow boundary keeps the package dependency-free. Most admin charts only need to turn numbers into lengths; palettes, themes, and print output then stay consistent.
+
+## Choose a chart by the question
+
+Ask what the chart must answer before choosing a type:
+
+| User question | Intent | Chart |
+| --- | --- | --- |
+| Who has more or less? | Comparison | `BarChart` |
+| Do a few categories make up most of the total? | Concentration | `Pareto` |
+| What parts make up this total? | Composition | `StackedBar` |
+| How does it change over time? | Trend | `TrendChart` |
+| How far is actual from target? | Attainment | `Bullet` |
+| Are these two values related? | Correlation | `Scatter` |
+| Where is a two-dimensional distribution concentrated? | Distribution | `Heatmap` |
+| How much does the top 20% own? | Cumulative distribution | `LineChart` with a diagonal baseline |
+
+<Rules>
+  <Do><p>One card, <strong>one chart, one question</strong>. Put the conclusion beside it in one sentence (a <a href="/components/callout">Callout</a> or chart-card description).</p></Do>
+  <Dont><p>Do not combine two questions in one chart. “While we are here, add last year” usually makes both questions unclear; use two charts.</p></Dont>
+</Rules>
+
+### No pie chart, deliberately
+
+People compare lengths more accurately than angles. Above three slices, it becomes difficult to compare categories and a separate legend is still needed. Use `StackedBar` for composition and `Pareto` for concentration.
+
+## Eight chart types
+
+### BarChart
+
+**Compare one measure across categories.** Use 3–12 categories with short labels and one measure. For time on the x-axis, use `TrendChart`; bars do not naturally express a continuous sequence.
+
+```tsx
+<BarChart data={[{ label: "North", value: 1_200_000 }, …]} showValues maxItems={12} />
+```
+
+`showValues` should be on for print and touch (no hover); `maxItems` aggregates the remainder into “Other (N)”; `valueFmt`, `onSelect`, `selectedIndex`, `color`, and `height` control formatting, drill-down, selection, color, and size.
+
+### Pareto
+
+**Descending bars + cumulative percentage line.** Use it to decide what to address first: defect causes, ABC analysis, or stagnant items. Do not use it when categories are already similar; the value comes from unevenness.
+
+The cumulative line is the one intentional dual-axis encoding because it defines Pareto. Do not draw a second Y-axis; show cumulative values in tooltips and the equivalent data table.
+
+### StackedBar
+
+**Show what composes several totals.** Use 2–6 segments with stable semantics (segment 1 means the same thing in every row). Merge tiny segments into “Other” instead of showing eight or more.
+
+Always show the total at the right of each row. Users cannot add colored blocks reliably by eye. The host provides each segment’s color so category identity stays stable.
+
+### TrendChart
+
+**Show how one measure changes over time.** Use equally spaced time points and at least three points. For irregular dates or non-time categories, use `BarChart` so a line does not invent continuous values between points.
+
+`zeroBased` defaults to **true**. Absolute amounts and counts should start at zero so a 2% change does not look like a cliff. Turn it off only for clearly labeled relative changes and keep endpoint values visible.
+
+### Bullet
+
+**Actual versus target in one compact mark.** Use it for one KPI (budget, SLA, quota) at the top of a card. Do not lay out ten as a primary visual; use a sorted `BarChart` instead.
+
+This is the only chart that uses status colors: over target uses `--danger`, under target uses `--success`, not categorical colors. The host must make clear whether exceeding the target is good or bad; the default assumes the target is an upper limit.
+
+### Scatter
+
+**Show whether two numeric values are related.** Both axes are continuous, use roughly 20–300 points, and label `xLabel` and `yLabel`. Do not infer a relationship from fewer than ten points or from thousands of points outside this package’s performance boundary. Axes use the data min/max rather than zero because the shape of the distribution matters.
+
+### Heatmap
+
+**Show where two categorical dimensions concentrate.** Keep the grid at about 100 cells or fewer. For a 50 × 50 grid, use a sorted list or Pareto instead.
+
+`null` means no data, not zero. Render it as a gray cell with `—` and explain the gray in the legend. When comparing multiple heatmaps, set `domain` explicitly; independently auto-scaled “reddest” cells cannot be compared.
+
+### LineChart
+
+**Show cumulative distribution or inequality.** Use it with a diagonal reference line when the question is how much the top share owns. Keep the cumulative values in the tooltip and equivalent table; the line is not a second hidden source of data.
+
+## Legend
+
+`Legend` is a reading aid, not decoration. Every category color used in the chart needs a label. The legend is also the fallback for print and low-vision readers when the chart itself is difficult to inspect.
+
+## Chart color strategy
+
+Ask about data shape first, then dimension semantics:
+
+### Layer 1 — semantics: status dimensions use status colors
+
+If the dimension is status, reuse `STATUS_SERIES` and the same meanings as badges: complete remains green, danger remains red. Do not take categorical colors by array index; that would teach users one meaning in a badge and another in a chart.
+
+### Layer 2 — identity: recurring dimensions keep their color
+
+If a category represents a recurring entity (a unit, product, or owner), its color follows that entity across every chart, timeline, and canvas. Theme changes do not change the data palette.
+
+### Layer 3 — distinction: one-off comparisons use palette order
+
+For a one-time comparison with no stable identity, take `--chart-1` through `--chart-N` in palette order. The palette is generated by farthest-point insertion so every prefix is a strong subset.
+
+Do not use semantic colors for ordinary categories. Do not use category colors for statuses. These two rules prevent the most expensive chart-reading errors.
+
+## Empty, single-point, and all-zero data
+
+- Empty data gets an EmptyState with a reason; never render an empty SVG frame.
+- A single point gets its value label and a short explanation that a trend cannot be inferred yet.
+- All-zero data keeps the axes and says “All values are zero”; do not let a blank-looking chart imply that data failed to load.
+
+## Accessibility: color is never the only cue
+
+### Text equivalent: the `role="img"` obligation
+
+Each chart has a visible title and an equivalent data table or caption. The SVG is `aria-hidden` when the table carries the same information; otherwise the wrapper exposes `role="img"` and a complete `aria-label`.
+
+### Keyboard equivalent: the data table is also the interaction surface
+
+Points, rows, and bars that support `onSelect` are keyboard reachable. Enter/Space selects the same item as clicking it; hover is an enhancement, not the only way to read a value.
+
+## Printing
+
+Values are visible without hover, categorical colors have labels, and state colors have text or icons. A grayscale print should still communicate the question, comparison, and result.
+
+## Interactive examples
+
+The Storybook “Charts” stories cover each chart’s point count, light/dark themes, selection, and empty/all-zero edges. Documentation demos use real components and intentionally small data.
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/charts.json
+```

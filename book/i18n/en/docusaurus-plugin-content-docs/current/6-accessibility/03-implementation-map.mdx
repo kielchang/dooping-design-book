@@ -1,0 +1,81 @@
+---
+title: Implementation Map
+---
+
+# Implementation Map
+
+[Four principles](/accessibility/principles) explain **what** to do; the [acceptance checklist](/accessibility/checklist) explains **how** to check it. This page connects the two by showing what the principles look like in components.
+
+## Principle → component
+
+### 1. Touch targets ≥44px
+
+This is a token constraint rather than a component API. The `--size-control-*` tokens keep controls within touch-friendly dimensions and every control shares the same values.
+
+| Component | Implementation |
+| --- | --- |
+| `Button` / `Input` / `Select` / `NumberInput` | Height uses `--size-control-md` by default and `--size-control-sm` in dense tables |
+| `Chips` / `SegGroup` | The option itself is the hit area, not a tiny box beside text |
+| DataTable sort header | The whole `<th>` is clickable, not only the arrow |
+
+:::warning The most common custom implementation mistake
+Do not make a checkbox a 16px square and expect fingers to hit it. **The hit area includes the label**—one reason SegGroup and Chips exist.
+:::
+
+### 2. Keyboard completion
+
+| Component | Mechanism |
+| --- | --- |
+| `SegGroup` / `Chips` | `radiogroup` / `group` + **roving tabindex**; one Tab stop and arrow-key movement |
+| `DataTable` | Focusable headers sort with Enter/Space; filter panels open and close by keyboard |
+| `Dialog` | Focus trap and Esc close, supplied by Radix |
+| `Tooltip` | Appears on keyboard focus, not only hover |
+| `EditableField` | Enter edits, Esc cancels/restores, Tab moves to the next field |
+| `Coachmark` | `aria-modal` and focus management; keyboard collapse and close |
+
+Roving tabindex is easy to get wrong: eight tabbable options take eight key presses to leave. Give the group one stop and use arrows inside it.
+
+### 3. AA contrast, independently light and dark
+
+The token layer handles this. Light and dark semantic values are contrast-tested, and each `*-foreground` is designed for its paired surface. Do not mix them arbitrarily, such as `text-muted-foreground` on `bg-primary`.
+
+The [eight-color chart palette](/foundations/color) has separate light/dark values and color-vision validation.
+
+### 4. Color is never the only cue
+
+| Component | Additional cue |
+| --- | --- |
+| `Badge` | Text, not a colored dot |
+| `Delta` | Arrow + text + color |
+| `Stepper` | Checkmark + color + `aria-current` |
+| `Callout` | Fixed icon for each semantic |
+| Changed `EditableField` | Amber + “Changed” label + undo |
+| DataTable sorting | Arrow direction + `aria-sort` |
+
+:::danger The biggest custom implementation trap
+“Use red for abnormal” is not enough. Color-vision deficiency, grayscale print, and dim screens all hide it. **Color reinforces meaning; it does not carry it alone.**
+:::
+
+## Screen-reader semantics declared by components
+
+| Attribute | Used by | Announces |
+| --- | --- | --- |
+| `role="radiogroup"` / `aria-checked` | `SegGroup`, `Chips` | “Option 2 of 5, selected” |
+| `aria-sort` | `DataTable`, `Table` | Current sort column and direction |
+| `aria-current` | `Stepper` | “Currently on step 2” |
+| `aria-selected` | `TabPills` | Tab selection |
+| `aria-live` | `Coachmark` | New guide step |
+| `aria-modal` | `Dialog`, `Coachmark` | Focus is restricted to this region |
+
+`aria-live` is intentionally sparse. Announcing every change means nothing is heard; announce only changes the user cannot see but needs to know, such as an automatically advancing guide.
+
+## What this page cannot replace
+
+Components handle structural accessibility. You still own:
+
+- **Copy:** “Close” versus “Close unit editing dialog” has different context.
+- **Order:** DOM order is reading order; CSS visual reordering can create a wrong reading sequence.
+- **Errors:** connect them with `aria-describedby`, not only a red paragraph at the top.
+- **Focus destination:** after deleting a row, decide where focus goes; otherwise it returns to `<body>`.
+
+Using the components does not mean the product passed accessibility acceptance; it means you do not start from zero.

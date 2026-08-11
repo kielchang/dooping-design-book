@@ -1,0 +1,50 @@
+---
+title: Card
+---
+
+# Card
+
+Groups related content into a recognizable region.
+
+<StoryLink id="元件-基礎-按鈕・徽章・提示・卡片--卡片" />
+
+## When not to use it
+
+<Rules>
+  <Do><p>Content is <strong>grouped</strong> and needs separation from its surroundings (stat cards, settings sections, list items).</p></Do>
+  <Dont><p>Do not wrap the whole page in one card. One card for the whole page is no card—it is only another border and another layer of padding.</p></Dont>
+</Rules>
+
+<Demo title="Card structure">
+  <Card className="max-w-sm">
+    <CardHeader>
+      <CardTitle>This month</CardTitle>
+      <CardDescription>February 2024, through today</CardDescription>
+    </CardHeader>
+    <CardContent className="text-3xl font-semibold tabular-nums">1,284</CardContent>
+    <CardFooter className="gap-2">
+      <Button size="sm">View details</Button>
+      <Button size="sm" variant="outline">Export</Button>
+    </CardFooter>
+  </Card>
+</Demo>
+
+## Composition
+
+`Card` / `CardHeader` / `CardTitle` / `CardDescription` / `CardContent` / `CardFooter`
+
+Every part is optional. When only a container is needed, wrap the content directly in `Card`.
+
+## Do not nest cards more than one level
+
+Two or more layers of card borders make it unclear which hierarchy matters. Use dividers or headings for additional structure.
+
+## Printing
+
+Cards include `print-block` by default (`break-inside: avoid`) so a card is not split across two pages. See [Print and export](/patterns/print-and-export).
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/card.json
+```

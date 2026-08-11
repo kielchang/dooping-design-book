@@ -1,0 +1,74 @@
+---
+title: Button
+---
+
+# Button
+
+Triggers an action.
+
+<StoryLink id="元件-基礎-按鈕・徽章・提示・卡片--按鈕" />
+
+## When not to use it
+
+<Rules>
+  <Do><p>Going to another page → use a link (<code>&lt;a&gt;</code>). If it needs to look like a button, use <code>asChild</code>.</p></Do>
+  <Dont><p>Do not use <code>&lt;button onClick=&#123;() =&gt; navigate()&#125;&gt;</code> for navigation. Users cannot open it in a new tab with the middle button or copy its URL, and search engines and screen readers cannot understand it.</p></Dont>
+</Rules>
+
+## Variants
+
+`default` primary action · `secondary` secondary · `outline` outlined · `ghost` muted · `link` link style · `destructive` destructive action
+
+<Demo title="Variants and sizes">
+  <div className="space-y-3">
+    <div className="flex flex-wrap items-center gap-2">
+      <Button>Primary action</Button>
+      <Button variant="secondary">Secondary action</Button>
+      <Button variant="outline">Outline</Button>
+      <Button variant="ghost">Ghost</Button>
+      <Button variant="link">Link style</Button>
+      <Button variant="destructive">Delete this</Button>
+    </div>
+    <div className="flex flex-wrap items-center gap-2">
+      <Button size="sm">Small</Button>
+      <Button>Default</Button>
+      <Button size="lg">Large</Button>
+    </div>
+    <div className="flex flex-wrap items-center gap-2">
+      <Button disabled>Disabled</Button>
+    </div>
+  </div>
+</Demo>
+
+## States
+
+| State | Appearance |
+| --- | --- |
+| Default | Depends on the variant |
+| hover | State layer **6%** (a `currentColor` overlay, not a replacement surface) |
+| **pressed** | State layer **14%**—there must be feedback while pressed |
+| focus-visible | 2px focus ring + 2px offset (**keyboard only**) |
+| disabled | 50% opacity, `pointer-events: none`, and **no state layer** |
+| loading | **No dedicated variant:** set `disabled`, swap in a spinner, and change the label |
+
+Hover and pressed use the `.state-layer` utility; all six variants share the same intensities. Previously each variant picked an opacity (`/90`, `/80`, …), ranging from ΔE00 **0.6** (`secondary`, effectively no hover) to **7.4** (`default`, too deliberate). They now all land between **2.6–4.5**. See [Color logic for interaction states](/foundations/color#color-logic-for-interaction-states).
+
+The `link` variant deliberately **does not** use a state layer: it is text, not a surface, and an overlay would make a block appear behind the letters. Its hover state uses an underline.
+
+There is no loading variant because another variant only creates another choice to hesitate over. Existing disabled + icon + copy communicates “processing; unavailable right now” more clearly. This is the third of the [three loading techniques](/foundations/color#loading-neutral-with-three-techniques-for-three-situations); skeletons and in-place darkening belong to content areas.
+
+## One primary button per screen
+
+The `default` variant means “the most important thing on this screen.” Two dark buttons side by side have no primary action.
+
+## Accessibility
+
+- Icon-only buttons **must** have an `aria-label`.
+- Pair destructive actions with a [Dialog](/components/dialog) for confirmation.
+- Buttons on touch devices should be at least 44px (`size="default"` is 40px; add `tap-target` in dense areas).
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/button.json
+```

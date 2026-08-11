@@ -11,11 +11,14 @@ import type * as Preset from "@docusaurus/preset-classic";
 
 const BASE_URL = process.env.BOOK_BASE_URL ?? "/";
 const SITE_URL = process.env.BOOK_SITE_URL ?? "https://kielchang.github.io";
+const IS_LOCAL = !process.env.BOOK_SITE_URL && !process.env.BOOK_BASE_URL;
 // 預覽站＝dev 的工作狀態，不是發佈。文件寫了「不可參照」，但誤入的人不會先讀文件——
 // 站台自己要說。用 baseUrl 判斷：只有 /preview/ 建置掛橫幅，正式站與本機都不出現。
 const IS_PREVIEW = BASE_URL.includes("/preview/");
 const PROD_URL = "https://kielchang.github.io/dooping-design-book/";
-const STORYBOOK_URL = `${SITE_URL.replace(/\/$/, "")}${BASE_URL}storybook/`;
+const STORYBOOK_URL = IS_LOCAL
+  ? "http://localhost:6006/"
+  : `${SITE_URL.replace(/\/$/, "")}${BASE_URL}storybook/`;
 const REGISTRY_BASE = `${SITE_URL.replace(/\/$/, "")}${BASE_URL}r`;
 
 const config: Config = {
@@ -29,7 +32,14 @@ const config: Config = {
   trailingSlash: true,
   onBrokenLinks: "throw",
   markdown: { hooks: { onBrokenMarkdownLinks: "throw" } },
-  i18n: { defaultLocale: "zh-Hant", locales: ["zh-Hant"] },
+  i18n: {
+    defaultLocale: "zh-Hant",
+    locales: ["zh-Hant", "en"],
+    localeConfigs: {
+      "zh-Hant": { label: "繁體中文", htmlLang: "zh-Hant" },
+      en: { label: "English", htmlLang: "en-US" },
+    },
+  },
 
   customFields: { storybookUrl: STORYBOOK_URL, registryBase: REGISTRY_BASE },
 
@@ -120,6 +130,7 @@ const config: Config = {
     navbar: {
       title: "Dooping Design Book",
       items: [
+        { type: "localeDropdown", position: "right" },
         { href: STORYBOOK_URL, label: "Storybook ↗", position: "right" },
         {
           href: "https://github.com/kielchang/dooping-design-book/issues/new/choose",

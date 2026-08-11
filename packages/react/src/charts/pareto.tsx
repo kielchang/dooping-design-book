@@ -31,7 +31,7 @@ export interface ParetoProps {
  */
 export function Pareto({
   data,
-  title = "柏拉圖",
+  title = "Pareto chart",
   maxItems = 12,
   valueFmt = defaultFmt,
   onSelect,
@@ -59,7 +59,7 @@ export function Pareto({
     <div className={cn("overflow-x-auto", className)}>
       <svg
         role="img"
-        aria-label={`${title}，共 ${sorted.length} 項，前 ${cutoff + 1} 項累積佔 ${Math.round(cum[Math.max(cutoff, 0)] * 100)}%`}
+        aria-label={`${title}, ${sorted.length} items, the first ${cutoff + 1} account for ${Math.round(cum[Math.max(cutoff, 0)] * 100)}%`}
         viewBox={`0 0 ${W} ${height}`}
         width={W}
         height={height}
@@ -76,7 +76,7 @@ export function Pareto({
               onClick={onSelect ? () => onSelect(i, d) : undefined}
               className={cn(onSelect && "cursor-pointer")}
             >
-              <title>{`${d.label}：${valueFmt(d.value)}（累積 ${Math.round(cum[i] * 100)}%）`}</title>
+              <title>{`${d.label}: ${valueFmt(d.value)} (cumulative ${Math.round(cum[i] * 100)}%)`}</title>
               <rect
                 x={x}
                 y={height - pad.bottom - h}
@@ -102,8 +102,8 @@ export function Pareto({
         ))}
       </svg>
       <ChartDataTable
-        caption={`${title}（資料表，含累積佔比）`}
-        head={["項目", "數值", "累積"]}
+        caption={`${title} (data table with cumulative share)`}
+        head={["Item", "Value", "Cumulative"]}
         rows={sorted.map((d, i) => [d.label, valueFmt(d.value), `${Math.round(cum[i] * 100)}%`])}
         onSelect={onSelect ? (i) => onSelect(i, sorted[i]) : undefined}
         selectedIndex={selectedIndex}

@@ -47,12 +47,12 @@ const PAGE_BG = {
 // 只有 ΔE00 8.5（淺）／7.9（深），低於 10 就是實務上分不開。
 // 那不是色相問題，是「用一個近中性色去做實色填底」本身就會撞到 disabled 的視覺位置。
 const THEMES = [
-  { name: "graphite", label: "石墨", hue: 265, cap: 0.030, neutralBrand: true },
-  { name: "indigo",   label: "靛藍", hue: 272, cap: 0.150 },
-  { name: "violet",   label: "藍紫", hue: 292, cap: 0.150 },
-  { name: "amethyst", label: "紫晶", hue: 305, cap: 0.150 },
-  { name: "teal",     label: "青玉", hue: 195, cap: 0.130 },
-  { name: "moss",     label: "苔綠", hue: 135, cap: 0.130 },
+  { name: "graphite", label: "Graphite", hue: 265, cap: 0.030, neutralBrand: true },
+  { name: "indigo",   label: "Indigo", hue: 272, cap: 0.150 },
+  { name: "violet",   label: "Violet", hue: 292, cap: 0.150 },
+  { name: "amethyst", label: "Amethyst", hue: 305, cap: 0.150 },
+  { name: "teal",     label: "Teal", hue: 195, cap: 0.130 },
+  { name: "moss",     label: "Moss", hue: 135, cap: 0.130 },
 ];
 const DEFAULT_THEME = "graphite";
 

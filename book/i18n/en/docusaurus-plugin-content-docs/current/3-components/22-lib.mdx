@@ -1,0 +1,119 @@
+---
+title: Utility Functions and Hooks
+---
+
+# Utility Functions and Hooks
+
+These six utilities are component **dependencies**. When `npx shadcn add` installs a component, the required utilities are placed in `lib/dooping/`. They are also useful on their own.
+
+```
+src/lib/dooping/
+├── utils.ts        cn + number formatting
+├── use-sort.ts     three-state sorting
+├── csv.ts          CSV serialization and parsing
+├── download.ts     trigger browser downloads
+└── forms-diff.ts   FieldSpec-driven change detection
+src/components/dooping/
+└── use-record-diff.ts   draft versus original
+```
+
+:::note Why one page?
+Each utility is too small for its own page, and they often appear together (`DataTable` export uses both `csv` and `download`).
+:::
+
+## `utils` — `cn` and number formatting
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/utils.json
+```
+
+**`cn(...inputs)`** is the standard shadcn helper: `clsx` + `tailwind-merge`, allowing later classes to override earlier ones. Every component depends on it, so it is the most commonly installed utility.
+
+```ts
+cn("px-2 py-1", isActive && "bg-primary", className)
+```
+
+The other functions centralize number display. If every admin table formats its own values, one report grows three different thousands-separator conventions:
+
+| Function | Use |
+| --- | --- |
+| `formatNumber(n, locale?)` | Integer with thousands separators |
+| `formatMoney(n, { symbol?, locale? })` | Money, `$` by default |
+| `formatPercent(value, digits = 1)` | Percentage |
+| `formatRatio(value, digits = 0)` | Ratio |
+| `formatSigned(n, format?)` | Signed value with a pluggable formatter |
+
+The second argument to `formatSigned` enables composition: `formatSigned(delta, formatMoney)` produces a signed amount. [Delta](/components/delta) uses this internally.
+
+## `use-sort` — three-state sorting
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/use-sort.json
+```
+
+```ts
+const { sorted, sortState, toggleSort } = useSort(rows, initialState);
+```
+
+The cycle is **none → descending → ascending → none**, not a two-state toggle. Admin tables often have a meaningful default order (creation order or ID); without the third state, users can never return to it after sorting.
+
+`SortState` is `{ key, dir } | null`; `null` is the “none” state.
+
+## `csv` — serialization and parsing
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/csv.json
+```
+
+| Function | Description |
+| --- | --- |
+| `csvSerialize(headers, rows, bom = true)` | Produce a CSV string |
+| `csvEscape(v)` | Escape one value (commas, quotes, line breaks) |
+| `csvParse(text)` | Parse back to a two-dimensional array |
+
+**`bom` defaults to `true`; keep it that way.** Without a UTF-8 BOM, Excel can open CSV files with garbled characters. Admin exports are overwhelmingly opened in Excel.
+
+## `download` — trigger a browser download
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/download.json
+```
+
+```ts
+saveBlob(new Blob([csv], { type: "text/csv" }), "report.csv");
+```
+
+One function does one job: create a temporary object URL, trigger the download, and clean it up. It is separate because every export screen otherwise rewrites this sequence and often forgets `revokeObjectURL`.
+
+## `forms-diff` — FieldSpec-driven change detection
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/forms-diff.json
+```
+
+This is the foundation of [inline field editing](/patterns/inline-field-editing) and [ChangeSummary](/components/change-summary).
+
+The core concept is **`FieldSpec`**: describe each field’s name, kind, and display format as data; derive comparison and display from that description instead of hand-writing logic per field.
+
+| Export | Use |
+| --- | --- |
+| `FieldSpec` / `FieldKind` / `Change` | Types |
+| `eqValue(a, b)` | Compare values—**empty string, `null`, and `undefined` are equivalent** |
+| `isEmptyValue(v)` | Detect empty values |
+| `fmtValue(v, kind, format?, unit?)` | Format a value by field kind |
+
+The `eqValue` rule matters: clearing a field that was already `null` is not a change. Otherwise the pre-submit summary fills with edits the user never made.
+
+## `use-record-diff` — draft versus original
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/use-record-diff.json
+```
+
+```ts
+const { draft, changes, setField, revertField, revertAll } = useRecordDiff(original, specs);
+```
+
+Keep original and draft values separate and calculate their difference at any time. [ChangeSummary](/components/change-summary) consumes its `changes`.
+
+Separate values make field-level restore natural: `revertField(key)` writes that draft cell back to the original instead of maintaining a second record of what changed.

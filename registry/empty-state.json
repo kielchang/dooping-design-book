@@ -3,8 +3,8 @@
   "name": "empty-state",
   "version": "0.11.1",
   "type": "registry:ui",
-  "title": "EmptyState 空狀態",
-  "description": "圖示＋標題＋說明＋行動呼籲。",
+  "title": "EmptyState",
+  "description": "Icon, title, explanation, and next action for empty results.",
   "dependencies": [
     "@dooping/tokens@^0.6.0",
     "lucide-react"

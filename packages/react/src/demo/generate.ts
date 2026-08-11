@@ -20,23 +20,23 @@ export function rng(seed = 1): () => number {
 }
 
 // ── 詞彙池：全部延伸自 sample-data 的既有模式，不得加入新領域詞 ──
-const STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
-const NUMS = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
+const STEMS = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Kappa"];
+const NUMS = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
 const NAME_VARIANTS = [
-  "第一階段", "第二階段", "第三階段", "初版", "第二版", "第三版",
-  "例行項目", "附屬項目", "基礎項目", "小額項目", "整併", "追蹤",
-  "補充", "擴充", "專案型", "附註項目",
+  "Phase 1", "Phase 2", "Phase 3", "Initial version", "Revision 2", "Revision 3",
+  "Routine item", "Supporting item", "Base item", "Small item", "Merged item", "Follow-up",
+  "Supplement", "Extension", "Project item", "Notes",
 ];
 // 沿用 R-2402 的寫法：長名稱是為了示範截斷與可調欄寬，不是真的敘述
-const LONG_SUFFIX = " 這一筆刻意加長，用來示範欄位截斷與可調欄寬";
+const LONG_SUFFIX = " deliberately extended to demonstrate truncation and resizable columns";
 // 抽象的「階段推進」流程步驟，延伸 demoGraphNodes 的五個節點
-const FLOW_STEPS = ["接收", "初審", "複核", "彙整", "確認", "覆核", "建檔", "歸檔", "通知", "結案"];
+const FLOW_STEPS = ["Intake", "Initial review", "Review", "Consolidation", "Approval", "Validation", "Filed", "Archived", "Notification", "Closed"];
 
 /** 天干編號：前十個直接用，超過十個補序號（甲單位、…、癸單位、甲單位2）。 */
 function stemLabel(i: number, suffix: string): string {
   const stem = STEMS[i % STEMS.length];
   const round = Math.floor(i / STEMS.length);
-  return round === 0 ? `${stem}${suffix}` : `${stem}${suffix}${round + 1}`;
+  return round === 0 ? `${stem} ${suffix}` : `${stem} ${suffix} ${round + 1}`;
 }
 
 /** 以 ISO 字串做日期加法，避免時區干擾（一律走 UTC）。 */
@@ -90,17 +90,17 @@ export function makeRecords(n: number, options: MakeRecordsOptions = {}): DemoRe
   const out: DemoRecord[] = [];
   let date = dateStart;
   for (let i = 0; i < n; i++) {
-    const base = `${STEMS[i % STEMS.length]}案 ${NAME_VARIANTS[Math.floor(r() * NAME_VARIANTS.length)]}`;
+    const base = `${STEMS[i % STEMS.length]} ${NAME_VARIANTS[Math.floor(r() * NAME_VARIANTS.length)]}`;
     out.push({
       id: `R-${3001 + i}`,
-      unit: stemLabel(Math.floor(r() * unitCount), "單位"),
+      unit: stemLabel(Math.floor(r() * unitCount), "Unit"),
       name: r() < longNameRatio ? `${base}${LONG_SUFFIX}` : base,
-      category: stemLabel(Math.floor(r() * categoryCount), "類"),
+      category: stemLabel(Math.floor(r() * categoryCount), "Category"),
       qty: Math.round(qtyRange[0] + r() * (qtyRange[1] - qtyRange[0])),
       amount: Math.round((amountRange[0] + r() * (amountRange[1] - amountRange[0])) / 100) * 100,
       status: pickWeighted(statusWeights, r()),
       createdAt: date,
-      owner: `第${NUMS[Math.floor(r() * ownerCount) % NUMS.length]}組`,
+      owner: `${NUMS[Math.floor(r() * ownerCount) % NUMS.length]} Group`,
     });
     date = addDays(date, 1 + Math.floor(r() * 3));
   }
@@ -111,7 +111,7 @@ export function makeRecords(n: number, options: MakeRecordsOptions = {}): DemoRe
 export function makeOptions(n: number): { value: string; label: string }[] {
   return Array.from({ length: n }, (_, i) => ({
     value: `opt-${i + 1}`,
-    label: stemLabel(i, "項"),
+    label: stemLabel(i, "Item"),
   }));
 }
 
@@ -132,7 +132,7 @@ export function makePhases(n: number, options: MakePhasesOptions = {}): DemoPhas
     const offset = Math.floor(r() * Math.max(1, spanDays - duration));
     out.push({
       id: `P-${String(i + 1).padStart(2, "0")}`,
-      label: `${STEMS[i % STEMS.length]}案 ${NAME_VARIANTS[i % NAME_VARIANTS.length]}`,
+      label: `${STEMS[i % STEMS.length]} ${NAME_VARIANTS[i % NAME_VARIANTS.length]}`,
       start: addDays(dateStart, offset),
       end: addDays(dateStart, offset + duration),
       category: (i % 8) + 1,
@@ -155,7 +155,7 @@ export function makeSeries(n: number, options: MakeSeriesOptions = {}): { label:
   const { seed = 1, labelKind = "unit", range = [8, 96] } = options;
   const r = rng(seed);
   return Array.from({ length: n }, (_, i) => ({
-    label: labelKind === "period" ? `第${i + 1}期` : stemLabel(i, "單位"),
+    label: labelKind === "period" ? `Period ${i + 1}` : stemLabel(i, "Unit"),
     value: Math.round(range[0] + r() * (range[1] - range[0])),
   }));
 }
@@ -172,9 +172,9 @@ export function makeStackedRows(
   const { seed = 1 } = options;
   const r = rng(seed);
   return Array.from({ length: rows }, (_, ri) => ({
-    label: stemLabel(ri, "單位"),
+    label: stemLabel(ri, "Unit"),
     segments: Array.from({ length: segs }, (_, ci) => ({
-      label: stemLabel(ci, "類"),
+      label: stemLabel(ci, "Category"),
       value: Math.round(4 + r() * 44),
     })),
   }));
@@ -228,7 +228,7 @@ export function makeGraph(
     if (seen.has(id)) return;
     seen.add(id);
     // 約每四條有一條帶「通過」標籤，沿用 demoGraphEdges 的示範密度
-    edges.push({ id, source: `n${from + 1}`, target: `n${to + 1}`, ...(edges.length % 4 === 2 ? { label: "通過" } : {}) });
+    edges.push({ id, source: `n${from + 1}`, target: `n${to + 1}`, ...(edges.length % 4 === 2 ? { label: "Approved" } : {}) });
   };
   for (let li = 1; li < layers.length; li++) {
     const prev = layers[li - 1];

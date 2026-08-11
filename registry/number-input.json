@@ -3,8 +3,8 @@
   "name": "number-input",
   "version": "0.11.1",
   "type": "registry:ui",
-  "title": "NumberInput 數值輸入",
-  "description": "右對齊等寬數字，行動裝置出數字鍵盤。",
+  "title": "NumberInput",
+  "description": "Right-aligned tabular numbers with a numeric mobile keyboard.",
   "dependencies": [
     "@dooping/tokens@^0.6.0"
   ],

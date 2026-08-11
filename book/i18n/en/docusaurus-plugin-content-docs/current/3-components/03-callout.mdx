@@ -1,0 +1,46 @@
+---
+title: Callout
+---
+
+# Callout
+
+Explains a state or reason in place on the screen.
+
+<StoryLink id="元件-基礎-按鈕・徽章・提示・卡片--提示框" />
+
+## When not to use it
+
+<Rules>
+  <Do><p>Information <strong>belongs to this area</strong> and needs to stay visible, such as “3 records are missing shipping information.”</p></Do>
+  <Dont><p>Do not report a successful operation with it. That is transient feedback; use a toast or an in-place state change. A “Saved successfully” message left on screen for three minutes only creates confusion.</p></Dont>
+</Rules>
+
+<Demo title="Four semantics">
+  <div className="space-y-2">
+    <Callout variant="success" title="All records in this batch are complete">12 records; the last completed on 2024-02-05.</Callout>
+    <Callout variant="info" title="Tip" tag="TIP">Use a field filter to compare multiple units at once.</Callout>
+    <Callout variant="warning" title="3 records are missing required information">Complete them before moving to the next step.</Callout>
+    <Callout variant="danger" title="Quota exceeded; unable to confirm" tag="E-104">Item “Project C, first draft” has 2 available; 6 required.</Callout>
+  </div>
+</Demo>
+
+## Each variant has a fixed icon
+
+`success` ✓ · `warning` ⚠ · `info` 💡 · `danger` ⊗
+
+The icon is not decoration; it is a **second cue**. When color is removed by printing or color-vision deficiency, the icon remains.
+
+## Put the conclusion in the title and details in the body
+
+<Rules>
+  <Do><p>Title: “Quota exceeded; unable to confirm”—one sentence says what happened.</p></Do>
+  <Dont><p>Title: “Error.” It contains no information, so users still have to read the body.</p></Dont>
+</Rules>
+
+The `tag` field holds a rule code such as `E-104`. Users can report the code and support staff do not have to guess.
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/callout.json
+```

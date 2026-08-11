@@ -4,14 +4,14 @@ import { Coachmark } from "./coachmark";
 import { Button } from "./button";
 import { Card, CardHeader, CardTitle, CardContent } from "./card";
 
-const meta: Meta<typeof Coachmark> = { title: "元件/引導/聚光導引 Coachmark" };
+const meta: Meta<typeof Coachmark> = { title: "Components/Guidance/Coachmark", id: "元件/引導/聚光導引-coachmark" };
 export default meta;
 type Story = StoryObj;
 
 const STEPS = [
-  { title: "先選擇單位", body: <>從這裡挑一個既有單位，或直接建立新的。</> },
-  { title: "加入項目", body: <>可以一次加入多筆；數量與金額都能之後再調整。</>, actionHint: "👆 點上方圈起來的按鈕試試" },
-  { title: "最後確認", body: <>送出前會顯示<strong>本次變更摘要</strong>，確認無誤再送出。</> },
+  { title: "Choose a unit", body: <>Choose an existing unit or create a new one.</> },
+  { title: "Add items", body: <>Add several items at once; quantity and amount can be adjusted later.</>, actionHint: "👆 Try the highlighted button above" },
+  { title: "Final review", body: <>Review the <strong>change summary</strong> before submitting.</> },
 ];
 
 /**
@@ -19,6 +19,7 @@ const STEPS = [
  * 這個 story 演示的就是「宿主要寫的那一小段」。
  */
 export const 三步導引: Story = {
+  name: "Three-step tour",
   render: function Render() {
     const [open, setOpen] = useState(false);
     const [step, setStep] = useState(0);
@@ -34,18 +35,18 @@ export const 三步導引: Story = {
 
     return (
       <div className="space-y-4">
-        <Button onClick={() => { setStep(0); setOpen(true); }}>開始導引</Button>
+        <Button onClick={() => { setStep(0); setOpen(true); }}>Start tour</Button>
         <Card className="max-w-xl">
-          <CardHeader><CardTitle>建立一筆資料</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Create a record</CardTitle></CardHeader>
           <CardContent className="flex flex-wrap gap-2">
-            <Button ref={refs[0]} variant="outline">選擇單位</Button>
-            <Button ref={refs[1]} variant="outline">加入項目</Button>
-            <Button ref={refs[2]}>確認送出</Button>
+            <Button ref={refs[0]} variant="outline">Choose unit</Button>
+            <Button ref={refs[1]} variant="outline">Add items</Button>
+            <Button ref={refs[2]}>Review and submit</Button>
           </CardContent>
         </Card>
         <p className="text-xs text-muted-foreground">
-          聚光洞可以點穿——導引是教人操作，不是代替他操作。卡片右上角可以縮小，
-          騰出空間做真正的操作後再展開。
+          The spotlight can be clicked through—this tour teaches the user, it does not act for them.
+          Collapse the card from its top-right corner to make room for the real action, then expand it again.
         </p>
         {open && (
           <Coachmark
@@ -68,6 +69,7 @@ export const 三步導引: Story = {
 };
 
 export const 驗收模式: Story = {
+  name: "Acceptance mode",
   render: function Render() {
     const [open, setOpen] = useState(false);
     const [verdict, setVerdict] = useState<"pass" | "issue" | null>(null);
@@ -77,20 +79,21 @@ export const 驗收模式: Story = {
     useLayoutEffect(() => { if (open) setRect(anchor.current?.getBoundingClientRect() ?? null); }, [open]);
     return (
       <div className="space-y-4">
-        <Button onClick={() => setOpen(true)}>開始驗收</Button>
+        <Button onClick={() => setOpen(true)}>Start acceptance</Button>
         <Card className="max-w-md">
-          <CardHeader><CardTitle>資料清單</CardTitle></CardHeader>
-          <CardContent><Button ref={anchor} variant="outline">匯出 CSV</Button></CardContent>
+          <CardHeader><CardTitle>Record list</CardTitle></CardHeader>
+          <CardContent><Button ref={anchor} variant="outline">Export CSV</Button></CardContent>
         </Card>
         <p className="text-xs text-muted-foreground">
-          同一個元件換一種用途：逐步標記「通過／有問題」＋備註，走完就是一份可交付的驗收報告。
+          The same component supports a different job: mark each step as “pass” or “issue” with a note.
+          When you finish, you have a handoff-ready acceptance report.
         </p>
         {open && (
           <Coachmark
             targetRect={rect}
-            title="驗收：匯出功能"
-            body={<>點「匯出 CSV」，確認下載的內容與畫面上<strong>篩選後</strong>的資料一致。</>}
-            warning={<>此環境為示範資料，請勿以此結果作為正式驗收依據。</>}
+            title="Acceptance: export"
+            body={<>Select “Export CSV” and confirm the download matches the <strong>filtered</strong> records on screen.</>}
+            warning={<>This is demo data; do not use the result as production acceptance evidence.</>}
             stepIndex={0}
             stepCount={1}
             isFirst

@@ -13,31 +13,32 @@ import { SegGroup } from "./seg-group";
 import { Chips } from "./chips";
 import { TIER_OPTIONS, CHANNEL_OPTIONS } from "../demo/sample-data";
 
-const meta: Meta = { title: "元件/表單/輸入控制項" };
+const meta: Meta = { title: "Components/Forms/Input controls", id: "元件/表單/輸入控制項" };
 export default meta;
 type Story = StoryObj;
 
 export const 文字與數值: Story = {
+  name: "Text and numeric inputs",
   render: function Render() {
     const [qty, setQty] = useState(120);
     return (
       <div className="max-w-sm space-y-4">
         <div className="space-y-1">
-          <Label htmlFor="s-name">單位名稱</Label>
-          <Input id="s-name" defaultValue="遠東貿易股份有限公司" />
+          <Label htmlFor="s-name">Unit name</Label>
+          <Input id="s-name" defaultValue="Northwind Trading Co." />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="s-code">單位代號</Label>
-          <Input id="s-code" placeholder="例：C-1042" />
+          <Label htmlFor="s-code">Unit code</Label>
+          <Input id="s-code" placeholder="Example: C-1042" />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="s-locked">建立日期</Label>
+          <Label htmlFor="s-locked">Created</Label>
           <Input id="s-locked" defaultValue="2019-04-01" disabled />
         </div>
         <div className="space-y-1">
-          <Label>訂購數量</Label>
-          <NumberInput value={qty} onChange={setQty} min={0} step={10} aria-label="訂購數量" />
-          <p className="text-tiny text-muted-foreground">數值輸入固定右對齊＋等寬數字，底色＝「可編輯」語意。</p>
+          <Label>Order quantity</Label>
+          <NumberInput value={qty} onChange={setQty} min={0} step={10} aria-label="Order quantity" />
+          <p className="text-tiny text-muted-foreground">Numeric inputs are right-aligned with tabular figures; the surface means “editable”.</p>
         </div>
       </div>
     );
@@ -45,32 +46,33 @@ export const 文字與數值: Story = {
 };
 
 export const 欄位狀態: Story = {
+  name: "Field states",
   render: function Render() {
     const [invalid, setInvalid] = useState(true);
     return (
       <div className="max-w-xl space-y-5">
         <p className="text-sm text-muted-foreground">
-          一格欄位可以<strong>同時</strong>是「被聚焦」「改過沒送」「不合格」。三件事走三個不同的通道，
-          疊起來互不干涉——<strong>聚焦環永遠是同一個顏色</strong>，邊框與底色管狀態。
+          One field can be<strong> simultaneously</strong> focused, changed but unsaved, and invalid.
+          Each state uses a separate channel, so they stack without interfering—<strong>the focus ring is always the same color</strong>, while borders and surfaces carry state.
         </p>
 
         <div className="space-y-3">
           <div className="space-y-1">
-            <Label htmlFor="f-ro">唯讀／計算值</Label>
+            <Label htmlFor="f-ro">Read-only / calculated</Label>
             <div className="field-readonly rounded-md border border-transparent px-3 py-2 text-sm">1,380,000</div>
           </div>
           <div className="space-y-1">
-            <Label htmlFor="f-ok">可編輯（優先序 0）</Label>
+            <Label htmlFor="f-ok">Editable (priority 0)</Label>
             <Input id="f-ok" defaultValue="1,500,000" />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="f-edit">已改動未送出（優先序 1）</Label>
+            <Label htmlFor="f-edit">Unsaved changes (priority 1)</Label>
             <div className="rounded-md border border-edit bg-edit-bg px-3 py-2 text-sm text-edit-foreground">
               1,650,000
             </div>
           </div>
           <div className="space-y-1">
-            <Label htmlFor="f-bad">不合格（優先序 2，最高）</Label>
+            <Label htmlFor="f-bad">Invalid (priority 2, highest)</Label>
             <Input
               id="f-bad"
               defaultValue="0"
@@ -80,21 +82,21 @@ export const 欄位狀態: Story = {
             />
             {invalid && (
               <p id="f-bad-err" className="text-tiny text-danger">
-                數值必須大於 0。改成別的值就會恢復。
+                Value must be greater than 0. Change it to recover.
               </p>
             )}
           </div>
         </div>
 
         <p className="text-xs text-muted-foreground">
-          用 Tab 鍵走過上面四格，注意<strong>聚焦環不隨狀態變色</strong>。
-          若環會跟著變紅，Tab 過三個必填空欄時每一格都會閃紅——那會訓練使用者忽略紅色。
-          環與邊框之間有一圈背景色（<code>ring-offset</code>）：少了它，環會直接畫在紅框上，
-          實測深色模式下兩者對比只有 <strong>1.04:1</strong>，聚焦環等於隱形。
+          Tab through the four fields above and notice that<strong> the focus ring does not change with state</strong>.
+          If it turned red, tabbing through three empty required fields would flash red on every field—teaching users to ignore red.
+          The ring has a background-color gap (<code>ring-offset</code>) from the border: without it, the ring would sit directly on the red border,
+          measuring only <strong>1.04:1</strong> contrast in dark mode and becoming effectively invisible.
         </p>
         <p className="text-xs text-muted-foreground">
-          「<strong>必填未填</strong>」是不合格的一種，但它的問題是<strong>時機</strong>不是顏色——
-          不該在使用者還沒碰過欄位時就標紅。慣例是 blur 或送出之後才標。
+          An<strong> empty required field</strong> is one kind of invalid state, but the problem is<strong> timing</strong>, not color—
+          do not mark it red before the user has touched it. Show it after blur or submission.
         </p>
       </div>
     );
@@ -102,17 +104,18 @@ export const 欄位狀態: Story = {
 };
 
 export const 勾選與下拉: Story = {
+  name: "Checkbox and select",
   render: function Render() {
     const [checked, setChecked] = useState(true);
     return (
       <div className="max-w-sm space-y-4">
         <div className="flex items-center gap-2">
           <Checkbox id="s-active" checked={checked} onCheckedChange={(v) => setChecked(v === true)} />
-          <Label htmlFor="s-active">啟用此單位</Label>
+          <Label htmlFor="s-active">Activate this unit</Label>
         </div>
         <div className="space-y-1">
           {/* combobox 的名稱不能取自值文字——Label 一定要用 htmlFor 接到觸發鈕的 id */}
-          <Label htmlFor="s-tier">等級</Label>
+          <Label htmlFor="s-tier">Tier</Label>
           <Select defaultValue="gold">
             <SelectTrigger id="s-tier"><SelectValue /></SelectTrigger>
             <SelectContent>
@@ -127,7 +130,7 @@ export const 勾選與下拉: Story = {
   // 鍵盤開啟出 listbox（portal 在 body）、Esc 收回且 aria-expanded 連動。
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const box = canvas.getByRole("checkbox", { name: "啟用此單位" });
+    const box = canvas.getByRole("checkbox", { name: "Activate this unit" });
     await expect(box).toHaveAttribute("aria-checked", "true");
     box.focus();
     await userEvent.keyboard(" ");
@@ -135,7 +138,7 @@ export const 勾選與下拉: Story = {
     await userEvent.keyboard(" ");
     await waitFor(() => expect(box).toHaveAttribute("aria-checked", "true"));
 
-    const trigger = canvas.getByRole("combobox", { name: "等級" });
+    const trigger = canvas.getByRole("combobox", { name: "Tier" });
     trigger.focus();
     await userEvent.keyboard("{Enter}");
     await within(canvasElement.ownerDocument.body).findByRole("listbox");
@@ -146,50 +149,52 @@ export const 勾選與下拉: Story = {
 };
 
 export const 分段選擇: Story = {
+  name: "Segmented selection",
   render: function Render() {
     const [v, setV] = useState("gold");
     const [locked] = useState("silver");
     return (
       <div className="space-y-4">
         <div className="space-y-1">
-          <p className="text-xs text-muted-foreground">選項少、標籤短、要一眼看完 → 分段選擇</p>
-          <SegGroup label="等級" options={TIER_OPTIONS} value={v} onPick={setV} />
+          <p className="text-xs text-muted-foreground">Few options, short labels, visible at a glance → segmented selection</p>
+          <SegGroup label="Tier" options={TIER_OPTIONS} value={v} onPick={setV} />
         </div>
         <div className="space-y-1">
-          <p className="text-xs text-muted-foreground">已改動未送出（琥珀）</p>
-          <SegGroup label="等級（已改動）" options={TIER_OPTIONS} value={v} onPick={setV} changed />
+          <p className="text-xs text-muted-foreground">Unsaved changes (amber)</p>
+          <SegGroup label="Tier (changed)" options={TIER_OPTIONS} value={v} onPick={setV} changed />
         </div>
         <div className="space-y-1">
-          <p className="text-xs text-muted-foreground">鎖定：可聚焦、有鎖頭、hover 有原因</p>
-          <SegGroup label="等級（鎖定）" options={TIER_OPTIONS} value={locked} onPick={() => {}} disabled lockHint="此筆已結案，需先解除鎖定" />
+          <p className="text-xs text-muted-foreground">Locked: focusable, with a lock and a reason on hover</p>
+          <SegGroup label="Tier (locked)" options={TIER_OPTIONS} value={locked} onPick={() => {}} disabled lockHint="This record is closed; unlock it first" />
         </div>
-        <p className="text-tiny text-muted-foreground">鍵盤：方向鍵移動、Space/Enter 選定、Esc 取消。整組只佔一個 Tab 停留點。</p>
+        <p className="text-tiny text-muted-foreground">Keyboard: arrow keys move, Space/Enter selects, Esc cancels. The group uses one Tab stop.</p>
       </div>
     );
   },
 };
 
 export const 開關: Story = {
+  name: "Switches",
   render: function Render() {
     const [autoSave, setAutoSave] = useState(true);
     const [dense, setDense] = useState(false);
     return (
       <div className="max-w-sm space-y-4">
         <div className="flex items-center justify-between gap-2">
-          <Label htmlFor="sw-save">自動儲存</Label>
+          <Label htmlFor="sw-save">Auto-save</Label>
           <Switch id="sw-save" checked={autoSave} onCheckedChange={setAutoSave} />
         </div>
         <div className="flex items-center justify-between gap-2">
-          <Label htmlFor="sw-dense">密集列表</Label>
+          <Label htmlFor="sw-dense">Dense lists</Label>
           <Switch id="sw-dense" checked={dense} onCheckedChange={setDense} />
         </div>
         <div className="flex items-center justify-between gap-2">
-          <Label htmlFor="sw-locked" className="opacity-60">週報寄送（由管理端統一設定）</Label>
+          <Label htmlFor="sw-locked" className="opacity-60">Weekly report delivery (managed centrally)</Label>
           <Switch id="sw-locked" checked disabled />
         </div>
         <p className="text-tiny text-muted-foreground">
-          開關＝<strong>切了立即生效</strong>（設定頁）；「送出才生效」的表單選項用 Checkbox。
-          所以開關沒有「已改動未送出」的琥珀態——立即生效的控制項不存在未送出狀態。
+          A switch means<strong> the change takes effect immediately</strong> (as on a settings page); use a checkbox for form choices that apply on submit.
+          Switches therefore have no amber “changed but unsaved” state—an immediately effective control has no unsaved state.
         </p>
       </div>
     );
@@ -197,28 +202,29 @@ export const 開關: Story = {
   // 開關：role=switch、Space 切換 aria-checked、disabled 的不動
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const sw = canvas.getByRole("switch", { name: "自動儲存" });
+    const sw = canvas.getByRole("switch", { name: "Auto-save" });
     await expect(sw).toHaveAttribute("aria-checked", "true");
     sw.focus();
     await userEvent.keyboard(" ");
     await waitFor(() => expect(sw).toHaveAttribute("aria-checked", "false"));
     await userEvent.keyboard(" ");
     await waitFor(() => expect(sw).toHaveAttribute("aria-checked", "true"));
-    await expect(canvas.getByRole("switch", { name: "週報寄送（由管理端統一設定）" })).toBeDisabled();
+    await expect(canvas.getByRole("switch", { name: "Weekly report delivery (managed centrally)" })).toBeDisabled();
   },
 };
 
 export const 長文輸入: Story = {
+  name: "Long text input",
   render: function Render() {
     const [note, setNote] = useState("");
     const tooLong = note.length > 200;
     return (
       <div className="max-w-xl space-y-4">
         <div className="space-y-1">
-          <Label htmlFor="ta-note">備註</Label>
+          <Label htmlFor="ta-note">Notes</Label>
           <Textarea
             id="ta-note"
-            placeholder="補充說明（選填）"
+            placeholder="Additional details (optional)"
             value={note}
             onChange={(e) => setNote(e.target.value)}
             rows={3}
@@ -227,17 +233,17 @@ export const 長文輸入: Story = {
           />
           {tooLong && (
             <p id="ta-err" className="text-tiny text-danger">
-              超過 200 字上限（目前 {note.length} 字）。
+              Exceeds the 200-character limit ({note.length} characters).
             </p>
           )}
         </div>
         <div className="space-y-1">
-          <Label htmlFor="ta-ro">結案原因（停用示意）</Label>
-          <Textarea id="ta-ro" defaultValue="重複建立，已併入既有紀錄。" disabled />
+          <Label htmlFor="ta-ro">Closure reason (disabled example)</Label>
+          <Textarea id="ta-ro" defaultValue="Created twice; merged into the existing record." disabled />
         </div>
         <p className="text-tiny text-muted-foreground">
-          與 Input 同一套邊框／聚焦環／不合格態；只准直向調整大小（resize-y），
-          橫向拉寬會破壞表單欄寬對齊。
+          Textareas use the same border, focus-ring, and invalid states as Input; allow only vertical resizing (resize-y),
+          because horizontal resizing breaks form-column alignment.
         </p>
       </div>
     );
@@ -245,15 +251,16 @@ export const 長文輸入: Story = {
 };
 
 export const 單選群: Story = {
+  name: "Radio group",
   render: function Render() {
     const [v, setV] = useState("all");
     return (
       <div className="max-w-md space-y-3">
-        <RadioGroup value={v} onValueChange={setV} aria-label="通知範圍">
+        <RadioGroup value={v} onValueChange={setV} aria-label="Notification scope">
           {[
-            { value: "all", label: "全部動態", hint: "每一筆變更都通知" },
-            { value: "important", label: "重要事項", hint: "只有需要動作的才通知" },
-            { value: "none", label: "暫停通知", hint: "改到站內清單自行查看" },
+            { value: "all", label: "All activity", hint: "Notify for every change" },
+            { value: "important", label: "Important only", hint: "Notify only when action is needed" },
+            { value: "none", label: "Pause notifications", hint: "Check the in-app list yourself" },
           ].map((o) => (
             <div key={o.value} className="flex items-start gap-2">
               <RadioGroupItem value={o.value} id={`rg-${o.value}`} className="mt-0.5" />
@@ -265,8 +272,8 @@ export const 單選群: Story = {
           ))}
         </RadioGroup>
         <p className="text-tiny text-muted-foreground">
-          選項長或含說明 → 單選群（垂直）；2–5 個短標籤 → 分段選擇；
-          超過 5 個或選項動態增減 → 下拉。整組只佔一個 Tab 停留點，方向鍵移動。
+          Long options or options with descriptions → vertical radio group; 2–5 short labels → segmented selection;
+          more than 5 options or a changing list → select. The group uses one Tab stop and arrow keys for movement.
         </p>
       </div>
     );
@@ -274,18 +281,19 @@ export const 單選群: Story = {
 };
 
 export const 多選標籤片: Story = {
+  name: "Multi-select chips",
   render: function Render() {
     const [sel, setSel] = useState<string[]>(["web", "phone"]);
     return (
       <div className="max-w-md space-y-2">
         <Chips
-          label="下單管道"
+          label="Order channels"
           options={CHANNEL_OPTIONS}
           selected={sel}
           onToggle={(v) => setSel((s) => (s.includes(v) ? s.filter((x) => x !== v) : [...s, v]))}
         />
         <p className="text-tiny text-muted-foreground">
-          已選與未選同時看得見——多選下拉「選完就看不見選了什麼」是後台最常見的抱怨。
+          Selected and unselected options remain visible together—“I cannot see what I selected after closing the multi-select” is a common back-office complaint.
         </p>
       </div>
     );

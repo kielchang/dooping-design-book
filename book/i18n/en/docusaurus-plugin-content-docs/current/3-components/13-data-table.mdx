@@ -1,0 +1,180 @@
+---
+title: DataTable
+---
+
+import { demoRecords, STATUS_LABEL } from "@dooping/react/demo/sample-data";
+
+export const rows = demoRecords.slice(0, 7);
+export const nt = (n) => n.toLocaleString("en-US");
+export const columns = [
+  { key: "id", header: "ID", freeze: true, cell: (r) => r.id, sortValue: (r) => r.id, filterText: (r) => r.id },
+  { key: "unit", header: "Unit", cell: (r) => r.unit, sortValue: (r) => r.unit, filterText: (r) => r.unit, filter: "select" },
+  { key: "name", header: "Item", truncate: 160, cell: (r) => r.name, sortValue: (r) => r.name, filterText: (r) => r.name },
+  { key: "qty", header: "Quantity", numeric: true, cell: (r) => nt(r.qty), sortValue: (r) => r.qty, total: (rs) => nt(rs.reduce((s, r) => s + r.qty, 0)) },
+  { key: "amount", header: "Amount", numeric: true, cell: (r) => `$${nt(r.amount)}`, sortValue: (r) => r.amount, total: (rs) => `$${nt(rs.reduce((s, r) => s + r.amount, 0))}` },
+  { key: "status", header: "Status", cell: (r) => STATUS_LABEL[r.status], sortValue: (r) => STATUS_LABEL[r.status], filterText: (r) => STATUS_LABEL[r.status], filter: "select" },
+];
+
+# DataTable
+
+**The workhorse of admin systems.** One column configuration provides search, filters, sorting, pagination, totals, a frozen first column, and export.
+
+<StoryLink id="元件-資料-資料表-datatable--完整功能">Storybook: Full feature set</StoryLink> <StoryLink id="元件-資料-資料表-datatable--互動">Interactive playground—adjust row count and modes</StoryLink>
+
+## Why converge on one component
+
+Tables are the easiest thing for each screen to hand-build. Three hand-built tables produce three search positions, three sort arrows, and three “no results” messages; a style change requires finding all three.
+
+<Rules>
+  <Do><p>Any list where users need to find a particular record uses DataTable.</p></Do>
+  <Dont><p>Do not hand-build <code>&lt;table&gt;</code> to save a few lines. The first table is faster; the third starts repaying the debt.</p></Dont>
+</Rules>
+
+<Demo title="Full feature set (search, sort, filters, and resize the columns)">
+  <DataTable rows={rows} columns={columns} getRowKey={(r) => r.id} initialSort={{ key: "amount", dir: "desc" }} pageSize={5}
+    csv={{ headers: ["ID", "Unit", "Item", "Quantity", "Amount", "Status"], row: (r) => [r.id, r.unit, r.name, r.qty, r.amount, STATUS_LABEL[r.status]], fileName: "records.csv" }} />
+</Demo>
+
+## Visual invariant: row rules only
+
+Like [Table](/components/table), the body has **no outer border, no vertical rules, and no cell borders**. Only a 1px `--border` rule separates rows. Filter panels use a `popover` surface and 1px `--border`; they portal directly under `body` so horizontal scrolling cannot clip them. The host style baseline must cover portal content, not only the demo container. The live example is checked by `npm run verify:book`; see ADR-0010.
+
+## Column configuration is the whole API
+
+```tsx
+const columns: Column<Order>[] = [
+  {
+    key: "amount",
+    header: "Amount",
+    numeric: true,                          // right-aligned tabular numbers
+    cell: (r) => formatMoney(r.amount),     // display
+    sortValue: (r) => r.amount,             // enables sorting
+    filterText: (r) => String(r.amount),    // participates in keyword search
+    filter: "range",                       // column filter type (can be inferred)
+    total: (rows) => formatMoney(sum(rows)),// total
+    freeze: true,                           // freeze first column
+    truncate: 180,                          // truncate + tooltip
+    width: 140,                             // initial width; users can resize
+    headerClassName: "text-right",         // header cell only
+  },
+];
+```
+
+## Three deliberate decisions
+
+### 1. Threshold pagination
+
+Do not show a paginator when the data fits on one page. “Page 1 of 1” is noise.
+
+### 2. Totals include all filtered rows, not only the current page
+
+After filtering, users want the filtered total. Summing only the current page is a classic reconciliation failure—and a quiet one that often survives until comparison with another system.
+
+### 3. Export follows the screen
+
+Export what the user **currently sees** (after filter and sort), not the original full dataset. “I filtered it, but export gave me everything” is a common source of confusion.
+
+## Why page sizes are 5 / 15 / 30 / 50
+
+| Size | Use |
+| --- | --- |
+| 5 | Small table embedded in a card or dialog; the table is not the main subject |
+| **15 (default)** | Fits on an ordinary laptop without scrolling; the daily-work default |
+| 30 | Compare two batches where paging is less annoying than scrolling |
+| 50 | Scanning mode: sweep a large surface for anomalies rather than finding one record |
+
+<Rules>
+  <Do><p>Keep the four sizes<strong> consistent across the site</strong>; users should not relearn them on each screen.</p></Do>
+  <Dont><p>Do not add “All.” Rendering 10,000 rows can freeze the browser for seconds, and users cannot predict that cost. If they truly need everything, export CSV.</p></Dont>
+</Rules>
+
+## Three single-column filter types
+
+| Type | Interaction | Automatic condition |
+| --- | --- | --- |
+| `text` | Multiple keywords; any within a column (OR), all across columns (AND) | `filterText` / `sortValue` present |
+| `range` | Minimum to maximum | Numeric and sortable |
+| `select` | Multi-select unique values from the column | Explicitly specified |
+
+Text filters suggest the three closest existing values as the user types. Users often remember the general shape but not the complete string, especially when names and codes are mixed.
+
+## Remove filters one by one
+
+Each condition is its own removable chip. Offering only “Clear all” forces users to rebuild the filter from scratch.
+
+## Loading has two appearances
+
+One `loading` prop chooses the appearance based on whether data exists:
+
+| Situation | Appearance |
+| --- | --- |
+| `loading` with no data (first load) | Skeleton rows: real header, gray rows, row count = page size (capped at 15) |
+| `loading` with existing data (refresh/filter) | Darken in place, lock interaction, set `aria-busy`; old data stays readable and is **not** covered by a skeleton |
+
+The container announces “Loading…” once through `role="status"` and overridable `labels`; skeleton blocks are `aria-hidden`.
+
+## Two empty states
+
+| Situation | Copy |
+| --- | --- |
+| No data | Custom `empty`, normally with a “create first” action |
+| No results after filtering | Automatically “No matching data; adjust the keyword or column filter” |
+
+<Demo title="Empty state (automatically detected)"><DataTable rows={[]} columns={columns} getRowKey={(r) => r.id} empty={{ title: "No data yet", hint: "Create the first record to see details and totals here." }} /></Demo>
+
+## Crosshair alignment
+
+The pointer highlights the whole row and column. This is what keeps a 20-column table from losing the reader’s place. The highlight uses a **background gradient layer**, not `background-color`, so it sits above the existing cell surfaces without covering the opaque frozen column or sticky header.
+
+## Resize and double-click to fit
+
+Drag a column’s right edge to resize; double-click the edge to fit the content. Dragging solves “I need to see this column”; double-click solves “I do not want to tune it by hand.” Width changes last for the current visit only. A temporary adjustment does not mean the user wants a permanent layout setting.
+
+`truncate` is the default escape hatch, with Tooltip for the full value; resizing is the temporary exception. Without truncation, one long note can push every other column off screen.
+
+## Defaults are the specification
+
+| Prop | Default | When to change |
+| --- | --- | --- |
+| `zebra` | `true` | Disable for 2–3 rows; stripes look noisy in a short table |
+| `dense` | `false` | Scanning tables; smaller touch targets mean not on mobile |
+| `stickyHeader` | `true` | Almost never; print automatically uses `table-header-group` |
+| `crosshair` | `true` | Disable below four columns; there is little row-alignment risk |
+| `resizable` | `true` | Fixed layouts precisely aligned to cards above |
+
+Keep the same switches for the same table class in one system. Five local “slightly tighter” adjustments create five row heights and nobody remembers why.
+
+## Labels can be overridden as a group
+
+```tsx
+<DataTable labels={{ search: "Search…", exportCsv: "Export CSV", prev: "Previous", next: "Next" }} … />
+```
+
+## How much data fits
+
+Threshold pagination caps rendering at 50 rows, but search and sort still scan the full collection:
+
+| Data | Behavior |
+| --- | --- |
+| ≤500 records | Immediate, including keyword search |
+| 500–5,000 | Usable; search recalculates per character |
+| >5,000 | Switch to server-side pagination and filtering; this component should render the current page |
+
+For very wide tables, the limit is readability rather than performance. Freeze the first column and keep the crosshair; secondary fields belong in an expanded row or detail page instead of 20 horizontal columns.
+
+## Accessibility
+
+- Sort headers expose `aria-sort`.
+- Filter buttons have an `aria-label` such as “Filter Unit.”
+- Clickable rows use `role="button"`, `tabIndex`, and Enter/Space handlers.
+- Filter panels use a fixed-position portal so table scrolling cannot clip them.
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/data-table.json
+```
+
+Dependencies install automatically: table, input, button, select, tooltip, empty-state, use-sort, csv, download, and utils.
+
+Further reading: [Pattern → DataTable standard](/patterns/data-table-standard)

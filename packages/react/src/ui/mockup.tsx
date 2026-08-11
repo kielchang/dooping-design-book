@@ -54,7 +54,7 @@ export function Spotlight({ children, label, className }: { children: ReactNode;
  * `min-w` 保底：小螢幕靠外層容器橫向捲動，不擠壞排版（擠壞的示意圖比沒有示意圖更糟）。
  */
 export function MockScreenFrame({
-  children, className, navLabel = "選單", topLabel = "頂部狀態列",
+  children, className, navLabel = "Menu", topLabel = "Global status bar",
 }: { children: ReactNode; className?: string; navLabel?: string; topLabel?: string }) {
   return (
     <div className={cn("flex min-w-[460px] gap-2.5 bg-background p-3 text-foreground", className)} style={{ minHeight: 230 }}>

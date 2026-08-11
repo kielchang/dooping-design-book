@@ -1,0 +1,27 @@
+---
+title: Three-Stage Adoption
+---
+
+# Three-Stage Adoption
+
+## Stage one: tokens only (one to two days)
+
+Install the token package and map the product's surfaces, text, borders, focus, and status colors
+to semantic tokens. Do not redesign every page yet. The goal is a stable vocabulary and a light/
+dark theme that can be validated independently.
+
+## Stage two: use components for new screens
+
+New work uses the shared controls, tables, feedback states, and stories. Avoid a broad rewrite;
+every new screen is an opportunity to replace one-off behavior with a tested contract.
+
+## Stage three: adopt patterns when needed
+
+Use page and workflow patterns where the product has the corresponding job. Migrate existing
+surfaces when they cause measurable inconsistency, accessibility failures, or maintenance cost.
+
+## Add the gates
+
+Keep the adoption sustainable with type checks, lint, tests, story coverage, visual checks, and
+the conformance ledger. A rule that cannot be observed or checked should be documented as a
+decision, not described as an automatic guarantee.

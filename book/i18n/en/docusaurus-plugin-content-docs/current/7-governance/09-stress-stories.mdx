@@ -1,0 +1,32 @@
+---
+title: Stress-Test Stories
+---
+
+# Stress-Test Stories
+
+## The problem
+
+Demo data is polite: short names, small numbers, one status, and no missing values. A component
+can look correct in that story and fail immediately with production-shaped data.
+
+## One separate category for extremes
+
+Keep stress stories separate from the everyday catalog. They are not a normal usage suggestion;
+they are a focused exercise for finding layout, contrast, overflow, and interaction failures.
+
+## Seven useful extremes
+
+Test long labels, empty and missing values, very large and very small numbers, dense rows,
+mixed statuses, slow or failed loading, and narrow/mobile widths. Give each category at least
+one realistic case and one deliberately difficult case.
+
+## Stress reveals rules
+
+When a stress story exposes a failure, turn the lesson into a component rule, token constraint,
+or automated regression. The value is not only finding a bug; it is making the next implementation
+less likely to repeat it.
+
+## When to run them
+
+Run stress stories before release, after token or typography changes, and whenever a component's
+content model changes. They are especially important for tables, charts, forms, and navigation.

@@ -4,7 +4,7 @@ import { Button } from "./button";
 import { ToastProvider, useToast } from "./toast";
 import { Skeleton, SkeletonText } from "./skeleton";
 
-const meta: Meta = { title: "元件/狀態/操作回饋與載入" };
+const meta: Meta = { title: "Components/States/Action feedback and loading", id: "元件/狀態/操作回饋與載入" };
 export default meta;
 type Story = StoryObj;
 
@@ -12,31 +12,32 @@ function PushButtons() {
   const { push } = useToast();
   return (
     <div className="flex flex-wrap gap-2">
-      <Button size="sm" onClick={() => push({ variant: "success", title: "已儲存", description: "12 個欄位已更新。" })}>
-        成功
+      <Button size="sm" onClick={() => push({ variant: "success", title: "Saved", description: "12 fields were updated." })}>
+        Success
       </Button>
-      <Button size="sm" variant="secondary" onClick={() => push({ variant: "info", title: "已加入排程", description: "匯出完成後會在這裡通知。" })}>
-        資訊
+      <Button size="sm" variant="secondary" onClick={() => push({ variant: "info", title: "Added to schedule", description: "You will be notified here when the export is ready." })}>
+        Info
       </Button>
-      <Button size="sm" variant="secondary" onClick={() => push({ variant: "warning", title: "部分項目已略過", description: "3 筆重複的紀錄未匯入。" })}>
-        警示
+      <Button size="sm" variant="secondary" onClick={() => push({ variant: "warning", title: "Some items skipped", description: "3 duplicate records were not imported." })}>
+        Warning
       </Button>
-      <Button size="sm" variant="destructive" onClick={() => push({ variant: "danger", title: "儲存失敗", description: "連線逾時，請再試一次。此訊息不會自動消失。" })}>
-        失敗（不自動消失）
+      <Button size="sm" variant="destructive" onClick={() => push({ variant: "danger", title: "Save failed", description: "The connection timed out. Try again. This message does not dismiss automatically." })}>
+        Failure (manual dismiss)
       </Button>
     </div>
   );
 }
 
 export const 操作回饋: Story = {
+  name: "Action feedback",
   render: () => (
     <ToastProvider>
       <div className="max-w-xl space-y-3">
         <PushButtons />
         <p className="text-tiny text-muted-foreground">
-          去向固定<strong>右下</strong>、堆疊上限 3（最舊被擠出）。success／info／warning
-          5 秒自動消失，hover／聚焦時暫停倒數；<strong>danger 一律手動關閉</strong>。
-          語彙與 Callout 同源：同一張圖示表、同一組淡底，不靠顏色單獨傳達。
+          Toasts stay in the<strong> bottom-right</strong> and stack up to 3 (the oldest is removed).
+          success/info/warning dismiss after 5 seconds and pause on hover or focus; <strong>danger always requires manual dismissal</strong>.
+          The vocabulary shares a source with Callout: one icon map and one set of subtle surfaces, never color alone.
         </p>
       </div>
     </ToastProvider>
@@ -45,10 +46,10 @@ export const 操作回饋: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const doc = within(canvasElement.ownerDocument.body);
-    await userEvent.click(canvas.getByRole("button", { name: "成功" }));
-    await expect(await doc.findByRole("status")).toHaveTextContent("已儲存");
-    await userEvent.click(canvas.getByRole("button", { name: "失敗（不自動消失）" }));
-    await expect(await doc.findByRole("alert")).toHaveTextContent("儲存失敗");
+    await userEvent.click(canvas.getByRole("button", { name: "Success" }));
+    await expect(await doc.findByRole("status")).toHaveTextContent("Saved");
+    await userEvent.click(canvas.getByRole("button", { name: "Failure (manual dismiss)" }));
+    await expect(await doc.findByRole("alert")).toHaveTextContent("Save failed");
   },
 };
 
@@ -60,10 +61,10 @@ function StressButtons() {
         size="sm"
         variant="secondary"
         onClick={() => {
-          for (let i = 1; i <= 10; i++) push({ variant: "info", title: `第 ${i} 則`, description: "連發測試——上限 3，最舊被擠出。" });
+          for (let i = 1; i <= 10; i++) push({ variant: "info", title: `Message ${i}`, description: "Burst test — maximum 3; oldest messages are removed." });
         }}
       >
-        連發 10 則
+        Send 10 messages
       </Button>
       <Button
         size="sm"
@@ -71,25 +72,26 @@ function StressButtons() {
         onClick={() =>
           push({
             variant: "warning",
-            title: "超長標題也不會把版面撐破，會自動折行而不是裁掉或推開其他訊息",
+            title: "A long title wraps instead of breaking the layout or pushing away other messages",
             description:
-              "說明文字同樣可以很長：匯入完成，共 4,820 筆；其中 96 筆因欄位格式不符已略過，明細已寫入匯入紀錄，可於清單頁以「已略過」篩選檢視。",
+              "Descriptions can be long too: import complete, 4,820 records; 96 were skipped because their field format was invalid. Details are in the import log and can be filtered on the list page.",
           })
         }
       >
-        超長文字
+        Long text
       </Button>
     </div>
   );
 }
 
 export const 回饋壓測: Story = {
+  name: "Feedback stress test",
   render: () => (
     <ToastProvider>
       <div className="max-w-xl space-y-3">
         <StressButtons />
         <p className="text-tiny text-muted-foreground">
-          連發不會疊出一面牆——上限 3 是硬的。重要到不能被擠出的訊息，該用 Dialog 不是 Toast。
+          Bursts do not build a wall—the limit of 3 is hard. A message too important to be pushed out belongs in a Dialog, not a Toast.
         </p>
       </div>
     </ToastProvider>
@@ -97,6 +99,7 @@ export const 回饋壓測: Story = {
 };
 
 export const 載入佔位: Story = {
+  name: "Loading placeholders",
   render: () => (
     <div className="grid max-w-2xl gap-4 md:grid-cols-2">
       <div aria-busy="true" className="space-y-3 rounded-lg border p-4">
@@ -111,11 +114,11 @@ export const 載入佔位: Story = {
         <Skeleton className="h-8 w-24" />
       </div>
       <div className="space-y-2 text-xs text-muted-foreground">
-        <p>骨架必須<strong>保留真實版面的高度與形狀</strong>——載入完成的瞬間版面不跳動。</p>
-        <p>只用於首次載入；重新整理既有畫面時保留舊內容，不要把看得好好的資料閃成灰塊。</p>
+        <p>Skeletons must<strong> preserve the height and shape of the real layout</strong> so the page does not jump when loading completes.</p>
+        <p>Use them only for the first load; keep existing content during a refresh instead of flashing healthy data into gray blocks.</p>
         <p>
-          骨架本身 <code>aria-hidden</code>，載入語意掛在容器的 <code>aria-busy</code> 上；
-          脈動尊重 <code>prefers-reduced-motion</code>（自動停止）。
+          The skeleton itself is <code>aria-hidden</code>; the loading meaning belongs on the container's <code>aria-busy</code>.
+          The pulse respects <code>prefers-reduced-motion</code> and stops automatically.
         </p>
       </div>
     </div>

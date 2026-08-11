@@ -31,7 +31,7 @@ export function Bullet({ label, value, target, valueFmt = defaultFmt, className 
       <div className="flex items-baseline justify-between gap-2 text-xs">
         <span className="font-medium">{label}</span>
         <span className="tabular-nums">
-          {valueFmt(value)} / 目標 {valueFmt(target)}
+          {valueFmt(value)} / Target {valueFmt(target)}
           {pct != null && <span className="ml-1 text-muted-foreground">（{pct}%）</span>}
         </span>
       </div>

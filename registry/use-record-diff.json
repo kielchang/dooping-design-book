@@ -3,8 +3,8 @@
   "name": "use-record-diff",
   "version": "0.11.1",
   "type": "registry:component",
-  "title": "useRecordDiff 變更追蹤",
-  "description": "草稿 vs 原始值的差異與還原 hook。",
+  "title": "useRecordDiff",
+  "description": "Hook for draft-versus-original differences and restore.",
   "dependencies": [
     "@dooping/tokens@^0.6.0"
   ],

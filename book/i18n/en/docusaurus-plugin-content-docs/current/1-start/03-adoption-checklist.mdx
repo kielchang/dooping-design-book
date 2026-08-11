@@ -1,0 +1,49 @@
+---
+title: Adoption checklist
+---
+
+# Adoption checklist
+
+Answer these questions before adopting the system. If you cannot answer them, pause first—a half-adopted design system is harder to clean up than no design system at all.
+
+## Fit check
+
+- [ ] My product is a **data-dense back-office interface** (tables, forms, approval flows), not a marketing or content site
+- [ ] The users are **internal people performing repeated operations**, not one-time visitors
+- [ ] I need to handle workflows such as “change data → confirm → leave an audit trail”
+- [ ] My interface needs to be **printed or exported** for signatures or archiving
+- [ ] The team can maintain component source code copied into the project (a registry is not a hosted service)
+
+If you check three or more, the full three-layer system is worth considering. If you check only one or two, start with the [Patterns](../../patterns) chapter.
+
+## Technical prerequisites
+
+- [ ] CSS variables are available (all modern browsers support them)
+- [ ] Dark mode is connected through either a `.dark` class or a `[data-theme="dark"]` attribute (both are supported out of the box)
+- [ ] If using the React components: React 18+, an `@/*` path alias, and Tailwind (or a willingness to provide equivalent utilities)
+
+## Decision prerequisites
+
+These questions matter more than the technology:
+
+- [ ] **Who decides color semantics?** Brand colors can change by editing token values, but “which color represents danger” is a product decision—not something each engineer should decide independently.
+- [ ] **Can anything else use the amber color reserved for “changed but not submitted”?** Recommended answer: no. See [ADR-0002](../../adr/amber-reserved-for-dirty-state).
+- [ ] **Can a record still be edited after confirmation?** If the team has no agreement, do not adopt the hard-lock pattern yet; settle the question first in [Hard locking and explicit unlocking](../../patterns/hard-lock).
+- [ ] **Who can reject a new component?** Without a gatekeeper, a design system will have five kinds of buttons within three months. This question is about **your project**; the upstream proposal process is documented in [Feedback and RFCs](../../governance/rfc).
+
+## The first week after adoption
+
+- [ ] Copy the [Drift protection](../../governance/drift-guards) guard tests into your CI
+- [ ] Add “Has the new component passed the rule of three?” to the code review checklist
+- [ ] Run the [Accessibility checklist](../../accessibility/checklist) over existing screens and record a baseline
+
+## What not to do
+
+<Rules>
+  <Do>
+    <p><strong>Introduce tokens first so old and new screens share the same colors.</strong> It is the highest-return first step and does not change existing behavior.</p>
+  </Do>
+  <Dont>
+    <p><strong>Do not replace every component at once.</strong> Big-bang migrations usually end halfway through, with two systems coexisting forever.</p>
+  </Dont>
+</Rules>

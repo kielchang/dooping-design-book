@@ -29,7 +29,14 @@ const config: Config = {
   trailingSlash: true,
   onBrokenLinks: "throw",
   markdown: { hooks: { onBrokenMarkdownLinks: "throw" } },
-  i18n: { defaultLocale: "zh-Hant", locales: ["zh-Hant"] },
+  i18n: {
+    defaultLocale: "zh-Hant",
+    locales: ["zh-Hant", "en"],
+    localeConfigs: {
+      "zh-Hant": { label: "繁體中文", htmlLang: "zh-Hant" },
+      en: { label: "English", htmlLang: "en-US" },
+    },
+  },
 
   customFields: { storybookUrl: STORYBOOK_URL, registryBase: REGISTRY_BASE },
 
@@ -120,6 +127,7 @@ const config: Config = {
     navbar: {
       title: "Dooping Design Book",
       items: [
+        { type: "localeDropdown", position: "right" },
         { href: STORYBOOK_URL, label: "Storybook ↗", position: "right" },
         {
           href: "https://github.com/kielchang/dooping-design-book/issues/new/choose",

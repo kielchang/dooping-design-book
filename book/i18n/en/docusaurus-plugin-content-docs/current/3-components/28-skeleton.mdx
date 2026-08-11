@@ -1,0 +1,48 @@
+---
+title: Skeleton
+---
+
+# Skeleton
+
+On first load, use gray blocks that preserve the **shape of the real layout**.
+
+<Demo title="Card loading placeholder (left: loading → right: loaded)">
+  <div className="grid gap-4 md:grid-cols-2">
+    <div aria-busy="true" className="space-y-3 rounded-lg border p-4">
+      <div className="flex items-center gap-3"><Skeleton className="size-10 rounded-full" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-2/5" /><Skeleton className="h-3 w-3/5" /></div></div>
+      <SkeletonText lines={3} /><Skeleton className="h-8 w-24" />
+    </div>
+    <div className="space-y-3 rounded-lg border p-4">
+      <div className="flex items-center gap-3"><div className="flex size-10 items-center justify-center rounded-full bg-muted text-sm font-semibold">B</div><div className="min-w-0 flex-1"><p className="text-sm font-medium">Unit B</p><p className="text-xs text-muted-foreground">Last updated: today 09:40</p></div></div>
+      <p className="text-sm leading-relaxed text-muted-foreground">128 records this period; 12 await confirmation. The total matches the previous period.</p>
+      <Button size="sm">View details</Button>
+    </div>
+  </div>
+</Demo>
+
+<StoryLink id="元件-狀態-載入與錯誤--載入的三種手段" />
+
+## Rules
+
+<Rules>
+  <Do><p>Skeletons <strong>preserve the height and shape of the real layout</strong> so the page does not jump when loading completes. That is their only reason to exist.</p></Do>
+  <Dont><p>Do not throw in three equal gray bars. A skeleton that does not match the real content makes the whole page jump, worse than “Loading…” text.</p></Dont>
+</Rules>
+
+<Rules>
+  <Do><p>Use it only for<strong> first load</strong>.</p></Do>
+  <Dont><p>Do not replace existing content with skeletons during refresh. Keep the readable old content and swap in new data when it arrives.</p></Dont>
+</Rules>
+
+## Accessibility and motion
+
+- Skeletons are `aria-hidden`; put `aria-busy="true"` on the **container** and remove it when complete. Screen readers do not need to read gray bars.
+- Pulse respects `prefers-reduced-motion` (`motion-reduce:animate-none`); a still gray block communicates “not ready.”
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/skeleton.json
+```
+
+`Skeleton` is one shape-customizable block; dimensions come from classes. `SkeletonText` renders n lines, with a 60% last line so the paragraph looks real.

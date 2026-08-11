@@ -40,6 +40,10 @@ const translatedDocs = [
   "3-components/19-change-summary.mdx",
   "3-components/20-coachmark.mdx",
   "3-components/21-mockup.mdx",
+  "3-components/24-gantt.mdx",
+  "3-components/27-toast.mdx",
+  "3-components/28-skeleton.mdx",
+  "3-components/29-date-range.mdx",
 ];
 
 describe("English translation coverage", () => {
@@ -63,7 +67,9 @@ describe("English translation coverage", () => {
       join(EN_I18N, "docusaurus-plugin-content-docs/current.json"),
     ].flatMap((file) => Object.values(JSON.parse(readFileSync(file, "utf8")) as Record<string, { message: string }>).map((entry) => entry.message));
 
-    const visibleDocs = docs.map((content) => content.replace(/<StoryLink\s+id="[^"]*"\s*\/?>(?:<\/StoryLink>)?/gu, ""));
+    const visibleDocs = docs.map((content) => content
+      .replace(/<StoryLink\s+id="[^"]*"[^>]*>(?:[\s\S]*?<\/StoryLink>)?/gu, "")
+      .replace(/<StoryFrame\s+id="[^"]*"[^>]*\/?>/gu, ""));
     for (const content of [...visibleDocs, ...translations]) {
       expect(content).not.toMatch(cjk);
     }

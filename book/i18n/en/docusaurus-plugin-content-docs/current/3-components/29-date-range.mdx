@@ -1,0 +1,48 @@
+---
+title: DateRange
+---
+
+import { useState } from "react";
+import { dateRangeFromPreset } from "@dooping/react";
+
+export function RangeDemo() {
+  const [v, setV] = useState(() => dateRangeFromPreset("30d"));
+  return (<div className="space-y-3"><DateRange value={v} initialPreset="30d" onChange={setV} /><p className="text-xs tabular-nums text-muted-foreground">Current value: {v.from} – {v.to}</p></div>);
+}
+
+# DateRange
+
+Time range for dashboard and list filters. **Presets are first-class:** today, last 7 days, last 30 days, and this month switch in one click; only “Custom” expands start/end inputs.
+
+<Demo title="Date range (try reversing the custom start and end)"><RangeDemo /></Demo>
+
+<StoryLink id="元件-表單-期間選擇--檔位與自訂" />
+
+## Behavior rules
+
+| Rule | Description |
+| --- | --- |
+| Presets include today | “Last 7 days” means seven days back including today; “This month” means the first through today |
+| Reverse endpoints auto-correct | If start is picked after end, clamp the other end to the same day; reversed selection usually means a single-day query, not an error |
+| Value format | `yyyy-mm-dd` local date without timezone; the host decides cross-time-zone interpretation |
+| Initialization | The host uses `dateRangeFromPreset("30d")`, the same algorithm as the component, so it cannot be off by one day |
+
+```tsx
+const [range, setRange] = useState(() => dateRangeFromPreset("30d"));
+<DateRange value={range} initialPreset="30d" onChange={setRange} />
+```
+
+## Deliberately not included: calendar grid
+
+Keyboard navigation, screen-reader semantics, and localization for a visual calendar are a mountain. Presets plus native `date` inputs cover the primary scenarios and provide free date validation, native mobile pickers, and screen-reader support. If a visual calendar is needed, collect three real use cases before building a second date interaction for the site.
+
+<Rules>
+  <Do><p>Use presets for dashboard and list ranges; use Custom for a specific date interval.</p></Do>
+  <Dont><p>Do not hand-build a calendar for one screen. It becomes a second date interaction across the site and will be incomplete for keyboard and screen-reader users.</p></Dont>
+</Rules>
+
+## Install
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/date-range.json
+```

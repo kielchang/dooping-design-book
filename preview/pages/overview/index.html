@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">頁面總覽 | Dooping Design Book</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://kielchang.github.io/dooping-design-book/preview/pages/overview/"><meta data-rh="true" property="og:locale" content="zh_Hant"><meta data-rh="true" name="docusaurus_locale" content="zh-Hant"><meta data-rh="true" name="docsearch:language" content="zh-Hant"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="頁面總覽 | Dooping Design Book"><meta data-rh="true" name="description" content="一種頁型，學一次。 元件章回答「這顆控制項怎麼用」，模式章回答「這類操作怎麼運作」，"><meta data-rh="true" property="og:description" content="一種頁型，學一次。 元件章回答「這顆控制項怎麼用」，模式章回答「這類操作怎麼運作」，"><link data-rh="true" rel="icon" href="/dooping-design-book/preview/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://kielchang.github.io/dooping-design-book/preview/pages/overview/"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/preview/pages/overview/" hreflang="zh-Hant"><link data-rh="true" rel="alternate" href="https://kielchang.github.io/dooping-design-book/preview/pages/overview/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"頁面 Pages","item":"https://kielchang.github.io/dooping-design-book/preview/pages"},{"@type":"ListItem","position":2,"name":"頁面總覽","item":"https://kielchang.github.io/dooping-design-book/preview/pages/overview"}]}</script><link rel="stylesheet" href="/dooping-design-book/preview/assets/css/styles.87fb2520.css">
-<script src="/dooping-design-book/preview/assets/js/runtime~main.2c58e5e8.js" defer="defer"></script>
-<script src="/dooping-design-book/preview/assets/js/main.d72e36f6.js" defer="defer"></script>
+<script src="/dooping-design-book/preview/assets/js/runtime~main.a551118a.js" defer="defer"></script>
+<script src="/dooping-design-book/preview/assets/js/main.0de94b3a.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -61,7 +61,7 @@
 需要正式元件時走 <a class="" href="/dooping-design-book/preview/governance/rfc/">RFC 流程</a>，過三次法則才收。
 「認領」欄直達<a href="https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml" target="_blank" rel="noopener noreferrer" class="">缺件認領表單</a>：
 回報一個使用場景＝三次法則的一次證據，三個場景湊齊就會動工。</p>
-<table><thead><tr><th>缺件</th><th>目前替代</th><th>用在</th><th>認領</th></tr></thead><tbody><tr><td>PageHeader／Breadcrumb</td><td>頁首區照解剖規範手排</td><td>明細頁</td><td><a href="https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml&amp;piece=PageHeader%EF%BC%8FBreadcrumb" target="_blank" rel="noopener noreferrer" class="">提出</a></td></tr><tr><td>Drawer</td><td><code>Dialog</code>（行動版側欄抽屜已由 Sidebar 內建）</td><td>各頁</td><td><a href="https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml&amp;piece=Drawer" target="_blank" rel="noopener noreferrer" class="">提出</a></td></tr></tbody></table>
+<table><thead><tr><th>缺件</th><th>目前替代</th><th>用在</th><th>認領</th></tr></thead><tbody><tr><td>Drawer</td><td><code>Dialog</code>（行動版側欄抽屜已由 Sidebar 內建）</td><td>各頁</td><td><a href="https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml&amp;piece=Drawer" target="_blank" rel="noopener noreferrer" class="">提出</a></td></tr><tr><td>DefinitionList</td><td>兩欄 grid 手排鍵值對</td><td>明細頁</td><td><a href="https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml&amp;piece=DefinitionList" target="_blank" rel="noopener noreferrer" class="">提出</a></td></tr></tbody></table>
 <p>（表單的下拉選項與這張表<strong>逐字一致</strong>——改表要同步改 <code>.github/ISSUE_TEMPLATE/missing-piece.yml</code>。）</p>
 <p>v0.11.0 已收錄七件，替代方案功成身退：
 <a class="" href="/dooping-design-book/preview/components/toast/">Toast</a>、<a class="" href="/dooping-design-book/preview/components/form-controls/">Switch／Textarea／RadioGroup</a>、
@@ -71,6 +71,10 @@ Form 包裝 → <code>FormField</code>／<code>FieldError</code>（見 <a class=
 <p>v0.12.0（<a class="" href="/dooping-design-book/preview/adr/">ADR-0011</a>，preview 評估中）再畢業兩件：
 <a class="" href="/dooping-design-book/preview/components/popover-dropdown/">Popover／DropdownMenu</a>——並同批收錄
 Collapsible、Separator、<a class="" href="/dooping-design-book/preview/components/confirm-dialog/">ConfirmDialog</a>。</p>
+<p>v0.13.0 畢業第一列：<a class="" href="/dooping-design-book/preview/components/page-header/">PageHeader／Breadcrumb</a>（含 <code>BackLink</code>）。
+走的是 <a class="" href="/dooping-design-book/preview/adr/">ADR-0008</a> 自己寫下的解鎖條件——這五種頁型的組合 story 曾在<strong>八處</strong>
+手排頁首並且已經漂移，證據滿了就收。同批把文件裡提過、但缺件表漏登記的
+<strong>DefinitionList</strong> 補進上表（只登記，尚未實作）。</p>
 <p>AppShell 與 Sidebar 原本刻意不收（ADR-0008），v0.12.0 起由
 <a class="" href="/dooping-design-book/preview/adr/">ADR-0011</a> 修訂、以<strong>純呈現元件</strong>收進<a class="" href="/dooping-design-book/preview/components/app-shell-sidebar/">元件章</a>
 （preview 評估中）；站台層的規範正本不變，仍在

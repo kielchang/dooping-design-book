@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "nav",
-  "version": "0.12.1",
+  "version": "0.13.0",
   "type": "registry:lib",
   "title": "nav 導覽契約",
   "description": "NavGroup 型別與 isNavActive()：側邊欄與指令面板共用的導覽資料形狀。",

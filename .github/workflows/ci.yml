@@ -186,14 +186,17 @@ jobs:
       # 渲染守衛：對剛建好的 book/build 逐頁驗 computed style——
       # 表格只有列底線、按鈕沒有 UA 外框、portal 面板有基座。這是整條流水線裡
       # 唯一「看得見畫出來的結果」的檢查，其餘守衛都是靜態的（ADR-0010）。
-      # Chromium 下載實測 622 秒、守衛本身 15 秒——瀏覽器必須快取。
-      #
       # 快取鍵只綁 playwright 自己的版本，不要綁整包 lockfile：這個 repo 每次進版都會
       # bump 三處版號並重跑 npm install --package-lock-only，lockfile 一定變，於是
-      # hashFiles('package-lock.json') 一定失效、Chromium 一定重抓。實測 2026-08-19
-      # 那輪（run 32235811827）光這一步就超過 30 分鐘，整條 CI 從平常的 4m45s 拖到
-      # 47 分鐘以上。改綁版本後，只有 playwright 真的升版才重抓。
-      # 命中時只補系統相依（apt 套件不在快取路徑裡，每次都要裝，約半分鐘）。
+      # hashFiles('package-lock.json') 一定失效、Chromium 一定重抓。改綁版本後，
+      # 只有 playwright 真的升版才重抓；命中時只補系統相依
+      # （apt 套件不在快取路徑裡，每次都要裝）。
+      #
+      # ★ 重抓的實際代價很飄，別拿單一數字當依據。同一天（2026-08-19）量到兩種極端：
+      # run 32235811827 卡在這一步 30 分鐘以上（最後被手動取消），
+      # 而 run 32241722279 同樣是 cache miss、從零下載，整個安裝步驟 **19 秒**。
+      # 差別不在快取鍵而在 CDN 當下的狀況——所以這個快取是为了「不要白白重抓」，
+      # 不是为了修某一次停滞。CI 突然變慢時先看這一步的 log，不要先改快取鍵。
       - name: 取出 Playwright 版本（快取鍵用）
         id: pw-version
         run: |

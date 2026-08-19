@@ -55,12 +55,10 @@ jobs:
 
       # 渲染守衛：正式站的建置產物也要過同一道驗收（ADR-0010）
       #
-      # Chromium 下載實測 622 秒、守衛本身 15 秒——瀏覽器必須快取。
-      #
       # 快取鍵只綁 playwright 自己的版本，不要綁整包 lockfile：進版一定 bump 版號、
-      # lockfile 一定變，綁 hashFiles('package-lock.json') 等於每次進版都重抓
-      # Chromium（ci.yml 那邊實測多花 30 分鐘以上）。命中時只補系統相依
-      # （apt 套件不在快取路徑裡，每次都要裝，約半分鐘）。
+      # lockfile 一定變，綁 hashFiles('package-lock.json') 等於每次進版都白白重抓
+      # Chromium。命中時只補系統相依（apt 套件不在快取路徑裡，每次都要裝）。
+      # 重抓的實際秒數波動極大（同一天量到 19 秒與 30 分鐘兩種），理由與量測見 ci.yml。
       - name: 取出 Playwright 版本（快取鍵用）
         id: pw-version
         run: |

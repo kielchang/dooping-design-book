@@ -1,0 +1,122 @@
+---
+title: PageHeader 頁首
+---
+
+# PageHeader 頁首
+
+**[頁面解剖](/pages/page-anatomy)第①區的元件化。** 那一頁定義了頁首區放什麼、
+[頁面總覽](/pages/overview)的跨頁守則定義了「一頁一個 h1」「至多一顆主要動作」——
+這個元件把那些規則從紀律變成預設值。
+
+<StoryLink id="元件-外殼-頁首-pageheader--典型組成" />
+
+## 為什麼收錄
+
+這一件是[缺件表](/pages/overview)的第一列，走的是
+[ADR-0008](/adr) 自己寫下的解鎖條件（「PageHeader 被重複手排就走 RFC 進元件章」）。
+
+證據不是推測：收錄前五支頁面組合 story 共**八處**手排頁首，
+而且已經漂移——四處用 `items-end`、一處用 `items-center`，兩處漏了 `flex-wrap`；
+明細頁的「返回清單」甚至是一顆 `<button>`，違反[明細頁](/pages/detail-page)自己那頁
+寫的「返回入口是真連結不是 JS 後退」。八處收斂成一個元件之後，這些差異沒有地方藏。
+
+## 三個 export，對應資訊架構的三層
+
+| export | 用在 | 規則 |
+| --- | --- | --- |
+| `PageHeader` | 每一頁 | 頁首骨架。渲染整頁唯一的 h1 |
+| `BackLink` | 兩層（清單 → 明細） | 真 `<a>` 的「返回清單」 |
+| `Breadcrumb` | 三層以上 | 末項＝目前頁，不可點 |
+
+`BackLink` 與 `Breadcrumb` 都放進 `PageHeader` 的 `nav` slot。
+**兩層用返回、三層以上用麵包屑，不要同時放**——兩個返回入口會讓使用者
+先花一秒判斷該點哪一個。層級再深下去該修的是站台層的分區
+（見[後台系統的資訊架構](/patterns/back-office-ia)），不是把麵包屑加長。
+
+## 五個 slot
+
+```tsx
+<PageHeader
+  nav={<BackLink href="/records" />}   // 上層路徑（BackLink 或 Breadcrumb）
+  title="項目清單"                       // h1，一頁一個
+  badges={<Badge variant="success">啟用中</Badge>}  // 與標題同列
+  meta="共 18 筆・最後更新 2024-02-07"   // 副標一行
+  actions={<Button>新增項目</Button>}    // 右側；至多一顆主要動作
+/>
+```
+
+版型不是呼叫端的選擇題：外層 `space-y-2`，標題列固定
+`flex flex-wrap items-center justify-between gap-3`。`meta` 是**一行**——
+長說明放內容區，塞進頁首只會把主要動作擠掉。
+
+<StoryFrame id="元件-外殼-頁首-pageheader--典型組成" title="清單頁頁首：標題＋筆數＋唯一的主要動作" height={200} />
+
+<Rules>
+  <Do><p><code>actions</code> 裡至多一顆主要按鈕，其餘用 <code>outline</code>／<code>ghost</code>，
+  破壞性動作排最後。</p></Do>
+  <Dont><p>不要在內容區再開一個 h1。<code>PageHeader</code> 已經渲染了那一個——
+  第二個會讓螢幕閱讀器的標題大綱長出兩個頂層。</p></Dont>
+</Rules>
+
+## 返回入口：為什麼一定是真連結
+
+<StoryFrame id="元件-外殼-頁首-pageheader--明細頁的返回入口" title="明細頁頁首：返回＋識別＋狀態＋動作" height={220} />
+
+`BackLink` 渲染 `<a href>`，不是 `<button onClick={history.back}>`。
+從搜尋結果、從同事貼來的網址直接進到明細頁的人**沒有「上一頁」可回**——
+JS 後退會把他們送出這個系統。真連結同時讓中鍵開新分頁、右鍵複製網址
+這些瀏覽器慣例照常運作。
+
+元件庫不綁路由，`href` 由宿主給；抄走之後把 `<a>` 換成自家的 Link 是預期中的改法：
+
+```tsx
+<BackLink href="/records" />
+// SPA：<PageHeader nav={<Link to="/records">…</Link>} title={…} />
+```
+
+## 麵包屑
+
+<StoryFrame id="元件-外殼-頁首-pageheader--三層以上用麵包屑" title="三層以上：末項是目前頁，不可點" height={200} />
+
+```tsx
+<Breadcrumb
+  items={[
+    { label: "基本資料", href: "/master" },
+    { label: "單位", href: "/master/units" },
+    { label: "甲單位" },      // 沒有 href＝目前頁
+  ]}
+/>
+```
+
+末項不給 `href`：它帶 `aria-current="page"` 且**不渲染成連結**。
+目前頁做成連結，使用者點下去什麼都沒發生，會以為畫面壞了。
+中間層不折疊（`…`）——真出現需要折疊的深度，該修的是分區。
+
+## 無障礙
+
+- h1 由元件渲染，**一頁一個**——三支 story 的 play function 直接斷言這件事。
+- `Breadcrumb` 是 `nav` 地標，可及名稱預設「所在位置」（`label` 可覆寫）。
+- 分隔符 `ChevronRight` 帶 `aria-hidden`，不會被唸成「大於」。
+- 根元素刻意是 `<div>` 不是 `<header>`：`<header>` 在 `main` 之外就是 `banner` 地標，
+  而一頁只能有一個。文件與 story 常常並排展示兩三個頁首（空狀態 vs 載入中），
+  用 `<header>` 會直接製造重複地標。頁首的語意由 h1 承擔。
+
+## 組進外殼
+
+站台外殼（[AppShell／Sidebar](/components/app-shell-sidebar)）管側欄與頂列，
+`PageHeader` 管單頁的第①區——**頂列不重複頁面標題**，否則螢幕閱讀器會唸兩次。
+
+<StoryFrame id="頁面-五種頁型組進外殼--切換分區" title="五種頁型在同一副外殼下切換" height={560} />
+
+## Token
+
+零新 token。字級走[標題階層](/pages/page-anatomy)的 `text-2xl font-semibold`，
+副標走 `--muted-foreground`。
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/page-header.json
+```
+
+一個 item 帶三個 export，會自動帶入 `button` 與 `utils`。

@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "command",
-  "version": "0.12.1",
+  "version": "0.13.0",
   "type": "registry:ui",
   "title": "Command 指令清單",
   "description": "可過濾的指令清單與對話框殼（cmdk 薄封裝，隔離相依）。",

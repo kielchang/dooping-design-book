@@ -7,6 +7,7 @@ import { NumberInput } from "../ui/number-input";
 import { SegGroup } from "../ui/seg-group";
 import { Chips } from "../ui/chips";
 import { Stepper } from "../ui/stepper";
+import { PageHeader } from "../ui/page-header";
 import { Callout } from "../ui/callout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import {
@@ -35,10 +36,7 @@ export const 典型組成: Story = {
     return (
       <div className="mx-auto max-w-2xl space-y-4">
         {/* 頁首區：這一頁只做一件事，標題直接說出那件事 */}
-        <div>
-          <h1 className="text-2xl font-semibold">建立項目</h1>
-          <p className="text-sm text-muted-foreground">填完基本資訊即可送出，其餘設定之後隨時可補。</p>
-        </div>
+        <PageHeader title="建立項目" meta="填完基本資訊即可送出，其餘設定之後隨時可補。" />
 
         {/* 頂部彙總：只列「有幾個欄位要補」，錯誤細節在欄位旁邊 */}
         {nameMissing && (
@@ -136,10 +134,7 @@ export const 多步驟: Story = {
     const cur = steps[idx].key;
     return (
       <div className="mx-auto max-w-2xl space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold">建立批次</h1>
-          <p className="text-sm text-muted-foreground">三步完成；可以隨時回上一步，已填的內容不會不見。</p>
-        </div>
+        <PageHeader title="建立批次" meta="三步完成；可以隨時回上一步，已填的內容不會不見。" />
 
         <Stepper
           current={cur}

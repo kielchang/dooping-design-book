@@ -130,6 +130,7 @@ const TITLES = {
   sidebar: ["Sidebar 側邊欄", "外殼側欄家族：Provider、收合圖示欄、行動版左滑抽屜（純呈現，不綁路由）。"],
   "sidebar-nav": ["SidebarNav 導覽渲染", "NavGroup[] 的三態渲染：連結／展開群組／收合態右彈選單，含例行・試算標籤。"],
   "app-shell": ["AppShell 外殼容器", "側欄＋頂列＋主內容的佈局容器，刻意小到宿主可自行重寫。"],
+  "page-header": ["PageHeader 頁首", "頁首骨架三件：PageHeader（一頁一個 h1）、BackLink（真連結返回）、Breadcrumb（三層以上）。"],
   csv: ["csv 序列化", "含 UTF-8 BOM 的 CSV 產出與解析。"],
   download: ["download 下載工具", "觸發瀏覽器下載 Blob。"],
   "forms-diff": ["forms/diff 欄位比對", "FieldSpec 驅動的變更偵測與顯示格式化。"],

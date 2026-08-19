@@ -17,8 +17,8 @@ body:
     attributes:
       label: 哪一件
       options:
-        - PageHeader／Breadcrumb
         - Drawer
+        - DefinitionList
         - 其他（下方說明）
     validations:
       required: true

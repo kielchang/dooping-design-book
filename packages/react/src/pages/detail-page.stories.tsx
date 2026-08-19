@@ -1,9 +1,9 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { ArrowLeft } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { TabPills } from "../ui/tab-pills";
+import { PageHeader, BackLink } from "../ui/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { DataTable, type Column } from "../ui/data-table";
 import {
@@ -38,20 +38,21 @@ const relatedColumns: Column<DemoRecord>[] = [
   { key: "status", header: "狀態", cell: (r) => STATUS_LABEL[r.status], sortValue: (r) => STATUS_LABEL[r.status] },
 ];
 
-function PageHeader() {
+// 頁首＝識別（名稱＋代號）＋狀態＋這個狀態允許的動作。
+// 版型與「返回是真連結」都由 PageHeader／BackLink 定型，這裡只填 slot。
+function ProfileHeader() {
   return (
-    <div className="space-y-2">
-      <Button variant="ghost" size="sm" className="-ml-2 text-muted-foreground">
-        <ArrowLeft /> 返回清單
-      </Button>
-      {/* 頁首＝識別（名稱＋代號）＋狀態＋這個狀態允許的動作 */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-semibold">{demoProfile.name}</h1>
+    <PageHeader
+      nav={<BackLink href="#/records" />}
+      title={demoProfile.name}
+      badges={
+        <>
           <Badge variant="outline">{demoProfile.code}</Badge>
           <Badge variant="success">啟用中</Badge>
-        </div>
-        <div className="flex gap-2">
+        </>
+      }
+      actions={
+        <>
           <Button variant="outline" size="sm">匯出</Button>
           <Dialog>
             <DialogTrigger asChild><Button variant="destructive" size="sm">停用</Button></DialogTrigger>
@@ -68,9 +69,9 @@ function PageHeader() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-        </div>
-      </div>
-    </div>
+        </>
+      }
+    />
   );
 }
 
@@ -80,7 +81,7 @@ export const 典型組成: Story = {
     const related = demoRecords.filter((r) => r.unit === "甲單位");
     return (
       <div className="mx-auto max-w-5xl space-y-4">
-        <PageHeader />
+        <ProfileHeader />
 
         {/* 分頁籤切區：實務上目前分頁要寫進網址，分享連結才落在同一個分頁 */}
         <TabPills
@@ -132,7 +133,7 @@ export const 編輯與變更摘要: Story = {
     const set = (k: keyof DemoProfile) => (v: unknown) => setDraft((d) => ({ ...d, [k]: v }));
     return (
       <div className="mx-auto max-w-5xl space-y-4">
-        <PageHeader />
+        <ProfileHeader />
         <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
           <Card>
             <CardHeader><CardTitle className="text-base">基本資料</CardTitle></CardHeader>

@@ -115,6 +115,13 @@ const FORBIDDEN = [
   "payroll", "salary", "wage", "labor insurance", "health insurance",
 ];
 
+// 詞表先小寫一次。原本每一行都對 176 個詞各呼叫一次 term.toLowerCase()，
+// 同一批常數字串被重算了「行數 × 176」遍。掃描量長到 v0.13.0 時，
+// 這支守衛跑到 4.9 秒、貼著 5 秒的預設 timeout，變成會隨機紅的守衛。
+// 會隨機紅比慢更糟：沒人相信的紅燈最後會被加 timeout 蓋掉，守衛就此空轉。
+// 所以改的是重算（行為逐字相同），不是把 timeout 調大。
+const FORBIDDEN_LOWER = FORBIDDEN.map((t) => t.toLowerCase());
+
 export interface Hit {
   line: number;
   term: string;
@@ -130,9 +137,10 @@ export interface Hit {
 export function scanLines(text: string): Hit[] {
   const hits: Hit[] = [];
   text.split("\n").forEach((line, i) => {
-    for (const term of FORBIDDEN) {
-      if (line.toLowerCase().includes(term.toLowerCase())) {
-        hits.push({ line: i + 1, term, text: line.trim().slice(0, 80) });
+    const lower = line.toLowerCase();
+    for (let t = 0; t < FORBIDDEN.length; t++) {
+      if (lower.includes(FORBIDDEN_LOWER[t])) {
+        hits.push({ line: i + 1, term: FORBIDDEN[t], text: line.trim().slice(0, 80) });
       }
     }
   });

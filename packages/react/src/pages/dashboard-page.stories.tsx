@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { Card, CardContent, CardDescription, CardHeader } from "../ui/card";
 import { Delta } from "../ui/delta";
 import { SegGroup } from "../ui/seg-group";
+import { PageHeader } from "../ui/page-header";
 import { TrendChart } from "../charts/trend-chart";
 import { StackedBar, type StackedBarRow } from "../charts/stacked-bar";
 import { STATUS_SERIES } from "../charts/base";
@@ -87,13 +88,11 @@ export const 典型組成: Story = {
     return (
       <div className="mx-auto max-w-5xl space-y-4">
         {/* 頁首區：標題＋期間切換。期間只在這裡出現一次，控整頁 */}
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-semibold">成效總覽</h1>
-            <p className="text-sm text-muted-foreground">資料期間：{periodLabel}・更新於 2024-02-07</p>
-          </div>
-          <SegGroup label="期間" options={PERIODS} value={period} onPick={setPeriod} />
-        </div>
+        <PageHeader
+          title="成效總覽"
+          meta={`資料期間：${periodLabel}・更新於 2024-02-07`}
+          actions={<SegGroup label="期間" options={PERIODS} value={period} onPick={setPeriod} />}
+        />
 
         {/* KPI 磚列：數字＋期間標籤＋與上期的變異（三重編碼），一排 3–5 磚 */}
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

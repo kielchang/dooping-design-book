@@ -1,6 +1,6 @@
 # ADR-0008：頁面章收組成規範與組合 story，不收外殼元件
 
-- **狀態**：已採用（外殼排除部分由 [ADR-0011](0011-adopt-app-shell.md) 修訂中——「Sidebar 永遠不收」不再成立；頁面章其餘邊界仍有效）
+- **狀態**：已採用（外殼排除部分由 [ADR-0011](0011-adopt-app-shell.md) 修訂中——「Sidebar 永遠不收」不再成立；頁面章其餘邊界仍有效。PageHeader 的解鎖條件已成立，見文末後記）
 - **日期**：2026-08
 
 ## 背景
@@ -69,3 +69,39 @@
   頁面章永遠不是元件的發佈通道。
 - `pages/` 目錄的「只准 stories」是規約而非守衛；若發現被誤用
   （有人放了非 stories 檔），優先補一條 boundary 測試把規約變成守衛。
+
+---
+
+## 後記：PageHeader 的解鎖條件成立（2026-08-19）
+
+本則「影響」段最後留了一個解鎖出口：
+
+> 未來若某個頁面骨架元件真的過了三次法則（例如 PageHeader 被三個宿主
+> 重複手排），它走 RFC 進**元件章**，頁面章只更新組成對照表。
+
+條件成立了，證據不是推測而是這個 repo 自己的程式碼——
+五支頁面組合 story 共**八處**手排頁首：
+
+| 檔案 | 處數 |
+| --- | --- |
+| `packages/react/src/pages/list-page.stories.tsx` | 3 |
+| `packages/react/src/pages/form-page.stories.tsx` | 2 |
+| `packages/react/src/pages/dashboard-page.stories.tsx` | 1 |
+| `packages/react/src/pages/detail-page.stories.tsx` | 1（該檔甚至已有一個自家函式就叫 `PageHeader`） |
+| `packages/react/src/pages/settings-page.stories.tsx` | 1 |
+
+而且八處已經漂移：四處 `items-end`、一處 `items-center`，兩處漏了 `flex-wrap`；
+明細頁的「返回清單」是一顆 `<button>`，違反該頁自己寫的
+「返回入口是真連結不是 JS 後退」——**規範沒有載體時，漂移就長這樣**。
+
+**這一版與原文設想的差異，誠實記錄**：原文寫的是「被三個**宿主**重複手排」，
+實際證據是**一個 repo 內的八處**。判斷仍然收錄，理由是漂移已經發生且可量測
+（不是「以後可能會用到」的投機性抽象，那正是本則要防的東西），
+而八處的形狀已經看得很完整——三次法則要的是「已經知道它的三種形狀」，
+八處給的形狀比三個宿主更多。若要等三個宿主，代價是這八處繼續各自漂移。
+
+**解鎖範圍僅限頁首。** 本則其餘邊界原封不動：`pages/` 只准 `.stories.tsx`、
+頁面章不發任何 registry item、其他頁面骨架（PageSection、DefinitionList…）
+仍走 RFC＋三次法則。ADR 是歷史紀錄，正文不改。
+
+落點：元件章「頁首 PageHeader」（正本 `book/docs/3-components/34-page-header.mdx`），規範 0.12.1 → 0.13.0。

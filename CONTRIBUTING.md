@@ -13,6 +13,8 @@
 
 另有一個低門檻入口：[**缺件認領**](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml)——頁面章缺件表的項目，回報一個使用場景就是三次法則的一次證據，證據齊了就會動工。
 
+缺件表的 **Drawer** 已經有一份實作草稿躺在遠端分支 `claude/overlays-page-header`（`packages/react/src/ui/drawer.tsx`，Radix Dialog 組成、右側滑出，檔頭有與 Dialog 的分工說明）。它基於 v0.11.0 舊底、**尚未收錄**，三次法則證據齊了再拿來重新底化；這支分支就是為此刻意保留的，清理分支時不要順手刪掉。
+
 **下游唯讀鐵律**：取用端專案對這個 repo 只有「讀」與「提案」兩種關係，
 沒有 submodule、沒有自動同步；**未合併的提案不得在下游先行實作**
 （理由見[符合性台帳](https://kielchang.github.io/dooping-design-book/governance/conformance-ledger/)）。

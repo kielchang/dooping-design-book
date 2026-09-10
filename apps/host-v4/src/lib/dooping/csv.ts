@@ -1,14 +1,14 @@
-// CSV 序列化／解析。
-//
-// 為什麼自己寫而不是拉套件：需求只有「跳脫 + BOM」兩件事，但 BOM 那件事沒有它中文在 Excel
-// 開起來就是亂碼——這是每個交付到台灣／日本辦公室的系統都會踩的坑，所以它必須是預設行為。
-
 export function csvEscape(v: string | number): string {
   const s = String(v ?? "");
   return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
-/** 表頭＋資料列 → CSV 文字。預設加 UTF-8 BOM（Excel 才會用 UTF-8 解讀）。 */
+/**
+ * 表頭＋資料列 → CSV 文字。預設加 UTF-8 BOM（Excel 才會用 UTF-8 解讀）。
+ *
+ * CSV 序列化／解析為什麼自己寫而不是拉套件：需求只有「跳脫 + BOM」兩件事，但 BOM 那件事沒有它中文在 Excel
+ * 開起來就是亂碼——這是每個交付到台灣／日本辦公室的系統都會踩的坑，所以它必須是預設行為。
+ */
 export function csvSerialize(headers: string[], rows: (string | number)[][], bom = true): string {
   const body = [headers, ...rows].map((r) => r.map(csvEscape).join(",")).join("\r\n");
   return (bom ? "﻿" : "") + body;

@@ -1,3 +1,11 @@
+import * as React from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { Slot } from "@radix-ui/react-slot";
+import { PanelLeft } from "lucide-react";
+import { cn } from "../lib/utils";
+import { Button, type ButtonProps } from "./button";
+import { Tooltip } from "./tooltip";
+
 // 應用外殼的側邊欄家族（ADR-0011，蒸餾自 shadcn sidebar，刻意精簡）。
 //
 // 與 shadcn 上游的差異都是刻意決定：
@@ -8,13 +16,6 @@
 //   focus trap／Esc／焦點歸還免費取得，且「分區與順序完全不變」自動成立
 //   （同一份 children，模式章〈後台系統的資訊架構〉的行動版規範）。
 // - 子元件與 --sidebar-* token 沿用 shadcn 命名，讓上游生態的 class 逐字對得上。
-import * as React from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { Slot } from "@radix-ui/react-slot";
-import { PanelLeft } from "lucide-react";
-import { cn } from "../lib/utils";
-import { Button, type ButtonProps } from "./button";
-import { Tooltip } from "./tooltip";
 
 // ── 狀態 ──────────────────────────────────────────────────────
 

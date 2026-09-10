@@ -1,13 +1,14 @@
-// 表單欄位比對：一份宣告同時餵給「變更偵測 → 送出前摘要 → 稽核 before/after」三個地方。
-//
-// 這是「稽核與回復」模式的資料骨架：只要每個表單都用 FieldSpec 描述欄位，
-// 稽核記錄就能自動帶結構化的 before/after，回復功能不必為每張表單各寫一次。
-
 export type FieldKind =
   | "text" | "number" | "money" | "rate" | "date"
   | "select" | "checkbox" | "radio" | "multiselect";
 
-/** 一個欄位的中繼資料（各表單宣告，驅動比對與顯示）。 */
+/**
+ * 一個欄位的中繼資料（各表單宣告，驅動比對與顯示）。
+ *
+ * 表單欄位比對：一份宣告同時餵給「變更偵測 → 送出前摘要 → 稽核 before/after」三個地方。
+ * 這是「稽核與回復」模式的資料骨架：只要每個表單都用 FieldSpec 描述欄位，
+ * 稽核記錄就能自動帶結構化的 before/after，回復功能不必為每張表單各寫一次。
+ */
 export interface FieldSpec {
   key: string;
   label: string;

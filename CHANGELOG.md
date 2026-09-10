@@ -259,6 +259,26 @@ Tailwind v4 為主、v3 相容的取用路徑（token 入口，本書自己的 S
 2. **我需要做什麼**：不需要。純守衛內部修正，不影響任何取用端。
 3. **為什麼改**：本批新增的檔把這支守衛推到 4.9 秒，貼著 vitest 預設的 5 秒 timeout——**會隨機紅的守衛比慢的守衛更糟**，最後一定會被加 timeout 蓋掉而空轉。改完 4.9 秒 → 2.6 秒。修的是重算，不是門檻。
 
+### registry 檔頭註解搬到 import 之後：shadcn CLI 會刪掉檔案開頭的註解
+
+1. **改了什麼**：`command`／`sidebar`／`sidebar-nav`／`mockup` 的檔頭設計說明移到最後一個 import 之後；
+   沒有 import 的 `csv`／`forms-diff` 併進後面 export 的 JSDoc，`download` 寫進函式內。說明文字一字未刪，
+   程式碼零變更。新守衛 `tests/registry-content.test.ts`：registry 裡任何檔案內容以 `//` 或 `/*` 開頭就紅
+   （先寫守衛、確認七個檔都紅，再搬註解轉綠）。
+2. **我需要做什麼**：不需要。這七個 item 的行為不變；想把說明補進自己的副本就重抄。
+3. **為什麼改**：內部試裝宿主實跑 `npx shadcn@4.21.0 add`、與 registry 逐位元組比對，發現 CLI 會刪掉
+   第一個程式 token 之前的全部註解——連掛在第一個 export 上的 JSDoc 也一起消失。走 CLI 的取用端因此拿不到
+   「為什麼這樣設計」，而 host-sync 那條路照樣保留，兩條安裝路徑悄悄分岔。修完重跑 CLI，56 個檔逐位元組相同。
+
+### 守衛：CHANGELOG 分節對得上 Release notes 的抽取規則
+
+1. **改了什麼**：新增 `tests/changelog.test.ts`——逐行移植 deploy.yml 抽 Release notes 的 awk，
+   斷言目前版號的 notes 不含其他節的標題、每一節前面都是「空行、`---`、空行」。
+   補回兩處缺的節尾分隔線（本節與 2026-07-29 那一節）。
+2. **我需要做什麼**：不需要。守衛與 CHANGELOG 格式修正，不影響任何取用端。
+3. **為什麼改**：deploy.yml 遇到第一條 `---` 才停。本節節尾原本少了分隔線，合併後 Release notes 會安靜地
+   吃進 v0.11.1 整節；合併前人工抓到，這支守衛讓它下次在本機就紅。
+
 ---
 
 ## v0.11.1 · 2026-08-08

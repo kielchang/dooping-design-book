@@ -1,12 +1,13 @@
-// cmdk 的唯一入口——相依被 tests/boundary.test.ts 的隔離守衛關在這一個檔案裡
-// （比照 graph-canvas.tsx 對 @xyflow/react 的作法，理由見 ADR-0011）。
-// 其他元件與取用端依賴 <Command> 的 API，不依賴 cmdk 本身，
-// 升級或抽換的成本永遠只在這裡。
 import * as React from "react";
 import { Command as CommandPrimitive } from "cmdk";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/dooping/utils";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/dooping/dialog";
+
+// cmdk 的唯一入口——相依被 tests/boundary.test.ts 的隔離守衛關在這一個檔案裡
+// （比照 graph-canvas.tsx 對 @xyflow/react 的作法，理由見 ADR-0011）。
+// 其他元件與取用端依賴 <Command> 的 API，不依賴 cmdk 本身，
+// 升級或抽換的成本永遠只在這裡。
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,

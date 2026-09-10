@@ -234,6 +234,18 @@
       }
     },
     {
+      "name": "dooping-check",
+      "version": "0.13.0",
+      "type": "registry:file",
+      "title": "dooping-check 更新檢查",
+      "description": "取用端的 lock 與例行檢查：已是最新／上游有更新／本地改過（ADR-0013 第二層）。",
+      "url": "https://kielchang.github.io/dooping-design-book/r/dooping-check.json",
+      "meta": {
+        "hash": "d721255e03e9f8d8",
+        "closureHash": "83be2d732a64ac13"
+      }
+    },
+    {
       "name": "download",
       "version": "0.13.0",
       "type": "registry:lib",

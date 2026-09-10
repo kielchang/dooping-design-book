@@ -63,3 +63,4 @@
 | 工具 | 版本 | 最後執行 | 結果 |
 | --- | --- | --- | --- |
 | shadcn CLI（`scripts/host-add.mjs`） | 4.21.0 | 2026-09-10 | 56 個檔逐位元組相同（第一次跑 50／56：開頭註解被 CLI 刪掉的 6 個已修，見回饋 5）。更新 data-table 時 `--dry-run` 列出 3 個要覆寫的相依檔（見回饋 6） |
+| dooping-check（`scripts/dooping-check.mjs`） | 隨 registry | 2026-09-10 | lock 記 35 個 item，全部已是最新。`npm run host:sync` 重建 lock，`npm run host:check` 以 `--strict` 跑例行檢查（ADR-0013 第二層） |

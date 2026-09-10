@@ -72,13 +72,18 @@ jobs:
 
       # ADR-0013 第三層的預演：合併進 main 時 Release 會附的 registry 異動清單，在 dev 就先算一次。
       # 腳本在這裡壞掉，比進版當下才在 deploy.yml 裡壞掉便宜得多。
+      # checkout 的 fetch-depth: 0 不保證帶 tag——2026-09 實測 CI 裡一個 v* tag 都沒有，這一步安靜地「略過」、照樣綠。
+      # 所以和 deploy.yml 的 Release 步驟一樣先明確抓 tag；抓完還是沒有就失敗，不准空轉。
+      # 清單同時印進 log（gh run view --log 查得到）與 step summary。
       - name: registry 異動預覽（相對上一個 v* tag，寫進 step summary）
         run: |
-          if git tag --list 'v*' | grep -q .; then
-            node scripts/registry-changes.mjs --before "v$(node -p "require('./package.json').version")" --markdown >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "沒有 v* tag，略過"
+          set -o pipefail
+          git fetch --tags --force -q origin
+          if ! git tag --list 'v*' | grep -q .; then
+            echo "::error::抓不到任何 v* tag——registry 異動預覽會空轉"
+            exit 1
           fi
+          node scripts/registry-changes.mjs --before "v$(node -p "require('./package.json').version")" --markdown | tee -a "$GITHUB_STEP_SUMMARY"
 
       # 「什麼時候該發 npm」的規則是：tokens.json 的內容有變才發。
       # 這一步讓那條規則變成會擋人的檢查，而不是要記得的事。

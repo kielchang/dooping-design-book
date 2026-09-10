@@ -16,9 +16,9 @@
 ```
 packages/tokens/src/tokens.json ◄──(build:theme＝generate-theme.mjs 以目標對比反解生成，不是手挑)
      │
-     │ build:tokens＝build-css.mjs
+     │ build:tokens＝build-css.mjs ＋ build-tailwind-v4.mjs
      ▼
-packages/tokens/dist/tokens.css ＋ src/tokens.data.ts   （dist/ 不進版控）
+packages/tokens/dist/tokens.css ＋ dist/tailwind.css ＋ src/tokens.data.ts   （dist/ 不進版控）
      ├── tests/tokens.test.ts 直接讀檔比對
      ├── .storybook/main.ts alias 到它
      └── book/src/css/kit.css @import 它        ◄── 三處硬相依：乾淨 clone 必先 build:tokens
@@ -48,8 +48,10 @@ AGENTS.md、ARCHITECTURE.md ──(book/scripts/sync-root-docs.mjs)──► boo
   要改就改生成器參數再重跑，不是挑好看的顏色填進去。
 - **閘門**：`scripts/verify-color.mjs`（六主題 × 兩模式的對比／色覺／狀態層門檻）。
   門檻優先序寫死：無障礙門檻不得為美感放寬；擠不下去時放寬的是美感約束。
-- **四個進入點**：`tokens.css`（純 CSS 變數）、`tailwind-preset.cjs`（覆蓋而非 extend，
-  清空 Tailwind 預設色盤——這是取用端的第一道漂移防線）、TS API、`tokens.json` 正本。
+- **五個進入點**：`tokens.css`（純 CSS 變數，值的唯一所在）、`tailwind.css`（Tailwind v4 的
+  `@theme inline reference` 名稱對映，`build-tailwind-v4.mjs` 產生）、`tailwind-preset.cjs`（v3，
+  覆蓋而非 extend）、TS API、`tokens.json` 正本。v4 與 v3 兩個出口都清空 Tailwind 預設色盤——
+  這是取用端的第一道漂移防線；兩者的鍵集由 `tests/tokens.test.ts` 與 tokens.json 三方逐鍵比對。
 - **發佈**：唯一路徑是 `tokens-v*` tag → `.github/workflows/publish-tokens.yml`
   （npm Trusted Publishing／OIDC，repo 不存長期 token）。兩道配對硬閘：
   tag 名必須等於 token 版號、tag 必須指向 `main` 上的 commit。

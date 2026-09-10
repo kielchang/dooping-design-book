@@ -44,6 +44,22 @@ commit 本身記在 tag 描述裡，不會遺失。
 [ADR-0008](docs/adr/0008-pages-chapter-scope.md) 解鎖（PageHeader）。
 規範 0.11.1 → 0.13.0、tokens 0.6.0 → 0.7.0。
 
+### Token：Tailwind v4 入口＋強制色彩模式的焦點備援（tokens 0.7.0）
+
+1. **改了什麼**：`@dooping/tokens` 新增第五個進入點 `@dooping/tokens/tailwind.css`——由
+   `build-tailwind-v4.mjs` 從 tokens.json 生成的 `@theme inline reference` 名稱對映，定位與 v3 preset
+   相同（只對映名稱，值一律 `var()` 回 `tokens.css`）：清空預設色盤、`@custom-variant dark` 同認
+   `.dark` 與 `[data-theme="dark"]`、`@layer base` 補 v4 preflight 拿掉的邊框預設色與按鈕游標。
+   用 `reference` 是實測結果：只寫 `inline` 時，v4 會把 `--shadow-sm: var(--shadow-sm)` 這類同名對映
+   吐進 `:root, :host`，在 shadow DOM 宿主裡自我參照而失效。`tokens.css` 另加強制色彩模式的焦點備援
+   （v4 的 `outline-none` 不再保留透明 outline，而強制色彩模式會移除聚焦環的 box-shadow）。
+   守衛：JSON 推導鍵集＝v4 `--color-*`＝v3 preset 攤平，三方逐鍵比對；非色彩 token 逐鍵；
+   `reference`、深色 variant、基座、焦點備援各一條。
+2. **我需要做什麼**：v3 宿主不需要。v4 宿主改用四行 `@import`（見 AGENTS.md「取 token」），
+   並刪掉 `shadcn init` 產生的 `:root`／`.dark` 色值與 `@theme inline` 的 `--color-*`。
+3. **為什麼改**：要統一的宿主多數已在 Tailwind v4，只出 v3 preset 等於照文件做也接不上——
+   這是至今沒有元件層取用端的結構性原因。基線定為 v4 為主、v3 相容。
+
 ### Token：`--sidebar-*` 八件組（tokens 0.7.0）
 
 1. **改了什麼**：新增 shadcn 相容的 `--sidebar-*` 八個 token。只有 `--sidebar` 是

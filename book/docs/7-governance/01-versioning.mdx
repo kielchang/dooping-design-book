@@ -171,6 +171,7 @@ git tag -a tokens-v0.1.3 -m "tokens 0.1.3" && git push origin tokens-v0.1.3
 | 改變一個 token 的**語意**（`--warning` 從黃變紅） | **major** |
 | 改變 `--radius` 之類會影響全站外觀的基準值 | **major** |
 | 新增 token | minor |
+| 新增可 import 的入口檔（例：`@dooping/tokens/tailwind.css`） | minor |
 | 微調色值但語意不變（對比修正） | patch |
 | 修正 CSS 產物的 bug | patch |
 
@@ -180,7 +181,7 @@ git tag -a tokens-v0.1.3 -m "tokens 0.1.3" && git push origin tokens-v0.1.3
 
 | 變更 | npm 版號 | 進 `main` |
 | --- | --- | --- |
-| 封裝設定（`exports`、`files`） | **不 bump** | ✅ |
+| 封裝設定（`exports`、`files`）的整理——**不新增**可 import 的入口 | **不 bump** | ✅ |
 | CI、建置腳本、測試 | **不 bump** | ✅ |
 | 文件、註解、重構、改名 | **不 bump** | ✅ |
 

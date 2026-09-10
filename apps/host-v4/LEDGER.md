@@ -22,12 +22,17 @@
 1. **BackLink 只渲染真 `<a>`，不吃路由元件。** SPA 宿主點下去是整頁重載，
    而且 `href` 要自己帶上部署 base（預覽站在子路徑下）。範本不改元件，只能照做。
    建議：`BackLink` 比照 `SidebarNav` 提供 `renderLink`。
+   **已處理（同版 v0.13.0）**：`BackLink` 與 `Breadcrumb` 都有 `renderLink`；明細頁改注入 react-router 的 `Link`，
+   `href` 不再自己補 base。
 2. **`useTableUrlState` 的 prefix 只隔離讀、沒有隔離寫。** 預設 `historyAdapter.set` 整串覆寫網址參數，
    同頁的其他參數（清單頁的 `view`）會被洗掉；兩張表各帶 prefix 也會互相覆蓋。
    宿主 adapter 目前自行合併。建議：hook 在寫入前保留非本表的參數，並補一支測試。
+   **已處理（同版 v0.13.0）**：hook 寫入改走 `mergeTableSearch`（只替換本表參數），測試含 hook 本身的寫入路徑；
+   宿主 adapter 拿掉自行合併、不再需要 prefix 參數。
 3. **`FormField` 包不了 Radix `Select`。** FormField 把 `id`／`aria-*` 注入唯一的子元素，
    而 Select 能聚焦的是 `SelectTrigger`、不是根元件——表單頁與設定頁的下拉因此照 Label＋id 手接。
    建議：文件講清楚，或讓 FormField 支援 render prop。
+   **已處理（同版 v0.13.0）**：`FormField` 的 `children` 可傳函式；表單頁與設定頁的下拉改走 FormField。
 4. **清單頁的兩條規範撞在一起：整列可點＋批次勾選。** 〈清單頁〉同時要求「整列可點」與
    「勾選後出現批次列」；DataTable 同時開 `onRowClick` 與 `selectable` 時，可聚焦的列裡包著勾選框——
    axe `nested-interactive`（serious），螢幕閱讀器把整列當成一個控制項，裡面的勾選框失去獨立語意。

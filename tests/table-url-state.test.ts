@@ -3,8 +3,11 @@
 // lib 刻意不 import ui（registry 相依不拖整張表），兩份結構型別的漂移
 // 要在這裡紅，不能等到取用端接不上才發現。
 import { describe, it, expect } from "vitest";
+import { createElement } from "react";
+import { renderToString } from "react-dom/server";
 import {
-  serializeTableState, deserializeTableState, type TableUrlState,
+  serializeTableState, deserializeTableState, mergeTableSearch, useTableUrlState,
+  type TableUrlState, type UrlStateAdapter,
 } from "../packages/react/src/lib/use-table-url-state";
 import type { DataTableState } from "../packages/react/src/ui/data-table";
 
@@ -74,5 +77,69 @@ describe("round-trip", () => {
     const s = deserializeTableState("q=%E7%94%B2&utm_source=x&page=abc", DEFAULTS);
     expect(s.query).toBe("甲");
     expect(s.page).toBe(0); // page=abc 不是合法頁碼
+  });
+});
+
+// prefix 原本只隔離讀、沒有隔離寫：寫入交出只有本表參數的字串，預設 adapter 又整串覆寫，
+// 同頁的 view 與另一張表的參數會被洗掉（內部試裝宿主 LEDGER 回饋 2）。
+describe("mergeTableSearch：寫入只替換本表的參數", () => {
+  it("保留同頁其他參數與另一張表的參數", () => {
+    const next = mergeTableSearch("view=draft&t2.q=%E4%B9%99&t1.page=3", { ...DEFAULTS, query: "甲" }, DEFAULTS, "t1.");
+    const p = new URLSearchParams(next);
+    expect(p.get("t1.q")).toBe("甲");
+    expect(p.get("view")).toBe("draft");
+    expect(p.get("t2.q")).toBe("乙");
+    expect(p.has("t1.page")).toBe(false); // 回到預設值的鍵要拿掉，不能留著舊值
+  });
+
+  it("同 prefix 開頭但不是表格鍵的參數不碰", () => {
+    const p = new URLSearchParams(mergeTableSearch("t1.tab=history&t1.q=%E8%88%8A", DEFAULTS, DEFAULTS, "t1."));
+    expect(p.get("t1.tab")).toBe("history");
+    expect(p.has("t1.q")).toBe(false);
+  });
+
+  it("沒有 prefix 時也保留非表格參數", () => {
+    const p = new URLSearchParams(mergeTableSearch("view=grid&q=old&page=2", { ...DEFAULTS, query: "新" }, DEFAULTS));
+    expect(p.get("q")).toBe("新");
+    expect(p.get("view")).toBe("grid");
+    expect(p.has("page")).toBe(false);
+  });
+
+  it("合併後另一張表的篩選值（含逗號、雙重編碼）原樣還原", () => {
+    const other: TableUrlState = { ...DEFAULTS, filters: { status: f({ values: ["已確認", "含,逗號"] }) } };
+    const merged = mergeTableSearch(serializeTableState(other, DEFAULTS, "t2."), { ...DEFAULTS, query: "甲" }, DEFAULTS, "t1.");
+    expect(deserializeTableState(merged, DEFAULTS, "t1.").query).toBe("甲");
+    expect(deserializeTableState(merged, DEFAULTS, "t2.")).toEqual(other);
+  });
+});
+
+describe("useTableUrlState：hook 的寫入走 mergeTableSearch", () => {
+  // node 環境用 renderToString 跑一次 hook、把 onStateChange 帶出來直接呼叫——
+  // 為了這一條不必拉 jsdom 或 testing-library。
+  function capture(adapter: UrlStateAdapter, prefix: string) {
+    let api: ReturnType<typeof useTableUrlState> | undefined;
+    function Probe() {
+      api = useTableUrlState({ adapter, prefix });
+      return null;
+    }
+    renderToString(createElement(Probe));
+    if (!api) throw new Error("hook 沒有執行");
+    return api;
+  }
+
+  it("同頁的 view 與另一張表的參數不會被洗掉", () => {
+    let search = "view=draft&t2.q=%E4%B9%99";
+    const adapter: UrlStateAdapter = {
+      get: () => search,
+      set: (s) => {
+        search = s;
+      },
+      subscribe: () => () => {},
+    };
+    capture(adapter, "t1.").onStateChange({ query: "甲" });
+    const p = new URLSearchParams(search);
+    expect(p.get("t1.q")).toBe("甲");
+    expect(p.get("view")).toBe("draft");
+    expect(p.get("t2.q")).toBe("乙");
   });
 });

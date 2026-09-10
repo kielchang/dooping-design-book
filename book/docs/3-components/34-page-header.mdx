@@ -67,12 +67,21 @@ title: PageHeader 頁首
 JS 後退會把他們送出這個系統。真連結同時讓中鍵開新分頁、右鍵複製網址
 這些瀏覽器慣例照常運作。
 
-元件庫不綁路由，`href` 由宿主給；抄走之後把 `<a>` 換成自家的 Link 是預期中的改法：
+元件庫不綁路由，`href` 由宿主給、連結元件由 `renderLink` 注入——比照側欄
+[SidebarNav](/components/app-shell-sidebar) 的同名注入點。預設就是真 `<a href>`，
+MPA 與文件站不必多寫；SPA 宿主注入自家的 Link，不必抄走後改原始碼，
+也不必自己在 `href` 前面補部署子路徑（路由的 basename 會處理）：
 
 ```tsx
-<BackLink href="/records" />
-// SPA：<PageHeader nav={<Link to="/records">…</Link>} title={…} />
+<BackLink href="/records" />   // MPA／文件站：預設真 <a href>
+
+// SPA（react-router）：其餘 props 原樣轉發——按鈕外觀是經 asChild 合併進去的 className
+const renderLink = ({ href, ...props }: PageLinkProps) => <Link to={href} {...props} />;
+<BackLink href="/records" renderLink={renderLink} />
+<Breadcrumb items={crumbs} renderLink={renderLink} />   // 麵包屑同一個注入點，末項不經注入
 ```
+
+<StoryFrame id="元件-外殼-頁首-pageheader--注入路由連結" title="注入路由連結：點擊交給宿主的路由，不整頁重載" height={280} />
 
 ## 麵包屑
 

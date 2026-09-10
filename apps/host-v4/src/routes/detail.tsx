@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { Badge } from "@/components/dooping/badge";
 import { Button } from "@/components/dooping/button";
 import { TabPills } from "@/components/dooping/tab-pills";
@@ -61,9 +61,8 @@ export function DetailPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-4">
       <PageHeader
-        // BackLink 渲染真 <a>、不吃路由元件：SPA 宿主點下去是整頁重載。
-        // 範本不改元件，所以 href 自己帶上 base——這一點記在 LEDGER.md 的回饋。
-        nav={<BackLink href={`${import.meta.env.BASE_URL}stock-check`} />}
+        // 返回連結注入 react-router 的 Link：站內導覽不整頁重載，部署子路徑交給 basename
+        nav={<BackLink href="/stock-check" renderLink={({ href, ...props }) => <Link to={href} {...props} />} />}
         title={demoProfile.name}
         badges={
           <>

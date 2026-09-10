@@ -55,22 +55,23 @@ export function SettingsPage() {
             value={theme.mode}
             onPick={(v) => setTheme({ ...theme, mode: v as Mode })}
           />
-          <div className="max-w-xs space-y-1.5">
-            <Label htmlFor="settings-color-theme">色相主題</Label>
-            <Select value={theme.color} onValueChange={(v) => setTheme({ ...theme, color: v })}>
-              <SelectTrigger id="settings-color-theme">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {COLOR_THEMES.map((t) => (
-                  <SelectItem key={t.name} value={t.name}>
-                    {t.label}
-                    {t.name === DEFAULT_THEME ? "（預設）" : ""}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <FormField label="色相主題" className="max-w-xs">
+            {(control) => (
+              <Select value={theme.color} onValueChange={(v) => setTheme({ ...theme, color: v })}>
+                <SelectTrigger {...control}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {COLOR_THEMES.map((t) => (
+                    <SelectItem key={t.name} value={t.name}>
+                      {t.label}
+                      {t.name === DEFAULT_THEME ? "（預設）" : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </FormField>
           <div className="flex items-center gap-2">
             <Switch id="settings-dense" checked={dense} onCheckedChange={setDense} />
             <Label htmlFor="settings-dense">清單使用密集模式</Label>

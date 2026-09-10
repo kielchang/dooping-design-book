@@ -48,7 +48,7 @@ export function ListPage() {
   const viewParam = params.get("view");
   const view: View = VIEWS.includes(viewParam as View) ? (viewParam as View) : "all";
 
-  const adapter = useRouterUrlAdapter(TABLE_PREFIX);
+  const adapter = useRouterUrlAdapter();
   const { state, onStateChange } = useTableUrlState({
     adapter,
     prefix: TABLE_PREFIX,

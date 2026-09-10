@@ -16,6 +16,13 @@ import { Label } from "../ui/label";
 // 錯誤訊息**就地**顯示在欄位下；多欄錯誤的彙總仍由區塊層的 Callout（live）負責——
 // 兩層分工，不是取代。
 
+/** FormField 要接到控制項上的屬性。render prop 形式收到的就是這一包，展開到真正可聚焦的元素上。 */
+export interface FormFieldControlProps {
+  id: string;
+  "aria-describedby"?: string;
+  "aria-invalid"?: true;
+}
+
 export interface FormFieldProps {
   label: ReactNode;
   /** 常駐說明（格式、範例）。錯誤出現時仍保留——錯誤是加上去的，不是換掉說明。 */
@@ -27,21 +34,30 @@ export interface FormFieldProps {
   error?: ReactNode;
   /** 必填星號＋文字說明（顏色不是唯一線索，星號本身帶 title）。 */
   required?: boolean;
-  /** 單一控制項（Input／Select／NumberInput／Checkbox…），aria 由本元件注入。 */
-  children: ReactElement<Record<string, unknown>>;
+  /**
+   * 單一控制項（Input／NumberInput／Checkbox…）：aria 由本元件注入到這個元素上。
+   *
+   * 可聚焦的不是根元素時（Radix `Select` 能聚焦的是 `SelectTrigger`），改傳函式，
+   * 把收到的屬性展開到那個元素上：
+   * `{(control) => <Select …><SelectTrigger {...control}>…</SelectTrigger>…</Select>}`
+   */
+  children: ReactElement<Record<string, unknown>> | ((control: FormFieldControlProps) => ReactNode);
   className?: string;
 }
 
 export function FormField({ label, hint, error, required, children, className }: FormFieldProps) {
   const id = useId();
-  const controlId = `${id}-control`;
   const hintId = hint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-error` : undefined;
-  const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
+  const control: FormFieldControlProps = {
+    id: `${id}-control`,
+    "aria-describedby": [hintId, errorId].filter(Boolean).join(" ") || undefined,
+    "aria-invalid": error ? true : undefined,
+  };
 
   return (
     <div className={cn("space-y-1.5", className)}>
-      <Label htmlFor={controlId}>
+      <Label htmlFor={control.id}>
         {label}
         {required && (
           <span className="ml-0.5 text-danger" title="必填" aria-label="必填">
@@ -49,13 +65,11 @@ export function FormField({ label, hint, error, required, children, className }:
           </span>
         )}
       </Label>
-      {isValidElement(children)
-        ? cloneElement(children, {
-            id: controlId,
-            "aria-describedby": describedBy,
-            "aria-invalid": error ? true : undefined,
-          })
-        : children}
+      {typeof children === "function"
+        ? children(control)
+        : isValidElement(children)
+          ? cloneElement(children, { ...control })
+          : children}
       {hint && (
         <p id={hintId} className="text-xs text-muted-foreground">
           {hint}

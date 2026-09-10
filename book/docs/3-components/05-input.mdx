@@ -65,6 +65,25 @@ id 連動自動接好，取用端不再手寫三條 aria、也就不會漏：
 多欄錯誤的**彙總**仍由區塊層的 [Callout](/components/callout)（`live`）負責——
 它報「有幾個欄位要修」，不重複每一條內容；兩層是分工，不是取代。
 
+### 可聚焦的不是根元件時：children 傳函式
+
+`FormField` 預設把 `id`／`aria-*` 注入唯一的子元素。Radix 的 Select 能聚焦的是
+`SelectTrigger`、不是 `Select` 根元件——注入到根上，Label 點了沒反應、錯誤訊息也接不到。
+這時 `children` 改傳函式，把收到的屬性展開到真正可聚焦的那個元素上：
+
+```tsx
+<FormField label="所屬單位" required error={unitError}>
+  {(control) => (
+    <Select value={unit} onValueChange={setUnit}>
+      <SelectTrigger {...control}><SelectValue /></SelectTrigger>
+      <SelectContent>…</SelectContent>
+    </Select>
+  )}
+</FormField>
+```
+
+不要為了下拉退回手寫 `Label htmlFor`＋`id`——那正是 FormField 要消滅的三條 aria 手工連動。
+
 ## 取用
 
 ```bash

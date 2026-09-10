@@ -32,6 +32,9 @@ export interface TableUrlState {
 /**
  * 網址存取的注入點。預設 historyAdapter；TanStack Router／Next 宿主
  * 用自家 API 包出同介面（get 回傳不含 "?" 的 search 字串）。
+ *
+ * `set` 收到的是**整串** search：hook 寫入前已保留同頁不屬於這張表的參數
+ * （分頁籤的 `view`、另一個 prefix 的表），adapter 照單寫回即可，不必自己合併。
  */
 export interface UrlStateAdapter {
   get(): string;
@@ -124,12 +127,40 @@ export function deserializeTableState(search: string, defaults: TableUrlState, p
   return state;
 }
 
+/** 參數是不是本表的：prefix 底下的表格鍵（q／page／size／sort／f.*／ft.*／fr.*）。同 prefix 開頭的其他鍵不算。 */
+function isTableParam(name: string, prefix: string): boolean {
+  const key = !prefix ? name : name.startsWith(prefix) ? name.slice(prefix.length) : null;
+  if (key === null) return false;
+  return (
+    key === "q" || key === "page" || key === "size" || key === "sort" ||
+    key.startsWith("f.") || key.startsWith("ft.") || key.startsWith("fr.")
+  );
+}
+
+/**
+ * 把這張表的狀態寫回**整串** search：只替換本表的參數，其他參數原樣保留。
+ *
+ * prefix 原本只隔離了讀：寫入時交出「只有本表參數」的字串，而預設 historyAdapter 整串覆寫，
+ * 同頁的其他參數（分頁籤的 `view`、另一張表的 `t2.*`）就被洗掉——內部試裝宿主第一次接就踩到。
+ * 沒有 prefix 時，通用鍵（`page`、`q`）一律視為本表的；同頁還有別人的參數就該帶 prefix。
+ */
+export function mergeTableSearch(search: string, state: TableUrlState, defaults: TableUrlState, prefix = ""): string {
+  const p = new URLSearchParams(search);
+  for (const name of [...new Set(p.keys())]) {
+    if (isTableParam(name, prefix)) p.delete(name);
+  }
+  for (const [name, value] of new URLSearchParams(serializeTableState(state, defaults, prefix))) {
+    p.append(name, value);
+  }
+  return p.toString();
+}
+
 export interface UseTableUrlStateOptions {
   /** 預設 historyAdapter。 */
   adapter?: UrlStateAdapter;
   /** 預設值不寫進網址；pageSize 的預設要與 DataTable 的 pageSize prop 一致。 */
   defaults?: Partial<TableUrlState>;
-  /** 同頁多張表時的鍵前綴（"t2." → t2.q=…），防互相覆蓋。 */
+  /** 同頁多張表、或同頁還有其他網址參數時的鍵前綴（"t2." → t2.q=…）。讀與寫都只碰這個前綴底下的表格鍵。 */
   prefix?: string;
 }
 
@@ -160,9 +191,13 @@ export function useTableUrlState(options: UseTableUrlStateOptions = {}) {
       if (Object.keys(rest).length === 0) return;
       // 條件變更未帶 page 時回第 1 頁——DataTable 端已附帶，獨立使用時這裡保險
       const resets = ["query", "filters", "sort", "pageSize"].some((key) => key in rest);
-      const current = deserializeTableState(adapter.get(), defaults, prefix);
-      const next: TableUrlState = { ...current, ...(resets && !("page" in rest) ? { page: 0 } : {}), ...rest };
-      adapter.set(serializeTableState(next, defaults, prefix));
+      const current = adapter.get();
+      const next: TableUrlState = {
+        ...deserializeTableState(current, defaults, prefix),
+        ...(resets && !("page" in rest) ? { page: 0 } : {}),
+        ...rest,
+      };
+      adapter.set(mergeTableSearch(current, next, defaults, prefix));
     },
     [adapter, defaults, prefix],
   );

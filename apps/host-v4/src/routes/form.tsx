@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/dooping/button";
 import { Input } from "@/components/dooping/input";
-import { Label } from "@/components/dooping/label";
 import { NumberInput } from "@/components/dooping/number-input";
 import { SegGroup } from "@/components/dooping/seg-group";
 import { Chips } from "@/components/dooping/chips";
@@ -75,20 +74,21 @@ export function FormPage() {
             <CardDescription>這個批次屬於誰。</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Select 的可聚焦元素是 Trigger 不是根元件，所以這裡照 Label＋id 手接，不經 FormField */}
-            <div className="max-w-sm space-y-1.5">
-              <Label htmlFor="form-unit">所屬單位</Label>
-              <Select value={unit} onValueChange={setUnit}>
-                <SelectTrigger id="form-unit">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {UNIT_OPTIONS.map((u) => (
-                    <SelectItem key={u} value={u}>{u}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {/* Select 能聚焦的是 Trigger 不是根元件：FormField 的 children 傳函式，把 id／aria 展開到 trigger 上 */}
+            <FormField label="所屬單位" className="max-w-sm">
+              {(control) => (
+                <Select value={unit} onValueChange={setUnit}>
+                  <SelectTrigger {...control}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {UNIT_OPTIONS.map((u) => (
+                      <SelectItem key={u} value={u}>{u}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </FormField>
             <SegGroup label="等級" options={TIER_OPTIONS} value={tier} onPick={setTier} />
           </CardContent>
         </Card>

@@ -279,6 +279,23 @@ Tailwind v4 為主、v3 相容的取用路徑（token 入口，本書自己的 S
 3. **為什麼改**：deploy.yml 遇到第一條 `---` 才停。本節節尾原本少了分隔線，合併後 Release notes 會安靜地
    吃進 v0.11.1 整節；合併前人工抓到，這支守衛讓它下次在本機就紅。
 
+### SPA 宿主的三個接縫：頁首連結注入、FormField 包複合控制項、表格網址狀態只寫本表參數
+
+1. **改了什麼**：
+   - `BackLink`／`Breadcrumb` 新增 `renderLink`（比照 `SidebarNav`），預設仍是真 `<a href>`；
+     匯出注入端收到的 `PageLinkProps`。新 story「注入路由連結」的 play 驗注入的元件拿到 href 與按鈕外觀、
+     點擊交給注入端處理、麵包屑末項不經注入。
+   - `FormField` 的 `children` 可以傳函式：收到 `id`／`aria-describedby`／`aria-invalid`，展開到真正可聚焦的元素
+     （Radix Select 的 `SelectTrigger`）。「欄位錯誤態」story 補一個下拉欄位，play 驗 aria 接在 trigger 上。
+   - `useTableUrlState` 寫入時只替換本表的參數（新增並匯出 `mergeTableSearch`）。prefix 以前只隔離讀，
+     預設 `historyAdapter` 又整串覆寫，同頁的 `view` 與另一張表的參數會被洗掉。`UrlStateAdapter.set` 從此收到整串 search；
+     測試除了純函式，另用 `renderToString` 跑一次 hook 驗寫入路徑。
+   - 內部試裝宿主拿掉三處繞道：adapter 不再自行合併參數、明細頁返回改注入 react-router 的 `Link`、兩處下拉改走 FormField。
+2. **我需要做什麼**：不需要，三項都是新增或修正，既有寫法照常可用。自訂 `UrlStateAdapter` 若自己合併過參數，
+   可以拿掉合併、直接寫回收到的字串（留著也不會錯）。
+3. **為什麼改**：內部試裝宿主照文件接 react-router 時一次撞到這三個缺口（`apps/host-v4/LEDGER.md` 回饋 1–3）。
+   範本不能改元件，只能在宿主繞道——每一個繞道，都是其他 SPA 子系統會各自重寫一次的東西。
+
 ---
 
 ## v0.11.1 · 2026-08-08

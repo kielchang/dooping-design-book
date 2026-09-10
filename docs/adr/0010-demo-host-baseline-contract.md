@@ -92,3 +92,20 @@ Storybook 的管線（`@tailwind base` ＋ `* { border-color }`）本來就是�
   為鉤子），其散文 children 保留站台排版，是刻意取捨。
 - 文件站的角色從「肉眼確認」升級為「被驗收的宿主」：預覽站仍供人工確認
   響應式與觸控，但基座正確性從此不靠人眼。
+
+## 附註：Tailwind v4 之後的管線（2026-09）
+
+決定不變，實作換了表達方式（本書整體升 v4，見 CHANGELOG 同批工作項）：
+
+- **「preflight: false」**不再是設定檔的一行（`book/tailwind.config.js` 已刪除），改成
+  `kit.css` 的結構：只引入 `tailwindcss/theme.css` 與 `tailwindcss/utilities.css`，
+  **不引入** `preflight.css`、也不整包 `@import "tailwindcss"`。`host-baseline` 鎖這兩件事。
+- **「基座在 utilities 之前、靠順序勝出」**多了一個前提：兩者都不能進 cascade layer。
+  Tailwind 的 `index.css` 會把 utilities 包進 `layer(utilities)`，進了 layer 就會輸給
+  unlayered 的 demo-base 與 Infima——所以 `kit.css` 直接引入 `utilities.css`，守衛也鎖這一點。
+- **移植檔改由產生器產出**：`book/scripts/port-preflight.mjs` 把 v4 preflight 與
+  `@dooping/tokens/tailwind.css` 的 `@layer base`（邊框預設色、按鈕游標）機械地移植到兩個 scope。
+  v4 的 preflight 有巢狀 `@supports` 與括號內的逗號，手抄一定會錯；靜態守衛改用獨立寫的
+  第二份移植規則逐條比對，「Tailwind 升版就紅」的維護點不變，紅了重跑產生器。
+- **渲染守衛看得懂新的顏色格式**：v4 的透明度修飾是 `color-mix(in oklab, …)`，
+  computed 值是 `oklab()`／`color(srgb …)`；`verify:book` 的頁內解析器換算回 sRGB 再比對有效值。

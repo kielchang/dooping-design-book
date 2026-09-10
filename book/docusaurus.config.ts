@@ -69,11 +69,11 @@ const config: Config = {
             },
           };
         },
+        // Tailwind v4：設定全在 src/css/kit.css（CSS-first），這裡只掛 PostCSS 外掛。
+        // 外掛只處理含 Tailwind 指令的檔案（kit.css），Infima 與 custom.css 原樣通過；
+        // 瀏覽器前綴由 Tailwind 內建的 Lightning CSS 處理，不再需要 autoprefixer。
         configurePostCss(opts: { plugins: unknown[] }) {
-          opts.plugins.push(
-            require("tailwindcss")(require(path.resolve(__dirname, "tailwind.config.js"))),
-            require("autoprefixer"),
-          );
+          opts.plugins.push(require("@tailwindcss/postcss")());
           return opts;
         },
       };

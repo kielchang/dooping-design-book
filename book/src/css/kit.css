@@ -1,11 +1,23 @@
-/* 活元件示例的樣式管線：token（來自 @dooping/tokens 的產物）＋ demo 宿主基座
-   ＋ Tailwind utilities。preflight 已在 tailwind.config.js 關閉——不對全站注入
-   第二套 reset；元件需要的樣式前提由 demo-base.css 在範例的 scope 內提供（ADR-0010）。
+/* 活元件示例的樣式管線（Tailwind v4）：token ＋ demo 宿主基座 ＋ Tailwind 主題與 utilities。
 
-   順序是承重結構：demo-base 必須在 @tailwind utilities 之前——基座與 utilities
-   同為 (0,1,0) 特異度，靠「utilities 較晚」讓元件宣告獲勝。
-   tests/host-baseline.test.ts 鎖著這個順序。 */
+   刻意不引入 tailwindcss/preflight.css、也不整包 @import "tailwindcss"——不對全站注入第二套 reset；
+   元件需要的樣式前提由 demo-base.css 在範例的 scope 內提供（ADR-0010）。
+
+   順序與 layer 是承重結構：
+   - demo-base 必須在 tailwindcss/utilities.css 之前，而且兩者都**不能**進 cascade layer——
+     基座與 utilities 同為 (0,1,0) 特異度，靠「utilities 較晚」讓元件宣告獲勝。
+     Tailwind 的 index.css 會把 utilities 包進 layer(utilities)；這裡直接 import utilities.css，
+     就是為了讓它留在 layer 外（進了 layer 就會輸給 unlayered 的 demo-base 與 Infima）。
+   - theme.css 進 layer(theme)：它只宣告被用到的主題變數，layer 內外不影響勝負。
+   tests/host-baseline.test.ts 鎖著這些條件。 */
 @import "../../../packages/tokens/dist/tokens.css";
 @import "./demo-base.css";
+@import "tailwindcss/theme.css" layer(theme);
+@import "tw-animate-css";
+@import "../../../packages/tokens/dist/tailwind.css";
+@import "tailwindcss/utilities.css" source(none);
 
-@tailwind utilities;
+/* 掃描範圍明示（與 v3 時代的 content 設定同一組）：元件原始碼、文件站自己的元件、文件內容 */
+@source "../../../packages/react/src";
+@source "..";
+@source "../../docs";

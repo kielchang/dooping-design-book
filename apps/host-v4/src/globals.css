@@ -1,0 +1,15 @@
+/* 內部試裝宿主的全域樣式——就是 AGENTS.md「取 token」那四行，一行都沒多。
+   刻意不在這裡宣告任何 :root 色值或 @theme：值只活在 @dooping/tokens 一處，
+   這個檔案要是長出第二份色值，這個宿主就不再是可以照抄的範本。 */
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@dooping/tokens/tokens.css";
+@import "@dooping/tokens/tailwind.css";
+
+@layer base {
+  body {
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-family-sans);
+  }
+}

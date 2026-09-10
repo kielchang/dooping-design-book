@@ -234,10 +234,31 @@ jobs:
         env:
           STORYBOOK_DIR: book/build/storybook
 
+      # 內部試裝宿主（apps/host-v4）：照取用端的路接上來的 Tailwind v4 應用。
+      # host:check 擋「registry 與宿主脫鉤」（宿主是範本，不允許手改元件）；
+      # 建置用預覽站的子路徑 base；verify:host 驗主題配色、頁面級 axe、強制色彩焦點、行動版外殼。
+      - name: 內部試裝宿主：同步檢查（registry ↔ 宿主）
+        run: npm run host:check
+      - name: 內部試裝宿主：建置（base 指向 /preview/host/）
+        run: npm run host:build
+        env:
+          VITE_BASE: /dooping-design-book/preview/host/
+      - name: 內部試裝宿主：渲染守衛（verify:host）
+        run: npm run verify:host
+        env:
+          HOST_BASE: /dooping-design-book/preview/host/
+
       - name: 放置 registry → /preview/r
         run: |
           mkdir -p book/build/r
           cp registry/*.json book/build/r/
+
+      # 預覽站只放 dev 的內部試裝宿主；正式站（deploy.yml）只放規範，不放它。
+      # 注意 GitHub Pages 沒有 SPA 回退：從 /preview/host/ 進入後站內導覽正常，直接開深連結會 404。
+      - name: 放置內部試裝宿主 → /preview/host
+        run: |
+          mkdir -p book/build/host
+          cp -r apps/host-v4/dist/. book/build/host/
 
       # PR 只驗證不部署——預覽站是 dev 的，不該被 PR 覆蓋。
       - name: "發佈預覽站 → gh-pages:preview/"

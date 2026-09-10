@@ -5,24 +5,30 @@
   "type": "module",
   "description": "Dooping Design Book — 跨專案設計語言、模式手冊與 React 參考實作",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "scripts": {
     "build:tokens": "npm run build --workspace @dooping/tokens",
     "build:theme": "node packages/tokens/scripts/generate-theme.mjs",
     "build:registry": "node scripts/build-registry.mjs",
+    "host:sync": "node scripts/host-sync.mjs",
+    "host:check": "node scripts/host-sync.mjs --check",
     "verify:color": "node scripts/verify-color.mjs",
     "verify:book": "node scripts/verify-book-host.mjs",
     "verify:storybook": "node scripts/verify-storybook.mjs",
     "verify:visual": "node scripts/verify-visual.mjs",
+    "verify:host": "node scripts/verify-host.mjs",
     "status": "node scripts/version-status.mjs",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json && npm run typecheck --workspace @dooping/host-v4",
     "test": "vitest run",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "book": "npm --prefix book run start",
     "build:book": "npm --prefix book run build",
-    "build:all": "npm run build:tokens && npm run build:registry && npm run build-storybook && npm run build:book"
+    "build:all": "npm run build:tokens && npm run build:registry && npm run build-storybook && npm run build:book",
+    "host:dev": "npm run dev --workspace @dooping/host-v4",
+    "host:build": "npm run build --workspace @dooping/host-v4"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "^8.6.18",

@@ -1,0 +1,4 @@
+# 內部試裝宿主的同步產物一律 LF：host-sync --check 逐位元組比對 registry 內容
+apps/host-v4/src/components/dooping/** text eol=lf
+apps/host-v4/src/lib/dooping/** text eol=lf
+apps/host-v4/src/demo/** text eol=lf

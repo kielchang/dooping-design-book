@@ -83,6 +83,17 @@
 與「為了美感放寬無障礙門檻」是同一種錯（見 CLAUDE.md 的門檻優先序）。
 判準②（真實宿主回饋）維持原樣，沒有被這次修正碰到。
 
+### 內部試裝（2026-09）
+
+`apps/host-v4` 是本 repo 內照取用端的路接上來的 Tailwind v4 應用：registry 抄進外殼三件與五種頁型需要的元件，
+`SidebarNav` 的 `renderLink` 注入 react-router 的 `Link`，`CommandPalette` 與側欄共用同一份 `NavGroup[]`；
+`scripts/verify-host.mjs` 驗六主題×兩模式的外殼配色、五頁各一個 h1、頁面級 axe、行動版抽屜的鍵盤焦點歸還。
+回饋記在 `apps/host-v4/LEDGER.md`：BackLink 不吃路由元件、表格網址狀態的 prefix 沒有隔離寫入、
+FormField 包不了 Select、清單頁「整列可點＋批次勾選」的巢狀互動。
+
+**它不計入判準②。** 內部試裝是同一個作者、同一個 repo、照著自己寫的文件接——
+它能提早暴露缺陷，證明不了「別人照文件接得上」。判準②仍等第一個子系統依文件自行導入的回報。
+
 ## 影響
 
 - 元件章新增：Sidebar 家族、SidebarNav、AppShell、Popover、DropdownMenu、

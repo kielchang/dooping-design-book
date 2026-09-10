@@ -39,6 +39,8 @@ npm run build:registry     # registry JSON — 改過元件就要重跑並提交
 npm run build-storybook
 npm run verify:storybook   # 無障礙行為守衛（axe＋play functions）— 需先 build-storybook
 npm run verify:visual      # 視覺回歸：token 期望值掃描 — 需先 build-storybook
+npm run host:sync          # 內部試裝宿主：registry → apps/host-v4（改過元件或安裝集要重跑並提交）
+npm run host:build && npm run verify:host   # 宿主渲染守衛：主題配色、頁面級 axe、強制色彩、行動版外殼
 BOOK_BASE_URL=/dooping-design-book/preview/ npm run build:book   # onBrokenLinks: throw
 ```
 

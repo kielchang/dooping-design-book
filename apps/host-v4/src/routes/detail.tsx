@@ -1,0 +1,147 @@
+import { useState } from "react";
+import { useSearchParams } from "react-router";
+import { Badge } from "@/components/dooping/badge";
+import { Button } from "@/components/dooping/button";
+import { TabPills } from "@/components/dooping/tab-pills";
+import { PageHeader, BackLink } from "@/components/dooping/page-header";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/dooping/card";
+import { DataTable, type Column } from "@/components/dooping/data-table";
+import {
+  Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose,
+} from "@/components/dooping/dialog";
+import { EditableField } from "@/components/dooping/editable-field";
+import { ChangeSummary } from "@/components/dooping/change-summary";
+import { useRecordDiff } from "@/components/dooping/use-record-diff";
+import type { FieldSpec } from "@/lib/dooping/forms-diff";
+import { formatMoney } from "@/lib/dooping/utils";
+import {
+  demoProfile, demoRecords, TIER_OPTIONS, STATUS_LABEL, type DemoProfile, type DemoRecord,
+} from "@/demo/sample-data";
+
+// 明細頁：頁首＝識別＋狀態＋該狀態允許的動作；分頁籤切區（分頁寫進網址，分享連結落在同一分頁）；
+// 欄位唯讀優先、改了標琥珀、送出前看得到變更摘要。
+
+const SPECS: FieldSpec[] = [
+  { key: "name", label: "單位名稱", kind: "text" },
+  { key: "tier", label: "等級", kind: "select", format: (v) => TIER_OPTIONS.find((o) => o.value === v)?.label ?? String(v) },
+  { key: "quota", label: "上限額度", kind: "money" },
+  { key: "contact", label: "聯絡方式", kind: "text" },
+];
+
+const relatedColumns: Column<DemoRecord>[] = [
+  { key: "id", header: "編號", cell: (r) => r.id, sortValue: (r) => r.id },
+  { key: "name", header: "項目", truncate: 160, cell: (r) => r.name, sortValue: (r) => r.name },
+  { key: "amount", header: "金額", numeric: true, cell: (r) => formatMoney(r.amount), sortValue: (r) => r.amount },
+  { key: "status", header: "狀態", cell: (r) => STATUS_LABEL[r.status], sortValue: (r) => STATUS_LABEL[r.status] },
+];
+
+const TABS = ["basic", "related", "history"] as const;
+type Tab = (typeof TABS)[number];
+
+export function DetailPage() {
+  const [params, setParams] = useSearchParams();
+  const tabParam = params.get("tab");
+  const tab: Tab = TABS.includes(tabParam as Tab) ? (tabParam as Tab) : "basic";
+  const setTab = (next: string) =>
+    setParams(
+      (prev) => {
+        const p = new URLSearchParams(prev);
+        if (next === "basic") p.delete("tab");
+        else p.set("tab", next);
+        return p;
+      },
+      { replace: true },
+    );
+
+  const [draft, setDraft] = useState<DemoProfile>(demoProfile);
+  const { changes, revertField, revertAll } = useRecordDiff(demoProfile, draft, setDraft, SPECS);
+  const set = (k: keyof DemoProfile) => (v: unknown) => setDraft((d) => ({ ...d, [k]: v }));
+  const related = demoRecords.filter((r) => r.unit === "甲單位");
+
+  return (
+    <div className="mx-auto max-w-5xl space-y-4">
+      <PageHeader
+        // BackLink 渲染真 <a>、不吃路由元件：SPA 宿主點下去是整頁重載。
+        // 範本不改元件，所以 href 自己帶上 base——這一點記在 LEDGER.md 的回饋。
+        nav={<BackLink href={`${import.meta.env.BASE_URL}stock-check`} />}
+        title={demoProfile.name}
+        badges={
+          <>
+            <Badge variant="outline">{demoProfile.code}</Badge>
+            <Badge variant="success">啟用中</Badge>
+          </>
+        }
+        actions={
+          <>
+            <Button variant="outline" size="sm">匯出</Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="destructive" size="sm">停用</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>確定要停用 {demoProfile.code}？</DialogTitle>
+                  <DialogDescription>停用後此單位不能再建立新項目，既有項目不受影響。此動作會寫入異動紀錄。</DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">返回</Button>
+                  </DialogClose>
+                  <Button variant="destructive">確定停用</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </>
+        }
+      />
+
+      <TabPills
+        label="明細分區"
+        value={tab}
+        onChange={setTab}
+        tabs={[
+          { key: "basic", label: "基本資料", badge: changes.length > 0 ? <Badge variant="edit">{changes.length}</Badge> : undefined },
+          { key: "related", label: "關聯項目", badge: <Badge variant="secondary">{related.length}</Badge> },
+          { key: "history", label: "異動紀錄" },
+        ]}
+      />
+
+      {tab === "basic" && (
+        <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">基本資料</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-3 sm:grid-cols-2">
+              <EditableField label="單位名稱" kind="text" value={draft.name} original={demoProfile.name} onChange={set("name")} onRevert={() => revertField("name")} />
+              <EditableField label="單位代號" kind="text" value={demoProfile.code} original={demoProfile.code} onChange={() => {}} disabled lockHint="代號建立後不可變更" />
+              <EditableField label="等級" kind="select" options={TIER_OPTIONS} value={draft.tier} original={demoProfile.tier} onChange={set("tier")} onRevert={() => revertField("tier")} />
+              <EditableField label="上限額度" kind="money" value={draft.quota} original={demoProfile.quota} onChange={set("quota")} onRevert={() => revertField("quota")} />
+              <EditableField label="聯絡方式" kind="text" value={draft.contact} original={demoProfile.contact} onChange={set("contact")} onRevert={() => revertField("contact")} />
+            </CardContent>
+          </Card>
+          <div className="space-y-2">
+            <ChangeSummary changes={changes} onRevertField={revertField} onRevertAll={revertAll} />
+            <Button className="w-full" disabled={changes.length === 0}>
+              送出{changes.length > 0 && `（${changes.length} 項變更）`}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {tab === "related" && (
+        <DataTable rows={related} columns={relatedColumns} getRowKey={(r) => r.id} dense searchable={false} />
+      )}
+
+      {tab === "history" && (
+        <Card>
+          <CardContent className="space-y-2 pt-6 text-sm">
+            <p><span className="text-muted-foreground">2024-02-05・第一組</span>　調整上限額度：$1,500,000 → $1,650,000</p>
+            <p><span className="text-muted-foreground">2024-01-26・第二組</span>　等級：銀級 → 金級</p>
+            <p><span className="text-muted-foreground">2019-04-01・系統</span>　建立此單位</p>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}

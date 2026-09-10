@@ -84,6 +84,20 @@ commit 本身記在 tag 描述裡，不會遺失。
    而開發環境一旦升 v4，「只有 v4 才有」的 class 寫得出來、畫面也對，直到 v3 宿主抄走才安靜變形——
    所以相容性要由守衛擋，不能靠開發環境。
 
+### 內部試裝宿主 apps/host-v4：照取用端的路接上來的 v4 應用（ADR-0011 內部補充證據）
+
+1. **改了什麼**：新增 `apps/host-v4`（Vite＋React 19＋Tailwind v4），`src/globals.css` 就是 AGENTS.md 的四行
+   `@import`；五種頁型各一頁組進 AppShell，側欄 `renderLink` 注入 react-router，表格狀態經宿主 adapter 寫進網址。
+   元件由 `scripts/host-sync.mjs` 從 registry JSON 決定性同步（`host:check` 擋任何差異），
+   `scripts/host-add.mjs` 保留真的 `npx shadcn add` 路徑。新守衛：`host-install-set`（頁面章五條安裝指令
+   都被宿主涵蓋、檔案都在；宿主的 tokens 配對與 workspace 連結）、`verify:host`（六主題×兩模式×五頁的
+   token 期望值、color-mix 探針、頁面級 axe、強制色彩焦點、行動版抽屜焦點歸還）。去領域化與示範資料守衛
+   把 `apps/` 納入掃描。registry 產生器的匯入改寫抽成 `scripts/lib/rewrite.mjs` 與宿主共用，並支援 `REGISTRY_OUT`。
+2. **我需要做什麼**：不需要。要開新子系統時，可以把 `apps/host-v4` 整個目錄複製走當起手範本（見其 README）。
+3. **為什麼改**：零取用端時，「照文件接得上」從來沒被證明過。第一次跑就抓到四個缺口
+   （記在 `apps/host-v4/LEDGER.md`），其中「整列可點＋批次勾選」的巢狀互動是 Storybook 一直沒看見的無障礙缺陷。
+   它不計入 ADR-0011 判準②——內部試裝證明不了別人接得上。
+
 ### Token：`--sidebar-*` 八件組（tokens 0.7.0）
 
 1. **改了什麼**：新增 shadcn 相容的 `--sidebar-*` 八個 token。只有 `--sidebar` 是

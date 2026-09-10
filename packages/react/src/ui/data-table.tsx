@@ -183,6 +183,10 @@ export type DataTableProps<T> = {
   /** 提供則顯示「匯出 CSV」按鈕，匯出**目前篩選排序後**的資料 */
   csv?: { headers: string[]; row: (row: T) => (string | number)[]; fileName: string };
   rowClassName?: (row: T) => string;
+  /**
+   * 整列可點（進明細）。滑鼠點列上非互動區域即觸發；鍵盤與讀屏的入口是**首個可見欄的真按鈕**。
+   * 列本身刻意不是 button——那樣列裡放不下勾選框（nested-interactive）。首欄的 `cell` 因此不要再渲染連結或按鈕。
+   */
   onRowClick?: (row: T) => void;
   labels?: Partial<DataTableLabels>;
   /**
@@ -700,11 +704,21 @@ export function DataTable<T>({
               <TableRow
                 key={getRowKey(row, i)}
                 data-state={selectable && selectedSet.has(getRowKey(row, i)) ? "selected" : undefined}
-                className={cn(rowClassName?.(row), onRowClick && "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring")}
-                onClick={onRowClick ? () => onRowClick(row) : undefined}
-                role={onRowClick ? "button" : undefined}
-                tabIndex={onRowClick ? 0 : undefined}
-                onKeyDown={onRowClick ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onRowClick(row); } } : undefined}
+                className={cn(rowClassName?.(row), onRowClick && "cursor-pointer")}
+                // 整列可點只接滑鼠。列刻意**不是** role="button"：那樣列裡放不下勾選框（nested-interactive），
+                // <tr> 的 row 角色也被蓋掉、讀屏念不出這是第幾列。鍵盤與讀屏的入口是首欄按鈕（下方 entry）。
+                // 點到列裡的真控制項時交給控制項自己；截斷提示的 tabIndex 容器不算控制項——點被截斷的文字仍是「點列」。
+                onClick={
+                  onRowClick
+                    ? (e) => {
+                        const hit = (e.target as HTMLElement).closest(
+                          "a[href], button, input, select, textarea, label, [role='checkbox'], [role='button'], [role='link'], [role='combobox'], [role='switch'], [role='menuitem']",
+                        );
+                        if (hit && hit !== e.currentTarget && e.currentTarget.contains(hit)) return;
+                        onRowClick(row);
+                      }
+                    : undefined
+                }
               >
                 {selectable && (
                   <TableCell
@@ -726,6 +740,13 @@ export function DataTable<T>({
                   const inCol = crosshair && cross?.c === ci;
                   const cw = colWidths[c.key];
                   const maxW = c.truncate ?? cw;
+                  // 整列可點的列入口：首個可見欄的內容包成真按鈕——Tab 得到、Enter／Space 觸發、名字就是首欄內容
+                  const entry = Boolean(onRowClick) && ci === 0;
+                  const entryCls = cn(
+                    "max-w-full rounded-sm underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    c.numeric ? "text-right" : "text-left",
+                    (c.truncate || cw) && "block w-full truncate",
+                  );
                   return (
                     <TableCell
                       key={c.key}
@@ -745,7 +766,20 @@ export function DataTable<T>({
                         inRow && inCol && xcell,
                       )}
                     >
-                      {c.truncate ? (
+                      {entry ? (
+                        c.truncate ? (
+                          // 入口按鈕本身可聚焦：提示泡泡不加 focusable，否則按鈕外面又多一層可聚焦元素
+                          <Tooltip content={c.filterText?.(row)} className="w-full">
+                            <button type="button" className={entryCls} onClick={() => onRowClick?.(row)}>
+                              {c.cell(row)}
+                            </button>
+                          </Tooltip>
+                        ) : (
+                          <button type="button" className={entryCls} onClick={() => onRowClick?.(row)}>
+                            {c.cell(row)}
+                          </button>
+                        )
+                      ) : c.truncate ? (
                         <Tooltip content={c.filterText?.(row)} className="w-full" focusable>
                           <span className="block truncate">{c.cell(row)}</span>
                         </Tooltip>

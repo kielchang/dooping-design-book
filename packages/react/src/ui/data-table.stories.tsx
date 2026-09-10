@@ -253,6 +253,72 @@ export const 批次操作: Story = {
   },
 };
 
+function RowEntryDemo() {
+  const [opened, setOpened] = React.useState<string | null>(null);
+  return (
+    <div className="space-y-2">
+      <p className="text-sm text-muted-foreground" data-testid="row-opened">
+        {opened ? `已開啟 ${opened}` : "尚未開啟任何一筆"}
+      </p>
+      <DataTable
+        rows={demoRecords.slice(0, 5)}
+        columns={columns}
+        getRowKey={(r) => r.id}
+        searchable={false}
+        selectable
+        onRowClick={(r) => setOpened(r.id)}
+        bulkActions={({ selected, clear }) => (
+          <Button size="sm" variant="outline" className="h-7" onClick={clear}>
+            匯出所選（{selected.length}）
+          </Button>
+        )}
+      />
+    </div>
+  );
+}
+
+export const 整列可點與批次勾選: Story = {
+  render: () => <RowEntryDemo />,
+  // 契約（〈清單頁〉兩條規範並存）：列本身不是 button——鍵盤與讀屏的入口是首欄的真按鈕，
+  // 列裡才放得下勾選框（axe 的 nested-interactive 由 verify:storybook 一併掃）。
+  // 勾選不開啟；按首欄按鈕、鍵盤 Enter、點列上非互動區域都開同一筆。
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const [a, b, c, d] = demoRecords.slice(0, 4).map((r) => r.id);
+    const opened = canvas.getByTestId("row-opened");
+
+    // 入口是首欄按鈕；列本身沒有 button 角色、不是 Tab 停點
+    const rowA = canvas.getByRole("button", { name: a }).closest("tr");
+    await expect(rowA).not.toBeNull();
+    await expect(rowA).not.toHaveAttribute("role");
+    await expect(rowA).not.toHaveAttribute("tabindex");
+
+    // 勾選只勾選，不開啟
+    await userEvent.click(canvas.getByRole("checkbox", { name: `選取 ${a}` }));
+    const bar = await canvas.findByRole("toolbar", { name: "已選 1 筆" });
+    await expect(opened).toHaveTextContent("尚未開啟任何一筆");
+
+    // 按首欄按鈕
+    await userEvent.click(canvas.getByRole("button", { name: b }));
+    await expect(opened).toHaveTextContent(`已開啟 ${b}`);
+
+    // 鍵盤：聚焦入口、Enter
+    canvas.getByRole("button", { name: c }).focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(opened).toHaveTextContent(`已開啟 ${c}`);
+
+    // 滑鼠點列上非互動區域（最後一欄）
+    const rowD = canvas.getByRole("button", { name: d }).closest("tr")!;
+    const cells = within(rowD).getAllByRole("cell");
+    await userEvent.click(cells[cells.length - 1]);
+    await expect(opened).toHaveTextContent(`已開啟 ${d}`);
+
+    // 收尾：清掉選取，不留殘留狀態給視覺掃描
+    await userEvent.click(within(bar).getByRole("button", { name: "清除選取" }));
+    await waitFor(() => expect(canvas.queryByRole("toolbar")).toBeNull());
+  },
+};
+
 export const 欄位顯示: Story = {
   render: () => (
     <DataTable

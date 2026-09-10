@@ -39,6 +39,8 @@
    `verify:host` 第一次跑就抓到；Storybook 沒有同時開兩者的 story，所以一直沒被發現。
    宿主暫時只開整列可點。建議：DataTable 在 `selectable` 時改用首欄連結當列入口（或提供 grid 鍵盤模式），
    〈清單頁〉同步寫清楚兩者怎麼並存，並補一支同時開兩者的 story。
+   **已處理（同版 v0.13.0）**：整列可點的鍵盤與讀屏入口改成首欄的真按鈕，列本身不再是 `role="button"`；
+   新 story「整列可點與批次勾選」讓 `verify:storybook` 的 axe 照得到這個組合。清單頁恢復批次勾選（匯出所選）。
 5. **真的 `npx shadcn add` 會刪掉檔案開頭的註解。** `shadcn@4.21.0` 安裝時，把從第一行起的那段註解整段拿掉——
    command、sidebar、sidebar-nav、csv、download、forms-diff 六個檔的「為什麼這樣設計」說明，
    在走 CLI 的取用端消失；註解寫在 import 之後的其餘 50 個檔逐位元組相同。

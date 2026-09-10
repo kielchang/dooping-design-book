@@ -276,7 +276,9 @@ const { state, onStateChange } = useTableUrlState();
 
 - 排序表頭帶 `aria-sort`
 - 篩選鈕帶 `aria-label`（「篩選 單位」）
-- 可點擊列有 `role="button"`、`tabIndex`、Enter/Space 觸發
+- 整列可點（`onRowClick`）：鍵盤與讀屏的入口是首個可見欄的真 `<button>`（Enter／Space 觸發、名字就是首欄內容）；
+  列本身只接滑鼠點擊、**不是** button——勾選欄與欄內控制項因此不會變成巢狀互動，`<tr>` 也保住表格列的語意。
+  首欄的 `cell` 不要再渲染連結或按鈕：它已經是入口
 - 篩選面板走 portal ＋ fixed 定位，避免被表格捲動裁切
 
 ## 取用

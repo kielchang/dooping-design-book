@@ -5,6 +5,7 @@ import { Badge } from "@/components/dooping/badge";
 import { Button } from "@/components/dooping/button";
 import { TabPills } from "@/components/dooping/tab-pills";
 import { PageHeader } from "@/components/dooping/page-header";
+import { useToast } from "@/components/dooping/toast";
 import { useTableUrlState } from "@/lib/dooping/use-table-url-state";
 import { formatMoney } from "@/lib/dooping/utils";
 import { demoRecords, STATUS_LABEL, type DemoRecord, type RecordStatus } from "@/demo/sample-data";
@@ -12,10 +13,7 @@ import { useRouterUrlAdapter } from "../url-adapter";
 
 // 清單頁：頁首（標題＋筆數＋唯一主要動作右上）→ 工具區（檢視切換）→ 內容區（資料表）。
 // 檢視與表格狀態都寫進網址：篩完的清單可以直接貼給別人（〈後台系統的資訊架構〉的深連結規範）。
-//
-// 刻意沒開 selectable：〈清單頁〉的「整列可點」與「勾選後出現批次列」同時成立時，
-// DataTable 會在可聚焦的列裡包勾選框（axe nested-interactive）。verify-host 第一次跑就抓到，
-// 回饋記在 LEDGER.md；元件修好之前，宿主只保留整列可點這條主要入口。
+// 〈清單頁〉的兩條規範同時成立：整列可點進明細（鍵盤入口是首欄按鈕）、勾選之後才出現批次列。
 
 const STATUS_VARIANT = { draft: "secondary", confirmed: "info", done: "success", void: "danger" } as const;
 
@@ -44,6 +42,7 @@ const TABLE_PREFIX = "t.";
 
 export function ListPage() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [params, setParams] = useSearchParams();
   const viewParam = params.get("view");
   const view: View = VIEWS.includes(viewParam as View) ? (viewParam as View) : "all";
@@ -104,6 +103,20 @@ export function ListPage() {
         state={state}
         onStateChange={onStateChange}
         onRowClick={() => navigate("/master")}
+        selectable
+        bulkActions={({ selected, clear }) => (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7"
+            onClick={() => {
+              toast.push({ variant: "success", title: `已匯出 ${selected.length} 筆` });
+              clear();
+            }}
+          >
+            匯出所選
+          </Button>
+        )}
         csv={{
           headers: ["編號", "單位", "項目", "金額", "狀態", "建立日期"],
           row: (r) => [r.id, r.unit, r.name, r.amount, STATUS_LABEL[r.status], r.createdAt],

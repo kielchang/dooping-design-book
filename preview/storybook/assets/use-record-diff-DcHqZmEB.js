@@ -1,1 +1,0 @@
-import{r as u}from"./index-UiW3gZKV.js";import{d as v}from"./editable-field-DANRApfL.js";function b(e,d,o,c){const f=u.useMemo(()=>v(e,d,c),[e,d,c]),m=u.useCallback(t=>{o(r=>({...r,[t]:e?e[t]:void 0}))},[e,o]),n=u.useCallback(()=>{o(t=>{const r={...t};for(const s of c)r[s.key]=e?e[s.key]:void 0;return r})},[e,o,c]);return{changes:f,revertField:m,revertAll:n}}export{b as u};

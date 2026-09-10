@@ -1,6 +1,3 @@
-// NavGroup[] → 側邊欄的三態渲染（蒸餾自 shadcn-admin 的 nav-group）：
-// 葉節點＝連結；兩層群組在展開態＝Collapsible、在 icon 收合態＝往右彈出的 DropdownMenu。
-// 同一份資料也餵 CommandPalette——單一來源，兩個出口。
 import * as React from "react";
 import { ChevronRight } from "lucide-react";
 import { isNavActive, type NavGroup, type NavLeaf } from "../lib/nav";
@@ -13,6 +10,10 @@ import {
   SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
   SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, useSidebar,
 } from "./sidebar";
+
+// NavGroup[] → 側邊欄的三態渲染（蒸餾自 shadcn-admin 的 nav-group）：
+// 葉節點＝連結；兩層群組在展開態＝Collapsible、在 icon 收合態＝往右彈出的 DropdownMenu。
+// 同一份資料也餵 CommandPalette——單一來源，兩個出口。
 
 /** renderLink 收到的 props——注入端要**原樣轉發**（onClick 帶著行動版關抽屜的行為）。 */
 export interface SidebarNavLinkProps {

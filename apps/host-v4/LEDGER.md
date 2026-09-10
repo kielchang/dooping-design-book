@@ -39,9 +39,12 @@
    在走 CLI 的取用端消失；註解寫在 import 之後的其餘 50 個檔逐位元組相同。
    `host-sync` 保留完整內容，所以兩條安裝路徑目前就差這六段註解。
    建議：設計理由一律寫在第一個 import 之後（或改成 export 上的 JSDoc），並加一條 registry 守衛擋「內容以註解開頭」。
+   **已處理（同版 v0.13.0）**：以註解開頭的其實是七個檔（另有宿主沒裝的 mockup）。說明移到最後一個 import 之後，
+   沒有 import 的 csv／forms-diff 併進後面 export 的 JSDoc、download 寫進函式內；
+   新守衛 `tests/registry-content.test.ts` 擋 registry 內容以註解開頭。重跑 CLI 後 56 個檔逐位元組相同。
 
 ## 工具
 
 | 工具 | 版本 | 最後執行 | 結果 |
 | --- | --- | --- | --- |
-| shadcn CLI（`scripts/host-add.mjs`） | 4.21.0 | 2026-09-10 | 56 個檔中 50 個逐位元組相同；6 個檔開頭的註解被 CLI 刪除（見回饋 5） |
+| shadcn CLI（`scripts/host-add.mjs`） | 4.21.0 | 2026-09-10 | 56 個檔逐位元組相同（第一次跑 50／56：開頭註解被 CLI 刪掉的 6 個已修，見回饋 5） |

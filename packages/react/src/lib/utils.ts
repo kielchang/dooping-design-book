@@ -2,13 +2,22 @@ import { clsx, type ClassValue } from "clsx";
 import { extendTailwindMerge } from "tailwind-merge";
 
 /**
- * twMerge 認不得 token 自訂的字級名：預設表只有 xs…9xl，未登記的 `text-tiny` 會被當成
- * **文字色**，於是 `cn("text-sm", "text-tiny")` 兩者並存、誰贏看 CSS 產出順序。
- * 這裡把它們登記進 font-size 群組。用 classGroups（tailwind-merge v2／v3 同一套 API），
- * 不用 v3 才有的 theme 鍵——registry 抄走的宿主可能還在 v2。
+ * twMerge 的預設分群有兩處對不上本書的 class，登記在這裡。用 classGroups（tailwind-merge v2／v3
+ * 同一套 API），不用 v3 才有的 theme 鍵——registry 抄走的宿主可能還在 v2。
+ *
+ * 1. token 自訂字級：預設表只有 xs…9xl，未登記的 `text-tiny` 會被當成**文字色**，
+ *    於是 `cn("text-sm", "text-tiny")` 兩者並存、誰贏看 CSS 產出順序。登記進 font-size 群組。
+ * 2. `bg-gradient-to-*`：tailwind-merge v3 只認 v4 的 `bg-linear-*`，把 `bg-gradient-to-r` 當成**底色**。
+ *    DataTable 的十字對準疊在凍結格上時，會把凍結格的 `bg-background` 合併掉，捲過去的欄位從凍結欄透出來
+ *    （2026-09 手機實測）。元件要相容 v3 宿主所以寫 `bg-gradient-to-*`，在這裡登記回背景圖片群組。
  */
 const twMerge = extendTailwindMerge({
-  extend: { classGroups: { "font-size": [{ text: ["micro", "tiny"] }] } },
+  extend: {
+    classGroups: {
+      "font-size": [{ text: ["micro", "tiny"] }],
+      "bg-image": [{ bg: [{ "gradient-to": ["t", "tr", "r", "br", "b", "bl", "l", "tl"] }] }],
+    },
+  },
 });
 
 /** class 合併：後者覆蓋前者的同類 Tailwind utility（避免 `p-2 p-4` 這種順序賭博）。 */

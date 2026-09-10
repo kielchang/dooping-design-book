@@ -104,6 +104,11 @@ const NumCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<HT
 NumCell.displayName = "NumCell";
 
 /** 凍結首欄：長表水平捲動時保留「這一列是誰」的脈絡。套在第一個 th/td。 */
+// 凍結格必須不透明，捲過去的欄位才不會透出來。兩個相依要一起守（窄螢幕才看得到，桌面寬度表格不必捲）：
+// 1. 十字對準用 bg-gradient-to-* 疊在這個底色上——cn() 要把它認成背景圖片群組，否則 twMerge 會吃掉 bg-background
+//    （tailwind-merge v3 預設就會吃；登記在 lib/utils）。
+// 2. 有勾選欄時凍結首欄 sticky 在 left: 2.5rem，所以勾選欄固定 w-10 min-w-10——少了 min-w，表格自動版面會把它壓到 32px，
+//    兩個凍結格之間多出 8px 縫。兩條都由 scripts/verify-host.mjs 的「凍結欄」情境在 390px 寬實測。
 const freezeFirst = "sticky left-0 z-10 bg-background";
 
 export interface SortHeadProps extends React.PropsWithChildren {

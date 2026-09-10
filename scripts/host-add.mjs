@@ -22,9 +22,15 @@ const STATIC = join(ROOT, OUT);
 // 釘版：升版走 PR，PR 必附「host-add 後 host-sync 零差異」的證據
 const SHADCN = "shadcn@4.21.0";
 
-const names = process.argv.slice(2).length
-  ? process.argv.slice(2)
+// 「--」開頭的參數原樣交給 CLI。`--dry-run` 預覽會動到哪些檔、`--diff=<檔案>` 看單檔差異——
+// 這是取用端「上游改了什麼、我抄走的哪幾個檔會變」的第一手視角；預覽時不帶 --overwrite。
+const argv = process.argv.slice(2);
+const passthrough = argv.filter((a) => a.startsWith("--"));
+const picked = argv.filter((a) => !a.startsWith("--"));
+const names = picked.length
+  ? picked
   : JSON.parse(readFileSync(join(ROOT, "apps/host-v4/dooping.install.json"), "utf8")).items;
+const preview = passthrough.some((a) => a === "--dry-run" || a.startsWith("--diff") || a.startsWith("--view"));
 
 const server = createServer((req, res) => {
   const path = decodeURIComponent(new URL(req.url, "http://x").pathname).replace(/^\/r\//, "");
@@ -54,7 +60,7 @@ const run = (cmd, args, env = {}) =>
 try {
   // 產一份 base 指向本機伺服器的 registry——registryDependencies 才會回到這台伺服器，而不是正式站
   await run("node", ["scripts/build-registry.mjs"], { REGISTRY_BASE: base, REGISTRY_OUT: OUT });
-  await run("npx", ["--yes", SHADCN, "add", "--yes", "--overwrite", "--cwd", "apps/host-v4", ...names.map((n) => `${base}/r/${n}.json`)]);
+  await run("npx", ["--yes", SHADCN, "add", "--yes", ...(preview ? [] : ["--overwrite"]), ...passthrough, "--cwd", "apps/host-v4", ...names.map((n) => `${base}/r/${n}.json`)]);
   console.log("\n[host-add] 完成。接著：npm run host:sync && git diff --exit-code -- apps/host-v4/src");
 } catch (e) {
   console.error(`[host-add] ${e.message}`);

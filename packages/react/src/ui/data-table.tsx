@@ -591,7 +591,7 @@ export function DataTable<T>({
         <Table zebra={false} maxHeight={maxHeight}>
           <TableHeader sticky={false}>
             <TableRow>
-              {selectable && <TableHead className="w-10" />}
+              {selectable && <TableHead className="w-10 min-w-10" />}
               {visibleColumns.map((c) => (
                 <TableHead key={c.key} className={cn(c.numeric && "text-right")}>
                   <div className={cn("flex h-10 items-center px-2", c.numeric && "justify-end")}>{c.header}</div>
@@ -602,7 +602,7 @@ export function DataTable<T>({
           <TableBody aria-hidden>
             {Array.from({ length: Math.min(size, 15) }, (_, r) => (
               <TableRow key={r}>
-                {selectable && <TableCell className="w-10" />}
+                {selectable && <TableCell className="w-10 min-w-10" />}
                 {visibleColumns.map((c) => (
                   <TableCell key={c.key}>
                     <Skeleton className={cn("h-4", c.numeric ? "ml-auto w-16" : "w-4/5")} />
@@ -631,7 +631,7 @@ export function DataTable<T>({
           <TableHeader sticky={stickyHeader}>
             <TableRow onMouseLeave={() => crosshair && setCross(null)}>
               {selectable && (
-                <TableHead className={cn("w-10 p-0", hasFreeze && freezeFirst)}>
+                <TableHead className={cn("w-10 min-w-10 p-0", hasFreeze && freezeFirst)}>
                   <div className="flex h-10 items-center justify-center px-2">
                     <Checkbox
                       aria-label={L.selectAllPage}
@@ -722,7 +722,7 @@ export function DataTable<T>({
               >
                 {selectable && (
                   <TableCell
-                    className={cn("w-10 p-0", hasFreeze && freezeFirst, dense && "py-1")}
+                    className={cn("w-10 min-w-10 p-0", hasFreeze && freezeFirst, dense && "py-1")}
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-center justify-center px-2">
@@ -795,7 +795,7 @@ export function DataTable<T>({
           {hasTotals && (
             <TableFooter>
               <TableRow>
-                {selectable && <TableCell className={cn("w-10", hasFreeze && freezeFirst)} />}
+                {selectable && <TableCell className={cn("w-10 min-w-10", hasFreeze && freezeFirst)} />}
                 {visibleColumns.map((c, i) => (
                   <TableCell
                     key={c.key}

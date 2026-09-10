@@ -49,9 +49,17 @@
    **已處理（同版 v0.13.0）**：以註解開頭的其實是七個檔（另有宿主沒裝的 mockup）。說明移到最後一個 import 之後，
    沒有 import 的 csv／forms-diff 併進後面 export 的 JSDoc、download 寫進函式內；
    新守衛 `tests/registry-content.test.ts` 擋 registry 內容以註解開頭。重跑 CLI 後 56 個檔逐位元組相同。
+6. **手機看預覽站：清單表格水平捲動時，捲過去的欄位從凍結欄透出來。** 兩個原因疊在一起：
+   十字對準的 `bg-gradient-to-r` 經 `cn()` 合併掉凍結格的 `bg-background`（tailwind-merge v3 把它當底色，v2 不會）；
+   勾選欄被表格自動版面壓到 32px，凍結首欄卻 sticky 在 `left: 2.5rem`，中間多出 8px 縫。
+   `verify:host` 原本只在桌面寬度看清單頁，表格不必捲，所以沒看見。
+   **已處理（同版 v0.13.0）**：`utils` 把 `bg-gradient-to-*` 登記回背景圖片群組、勾選欄加 `min-w-10`；
+   `verify:host` 加 390px 寬的「凍結欄」情境，對修正前的宿主跑出 3 條紅。
+   宿主照取用端的路更新：`host-add --dry-run data-table` 預覽出 3 個會覆寫的檔（`utils`、`table`、`data-table`，
+   其餘相依標 identical 跳過）→ 真的覆寫 → `host-sync` 零差異。
 
 ## 工具
 
 | 工具 | 版本 | 最後執行 | 結果 |
 | --- | --- | --- | --- |
-| shadcn CLI（`scripts/host-add.mjs`） | 4.21.0 | 2026-09-10 | 56 個檔逐位元組相同（第一次跑 50／56：開頭註解被 CLI 刪掉的 6 個已修，見回饋 5） |
+| shadcn CLI（`scripts/host-add.mjs`） | 4.21.0 | 2026-09-10 | 56 個檔逐位元組相同（第一次跑 50／56：開頭註解被 CLI 刪掉的 6 個已修，見回饋 5）。更新 data-table 時 `--dry-run` 列出 3 個要覆寫的相依檔（見回饋 6） |

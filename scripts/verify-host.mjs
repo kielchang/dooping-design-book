@@ -1,4 +1,4 @@
-// 內部試裝宿主的渲染守衛——token 期望值（主題×模式×頁）＋頁面級 axe＋強制色彩焦點＋行動版外殼。
+// 內部試裝宿主的渲染守衛——token 期望值（主題×模式×頁）＋頁面級 axe＋強制色彩焦點＋行動版外殼＋凍結欄。
 //
 //   npm run host:build && node scripts/verify-host.mjs
 //   HOST_BASE=/dooping-design-book/preview/host/ node scripts/verify-host.mjs   # 建置帶子路徑 base 時
@@ -13,6 +13,7 @@
 //   4. 強制色彩下鍵盤焦點看得見（scripts/lib/forced-colors.mjs，與 verify:storybook 共用）。
 //   5. 行動版外殼：窄螢幕側欄轉成抽屜、開得起來、Esc 關閉後焦點回到開關。
 //   6. 每一頁零 pageerror、零 console error。
+//   7. 凍結欄：窄螢幕水平捲動＋十字對準時，凍結格仍不透明、彼此之間沒有縫（捲過去的欄位不會透出來）。
 //
 // 讀 computed style 不讀截圖：宿主頁面的實色面積小（卡片、表格），掃圖容易被反鋸齒湊巧命中。
 // 主題由 useEffect 非同步套上——驗到相符為止（bounded retry），不靠長等待。
@@ -250,18 +251,95 @@ async function main() {
     await context.close();
   }
 
+  // ── 7：凍結欄在水平捲動＋十字對準下不透明、彼此無縫 ────────────────
+  // 2026-09 手機實測（預覽站清單頁）：窄螢幕水平捲動時捲過去的欄位從凍結欄透出來，兩個原因——
+  //   (a) 十字對準的 bg-gradient-to-r 經 cn() 合併掉凍結格的 bg-background（tailwind-merge v3 把它當底色）；
+  //   (b) 勾選欄被表格自動版面壓到 32px，凍結首欄卻 sticky 在 left: 2.5rem，中間多出 8px 縫。
+  // Storybook 與桌面寬度都看不到：表格不需要捲，凍結格底下沒有東西可以透。
+  {
+    const { context, page, errors } = await openPage(browser, {
+      theme: DEFAULT_THEME,
+      mode: "light",
+      contextOptions: { viewport: { width: 390, height: 844 } },
+    });
+    try {
+      await page.goto(url("stock-check"), { waitUntil: "load" });
+      await page.waitForSelector("main tbody tr td", { timeout: 10000 });
+      const scrolled = await page.evaluate(() => {
+        const table = document.querySelector("main table");
+        let sc = table ? table.parentElement : null;
+        while (sc && sc !== document.body && sc.scrollWidth <= sc.clientWidth) sc = sc.parentElement;
+        if (!sc || sc === document.body) return 0;
+        sc.scrollLeft = 150;
+        return sc.scrollLeft;
+      });
+      if (scrolled <= 0) fails.push("[凍結欄] 390px 寬的清單表格沒有水平捲動——情境不成立（檢查空轉）");
+
+      // 指向一個沒被凍結欄蓋住的一般儲存格，觸發十字對準（同一列的凍結格會套上漸層）
+      const rowIndex = 2;
+      const target = await page.evaluate((ri) => {
+        const tr = document.querySelectorAll("main tbody tr")[ri];
+        const tds = tr ? [...tr.children] : [];
+        return tds.findIndex((td) => {
+          if (getComputedStyle(td).position === "sticky") return false;
+          const r = td.getBoundingClientRect();
+          const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+          return r.width > 0 && hit !== null && td.contains(hit);
+        });
+      }, rowIndex);
+      if (target < 0) throw new Error("找不到沒被蓋住的一般儲存格可以指向");
+      await page.locator("main tbody tr").nth(rowIndex).locator("td").nth(target).hover();
+
+      const stickyCells = (selector) =>
+        page.evaluate((sel) => {
+          const tr = document.querySelector(sel);
+          return (tr ? [...tr.children] : [])
+            .filter((cell) => getComputedStyle(cell).position === "sticky")
+            .map((cell) => {
+              const cs = getComputedStyle(cell);
+              const r = cell.getBoundingClientRect();
+              return { bg: cs.backgroundColor, gradient: cs.backgroundImage.includes("gradient"), left: r.left, right: r.right };
+            });
+        }, selector);
+
+      let body = [];
+      for (let i = 0; i < RETRIES; i++) {
+        await page.waitForTimeout(100 * (i + 1));
+        body = await stickyCells(`main tbody tr:nth-child(${rowIndex + 1})`);
+        if (body.some((c) => c.gradient)) break;
+      }
+      const head = await stickyCells("main thead tr");
+      if (body.length < 2) fails.push(`[凍結欄] 資料列只有 ${body.length} 個凍結格（期望勾選欄＋凍結首欄）——檢查空轉`);
+      if (!body.some((c) => c.gradient)) fails.push("[凍結欄] 十字對準沒有套到凍結格——情境不成立（檢查空轉）");
+      for (const [where, cells] of [["資料列", body], ["表頭", head]]) {
+        cells.forEach((c, k) => {
+          if (parseColor(c.bg).alpha < 1)
+            fails.push(`[凍結欄] ${where}第 ${k + 1} 個凍結格背景是 ${c.bg}——不透明底被合併掉，捲過去的欄位會透出來`);
+          if (k > 0) {
+            const gap = Math.round((c.left - cells[k - 1].right) * 10) / 10;
+            if (gap > 0.5) fails.push(`[凍結欄] ${where}第 ${k} 與第 ${k + 1} 個凍結格之間有 ${gap}px 縫——捲過去的欄位會從縫裡透出來`);
+          }
+        });
+      }
+    } catch (e) {
+      fails.push(`[凍結欄] 情境執行失敗：${String(e.message).split("\n")[0]}`);
+    }
+    for (const e of errors) fails.push(`[凍結欄]  ${e}`);
+    await context.close();
+  }
+
   await browser.close();
   server.close();
 
   console.log(
     `token 期望值 ${combos} 組（${THEMES.length} 主題 × ${MODES.length} 模式 × ${PAGES.length} 頁）；` +
-      `頁面級 axe ${PAGES.length} 頁；強制色彩焦點 ${FORCED_COLORS_PAGES.length} 頁；行動版外殼 1 個情境`,
+      `頁面級 axe ${PAGES.length} 頁；強制色彩焦點 ${FORCED_COLORS_PAGES.length} 頁；行動版外殼 1 個情境；凍結欄 1 個情境`,
   );
   if (fails.length) {
     console.error(`\n✗ 內部試裝宿主渲染守衛不通過（${fails.length} 條）：\n` + fails.map((f) => "  " + f).join("\n"));
     process.exit(1);
   }
-  console.log("✓ 內部試裝宿主渲染守衛通過：主題套上、透明度可用、頁面結構無障礙、強制色彩與行動版外殼行為正確。");
+  console.log("✓ 內部試裝宿主渲染守衛通過：主題套上、透明度可用、頁面結構無障礙、強制色彩、行動版外殼與凍結欄行為正確。");
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

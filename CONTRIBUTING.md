@@ -13,7 +13,7 @@
 
 另有一個低門檻入口：[**缺件認領**](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml)——頁面章缺件表的項目，回報一個使用場景就是三次法則的一次證據，證據齊了就會動工。
 
-缺件表的 **Drawer** 已經有一份實作草稿躺在遠端分支 `claude/overlays-page-header`（`packages/react/src/ui/drawer.tsx`，Radix Dialog 組成、右側滑出，檔頭有與 Dialog 的分工說明）。它基於 v0.11.0 舊底、**尚未收錄**，三次法則證據齊了再拿來重新底化；這支分支就是為此刻意保留的，清理分支時不要順手刪掉。
+缺件表的 **Drawer** 已經有一份實作草稿，保存在 tag `draft/drawer-on-0.11.0`：`packages/react/src/ui/drawer.tsx`（Radix Dialog 組成、右側滑出，檔頭有與 Dialog 的分工說明），連同 `overlay-panels.stories.tsx`、`registry/drawer.json` 與文件頁 `book/docs/3-components/31-overlays.mdx`。它基於 v0.11.0 舊底、**尚未收錄**，三次法則證據齊了再拿來重新底化。原本放草稿的分支 `claude/overlays-page-header` 已於 2026-09-10 改以 tag 保存並刪除——tag 不會在清理分支時被帶走，**不要刪這個 tag**。取回單檔：`git fetch origin tag draft/drawer-on-0.11.0` 後 `git show draft/drawer-on-0.11.0:packages/react/src/ui/drawer.tsx`。
 
 **下游唯讀鐵律**：取用端專案對這個 repo 只有「讀」與「提案」兩種關係，
 沒有 submodule、沒有自動同步；**未合併的提案不得在下游先行實作**

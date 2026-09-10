@@ -17,7 +17,7 @@ npm run build:tokens
 | --- | --- |
 | `tests/tokens.test.ts`、`tests/tokens-v4.test.ts` | 直接讀檔比對、真的用 Tailwind v4 編一次 |
 | `.storybook/styles.css`（＋`main.ts` 的 alias） | `@import` 兩個產物——與取用端同一套四行 |
-| `book/src/css/kit.css` | `@import` `tokens.css` |
+| `book/src/css/kit.css` | `@import` 兩個產物（v4 管線；demo-base 由 `book/scripts/port-preflight.mjs` 產生） |
 
 所以乾淨 clone 之後不先跑 `build:tokens`，`npm test`、Storybook、文件站**三者都會失敗**。
 `.claude/hooks/session-start.sh` 會自動處理，手動操作時要自己記得。

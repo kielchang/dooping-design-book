@@ -17,6 +17,10 @@
 //   1) 全部用 DOM query 找目標，不用固定座標——版面一動座標就失效；
 //   2) 期望值來自 tokens.json 經 resolve(defaultTheme) 的**有效值**，不是肉眼；
 //   3) hydration 與深色切換是非同步的——驗到相符為止（bounded retry），不靠「等久一點」。
+//
+// Tailwind v4 之後：透明度修飾（bg-muted/30、border-muted-foreground/30）編成
+// color-mix(in oklab, …)，瀏覽器給的 computed 值是 oklab()／color(srgb …) 而不是 rgba()。
+// 頁內色彩解析器（installColorParser）看得懂這幾種格式——否則「值其實對」也會判錯。
 import { readFileSync, readdirSync, statSync, existsSync, mkdirSync } from "node:fs";
 import { createServer } from "node:http";
 import { dirname, join, extname, normalize } from "node:path";
@@ -41,20 +45,60 @@ const resolve = (mode, name) => {
   return hslToRgb8((t ?? tokens.color[mode][name]).value);
 };
 
-const parseColor = (str) => {
-  const m = /^rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\)$/.exec(str ?? "");
-  if (!m) return null;
-  return { r: +m[1], g: +m[2], b: +m[3], a: m[4] === undefined ? 1 : +m[4] };
-};
-const near = (str, rgb8, alpha = 1) => {
-  const c = parseColor(str);
-  if (!c) return false;
-  return (
-    Math.abs(c.r - rgb8[0]) <= TOL && Math.abs(c.g - rgb8[1]) <= TOL &&
-    Math.abs(c.b - rgb8[2]) <= TOL && Math.abs(c.a - alpha) <= ALPHA_TOL
-  );
-};
-const isTransparent = (str) => str === "transparent" || parseColor(str)?.a === 0;
+/**
+ * 頁內色彩解析器：rgb()／rgba()／color(srgb …)／oklab()／oklch() → { r, g, b（0–255）, a }。
+ * 以 addInitScript 注入每一頁（page.evaluate 傳進去的函式拿不到外層 closure）。
+ * oklab → sRGB 用 Björn Ottosson 的矩陣，與 packages/tokens/scripts/lib/color.mjs 同一套。
+ */
+function installColorParser() {
+  const gamma = (c) => (c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055);
+  const to255 = (v) => Math.max(0, Math.min(255, v * 255));
+  const num = (v, pctScale) => (v.endsWith("%") ? (parseFloat(v) / 100) * pctScale : parseFloat(v));
+  const split = (inner) => {
+    const [main, alpha] = inner.split("/");
+    return { vals: main.trim().split(/[\s,]+/).filter(Boolean), a: alpha === undefined ? 1 : num(alpha.trim(), 1) };
+  };
+  window.__toRgba = (input) => {
+    const s = String(input ?? "").trim().toLowerCase();
+    if (s === "transparent") return { r: 0, g: 0, b: 0, a: 0 };
+    let m = /^rgba?\((.*)\)$/.exec(s);
+    if (m) {
+      const n = m[1].split(/[\s,/]+/).filter(Boolean).map((v) => num(v, 1));
+      return { r: n[0], g: n[1], b: n[2], a: n.length > 3 ? n[3] : 1 };
+    }
+    m = /^color\(srgb\s+(.*)\)$/.exec(s);
+    if (m) {
+      const { vals, a } = split(m[1]);
+      return { r: to255(num(vals[0], 1)), g: to255(num(vals[1], 1)), b: to255(num(vals[2], 1)), a };
+    }
+    m = /^(oklab|oklch)\((.*)\)$/.exec(s);
+    if (m) {
+      const { vals, a } = split(m[2]);
+      const L = num(vals[0], 1);
+      let A;
+      let Bv;
+      if (m[1] === "oklab") {
+        A = num(vals[1], 0.4);
+        Bv = num(vals[2], 0.4);
+      } else {
+        const C = num(vals[1], 0.4);
+        const h = (parseFloat(vals[2]) * Math.PI) / 180;
+        A = C * Math.cos(h);
+        Bv = C * Math.sin(h);
+      }
+      const l = (L + 0.3963377774 * A + 0.2158037573 * Bv) ** 3;
+      const mm = (L - 0.1055613458 * A - 0.0638541728 * Bv) ** 3;
+      const ss = (L - 0.0894841775 * A - 1.291485548 * Bv) ** 3;
+      return {
+        r: to255(gamma(4.0767416621 * l - 3.3077115913 * mm + 0.2309699292 * ss)),
+        g: to255(gamma(-1.2684380046 * l + 2.6097574011 * mm - 0.3413193965 * ss)),
+        b: to255(gamma(-0.0041960863 * l - 0.7034186147 * mm + 1.707614701 * ss)),
+        a,
+      };
+    }
+    return null;
+  };
+}
 
 // ── 找頁與起站 ────────────────────────────────────────────────
 function findDemoPages() {
@@ -109,14 +153,12 @@ function serve(base) {
 function pageChecks(exp) {
   const fails = [];
   const near = (str, rgb, alpha = 1) => {
-    const m = /^rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\)$/.exec(str ?? "");
-    if (!m) return false;
-    const a = m[4] === undefined ? 1 : +m[4];
-    return Math.abs(+m[1] - rgb[0]) <= exp.tol && Math.abs(+m[2] - rgb[1]) <= exp.tol &&
-      Math.abs(+m[3] - rgb[2]) <= exp.tol && Math.abs(a - alpha) <= exp.alphaTol;
+    const c = window.__toRgba(str);
+    if (!c) return false;
+    return Math.abs(c.r - rgb[0]) <= exp.tol && Math.abs(c.g - rgb[1]) <= exp.tol &&
+      Math.abs(c.b - rgb[2]) <= exp.tol && Math.abs(c.a - alpha) <= exp.alphaTol;
   };
-  const transparent = (str) =>
-    str === "transparent" || /^rgba\([\d.]+,\s*[\d.]+,\s*[\d.]+,\s*0\)$/.test(str ?? "");
+  const transparent = (str) => window.__toRgba(str)?.a === 0;
   const label = (el) => `<${el.tagName.toLowerCase()} class="${String(el.className).slice(0, 60)}">`;
 
   // 1) demo 內的按鈕：不帶邊框寬度 class 的，四邊必須 0；任何按鈕都不得出現 UA 的
@@ -202,11 +244,10 @@ function pageChecks(exp) {
 function portalChecks(exp) {
   const fails = [];
   const near = (str, rgb, alpha = 1) => {
-    const m = /^rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\)$/.exec(str ?? "");
-    if (!m) return false;
-    const a = m[4] === undefined ? 1 : +m[4];
-    return Math.abs(+m[1] - rgb[0]) <= exp.tol && Math.abs(+m[2] - rgb[1]) <= exp.tol &&
-      Math.abs(+m[3] - rgb[2]) <= exp.tol && Math.abs(a - alpha) <= exp.alphaTol;
+    const c = window.__toRgba(str);
+    if (!c) return false;
+    return Math.abs(c.r - rgb[0]) <= exp.tol && Math.abs(c.g - rgb[1]) <= exp.tol &&
+      Math.abs(c.b - rgb[2]) <= exp.tol && Math.abs(c.a - alpha) <= exp.alphaTol;
   };
   const panel = [...document.body.children].find((el) => el.classList?.contains("bg-popover"));
   if (!panel) return { fails: ["篩選面板未出現在 body 直下"], hasCheckbox: false };
@@ -290,6 +331,7 @@ async function main() {
 
   // 淺色：全部 demo 頁
   const light = await browser.newContext({ colorScheme: "light" });
+  await light.addInitScript(installColorParser);
   const lp = await light.newPage();
   for (const p of pages) {
     record(`[light] ${p}`, await checkPage(lp, origin + base.replace(/\/$/, "") + p, exp("light")));
@@ -338,6 +380,7 @@ async function main() {
 
   // 深色：驗切換後的邊框有效值（Docusaurus respectPrefersColorScheme + hydration 非同步，驗到就位為止）
   const dark = await browser.newContext({ colorScheme: "dark" });
+  await dark.addInitScript(installColorParser);
   const dp = await dark.newPage();
   {
     const url = origin + base.replace(/\/$/, "") + "/components/table/";

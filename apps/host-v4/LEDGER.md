@@ -34,9 +34,14 @@
    `verify:host` 第一次跑就抓到；Storybook 沒有同時開兩者的 story，所以一直沒被發現。
    宿主暫時只開整列可點。建議：DataTable 在 `selectable` 時改用首欄連結當列入口（或提供 grid 鍵盤模式），
    〈清單頁〉同步寫清楚兩者怎麼並存，並補一支同時開兩者的 story。
+5. **真的 `npx shadcn add` 會刪掉檔案開頭的註解。** `shadcn@4.21.0` 安裝時，把從第一行起的那段註解整段拿掉——
+   command、sidebar、sidebar-nav、csv、download、forms-diff 六個檔的「為什麼這樣設計」說明，
+   在走 CLI 的取用端消失；註解寫在 import 之後的其餘 50 個檔逐位元組相同。
+   `host-sync` 保留完整內容，所以兩條安裝路徑目前就差這六段註解。
+   建議：設計理由一律寫在第一個 import 之後（或改成 export 上的 JSDoc），並加一條 registry 守衛擋「內容以註解開頭」。
 
 ## 工具
 
 | 工具 | 版本 | 最後執行 | 結果 |
 | --- | --- | --- | --- |
-| shadcn CLI（`scripts/host-add.mjs`） | 4.21.0 | 尚未執行 | — |
+| shadcn CLI（`scripts/host-add.mjs`） | 4.21.0 | 2026-09-10 | 56 個檔中 50 個逐位元組相同；6 個檔開頭的註解被 CLI 刪除（見回饋 5） |

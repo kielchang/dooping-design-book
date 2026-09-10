@@ -36,7 +36,7 @@ export * from "./ui/confirm-dialog";
 export * from "./ui/command";
 export * from "./ui/command-palette";
 
-// 應用外殼（ADR-0011，preview 評估中）：純呈現、不綁路由與資料
+// 應用外殼（ADR-0011，評估中）：純呈現、不綁路由與資料
 export * from "./ui/sidebar";
 export * from "./ui/sidebar-nav";
 export * from "./ui/app-shell";

@@ -37,11 +37,13 @@ commit 本身記在 tag 描述裡，不會遺失。
 
 ---
 
-## 未發佈（`dev`）
+## v0.13.0 · 2026-09-10
 
-兩條線：蒸餾 shadcn-admin（MIT）進本書（[ADR-0011](docs/adr/0011-adopt-app-shell.md)，
-提議中——preview 評估通過才併 main），以及缺件表第一列的
-[ADR-0008](docs/adr/0008-pages-chapter-scope.md) 解鎖（PageHeader）。
+四條線：蒸餾 shadcn-admin（MIT）進本書（[ADR-0011](docs/adr/0011-adopt-app-shell.md)，
+提議中——2026-09 起先合併、在 main 上評估），缺件表第一列的
+[ADR-0008](docs/adr/0008-pages-chapter-scope.md) 解鎖（PageHeader），
+Tailwind v4 為主、v3 相容的取用路徑（token 入口，本書自己的 Storybook 與文件站一併升級），
+以及照取用端的路接上來的內部試裝宿主 `apps/host-v4`。
 規範 0.11.1 → 0.13.0、tokens 0.6.0 → 0.7.0。
 
 ### Token：Tailwind v4 入口＋強制色彩模式的焦點備援（tokens 0.7.0）
@@ -98,6 +100,20 @@ commit 本身記在 tag 描述裡，不會遺失。
    （記在 `apps/host-v4/LEDGER.md`），其中「整列可點＋批次勾選」的巢狀互動是 Storybook 一直沒看見的無障礙缺陷。
    它不計入 ADR-0011 判準②——內部試裝證明不了別人接得上。
 
+### 文件站升 Tailwind v4：demo 宿主基座改由產生器移植
+
+1. **改了什麼**：文件站改掛 `@tailwindcss/postcss`，刪除 `book/tailwind.config.js` 與 autoprefixer。
+   `kit.css` 的順序改為 tokens → demo-base → `tailwindcss/theme.css`（layer）→ tokens 的 `tailwind.css` →
+   `tailwindcss/utilities.css`（**不進 layer**——ADR-0010「utilities 較晚所以勝出」的前提才保得住），並明示 `@source`。
+   `demo-base.css` 改由 `book/scripts/port-preflight.mjs` 從 v4 preflight＋tokens 基座機械產生：
+   v4 的 preflight 有巢狀 `@supports` 與括號內的逗號，手抄一定會錯。`host-baseline` 守衛改用獨立寫的第二份
+   移植規則逐條比對；`verify:book` 的頁內色彩解析器看得懂 v4 透明度修飾算出來的 `oklab()`／`color(srgb …)`。
+   文件站的 prebuild 補建 `tailwind.css`。
+2. **我需要做什麼**：不需要。照抄 `demo-base.css` 當宿主基座的取用端，下次重抄會拿到 v4 版本
+   （全元素 margin／padding 歸零、placeholder 改用 currentcolor 50%）。
+3. **為什麼改**：規劃決定本書自己一次到位升 v4。文件站留在 v3，活範例與 Storybook、宿主拿到的就是兩套基座，
+   ADR-0010 要守的「同一份樣式前提」不成立。
+
 ### Token：`--sidebar-*` 八件組（tokens 0.7.0）
 
 1. **改了什麼**：新增 shadcn 相容的 `--sidebar-*` 八個 token。只有 `--sidebar` 是
@@ -135,7 +151,7 @@ commit 本身記在 tag 描述裡，不會遺失。
 3. **為什麼改**：導覽資料單一來源同時餵側邊欄與指令面板，是 shadcn-admin
    最划算的原創 pattern；契約（lib/nav）先於外殼落地。
 
-### 應用外殼：Sidebar 家族＋SidebarNav＋AppShell（ADR-0011，preview 評估中）
+### 應用外殼：Sidebar 家族＋SidebarNav＋AppShell（ADR-0011，評估中）
 
 1. **改了什麼**：新收外殼三件——Sidebar 家族（Provider／Trigger／結構件／選單鈕；
    桌面 icon 收合、行動版自動轉左滑抽屜＝既有 Radix Dialog 組成，焦點歸還自己記
@@ -144,8 +160,8 @@ commit 本身記在 tag 描述裡，不會遺失。
    AppShell（純佈局，刻意小到宿主可自行重寫）。相對 shadcn 上游砍掉
    floating/inset variant、SidebarRail、cookie、Ctrl+B——皆為刻意決定（ADR-0011）。
    verify:visual 增第三支外殼哨兵（sidebar＋sidebar-accent 是主題指紋）。
-2. **我需要做什麼**：**先不要在正式系統採用**——ADR-0011 狀態提議中，preview
-   評估通過（時間盒 4–6 週或兩個取用端試裝）才併入 main；評估不過整組退場。
+2. **我需要做什麼**：可以採用。ADR-0011 仍在評估（提議中，改在 main 上評估，見該 ADR「合併先於評估」一節）；
+   若評估不過，走〈版本策略〉的棄用流程（`@deprecated` → 保留至少一個 minor → 下個 major 移除），不會無預警消失。
 3. **為什麼改**：外殼是跨系統不一致成本最高的一塊；〈後台系統的資訊架構〉的
    規範從此有元件載體，行動版「分區順序不變」變成結構保證而不是紀律要求。
 

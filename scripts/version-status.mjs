@@ -9,6 +9,7 @@ import { readFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { classify, listTags, previousTag, registryItemsAt } from "./lib/registry-changes.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p) => JSON.parse(readFileSync(join(ROOT, p), "utf8"));
@@ -65,6 +66,13 @@ if (ahead.length === 0 && behind === 0) {
     console.log(`  　　　　　　　　　合併前記得把「未發佈」節改名為「## v${localVer} · 日期」`);
     if (declaredTokens !== npmTokens) {
       console.log(`  　　　　　　　　　⚠ token 宣告 ${declaredTokens} 尚未發佈到 npm——合併後要推 tokens-v${declaredTokens}`);
+    }
+    // ADR-0013 第三層：Release 會附的 registry 異動清單——合併前先看規模
+    const prev = tryto(() => previousTag(listTags(ROOT), `v${localVer}`), null);
+    const changes = prev ? tryto(() => classify(registryItemsAt(ROOT, prev), registryItemsAt(ROOT, "worktree")), null) : null;
+    if (changes) {
+      console.log(`  　　　　　　　　　Release 會附 registry 異動（相對 ${prev}）：內容有變 ${changes.changed.length}、只因相依受影響 ${changes.affected.length}、新增 ${changes.added.length}、移除 ${changes.removed.length}`);
+      console.log(`  　　　　　　　　　完整清單：npm run registry:changes -- --before v${localVer}`);
     }
   } else {
     console.log("  合併進 main 之後：純文件進版——不蓋 tag、不發 Release（取用端無感）");

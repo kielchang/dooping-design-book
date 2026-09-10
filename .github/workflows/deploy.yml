@@ -28,6 +28,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # 要讀上一個 v* tag 的 registry/ 來列 registry 異動（ADR-0013 第三層）
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
 
@@ -169,6 +172,15 @@ jobs:
           if [ ! -s /tmp/release-notes.md ]; then
             echo "::warning::CHANGELOG 找不到 $TAG 的段落——請回頭補查「合併前改名」步驟"
             echo "改了什麼、你需要做什麼：讀 [CHANGELOG](${{ github.server_url }}/${{ github.repository }}/blob/main/CHANGELOG.md) 的 $TAG 一則。" > /tmp/release-notes.md
+          fi
+          # ADR-0013 第三層：附上這一版動到的 registry item（相對上一個 v* tag）。
+          # 取用端看 Release 就知道自己抄的 item 有沒有被動到——包括只有相依變了的
+          # （例：修正落在 utils，抄了 data-table 的人一樣要重抄）。算不出來不擋發佈，只出 warning。
+          if node scripts/registry-changes.mjs --before "$TAG" --markdown > /tmp/registry-changes.md 2> /tmp/registry-changes.err; then
+            { echo ""; cat /tmp/registry-changes.md; } >> /tmp/release-notes.md
+            cat /tmp/registry-changes.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::算不出 registry 異動清單（不擋發佈）：$(head -c 300 /tmp/registry-changes.err)"
           fi
           {
             echo ""

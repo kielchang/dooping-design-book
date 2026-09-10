@@ -12,6 +12,7 @@ import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, rmSync }
 import { dirname, join, basename, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { rewrite } from "./lib/rewrite.mjs";
+import { fingerprints } from "./lib/fingerprint.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = join(ROOT, "packages/react/src");
@@ -177,6 +178,8 @@ rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 
 const items = [];
+// 完整的 item（含檔案與相依）：算指紋要用，index 只放摘要（ADR-0013）
+const fullItems = [];
 for (const abs of walk(SRC)) {
   const rel = relative(SRC, abs).replace(/\\/g, "/");
   if (rel === "index.ts" || rel === "version.ts" || rel.startsWith("demo/")) continue;
@@ -220,6 +223,7 @@ for (const abs of walk(SRC)) {
     ],
   };
   writeFileSync(join(OUT, `${name}.json`), `${JSON.stringify(item, null, 2)}\n`, "utf8");
+  fullItems.push(item);
   items.push({ name, version: SPEC_VERSION, type: item.type, title, description });
 }
 
@@ -264,9 +268,13 @@ for (const abs of walk(SRC)) {
       files,
     };
     writeFileSync(join(OUT, "charts.json"), `${JSON.stringify(item, null, 2)}\n`, "utf8");
+    fullItems.push(item);
     items.push({ name: "charts", version: SPEC_VERSION, type: item.type, title, description });
   }
 }
+
+// 逐 item 指紋（ADR-0013 第一層）：相依指到不存在的 item 會在這裡直接丟錯。
+const prints = fingerprints(fullItems);
 
 // registry 索引（給人看、也給工具列舉用）。
 // 索引上的 version 是「main 目前發佈的版本」——取用端拿它跟自己抄走那份比對，
@@ -281,9 +289,14 @@ const index = {
   // 機器可讀的欄位，取用端一個端點就能問到配對，不必翻 CHANGELOG。
   tokensVersion: TOKENS_VERSION,
   homepage: BASE,
+  // meta.hash：取用端抄走的內容與相依；meta.closureHash：再把遞移相依的指紋算進去——
+  // utils 修了，抄了 data-table 的人也看得出要重抄。版號、標題、說明與 base 都不進指紋。
   items: items
     .sort((a, b) => a.name.localeCompare(b.name))
-    .map((i) => ({ ...i, url: `${BASE}/r/${i.name}.json` })),
+    .map((i) => {
+      const fp = prints.get(i.name);
+      return { ...i, url: `${BASE}/r/${i.name}.json`, meta: { hash: fp.hash, closureHash: fp.closureHash } };
+    }),
 };
 writeFileSync(join(OUT, "index.json"), `${JSON.stringify(index, null, 2)}\n`, "utf8");
 

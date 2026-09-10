@@ -46,6 +46,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # 要讀上一個 v* tag 的 registry/ 來列 registry 異動（ADR-0013 第三層）
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
 
@@ -66,6 +69,16 @@ jobs:
             echo "::error::registry/ 與原始碼不同步。請執行 npm run build:registry 並提交結果。"
             exit 1
           }
+
+      # ADR-0013 第三層的預演：合併進 main 時 Release 會附的 registry 異動清單，在 dev 就先算一次。
+      # 腳本在這裡壞掉，比進版當下才在 deploy.yml 裡壞掉便宜得多。
+      - name: registry 異動預覽（相對上一個 v* tag，寫進 step summary）
+        run: |
+          if git tag --list 'v*' | grep -q .; then
+            node scripts/registry-changes.mjs --before "v$(node -p "require('./package.json').version")" --markdown >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "沒有 v* tag，略過"
+          fi
 
       # 「什麼時候該發 npm」的規則是：tokens.json 的內容有變才發。
       # 這一步讓那條規則變成會擋人的檢查，而不是要記得的事。

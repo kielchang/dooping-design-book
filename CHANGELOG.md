@@ -322,6 +322,19 @@ Tailwind v4 為主、v3 相容的取用路徑（token 入口，本書自己的 S
 3. **為什麼改**：在手機上看預覽站的內部試裝宿主時抓到（LEDGER 回饋 6）。回歸來自本版把 tailwind-merge 從 v2 升到 v3。
    Storybook 與桌面寬度都看不到：表格不需要捲，凍結格底下沒有東西可以透。
 
+### 元件更新訊號（一）：registry 逐 item 指紋＋Release 列出這一版動到的 item（ADR-0013）
+
+1. **改了什麼**：
+   - `/r/index.json` 每個 item 多了 `meta.hash`（抄走的內容與相依）與 `meta.closureHash`（再把遞移相依的指紋算進去）。
+     版號、標題、說明與 base 不進指紋——預覽站與正式站的同一份內容，同一個指紋。
+   - 發 Release 時自動附上「這一版動到的 registry item」，相對上一個 `v*` tag 分四類：內容有變、只因相依變了而受影響、新增、移除。
+     dev 上的 CI 先在 step summary 預演；`npm run status` 在合併前印出四類數量；`npm run registry:changes` 看完整清單。
+   - 守衛：`tests/registry-fingerprint.test.ts` 用第二份獨立實作逐 item 重算 index 的指紋，並盯住「base 與說明不進指紋、相依變了 closureHash 跟著變」；
+     `tests/registry-changes.test.ts` 驗四類分類、Markdown 輸出、上一個 tag 照數字大小挑。
+2. **我需要做什麼**：不需要。訂閱了 Release 的話，之後每一版的通知會直接列出動到哪些 item，對照自己抄過的就知道要不要重抄。
+3. **為什麼改**：凍結欄那一次的修正主要落在 `utils`，取用端從來不會主動去抄它。整個規範一個版號，看不出動到哪幾個 item；
+   只比對自己抄的 `data-table` 也找不到。拿 dev 上凍結欄修正前後實跑：內容有變 3 個（`data-table`、`table`、`utils`），只因相依受影響 41 個。
+
 ---
 
 ## v0.11.1 · 2026-08-08

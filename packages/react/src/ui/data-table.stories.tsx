@@ -300,7 +300,7 @@ function UrlSyncDemo() {
   const { state, onStateChange } = useTableUrlState({ adapter });
   return (
     <div className="space-y-2">
-      <p className="rounded border bg-muted px-2 py-1 font-mono text-xs" data-testid="url">
+      <p className="rounded-sm border bg-muted px-2 py-1 font-mono text-xs" data-testid="url">
         ?{search || "（全部預設，網址乾淨）"}
       </p>
       <DataTable rows={demoRecords} columns={columns} getRowKey={(r) => r.id} pageSize={5} state={state} onStateChange={onStateChange} />

@@ -25,7 +25,7 @@ export const 提示泡泡: Story = {
       </div>
       <div className="flex justify-end">
         <Tooltip content="靠右的泡泡會自動夾回視窗內，不會被切掉。">
-          <span className="cursor-help rounded border px-2 py-1 text-xs">邊緣測試</span>
+          <span className="cursor-help rounded-sm border px-2 py-1 text-xs">邊緣測試</span>
         </Tooltip>
       </div>
       <p className="text-tiny text-muted-foreground">

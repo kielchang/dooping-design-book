@@ -1,5 +1,15 @@
 import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { extendTailwindMerge } from "tailwind-merge";
+
+/**
+ * twMerge 認不得 token 自訂的字級名：預設表只有 xs…9xl，未登記的 `text-tiny` 會被當成
+ * **文字色**，於是 `cn("text-sm", "text-tiny")` 兩者並存、誰贏看 CSS 產出順序。
+ * 這裡把它們登記進 font-size 群組。用 classGroups（tailwind-merge v2／v3 同一套 API），
+ * 不用 v3 才有的 theme 鍵——registry 抄走的宿主可能還在 v2。
+ */
+const twMerge = extendTailwindMerge({
+  extend: { classGroups: { "font-size": [{ text: ["micro", "tiny"] }] } },
+});
 
 /** class 合併：後者覆蓋前者的同類 Tailwind utility（避免 `p-2 p-4` 這種順序賭博）。 */
 export function cn(...inputs: ClassValue[]) {

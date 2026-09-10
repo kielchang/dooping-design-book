@@ -237,7 +237,7 @@ export function EditableField({
           changed={changed}
         />
         {!alwaysEdit && (
-          <button type="button" onClick={exit} className="tap-target-y rounded border border-input bg-background px-2.5 py-0.5 text-xs hover:bg-accent">{L.done}</button>
+          <button type="button" onClick={exit} className="tap-target-y rounded-sm border border-input bg-background px-2.5 py-0.5 text-xs hover:bg-accent">{L.done}</button>
         )}
       </div>,
     );
@@ -308,7 +308,7 @@ function FieldShell({
     <div className={cn("space-y-1", className)}>
       <div className="flex items-center gap-1.5">
         <Label className="text-xs">{label}</Label>
-        {changed && <span className="rounded bg-edit-bg px-1 text-micro font-medium text-edit-foreground">{labels.changed}</span>}
+        {changed && <span className="rounded-sm bg-edit-bg px-1 text-micro font-medium text-edit-foreground">{labels.changed}</span>}
       </div>
       <div className="flex items-center gap-1">
         <div className="min-w-0 flex-1">{children}</div>
@@ -341,8 +341,8 @@ function ConfirmBar({
       <ArrowRight className="size-3 shrink-0 text-warning" aria-hidden />
       <span className="font-medium text-edit-foreground">{toText}</span>
       <span className="ml-auto flex gap-1">
-        <button type="button" onClick={onCancel} className="rounded border border-input bg-background px-2 py-0.5 hover:bg-accent">{labels.cancel}</button>
-        <button type="button" onClick={onConfirm} className="rounded bg-primary px-2 py-0.5 text-primary-foreground">{labels.confirm}</button>
+        <button type="button" onClick={onCancel} className="rounded-sm border border-input bg-background px-2 py-0.5 hover:bg-accent">{labels.cancel}</button>
+        <button type="button" onClick={onConfirm} className="rounded-sm bg-primary px-2 py-0.5 text-primary-foreground">{labels.confirm}</button>
       </span>
     </div>
   );

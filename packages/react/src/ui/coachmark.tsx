@@ -179,10 +179,10 @@ export function Coachmark({
         <div className="mb-1 flex items-start justify-between gap-2">
           <p className="text-sm font-semibold">{title}</p>
           <div className="-m-1 flex items-center gap-0.5">
-            <button type="button" onClick={() => setCollapsed(true)} aria-label={L.collapse} title={L.collapse} className="tap-target rounded p-1 text-muted-foreground hover:text-foreground">
+            <button type="button" onClick={() => setCollapsed(true)} aria-label={L.collapse} title={L.collapse} className="tap-target rounded-sm p-1 text-muted-foreground hover:text-foreground">
               <Minus className="size-4" aria-hidden />
             </button>
-            <button type="button" onClick={onSkip} aria-label={L.skip} className="tap-target rounded p-1 text-muted-foreground hover:text-foreground">
+            <button type="button" onClick={onSkip} aria-label={L.skip} className="tap-target rounded-sm p-1 text-muted-foreground hover:text-foreground">
               <X className="size-4" aria-hidden />
             </button>
           </div>

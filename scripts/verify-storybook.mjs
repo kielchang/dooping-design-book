@@ -1,29 +1,34 @@
-// 無障礙行為守衛 —— Storybook 全量 story 的 axe 掃描＋play function 執行驗收。
+// 無障礙行為守衛 —— Storybook 全量 story 的 axe 掃描＋play function 執行驗收＋強制色彩焦點。
 //
-//   node scripts/verify-storybook.mjs      # 對 storybook-static 逐 story 驗，不合格 exit 1
+//   node scripts/verify-storybook.mjs                        # 全部，不合格 exit 1
+//   node scripts/verify-storybook.mjs --only=forced-colors   # 只跑強制色彩焦點（反向驗證用，快）
 //
 // 前提：storybook-static 已建置（npm run build-storybook）。
 //
 // 為什麼要有這支：規範寫了焦點陷阱、鍵盤操作、aria 連動，但行為層此前沒有任何守衛——
-// play function 只在瀏覽器手動打開 story 時執行，CI 從來沒跑過它們。這支補兩件事：
+// play function 只在瀏覽器手動打開 story 時執行，CI 從來沒跑過它們。這支補三件事：
 //   1. 每支 story 載入後跑 axe-core（停用 color-contrast——顏色的唯一權威是 verify:color，
 //      兩套權威會打架；停用 region 等頁面級規則——story 是片段，不是完整頁面）。
 //   2. play function 是 Storybook 渲染 story 時**自動執行**的；這裡監聽 preview channel 的
 //      失敗事件（playFunctionThrewException 等），任何一支 play 掛掉就紅。
+//   3. 強制色彩模式（Windows 高對比）下鍵盤焦點仍看得見：幾支哨兵 story 模擬 forced-colors、
+//      用 Tab 走過可聚焦元素，outline 不得是 none（理由見 scripts/lib/forced-colors.mjs）。
 //
-// 防空轉雙底線：story 總數下限（守衛不能因掃描壞掉而安靜變綠）；
-// 至少一支 play function 被觀測到進入 playing 階段（拿現有的哨兵 story 驗「play 真的有跑」）。
+// 防空轉底線：story 總數下限（守衛不能因掃描壞掉而安靜變綠）；
+// 至少一支 play function 被觀測到進入 playing 階段；每支強制色彩哨兵至少走到一個可聚焦元素。
 import { readFileSync, existsSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { dirname, join, extname, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
+import { forcedColorsFocusFailures } from "./lib/forced-colors.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 // CI 的建置輸出在 book/build/storybook（-o 指定）；本機預設 storybook-static
 const STATIC = join(ROOT, process.env.STORYBOOK_DIR ?? "storybook-static");
+const ONLY_FORCED = process.argv.includes("--only=forced-colors");
 
-// story 總數下限：目前 60 支。掉到 40 以下代表 index.json 讀取或建置壞了，要出聲。
+// story 總數下限：目前 108 支。掉到 40 以下代表 index.json 讀取或建置壞了，要出聲。
 const MIN_STORIES = 40;
 
 // 停用規則與理由（新增前先想清楚屬於哪一類，不要順手關）：
@@ -31,6 +36,15 @@ const MIN_STORIES = 40;
 //   region            story 是片段，內容本來就不在 landmark 裡
 //   landmark-one-main / page-has-heading-one / bypass   同上，頁面級結構規則
 const DISABLED_RULES = ["color-contrast", "region", "landmark-one-main", "page-has-heading-one", "bypass"];
+
+// 強制色彩焦點哨兵：挑可聚焦元素多、而且元件自己寫了 focus-visible:outline-none 的畫面——
+// 那正是「聚焦環被強制色彩拿掉之後，只剩 outline 備援」的情境。
+const FORCED_COLORS_SENTINELS = [
+  { title: "元件/基礎/按鈕・徽章・提示・卡片", name: "按鈕" },
+  { title: "元件/表單/輸入控制項", name: "文字與數值" },
+  { title: "元件/資料/資料表 DataTable", name: "完整功能" },
+];
+const FORCED_COLORS_TABS = 8;
 
 const MIME = {
   ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript",
@@ -114,69 +128,98 @@ async function main() {
   const fails = [];
   let playObserved = 0;
 
-  for (const story of stories) {
-    pageErrors.length = 0;
-    await page.goto(`${origin}/iframe.html?id=${encodeURIComponent(story.id)}&viewMode=story`, {
-      waitUntil: "load",
-    });
-    // 等到 storyRendered（play 完成後才發）或任一失敗事件——不用固定長等待
-    let events = [];
-    try {
-      await page.waitForFunction(
-        () => window.__SB_EVENTS__.some((e) => e.ev !== "playing"),
-        undefined,
-        { timeout: 20000 },
-      );
-      events = await page.evaluate(() => window.__SB_EVENTS__);
-    } catch {
-      fails.push(`${story.id}  渲染逾時（20s 內沒有 storyRendered 或錯誤事件）`);
-      process.stdout.write("x");
+  if (!ONLY_FORCED) {
+    for (const story of stories) {
+      pageErrors.length = 0;
+      await page.goto(`${origin}/iframe.html?id=${encodeURIComponent(story.id)}&viewMode=story`, {
+        waitUntil: "load",
+      });
+      // 等到 storyRendered（play 完成後才發）或任一失敗事件——不用固定長等待
+      let events = [];
+      try {
+        await page.waitForFunction(
+          () => window.__SB_EVENTS__.some((e) => e.ev !== "playing"),
+          undefined,
+          { timeout: 20000 },
+        );
+        events = await page.evaluate(() => window.__SB_EVENTS__);
+      } catch {
+        fails.push(`${story.id}  渲染逾時（20s 內沒有 storyRendered 或錯誤事件）`);
+        process.stdout.write("x");
+        continue;
+      }
+      if (events.some((e) => e.ev === "playing")) playObserved++;
+      const bad = events.filter((e) => ["storyErrored", "storyThrewException", "playFunctionThrewException", "storyMissing"].includes(e.ev));
+      for (const b of bad) fails.push(`${story.id}  ${b.ev}: ${b.msg}`);
+      for (const m of pageErrors) fails.push(`${story.id}  pageerror: ${m}`);
+      if (bad.length) { process.stdout.write("x"); continue; }
+
+      // addon-a11y 已把 axe 打包進 preview 並可能正在跑（axe 是全域單例）——
+      // 頁內有 window.axe 就直接用，撞到「already running」就等它跑完重試。
+      if (!(await page.evaluate(() => !!window.axe))) await page.addScriptTag({ content: axeSource });
+      const violations = await page.evaluate(async (disabled) => {
+        const rules = Object.fromEntries(disabled.map((r) => [r, { enabled: false }]));
+        for (let i = 0; ; i++) {
+          try {
+            const r = await window.axe.run(document.body, { rules, resultTypes: ["violations"] });
+            return r.violations.map((v) => ({
+              id: v.id, impact: v.impact, help: v.help,
+              targets: v.nodes.slice(0, 3).map((n) => n.target.join(" ")),
+            }));
+          } catch (e) {
+            if (i >= 20 || !String(e.message).includes("already running")) throw e;
+            await new Promise((ok) => setTimeout(ok, 250));
+          }
+        }
+      }, DISABLED_RULES);
+      for (const v of violations)
+        fails.push(`${story.id}  axe:${v.id}（${v.impact}）${v.help} → ${v.targets.join("；")}`);
+      process.stdout.write(violations.length ? "x" : ".");
+    }
+    process.stdout.write("\n");
+  }
+
+  // ── 強制色彩模式的焦點哨兵 ────────────────────────────────────
+  let forcedVisited = 0;
+  for (const s of FORCED_COLORS_SENTINELS) {
+    const hit = stories.find((e) => e.title === s.title && e.name === s.name);
+    if (!hit) {
+      fails.push(`強制色彩哨兵 story 不存在：${s.title} / ${s.name}——改了 story 名要同步這裡，守衛不能空轉`);
       continue;
     }
-    if (events.some((e) => e.ev === "playing")) playObserved++;
-    const bad = events.filter((e) => ["storyErrored", "storyThrewException", "playFunctionThrewException", "storyMissing"].includes(e.ev));
-    for (const b of bad) fails.push(`${story.id}  ${b.ev}: ${b.msg}`);
-    for (const m of pageErrors) fails.push(`${story.id}  pageerror: ${m}`);
-    if (bad.length) { process.stdout.write("x"); continue; }
-
-    // addon-a11y 已把 axe 打包進 preview 並可能正在跑（axe 是全域單例）——
-    // 頁內有 window.axe 就直接用，撞到「already running」就等它跑完重試。
-    if (!(await page.evaluate(() => !!window.axe))) await page.addScriptTag({ content: axeSource });
-    const violations = await page.evaluate(async (disabled) => {
-      const rules = Object.fromEntries(disabled.map((r) => [r, { enabled: false }]));
-      for (let i = 0; ; i++) {
-        try {
-          const r = await window.axe.run(document.body, { rules, resultTypes: ["violations"] });
-          return r.violations.map((v) => ({
-            id: v.id, impact: v.impact, help: v.help,
-            targets: v.nodes.slice(0, 3).map((n) => n.target.join(" ")),
-          }));
-        } catch (e) {
-          if (i >= 20 || !String(e.message).includes("already running")) throw e;
-          await new Promise((ok) => setTimeout(ok, 250));
-        }
-      }
-    }, DISABLED_RULES);
-    for (const v of violations)
-      fails.push(`${story.id}  axe:${v.id}（${v.impact}）${v.help} → ${v.targets.join("；")}`);
-    process.stdout.write(violations.length ? "x" : ".");
+    await page.goto(`${origin}/iframe.html?id=${encodeURIComponent(hit.id)}&viewMode=story`, { waitUntil: "load" });
+    await page
+      .waitForFunction(() => window.__SB_EVENTS__.some((e) => e.ev === "storyRendered"), undefined, { timeout: 20000 })
+      .catch(() => fails.push(`${hit.id}  強制色彩：20s 內沒有 storyRendered`));
+    const { visited, fails: focusFails } = await forcedColorsFocusFailures(page, FORCED_COLORS_TABS);
+    forcedVisited += visited;
+    if (visited === 0) fails.push(`${hit.id}  強制色彩：Tab 沒有走到任何可聚焦元素——檢查空轉`);
+    for (const m of focusFails) fails.push(`${hit.id}  強制色彩下焦點看不見：${m}`);
   }
-  process.stdout.write("\n");
 
   await browser.close();
   server.close();
 
   // 防空轉：play function 是這支守衛的存在理由之一，一支都沒觀測到＝驗收機制壞了
-  if (playObserved === 0)
+  if (!ONLY_FORCED && playObserved === 0)
     fails.push("沒有觀測到任何 play function 進入 playing 階段——play 驗收空轉了（哨兵：loading-error 的欄位錯誤態）");
 
-  console.log(`掃描 ${stories.length} 支 story（axe ＋ play 執行驗收，觀測到 ${playObserved} 支 play）`);
+  const forcedSummary = `強制色彩焦點 ${FORCED_COLORS_SENTINELS.length} 支哨兵、走過 ${forcedVisited} 個可聚焦元素`;
+  console.log(
+    ONLY_FORCED
+      ? forcedSummary
+      : `掃描 ${stories.length} 支 story（axe ＋ play 執行驗收，觀測到 ${playObserved} 支 play）；${forcedSummary}`,
+  );
   if (fails.length) {
     console.error(`\n✗ 無障礙行為守衛不通過（${fails.length} 條）：\n` + fails.map((f) => "  " + f).join("\n"));
     console.error("\n規則分工：顏色歸 verify:color，行為與結構歸這支。停用規則清單見檔頭。");
     process.exit(1);
   }
-  console.log("✓ 無障礙行為守衛通過：axe 無違規、play functions 全數執行成功。");
+  console.log(
+    ONLY_FORCED
+      ? "✓ 強制色彩焦點檢查通過。"
+      : "✓ 無障礙行為守衛通過：axe 無違規、play functions 全數執行成功、強制色彩下焦點看得見。",
+  );
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

@@ -188,7 +188,7 @@ export function Gantt({
               ))}
               {showToday && (
                 <span className="absolute inset-y-0 z-10 border-l-2 border-foreground/50" style={{ left: pct(todayDate) }}>
-                  <span className="absolute top-0 -translate-x-1/2 rounded-b bg-foreground/70 px-1 text-tiny text-background">
+                  <span className="absolute top-0 -translate-x-1/2 rounded-b-sm bg-foreground/70 px-1 text-tiny text-background">
                     {L.today}
                   </span>
                 </span>

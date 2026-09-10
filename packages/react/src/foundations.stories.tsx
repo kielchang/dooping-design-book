@@ -14,7 +14,7 @@ function Swatch({ name, entry }: { name: string; entry: Entry }) {
   return (
     <div className="flex items-center gap-3 rounded-md border p-2">
       <span
-        className="size-9 shrink-0 rounded border"
+        className="size-9 shrink-0 rounded-sm border"
         style={{ background: isHex ? entry.value : `hsl(var(--${name}))` }}
         aria-hidden
       />
@@ -76,7 +76,7 @@ export const 圖表色票: Story = {
             <div className="flex gap-1.5">
               {pal(mode).map((c, i) => (
                 <div key={i} className="flex-1 space-y-1">
-                  <div className="h-10 rounded" style={{ background: c }} aria-hidden />
+                  <div className="h-10 rounded-sm" style={{ background: c }} aria-hidden />
                   <p className="text-center font-mono text-tiny opacity-70">{i + 1}</p>
                 </div>
               ))}

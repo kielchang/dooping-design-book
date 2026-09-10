@@ -57,7 +57,7 @@ function PaletteDemo() {
   return (
     <div className="space-y-3 py-8">
       <Button variant="outline" onClick={() => setOpen(true)}>
-        開啟指令面板 <kbd className="ml-2 rounded border px-1.5 text-xs text-muted-foreground">Ctrl K</kbd>
+        開啟指令面板 <kbd className="ml-2 rounded-sm border px-1.5 text-xs text-muted-foreground">Ctrl K</kbd>
       </Button>
       <p className="text-tiny text-muted-foreground">
         導覽項來自與側邊欄同一份 demoNavGroups——單一來源，兩個出口。

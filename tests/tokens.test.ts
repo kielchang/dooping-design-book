@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { createRequire } from "node:module";
 import { semanticColors, chartColors, TOKENS_VERSION } from "@dooping/tokens";
+import { tokensJson, tokenKeys, expectedColorKeys } from "./lib/token-keys";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const require = createRequire(import.meta.url);
@@ -182,22 +183,6 @@ describe("設計 token", () => {
 // 任何一邊漏鍵，那個版本的宿主寫 bg-sidebar-accent 就安靜地產不出樣式——不報錯、測試不紅。
 // 所以三方比對：JSON 推導的鍵集 ＝ v4 檔的 --color-* ＝ v3 preset 攤平後的 class 名。
 const V4_PATH = join(ROOT, "packages/tokens/dist/tailwind.css");
-const tokensJson = JSON.parse(readFileSync(join(ROOT, "packages/tokens/src/tokens.json"), "utf8"));
-
-type Group = Record<string, unknown>;
-const tokenKeys = (obj: Group | undefined): string[] =>
-  Object.keys(obj ?? {}).filter((k) => {
-    const v = (obj as Group)[k] as { value?: unknown } | null;
-    return typeof v === "object" && v !== null && typeof v.value === "string";
-  });
-
-function expectedColorKeys(): string[] {
-  const semantic = tokenKeys(tokensJson.color.light);
-  const set = new Set(semantic);
-  const themes = Object.values(tokensJson.themes as Record<string, { light: Group }>);
-  const themeOnly = [...new Set(themes.flatMap((t) => tokenKeys(t.light)))].filter((k) => !set.has(k));
-  return [...semantic, ...themeOnly, ...tokenKeys(tokensJson.chart.light)].sort();
-}
 
 const readV4 = () => readFileSync(V4_PATH, "utf8");
 const stripComments = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, "");

@@ -148,7 +148,7 @@ function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: () => void
         type="button"
         aria-label="關閉通知"
         onClick={onDismiss}
-        className="state-layer tap-target -m-1 ml-auto flex shrink-0 items-center justify-center rounded p-1"
+        className="state-layer tap-target -m-1 ml-auto flex shrink-0 items-center justify-center rounded-sm p-1"
       >
         <X className="size-4" aria-hidden />
       </button>

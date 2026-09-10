@@ -12,6 +12,7 @@
     "build:tokens": "npm run build --workspace @dooping/tokens",
     "build:theme": "node packages/tokens/scripts/generate-theme.mjs",
     "build:registry": "node scripts/build-registry.mjs",
+    "registry:changes": "node scripts/registry-changes.mjs",
     "host:sync": "node scripts/host-sync.mjs",
     "host:check": "node scripts/host-sync.mjs --check",
     "verify:color": "node scripts/verify-color.mjs",

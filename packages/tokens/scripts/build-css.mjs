@@ -188,6 +188,21 @@ lines.push(`/* 互動狀態層：hover／pressed／selected 三級，疊在元�
 }
 `);
 
+// ── 強制色彩模式的焦點備援 ────────────────────────────────────
+// Tailwind v4 的 outline-none 是 outline-style: none（v3 是 2px 透明 outline）。
+// 強制色彩模式（Windows 高對比）會移除 box-shadow——元件的聚焦環整個消失——
+// 而 v3 那層「透明 outline 在強制色彩下由系統色顯形」的備援也跟著沒了。
+// 這裡把它補回所有宿主：一般模式完全不可見；v3 宿主重複宣告無害。
+// !important 是必要的：focus-visible:outline-none 的特異度（0,2,0）高於這裡。
+lines.push(`/* 強制色彩模式的焦點備援：透明 outline 由系統色顯形（v4 的 outline-none 不再保留它）。 */
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid transparent !important;
+    outline-offset: 2px !important;
+  }
+}
+`);
+
 // ── 觸控目標（WCAG 2.5.5） ────────────────────────────────────
 lines.push(`/* 觸控目標：粗指標（手機／平板）才放大，桌機維持精簡尺寸。 */
 @media (pointer: coarse) {

@@ -17,9 +17,19 @@ title: 導入三階段
 npm install @dooping/tokens
 ```
 
-```js title="tailwind.config.js"
+```css title="Tailwind v4：全域 CSS"
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@dooping/tokens/tokens.css";
+@import "@dooping/tokens/tailwind.css";
+```
+
+```js title="Tailwind v3：tailwind.config.js"
 presets: [require("@dooping/tokens/tailwind-preset")]
 ```
+
+既有的 v4 專案通常已經有一份 shadcn 產生的 `:root`／`.dark` 色值與 `@theme inline` 對映：
+**整段刪掉**，換成上面兩行 `@dooping/tokens`。不刪就是兩份真相，後宣告者蓋前者。
 
 做什麼：把硬編色換成語意 token。
 

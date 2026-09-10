@@ -74,14 +74,17 @@ src/
 只會安靜地變形**：邊框整批消失（只有寬度沒有樣式）、裸按鈕露出瀏覽器原生
 灰底凸框、表格吃到宿主的格線。看到這三種症狀，先查基座，不是查元件。
 
-- **標準 Tailwind／shadcn 專案**：`shadcn init` 標配 `@tailwind base`，天然滿足。
-  建議再加一條（shadcn 慣例，把「不帶色的 border」接到 token）：
+- **標準 Tailwind／shadcn 專案**
+  - **Tailwind v4**：`@import "tailwindcss"` 內含 preflight；v4 preflight 拿掉的邊框預設色與
+    按鈕游標，由 `@dooping/tokens/tailwind.css` 的 `@layer base` 補齊。宿主不必再寫。
+  - **Tailwind v3**：`shadcn init` 標配 `@tailwind base`，天然滿足。
+    建議再加一條（shadcn 慣例，把「不帶色的 border」接到 token）：
 
-  ```css
-  @layer base {
-    * { border-color: hsl(var(--border)); }
-  }
-  ```
+    ```css
+    @layer base {
+      * { border-color: hsl(var(--border)); }
+    }
+    ```
 
 - **把元件嵌進有自己 CSS 的既有站台**（後台框架、文件站、CMS——關掉 preflight
   的宿主）：不要全站開 preflight（會打爆站台既有樣式），改在元件所在的 scope 內
@@ -97,7 +100,25 @@ src/
 npm install @dooping/tokens
 ```
 
-這是**唯一建議的硬相依**。四個進入點，挑你的宿主吃得下的用：
+這是**唯一建議的硬相依**。五個進入點，挑你的宿主吃得下的用：
+
+```css title="Tailwind v4（建議）：全域 CSS，順序是承重結構"
+@import "tailwindcss";
+@import "tw-animate-css";               /* 動畫 class，對應 v3 的 tailwindcss-animate */
+@import "@dooping/tokens/tokens.css";   /* 值 */
+@import "@dooping/tokens/tailwind.css"; /* token → utility 名稱對映 */
+```
+
+v4 宿主從 `npx shadcn init` 起手時，**刪掉**它產生的 `:root`／`.dark` 色值區塊、
+`@theme inline` 裡的 `--color-*` 對映與 `@custom-variant dark`——留著就是兩份真相，
+後宣告者蓋前者。已經 `@import "shadcn/tailwind.css"` 的宿主，把兩行 `@dooping/tokens` 放在它之後。
+
+v4 與 v3 的兩個語意差要知道：
+
+- `tokens.css` 在 v4 宿主裡是 unlayered，它的語意 class（`.field-editable`、`.state-layer`、
+  `.tap-target`…）會壓過 utilities（v3 相反）。元件已避開同屬性衝突；自己組合時留意。
+- `hover:` 在 v4 只在指標裝置生效（`@media (hover: hover)`）。觸控裝置沒有 hover 是正確行為，
+  回饋靠按住（pressed）態——**不要**把功能藏在只有 hover 才出現的地方。
 
 ```css title="純 CSS（任何宿主）"
 @import "@dooping/tokens/tokens.css";

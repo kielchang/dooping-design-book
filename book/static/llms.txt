@@ -13,6 +13,11 @@
 - 四條不可改契約：語意色的名稱與意義不可改（換品牌改值不改名）；琥珀色保留給
   「已改動未送出」；深色鉤子掛 document.documentElement（.dark class 或
   [data-theme="dark"]）；不得只靠顏色傳達語意。
+- token 取用：Tailwind v4 宿主在全域 CSS 依序 @import "tailwindcss"、"tw-animate-css"、
+  "@dooping/tokens/tokens.css"、"@dooping/tokens/tailwind.css"，並刪掉 shadcn init 產生的
+  :root／.dark 色值與 @theme 的 --color-* 對映；Tailwind v3 宿主用
+  presets: [require("@dooping/tokens/tailwind-preset")] 加 @import "@dooping/tokens/tokens.css"。
+  兩版產出的 class 名稱逐字相同。
 - Storybook（活元件展示，元件頁的「互動」story 可在 Controls 面板調整資料）：
   https://kielchang.github.io/dooping-design-book/storybook/
 

@@ -28,10 +28,16 @@ title: 漂移防護
 
 ### ① 編譯層：讓違規寫不出來
 
-`@dooping/tokens` 的 Tailwind preset **覆蓋**（而非 extend）`theme.colors`，
-所以套用 preset 之後，Tailwind 的預設色盤整個消失：
+`@dooping/tokens` 的兩個 Tailwind 出口都**清空**預設色盤，套用之後 Tailwind 的預設色盤整個消失：
 
-```js title="tailwind.config.js"
+```css title="Tailwind v4：@dooping/tokens/tailwind.css 裡的這一行"
+@theme inline reference {
+  --color-*: initial;
+  /* …其後才是語意色對映… */
+}
+```
+
+```js title="Tailwind v3：preset 覆蓋（而非 extend）theme.colors"
 module.exports = {
   presets: [require("@dooping/tokens/tailwind-preset")],
   content: ["./src/**/*.{ts,tsx}"],

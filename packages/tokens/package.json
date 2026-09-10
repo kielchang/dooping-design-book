@@ -9,6 +9,7 @@
     "css-variables",
     "tailwindcss",
     "tailwind-preset",
+    "tailwindcss-v4",
     "theming",
     "dark-mode"
   ],
@@ -32,6 +33,7 @@
     },
     "./tokens.json": "./src/tokens.json",
     "./tokens.css": "./dist/tokens.css",
+    "./tailwind.css": "./dist/tailwind.css",
     "./tailwind-preset": "./tailwind-preset.cjs",
     "./package.json": "./package.json"
   },
@@ -42,7 +44,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "node scripts/build-css.mjs && tsc -p tsconfig.build.json",
+    "build": "node scripts/build-css.mjs && node scripts/build-tailwind-v4.mjs && tsc -p tsconfig.build.json",
     "prepublishOnly": "npm run build"
   }
 }

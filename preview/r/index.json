@@ -11,7 +11,11 @@
       "type": "registry:ui",
       "title": "AppShell 外殼容器",
       "description": "側欄＋頂列＋主內容的佈局容器，刻意小到宿主可自行重寫。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/app-shell.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/app-shell.json",
+      "meta": {
+        "hash": "906cc1abd89ac714",
+        "closureHash": "47a0bf1a2fc93bd0"
+      }
     },
     {
       "name": "badge",
@@ -19,7 +23,11 @@
       "type": "registry:ui",
       "title": "Badge 狀態徽章",
       "description": "帶文字的狀態標記，不只靠顏色傳達語意。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/badge.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/badge.json",
+      "meta": {
+        "hash": "69715c6174b37be5",
+        "closureHash": "62f2a9e6b18f84b1"
+      }
     },
     {
       "name": "button",
@@ -27,7 +35,11 @@
       "type": "registry:ui",
       "title": "Button 按鈕",
       "description": "主要／次要／破壞性動作按鈕，含 asChild 組合。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/button.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/button.json",
+      "meta": {
+        "hash": "530bc83c77e8111e",
+        "closureHash": "d89b86f5903eaa79"
+      }
     },
     {
       "name": "callout",
@@ -35,7 +47,11 @@
       "type": "registry:ui",
       "title": "Callout 提示框",
       "description": "良好／警示／提醒／危險四種語意提示。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/callout.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/callout.json",
+      "meta": {
+        "hash": "3567df0c12264925",
+        "closureHash": "1c8c74f8eb6c856b"
+      }
     },
     {
       "name": "card",
@@ -43,7 +59,11 @@
       "type": "registry:ui",
       "title": "Card 卡片",
       "description": "內容容器：標題／描述／內容／頁尾。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/card.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/card.json",
+      "meta": {
+        "hash": "e0413fd2ebeba75c",
+        "closureHash": "bf7a76f60db5c03a"
+      }
     },
     {
       "name": "change-summary",
@@ -51,7 +71,11 @@
       "type": "registry:component",
       "title": "ChangeSummary 變更摘要",
       "description": "送出前的舊值→新值清單，可逐欄還原。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/change-summary.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/change-summary.json",
+      "meta": {
+        "hash": "e24dd6427379f84a",
+        "closureHash": "7c78dcaa939d4e9f"
+      }
     },
     {
       "name": "charts",
@@ -59,7 +83,11 @@
       "type": "registry:ui",
       "title": "Charts 圖表",
       "description": "後台閱讀型的八種零相依圖＋圖例＋色票工具，含文字與鍵盤等價。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/charts.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/charts.json",
+      "meta": {
+        "hash": "11cb0f26cf392252",
+        "closureHash": "ceb345e456f5c8ba"
+      }
     },
     {
       "name": "checkbox",
@@ -67,7 +95,11 @@
       "type": "registry:ui",
       "title": "Checkbox 勾選框",
       "description": "單一勾選（Radix Checkbox）。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/checkbox.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/checkbox.json",
+      "meta": {
+        "hash": "cd65d5023dc565df",
+        "closureHash": "bfa678ae9c6f2161"
+      }
     },
     {
       "name": "chips",
@@ -75,7 +107,11 @@
       "type": "registry:ui",
       "title": "Chips 多選標籤片",
       "description": "已選與未選同時可見的多選控制項。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/chips.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/chips.json",
+      "meta": {
+        "hash": "24ce0005f97496bd",
+        "closureHash": "a845ef88de8d4826"
+      }
     },
     {
       "name": "coachmark",
@@ -83,7 +119,11 @@
       "type": "registry:ui",
       "title": "Coachmark 聚光導引",
       "description": "純呈現的引導聚光框，可縮小、可鍵盤操作、支援驗收標記。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/coachmark.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/coachmark.json",
+      "meta": {
+        "hash": "1a930da4e6999138",
+        "closureHash": "bf634355b8928d0b"
+      }
     },
     {
       "name": "collapsible",
@@ -91,7 +131,11 @@
       "type": "registry:ui",
       "title": "Collapsible 摺疊區",
       "description": "展開／收合容器（Radix Collapsible），無自帶視覺。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/collapsible.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/collapsible.json",
+      "meta": {
+        "hash": "9fdb5bbdd1b74b5d",
+        "closureHash": "ff7ab98857283e54"
+      }
     },
     {
       "name": "command",
@@ -99,7 +143,11 @@
       "type": "registry:ui",
       "title": "Command 指令清單",
       "description": "可過濾的指令清單與對話框殼（cmdk 薄封裝，隔離相依）。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/command.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/command.json",
+      "meta": {
+        "hash": "d61a156a881aef7f",
+        "closureHash": "626a11928dd8a2c9"
+      }
     },
     {
       "name": "command-palette",
@@ -107,7 +155,11 @@
       "type": "registry:ui",
       "title": "CommandPalette 指令面板",
       "description": "全域搜尋：⌘K 開啟，導覽資料與側邊欄單一來源。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/command-palette.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/command-palette.json",
+      "meta": {
+        "hash": "4b7a2223f85a15fd",
+        "closureHash": "1d7f2caa3e51b396"
+      }
     },
     {
       "name": "confirm-dialog",
@@ -115,7 +167,11 @@
       "type": "registry:ui",
       "title": "ConfirmDialog 確認對話框",
       "description": "破壞性操作確認：載入中鎖出口、可選硬確認輸入。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/confirm-dialog.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/confirm-dialog.json",
+      "meta": {
+        "hash": "e1ee336670a97e6e",
+        "closureHash": "696bdc755ec4d443"
+      }
     },
     {
       "name": "csv",
@@ -123,7 +179,11 @@
       "type": "registry:lib",
       "title": "csv 序列化",
       "description": "含 UTF-8 BOM 的 CSV 產出與解析。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/csv.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/csv.json",
+      "meta": {
+        "hash": "ec12443583c00100",
+        "closureHash": "a6cf84df54bfb80f"
+      }
     },
     {
       "name": "data-table",
@@ -131,7 +191,11 @@
       "type": "registry:ui",
       "title": "DataTable 資料表",
       "description": "搜尋・篩選（表頭＋facet 鈕）・排序・分頁・合計・多選批次・欄位顯示・CSV 匯出・可同步網址。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/data-table.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/data-table.json",
+      "meta": {
+        "hash": "a3144dabdd7f2758",
+        "closureHash": "97500d2953960851"
+      }
     },
     {
       "name": "date-range",
@@ -139,7 +203,11 @@
       "type": "registry:ui",
       "title": "date-range",
       "description": "",
-      "url": "https://kielchang.github.io/dooping-design-book/r/date-range.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/date-range.json",
+      "meta": {
+        "hash": "2a157089f190754a",
+        "closureHash": "8661af6aa49143bb"
+      }
     },
     {
       "name": "delta",
@@ -147,7 +215,11 @@
       "type": "registry:ui",
       "title": "Delta 變異顯示",
       "description": "箭頭＋文字＋顏色三重編碼的差異呈現。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/delta.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/delta.json",
+      "meta": {
+        "hash": "359ecb8fb1f338da",
+        "closureHash": "a77a5cb8bf065711"
+      }
     },
     {
       "name": "dialog",
@@ -155,7 +227,23 @@
       "type": "registry:ui",
       "title": "Dialog 對話框",
       "description": "模態對話框（Radix Dialog）。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/dialog.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/dialog.json",
+      "meta": {
+        "hash": "9aae5950f0224574",
+        "closureHash": "d6002120d8f9fab9"
+      }
+    },
+    {
+      "name": "dooping-check",
+      "version": "0.13.0",
+      "type": "registry:file",
+      "title": "dooping-check 更新檢查",
+      "description": "取用端的 lock 與例行檢查：已是最新／上游有更新／本地改過（ADR-0013 第二層）。",
+      "url": "https://kielchang.github.io/dooping-design-book/r/dooping-check.json",
+      "meta": {
+        "hash": "d721255e03e9f8d8",
+        "closureHash": "83be2d732a64ac13"
+      }
     },
     {
       "name": "download",
@@ -163,7 +251,11 @@
       "type": "registry:lib",
       "title": "download 下載工具",
       "description": "觸發瀏覽器下載 Blob。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/download.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/download.json",
+      "meta": {
+        "hash": "1fe75a6f64156d22",
+        "closureHash": "5643a1f8325f9f11"
+      }
     },
     {
       "name": "dropdown-menu",
@@ -171,7 +263,11 @@
       "type": "registry:ui",
       "title": "DropdownMenu 下拉選單",
       "description": "動作選單與勾選項（Radix DropdownMenu），單層。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/dropdown-menu.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/dropdown-menu.json",
+      "meta": {
+        "hash": "3e1cd0359525b42d",
+        "closureHash": "e3af8dd1d1a48a40"
+      }
     },
     {
       "name": "editable-field",
@@ -179,7 +275,11 @@
       "type": "registry:component",
       "title": "EditableField 唯讀逐欄編輯",
       "description": "點擊才進編輯、改動標色、undo/redo 先確認。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/editable-field.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/editable-field.json",
+      "meta": {
+        "hash": "00d417154c595329",
+        "closureHash": "a6e6dda58b0421cb"
+      }
     },
     {
       "name": "empty-state",
@@ -187,7 +287,11 @@
       "type": "registry:ui",
       "title": "EmptyState 空狀態",
       "description": "圖示＋標題＋說明＋行動呼籲。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/empty-state.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/empty-state.json",
+      "meta": {
+        "hash": "bb03d4dbdb6f0fca",
+        "closureHash": "264223b298240584"
+      }
     },
     {
       "name": "form-field",
@@ -195,7 +299,11 @@
       "type": "registry:component",
       "title": "FormField 欄位包裝",
       "description": "Label＋aria 連動＋錯誤態的固定寫法元件化，含 FieldError。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/form-field.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/form-field.json",
+      "meta": {
+        "hash": "0616f262be7f3058",
+        "closureHash": "1689a906ffdf19f4"
+      }
     },
     {
       "name": "forms-diff",
@@ -203,7 +311,11 @@
       "type": "registry:lib",
       "title": "forms/diff 欄位比對",
       "description": "FieldSpec 驅動的變更偵測與顯示格式化。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/forms-diff.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/forms-diff.json",
+      "meta": {
+        "hash": "ca86a6518c8a1e48",
+        "closureHash": "b662620108b8fa43"
+      }
     },
     {
       "name": "gantt",
@@ -211,7 +323,11 @@
       "type": "registry:ui",
       "title": "Gantt 時間軸",
       "description": "檢視與選取用的精簡時間軸：分類色長條、進度、今天線、列選取。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/gantt.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/gantt.json",
+      "meta": {
+        "hash": "caac3b5831210a54",
+        "closureHash": "1f1f209ca6618a71"
+      }
     },
     {
       "name": "graph-canvas",
@@ -219,7 +335,11 @@
       "type": "registry:ui",
       "title": "GraphCanvas 節點畫布",
       "description": "@xyflow/react 的薄封裝：token 橋接、狀態層選取、中性聚焦環。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/graph-canvas.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/graph-canvas.json",
+      "meta": {
+        "hash": "aeea0d3126c20512",
+        "closureHash": "84db4873924059c7"
+      }
     },
     {
       "name": "input",
@@ -227,7 +347,11 @@
       "type": "registry:ui",
       "title": "Input 輸入框",
       "description": "文字輸入，高度對齊控制項尺寸 token。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/input.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/input.json",
+      "meta": {
+        "hash": "a42e317c8acafbcf",
+        "closureHash": "17a1aba49f9103f0"
+      }
     },
     {
       "name": "label",
@@ -235,7 +359,11 @@
       "type": "registry:ui",
       "title": "Label 標籤",
       "description": "表單標籤（Radix Label）。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/label.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/label.json",
+      "meta": {
+        "hash": "c72e2fba1f2f9252",
+        "closureHash": "1f23cc117b370de1"
+      }
     },
     {
       "name": "mockup",
@@ -243,7 +371,11 @@
       "type": "registry:ui",
       "title": "Mockup 文件示意積木",
       "description": "Placeholder／Spotlight／MockScreenFrame：零截圖文件示意。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/mockup.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/mockup.json",
+      "meta": {
+        "hash": "61daa81eb4636abc",
+        "closureHash": "4863090becea3f83"
+      }
     },
     {
       "name": "nav",
@@ -251,7 +383,11 @@
       "type": "registry:lib",
       "title": "nav 導覽契約",
       "description": "NavGroup 型別與 isNavActive()：側邊欄與指令面板共用的導覽資料形狀。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/nav.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/nav.json",
+      "meta": {
+        "hash": "0a2cf26d424e5e4c",
+        "closureHash": "80898f563d29b536"
+      }
     },
     {
       "name": "number-input",
@@ -259,7 +395,11 @@
       "type": "registry:ui",
       "title": "NumberInput 數值輸入",
       "description": "右對齊等寬數字，行動裝置出數字鍵盤。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/number-input.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/number-input.json",
+      "meta": {
+        "hash": "ded2b0e00c1665c8",
+        "closureHash": "9d673d77f93b227e"
+      }
     },
     {
       "name": "page-header",
@@ -267,7 +407,11 @@
       "type": "registry:ui",
       "title": "PageHeader 頁首",
       "description": "頁首骨架三件：PageHeader（一頁一個 h1）、BackLink（真連結返回）、Breadcrumb（三層以上）。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/page-header.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/page-header.json",
+      "meta": {
+        "hash": "6e31b06bd9e0994d",
+        "closureHash": "10014a51a7284f00"
+      }
     },
     {
       "name": "popover",
@@ -275,7 +419,11 @@
       "type": "registry:ui",
       "title": "Popover 彈出面板",
       "description": "錨定在觸發元素旁的浮層容器（Radix Popover）。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/popover.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/popover.json",
+      "meta": {
+        "hash": "d64684689fb58b19",
+        "closureHash": "7401c1f00891b88b"
+      }
     },
     {
       "name": "radio-group",
@@ -283,7 +431,11 @@
       "type": "registry:ui",
       "title": "radio-group",
       "description": "",
-      "url": "https://kielchang.github.io/dooping-design-book/r/radio-group.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/radio-group.json",
+      "meta": {
+        "hash": "f692f72218ea48ca",
+        "closureHash": "408bbce0f189a4db"
+      }
     },
     {
       "name": "seg-group",
@@ -291,7 +443,11 @@
       "type": "registry:ui",
       "title": "SegGroup 分段選擇",
       "description": "少量互斥選項，radiogroup ＋ roving tabindex。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/seg-group.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/seg-group.json",
+      "meta": {
+        "hash": "8354a33c171a8d31",
+        "closureHash": "e6a23af457a3a600"
+      }
     },
     {
       "name": "select",
@@ -299,7 +455,11 @@
       "type": "registry:ui",
       "title": "Select 下拉選單",
       "description": "單選下拉（Radix Select）。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/select.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/select.json",
+      "meta": {
+        "hash": "d3ea2d2930e734af",
+        "closureHash": "93acb0b1278d6420"
+      }
     },
     {
       "name": "separator",
@@ -307,7 +467,11 @@
       "type": "registry:ui",
       "title": "Separator 分隔線",
       "description": "水平／垂直分隔（Radix Separator），預設裝飾性。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/separator.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/separator.json",
+      "meta": {
+        "hash": "0d642e124cd49d0c",
+        "closureHash": "2e6766fd746a1bcf"
+      }
     },
     {
       "name": "sidebar",
@@ -315,7 +479,11 @@
       "type": "registry:ui",
       "title": "Sidebar 側邊欄",
       "description": "外殼側欄家族：Provider、收合圖示欄、行動版左滑抽屜（純呈現，不綁路由）。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/sidebar.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/sidebar.json",
+      "meta": {
+        "hash": "5130edb5cae63768",
+        "closureHash": "a68ee7d74af16e5a"
+      }
     },
     {
       "name": "sidebar-nav",
@@ -323,7 +491,11 @@
       "type": "registry:ui",
       "title": "SidebarNav 導覽渲染",
       "description": "NavGroup[] 的三態渲染：連結／展開群組／收合態右彈選單，含例行・試算標籤。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/sidebar-nav.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/sidebar-nav.json",
+      "meta": {
+        "hash": "08129e6493da4136",
+        "closureHash": "6b10a66e69a7066e"
+      }
     },
     {
       "name": "skeleton",
@@ -331,7 +503,11 @@
       "type": "registry:ui",
       "title": "Skeleton 骨架屏",
       "description": "首載用的版面灰塊；三種載入手段的分工見文件〈載入中〉。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/skeleton.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/skeleton.json",
+      "meta": {
+        "hash": "6804569f1adeee5c",
+        "closureHash": "9c480f9e18d628d3"
+      }
     },
     {
       "name": "stepper",
@@ -339,7 +515,11 @@
       "type": "registry:ui",
       "title": "Stepper 步驟指示",
       "description": "多步驟流程進度，完成態同時用勾選與顏色。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/stepper.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/stepper.json",
+      "meta": {
+        "hash": "80760c8091d14480",
+        "closureHash": "91210399f9c1f60d"
+      }
     },
     {
       "name": "switch",
@@ -347,7 +527,11 @@
       "type": "registry:ui",
       "title": "switch",
       "description": "",
-      "url": "https://kielchang.github.io/dooping-design-book/r/switch.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/switch.json",
+      "meta": {
+        "hash": "4a1a39d33b2646eb",
+        "closureHash": "9728975b5630e4c9"
+      }
     },
     {
       "name": "tab-pills",
@@ -355,7 +539,11 @@
       "type": "registry:ui",
       "title": "TabPills 分頁膠囊",
       "description": "分頁切換的統一元件，含 tablist 語意。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/tab-pills.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/tab-pills.json",
+      "meta": {
+        "hash": "5875f02f41bceedd",
+        "closureHash": "9a98920e30858696"
+      }
     },
     {
       "name": "table",
@@ -363,7 +551,11 @@
       "type": "registry:ui",
       "title": "Table 表格基礎件",
       "description": "表格語意元素＋數字欄／凍結首欄／可排序表頭。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/table.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/table.json",
+      "meta": {
+        "hash": "fa5679c4989d6948",
+        "closureHash": "cf13a498127b93d9"
+      }
     },
     {
       "name": "textarea",
@@ -371,7 +563,11 @@
       "type": "registry:ui",
       "title": "textarea",
       "description": "",
-      "url": "https://kielchang.github.io/dooping-design-book/r/textarea.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/textarea.json",
+      "meta": {
+        "hash": "0bdebc5a00fb8c4e",
+        "closureHash": "889805a2d8dc5176"
+      }
     },
     {
       "name": "toast",
@@ -379,7 +575,11 @@
       "type": "registry:ui",
       "title": "toast",
       "description": "",
-      "url": "https://kielchang.github.io/dooping-design-book/r/toast.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/toast.json",
+      "meta": {
+        "hash": "ff28232c8475e770",
+        "closureHash": "751df418ad5ccaa6"
+      }
     },
     {
       "name": "tooltip",
@@ -387,7 +587,11 @@
       "type": "registry:ui",
       "title": "Tooltip 提示泡泡",
       "description": "hover／鍵盤聚焦／長壓顯示，含邊緣防溢與截斷文字元件。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/tooltip.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/tooltip.json",
+      "meta": {
+        "hash": "920fb25cb4d8c82f",
+        "closureHash": "ab6a0a5afe2bab86"
+      }
     },
     {
       "name": "use-dialog-state",
@@ -395,7 +599,11 @@
       "type": "registry:lib",
       "title": "useDialogState 對話框開關",
       "description": "多種對話框的集中開關：天然單開、同值再設即關。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/use-dialog-state.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/use-dialog-state.json",
+      "meta": {
+        "hash": "8e03f299339f455a",
+        "closureHash": "00a5d36c4299755a"
+      }
     },
     {
       "name": "use-record-diff",
@@ -403,7 +611,11 @@
       "type": "registry:component",
       "title": "useRecordDiff 變更追蹤",
       "description": "草稿 vs 原始值的差異與還原 hook。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/use-record-diff.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/use-record-diff.json",
+      "meta": {
+        "hash": "f92ce05561922f86",
+        "closureHash": "b1237fb43346983b"
+      }
     },
     {
       "name": "use-sort",
@@ -411,7 +623,11 @@
       "type": "registry:lib",
       "title": "useSort 排序 hook",
       "description": "無→大到小→小到大 的三態排序。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/use-sort.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/use-sort.json",
+      "meta": {
+        "hash": "cbcdb07687bc1dc2",
+        "closureHash": "3a107a2f13ec34b2"
+      }
     },
     {
       "name": "use-table-url-state",
@@ -419,7 +635,11 @@
       "type": "registry:lib",
       "title": "useTableUrlState 網址同步",
       "description": "表格狀態 ↔ 網址：預設值省略、條件變更回第 1 頁、adapter 可注入。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/use-table-url-state.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/use-table-url-state.json",
+      "meta": {
+        "hash": "02c14878aa94544c",
+        "closureHash": "58ebf98f7c076e31"
+      }
     },
     {
       "name": "utils",
@@ -427,7 +647,11 @@
       "type": "registry:lib",
       "title": "utils 通用工具",
       "description": "cn 與數值／金額／百分比格式化。",
-      "url": "https://kielchang.github.io/dooping-design-book/r/utils.json"
+      "url": "https://kielchang.github.io/dooping-design-book/r/utils.json",
+      "meta": {
+        "hash": "bf9c4e22214bec0f",
+        "closureHash": "2fe5673cf754ad13"
+      }
     }
   ]
 }

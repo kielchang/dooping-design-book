@@ -10,6 +10,7 @@
 //
 // 這個宿主不允許改元件：它是範本不是產品，任何差異都代表 registry 與原始碼、或與宿主脫鉤了。
 // 取用端「改了元件要記原因」的正常情況，由它的 LEDGER.md 示範格式。
+import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -52,7 +53,9 @@ while (queue.length) {
 
 // 期望的檔案：registry item 的檔案 ＋ 示範資料（唯一來源 packages/react/src/demo/sample-data.ts）
 const expected = new Map();
-for (const item of resolved.values()) for (const f of item.files) expected.set(join(SRC, f.target), f.content);
+// target 以 ~/ 開頭＝專案根目錄（shadcn CLI 的規則；registry:file 用，例如 dooping-check），其餘落在 src/
+const targetPath = (target) => (target.startsWith("~/") ? join(HOST, target.slice(2)) : join(SRC, target));
+for (const item of resolved.values()) for (const f of item.files) expected.set(targetPath(f.target), f.content);
 
 const DEMO_SRC = join(ROOT, "packages/react/src/demo/sample-data.ts");
 const DEMO_HEADER =
@@ -106,6 +109,23 @@ console.log(
     (CHECK ? "（比對模式，未寫檔）" : ""),
 );
 if (expected.size <= 1) problems.push("幾乎沒有檔案可同步——安裝集或 registry 讀取壞了，守衛不能空轉");
+
+// 宿主的 dooping.lock.json（ADR-0013 第二層）。宿主是取用端範本：host:sync＝「重抄＋重建 lock」，
+// host:check＝「例行檢查 --strict」——用剛同步進宿主的那一份工具跑，走取用端會走的同一條路。
+// lock 指向本 repo 的 registry/（相對於宿主根目錄），CI 零網路、結果決定性。
+const TOOL = join(HOST, "scripts/dooping-check.mjs");
+if (!existsSync(TOOL)) {
+  problems.push("缺 apps/host-v4/scripts/dooping-check.mjs——安裝集要含 dooping-check");
+} else {
+  const toolArgs = CHECK
+    ? ["--cwd", HOST, "--strict"]
+    : ["init", ...INSTALL_SET, "--cwd", HOST, "--registry", "../../registry"];
+  try {
+    execFileSync(process.execPath, [TOOL, ...toolArgs], { stdio: "inherit" });
+  } catch {
+    problems.push(CHECK ? "dooping.lock.json 與 registry 或宿主檔案對不上" : "dooping-check init 失敗");
+  }
+}
 
 if (problems.length) {
   console.error(problems.map((p) => `  ✗ ${p}`).join("\n"));

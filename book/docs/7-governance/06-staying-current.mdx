@@ -14,19 +14,48 @@ title: 跟上新版
 
 | 通道 | 涵蓋 | 怎麼訂 |
 | --- | --- | --- |
-| GitHub Release（`vX.Y.Z`） | 規範版：元件與 token 有取用端可感知的變更 | repo 頁 Watch → Custom → Releases，有新版就收到通知 |
+| GitHub Release（`vX.Y.Z`） | 規範版：元件與 token 有取用端可感知的變更；notes 末尾列出**這一版動到的 registry item** | repo 頁 Watch → Custom → Releases，有新版就收到通知 |
 | [CHANGELOG](https://github.com/kielchang/dooping-design-book/blob/main/CHANGELOG.md) | 每次進版一則，含「我需要做什麼」 | 判斷時讀；不適合當提醒機制 |
 | `npm outdated @dooping/tokens` | token 層 | 放進宿主 CI 例行跑 |
-| `/r/index.json` 的 `version` | 元件層＋配對正本（`tokensVersion`） | 下面的檢查片段，放進宿主 CI |
+| `dooping-check` | 元件層：**你抄過的 item**（含相依）上游動了沒、本地改了沒 | 下面的「例行檢查」，放進宿主 CI |
+| `/r/index.json` | 機器可讀正本：規範 `version`、配對的 `tokensVersion`、每個 item 的指紋 `meta.closureHash` | 自己寫檢查時讀 |
 
-兩個刻意設計要知道：
+三個刻意設計要知道：
 
 - **純文件進版不打 tag、不發 Release。** 版號沒動＝取用端不需要任何動作，
   所以你不會收到通知——安靜本身就是訊號。
 - 規範版與 token 版是**配對**的：每版規範恰好宣告一個 tokens 版，
   正本在 `/r/index.json` 的 `tokensVersion`（見[版本策略](/governance/versioning)的配對模型）。
+- **Release 的 item 清單分四類**：內容有變、只因相依變了而受影響、新增、移除。
+  最容易漏的是「只因相依受影響」——修正落在 `utils` 時，抄了 `data-table` 的人一樣要重抄。
 
-宿主 CI 的例行檢查（提醒用，**不擋建置**——升級是決定，不是 CI 事件）：
+### 例行檢查：dooping-check
+
+提醒用，**不擋建置**——升級是決定，不是 CI 事件。一次性準備：
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/dooping-check.json   # 裝進 scripts/dooping-check.mjs
+node scripts/dooping-check.mjs init data-table page-header   # 列出你「主動」裝過的 item，相依會自動算進去
+```
+
+之後每週在宿主 CI 跑一次：
+
+```bash
+node scripts/dooping-check.mjs
+```
+
+每個 item 回報三種狀態之一：
+
+| 狀態 | 意思 | 下一步 |
+| --- | --- | --- |
+| 已是最新 | 上游的指紋與 lock 相同，本地檔案也沒改 | 不必動 |
+| 上游有更新 | 這個 item 或它的相依在上游變了 | 照輸出的指令先 `--dry-run --diff` 看差異；決定跟進就重抄，再 `update <item>` |
+| 本地改過 | 本地檔案的內容與 lock 記的不同 | 刻意偏離就記進[符合性台帳](/governance/conformance-ledger)；不是刻意的，重抄即可 |
+
+`dooping-check` 本身也是 registry item：它有更新時，檢查會把它列成「上游有更新」。
+想讓提醒擋 PR 就加 `--strict`（不建議當預設）。指紋怎麼算、為什麼含相依，見[決策紀錄](/adr)的 ADR-0013。
+
+裝不了腳本的專案，退而求其次比對規範版號——粒度只到「規範動了」，看不出動到哪些 item：
 
 ```bash
 UPSTREAM=$(curl -s https://kielchang.github.io/dooping-design-book/r/index.json | jq -r .version)
@@ -67,7 +96,7 @@ fi
 | 層 | 程序 |
 | --- | --- |
 | token | `npm update @dooping/tokens`（`^` 範圍內）。跨大版先讀 CHANGELOG；0.x 期間任何版本都可能 breaking，語意色**名稱**已穩定、值仍可能調 |
-| 元件 | 重跑同名 `npx shadcn@latest add <URL>`（覆寫 `components/dooping/` 同名檔）→ 用 `git diff` 逐檔審查——落點固定就是為了這一刻 diff 是乾淨的 → 台帳該列更新上游版本 |
+| 元件 | 重跑同名 `npx shadcn@latest add <URL>`（覆寫 `components/dooping/` 同名檔，相依會一起覆寫；先加 `--dry-run --diff` 看會動到哪些檔）→ 用 `git diff` 逐檔審查——落點固定就是為了這一刻 diff 是乾淨的 → `node scripts/dooping-check.mjs update <item>` → 台帳該列更新上游版本 |
 | 模式／頁面 | 重讀該則文件，對照本地實作；有差就記台帳（遵循／刻意偏離） |
 
 <Rules>

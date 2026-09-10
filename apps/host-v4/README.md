@@ -32,16 +32,20 @@ npm run host:build    # 產出 apps/host-v4/dist
 | --- | --- | --- |
 | `npm run host:sync` | `scripts/host-sync.mjs` 直接讀 `registry/*.json` 寫檔 | 日常與 CI：零網路、決定性 |
 | `npm run host:check` | 同上但只比對，有差異就失敗 | CI 閘門 |
-| `node scripts/host-add.mjs [item…]` | 起本機 registry 伺服器，真的跑 `npx shadcn add` | 確認 CLI 行為沒變 |
+| `node scripts/host-add.mjs [item…]` | 起本機 registry 伺服器，真的跑 `npx shadcn add`；可加 `--dry-run`、`--diff` 只預覽 | 確認 CLI 行為沒變、看上游改了什麼 |
 
 兩條路的產物必須逐位元組相同。要多裝一個元件：把名字加進 `dooping.install.json`，再跑 `host:sync`。
 遞移相依（例如 data-table 帶進來的 table、input）會自動補齊，不必列。
 
+`dooping.lock.json` 是更新檢查的紀錄（ADR-0013 第二層）：`host:sync` 用 `scripts/dooping-check.mjs init` 重建它，
+`host:check` 用同一支工具加 `--strict` 做例行檢查。取用端怎麼用這支工具，見文件站〈跟上新版〉。
+
 ## 當範本開新系統
 
 1. 複製整個 `apps/host-v4` 到新的 repo。
-2. `package.json` 的 `@dooping/tokens` 改成 npm 上的版本；刪掉 `dooping.install.json`——真實宿主用 CLI 安裝。
-3. 用 `npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/<item>.json` 補齊要的元件。
+2. `package.json` 的 `@dooping/tokens` 改成 npm 上的版本；刪掉 `dooping.install.json` 與 `dooping.lock.json`——真實宿主用 CLI 安裝。
+3. 用 `npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/<item>.json` 補齊要的元件，
+   再跑 `node scripts/dooping-check.mjs init <你裝的 item…>` 重建 lock，把 `node scripts/dooping-check.mjs` 放進每週的 CI。
 4. `LEDGER.md` 換成你自己的符合性台帳（骨架見 AGENTS.md）。
 5. `src/routes/` 是五種頁型的示範，換成你的畫面；`src/demo/` 換成你的資料來源。
 

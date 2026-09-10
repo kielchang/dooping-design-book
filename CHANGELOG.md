@@ -335,6 +335,23 @@ Tailwind v4 為主、v3 相容的取用路徑（token 入口，本書自己的 S
 3. **為什麼改**：凍結欄那一次的修正主要落在 `utils`，取用端從來不會主動去抄它。整個規範一個版號，看不出動到哪幾個 item；
    只比對自己抄的 `data-table` 也找不到。拿 dev 上凍結欄修正前後實跑：內容有變 3 個（`data-table`、`table`、`utils`），只因相依受影響 41 個。
 
+### 元件更新訊號（二）：取用端的 dooping-check——lock＋例行檢查（ADR-0013）
+
+1. **改了什麼**：新增 registry item `dooping-check`（`registry:file`，裝進專案根目錄的 `scripts/dooping-check.mjs`，零相依）。
+   - `init <item…>`：剛 `npx shadcn add` 完，以這幾個 item 建立 `dooping.lock.json`——記上游的 `closureHash`，
+     以及它（含相依）寫進專案的每個檔的內容指紋。
+   - 不帶參數＝例行檢查：每個 item 回報「已是最新／上游有更新／本地改過」，上游有更新時印出看差異與跟進的指令；
+     預設只提醒，加 `--strict` 才以結束碼 1 結束。
+   - `update [item…]`：重抄完更新紀錄。
+   路徑對應照 `components.json` 的 aliases 與 tsconfig 的 `@/*`，與 shadcn CLI 同一套。
+   內部試裝宿主是第一個取用端：`host:sync` 重建它的 lock，`host:check` 以 `--strict` 跑例行檢查（CI 已經在跑 `host:check`）。
+   守衛：`tests/dooping-check.test.ts`（工具與 registry 產生器的指紋規則一致、路徑對應、三種狀態分得出來）。
+2. **我需要做什麼**：可選。想讓 CI 在上游動到你抄過的 item 時提醒你，照文件站〈跟上新版〉的「例行檢查」裝一次、
+   列出你主動裝過的 item，之後每週在 CI 跑一次。
+3. **為什麼改**：第一、三層讓上游說得出「動到哪些 item」，但取用端還得自己記得裝過哪些、逐一對照。
+   lock 把「我裝了什麼、裝的時候長什麼樣」變成機器可讀，檢查才分得出「上游有更新」與「本地改過」——
+   後者就是符合性台帳「刻意偏離」的機器版。
+
 ---
 
 ## v0.11.1 · 2026-08-08

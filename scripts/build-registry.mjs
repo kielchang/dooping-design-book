@@ -132,6 +132,7 @@ const TITLES = {
   download: ["download 下載工具", "觸發瀏覽器下載 Blob。"],
   "forms-diff": ["forms/diff 欄位比對", "FieldSpec 驅動的變更偵測與顯示格式化。"],
   charts: ["Charts 圖表", "後台閱讀型的八種零相依圖＋圖例＋色票工具，含文字與鍵盤等價。"],
+  "dooping-check": ["dooping-check 更新檢查", "取用端的 lock 與例行檢查：已是最新／上游有更新／本地改過（ADR-0013 第二層）。"],
 };
 
 /**
@@ -271,6 +272,31 @@ for (const abs of walk(SRC)) {
     fullItems.push(item);
     items.push({ name: "charts", version: SPEC_VERSION, type: item.type, title, description });
   }
+}
+
+// ── 取用端工具：registry:file（ADR-0013 第二層）──────────────────────
+//
+// dooping-check 是給取用端專案用的 Node 腳本，不是元件：target 以 ~/ 開頭＝專案根目錄，
+// shadcn CLI 對 registry:file 不做任何改寫、原樣寫檔。它本身也是 registry item——更新了，取用端用同一套檢查就會知道。
+// 不相依 @dooping/tokens（它不是元件，tokens.test 對 registry:file 放行）。
+const TOOL_FILES = [{ name: "dooping-check", source: "templates/dooping-check.mjs", target: "~/scripts/dooping-check.mjs" }];
+for (const tool of TOOL_FILES) {
+  const content = readFileSync(join(ROOT, tool.source), "utf8").replace(/\r\n/g, "\n");
+  const [title, description] = TITLES[tool.name];
+  const item = {
+    $schema: "https://ui.shadcn.com/schema/registry-item.json",
+    name: tool.name,
+    version: SPEC_VERSION,
+    type: "registry:file",
+    title,
+    description,
+    dependencies: [],
+    registryDependencies: [],
+    files: [{ path: `dooping/${tool.source}`, content, type: "registry:file", target: tool.target }],
+  };
+  writeFileSync(join(OUT, `${tool.name}.json`), `${JSON.stringify(item, null, 2)}\n`, "utf8");
+  fullItems.push(item);
+  items.push({ name: tool.name, version: SPEC_VERSION, type: item.type, title, description });
 }
 
 // 逐 item 指紋（ADR-0013 第一層）：相依指到不存在的 item 會在這裡直接丟錯。

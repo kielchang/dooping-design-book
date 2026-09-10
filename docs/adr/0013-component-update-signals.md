@@ -1,6 +1,6 @@
 # ADR-0013：元件更新訊號——registry 逐 item 指紋、Release 列出受影響的 item、取用端 lock 檢查
 
-- **狀態**：已採用（第一、三層 2026-09 上線；第二層接著做，完成時在本則補記）
+- **狀態**：已採用（三層皆於 2026-09 上線；第二層的落地細節見文末後記）
 - **日期**：2026-09
 
 ## 背景
@@ -93,3 +93,16 @@
 - Release notes 變長。v0.13.0 相對 v0.11.1 幾乎每個 item 都會列出；之後的小版才顯出價值。
 - 指紋的串接規則是對外契約：改規則等於讓所有取用端的 lock 一次失效，要走本則的修訂。
 - 不做：逐 item semver、自動開 PR 的同步 bot、擋建置的檢查。
+
+## 後記：第二層上線（2026-09）
+
+- **分發**：`dooping-check` 是 `registry:file` item，target 為 `~/scripts/dooping-check.mjs`。shadcn CLI 4.21 把 `~/` 解析成專案根目錄，
+  對 `registry:file` 也不做任何改寫——實跑 `npx shadcn add` 裝進內部試裝宿主，落點與內容和 `host-sync` 寫的檔相同。
+  它不相依 `@dooping/tokens`，所以 `tests/tokens.test.ts`「每個 item 都相依 token」那一條對 `registry:file` 放行。
+- **指紋規則的第三份實作**：工具是抄進取用端的獨立腳本，不能 import 本 repo 的任何東西，內容指紋只好在工具裡另寫一份；
+  `tests/dooping-check.test.ts` 確認它與 registry 產生器的規則一致。
+- **路徑對應**：lock 記的是專案內的實際路徑。`components/`、`lib/` 照 `components.json` 的 aliases 與 tsconfig 的 `@/*` 展開，與 CLI 同一套。
+- **內部試裝宿主是第一個取用端**：`host:sync` 以安裝集重建 `apps/host-v4/dooping.lock.json`（35 個 item），
+  `host:check` 以 `--strict` 跑例行檢查。CI 本來就跑 `host:check`，不必另加步驟。
+- **反向驗證**：把宿主 lock 裡 `data-table` 的 closureHash 改掉，`host:check` 轉紅，報告列出「data-table：上游有更新」與看差異的指令；
+  工具的指紋規則少取一個字元，「規則一致」那條轉紅；拿掉判斷上游有更新的條件，「狀態」那條轉紅。

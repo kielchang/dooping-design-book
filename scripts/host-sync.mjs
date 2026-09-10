@@ -81,11 +81,23 @@ if (CHECK) {
     if (!expected.has(f)) problems.push(`安裝集之外的檔案：${rel(f)}（安裝集拿掉了這個 item，或有人手動加檔）`);
   }
 } else {
-  for (const dir of MANAGED) rmSync(dir, { recursive: true, force: true });
+  // 就地同步：只寫內容有變的檔、只刪安裝集之外的檔。不整個目錄先刪再寫——
+  // 開著 `npm run host:dev` 時，刪除與重寫之間的空檔會讓 Vite 把「找不到模組」快取住，
+  // 開發中的畫面就卡在錯誤覆蓋層上（實際踩過一次）。
+  let written = 0;
+  let removed = 0;
   for (const [file, content] of expected) {
+    if (existsSync(file) && lf(readFileSync(file, "utf8")) === content) continue;
     mkdirSync(dirname(file), { recursive: true });
     writeFileSync(file, content, "utf8");
+    written++;
   }
+  for (const f of MANAGED.flatMap(walk)) {
+    if (expected.has(f)) continue;
+    rmSync(f);
+    removed++;
+  }
+  console.log(`[host-sync] 寫入 ${written} 個、移除 ${removed} 個（其餘內容相同，未動）`);
 }
 
 const direct = new Set(INSTALL_SET).size;

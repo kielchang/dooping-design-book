@@ -467,7 +467,7 @@ export function DataTable<T>({
                   <Button variant="outline" size="sm" className="h-8 border-dashed">
                     <Filter /> {head}
                     {f.values.length > 0 && (
-                      <span className="rounded bg-primary/10 px-1.5 text-xs tabular-nums text-primary">{f.values.length}</span>
+                      <span className="rounded-sm bg-primary/10 px-1.5 text-xs tabular-nums text-primary">{f.values.length}</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -490,8 +490,8 @@ export function DataTable<T>({
                           {all.map((v) => {
                             const on = f.values.includes(v);
                             return (
-                              <button key={v} type="button" role="checkbox" aria-checked={on} onClick={() => toggleValue(v)} className="state-layer flex w-full items-center gap-2 rounded px-1.5 py-1 text-left text-xs">
-                                <span className={cn("flex size-4 shrink-0 items-center justify-center rounded border", on ? "border-primary bg-primary text-primary-foreground" : "border-input")}>
+                              <button key={v} type="button" role="checkbox" aria-checked={on} onClick={() => toggleValue(v)} className="state-layer flex w-full items-center gap-2 rounded-sm px-1.5 py-1 text-left text-xs">
+                                <span className={cn("flex size-4 shrink-0 items-center justify-center rounded-sm border", on ? "border-primary bg-primary text-primary-foreground" : "border-input")}>
                                   {on && <Check className="size-3" aria-hidden />}
                                 </span>
                                 <span className="min-w-0 flex-1 truncate">{v}</span>
@@ -501,7 +501,7 @@ export function DataTable<T>({
                           })}
                         </div>
                         {f.values.length > 0 && (
-                          <button type="button" onClick={() => clearFilter(facetKey)} className="w-full rounded border-t pt-1.5 text-center text-xs text-muted-foreground hover:underline">
+                          <button type="button" onClick={() => clearFilter(facetKey)} className="w-full rounded-sm border-t pt-1.5 text-center text-xs text-muted-foreground hover:underline">
                             {L.clear}
                           </button>
                         )}
@@ -670,7 +670,7 @@ export function DataTable<T>({
                           aria-label={L.filterOf(typeof c.header === "string" ? c.header : c.key)}
                           onClick={(e) => { e.stopPropagation(); openFilterAt(c.key, e.currentTarget); }}
                           className={cn(
-                            "tap-target ml-auto inline-flex shrink-0 items-center justify-center rounded p-0.5 transition-colors duration-fast",
+                            "tap-target ml-auto inline-flex shrink-0 items-center justify-center rounded-sm p-0.5 transition-colors duration-fast",
                             active ? "text-primary" : "text-muted-foreground/40 hover:text-muted-foreground",
                           )}
                         >
@@ -817,8 +817,8 @@ export function DataTable<T>({
                           {shown.map((v) => {
                             const on = f.values.includes(v);
                             return (
-                              <button key={v} type="button" role="checkbox" aria-checked={on} onClick={() => toggleValue(v)} className="state-layer flex w-full items-center gap-2 rounded px-1.5 py-1 text-left text-xs">
-                                <span className={cn("flex size-4 shrink-0 items-center justify-center rounded border", on ? "border-primary bg-primary text-primary-foreground" : "border-input")}>
+                              <button key={v} type="button" role="checkbox" aria-checked={on} onClick={() => toggleValue(v)} className="state-layer flex w-full items-center gap-2 rounded-sm px-1.5 py-1 text-left text-xs">
+                                <span className={cn("flex size-4 shrink-0 items-center justify-center rounded-sm border", on ? "border-primary bg-primary text-primary-foreground" : "border-input")}>
                                   {on && <Check className="size-3" aria-hidden />}
                                 </span>
                                 <span className="truncate">{v}</span>
@@ -890,7 +890,7 @@ export function DataTable<T>({
                           <div className="space-y-0.5">
                             <p className="px-1 text-tiny text-muted-foreground">{L.suggestions}</p>
                             {sugg.map((v) => (
-                              <button key={v} type="button" onClick={() => add(v)} className="state-layer flex w-full items-center gap-1.5 rounded px-1.5 py-1 text-left text-xs">
+                              <button key={v} type="button" onClick={() => add(v)} className="state-layer flex w-full items-center gap-1.5 rounded-sm px-1.5 py-1 text-left text-xs">
                                 <Plus className="size-3 shrink-0 text-muted-foreground" aria-hidden />
                                 <span className="truncate">{v}</span>
                               </button>

@@ -69,19 +69,36 @@ viteFinal: async (cfg) => {
     // 1. 直接指到套件原始碼：改元件立刻可見，不必先 build
     "@dooping/react": path.resolve(process.cwd(), "packages/react/src"),
   };
-  // 2. PostCSS 寫在這裡，不要放 repo 根目錄
-  cfg.css = { postcss: { plugins: [tailwindcss(tailwindConfig), autoprefixer()] } };
+  // 2. Tailwind v4 走 Vite plugin；設定寫在 CSS（見下方 styles.css），不需要 tailwind.config
+  const { default: tailwindcss } = await import("@tailwindcss/vite");
+  cfg.plugins = [...(cfg.plugins ?? []), tailwindcss()];
   // 3. 相對 base → 可發佈在靜態主機的子路徑
   cfg.base = "./";
   return cfg;
 }
 ```
 
+```css title=".storybook/styles.css：與取用端同一套四行 import，再明示掃描範圍"
+@import "tailwindcss" source(none);
+@import "tw-animate-css";
+@import "@dooping/tokens/tokens.css";
+@import "@dooping/tokens/tailwind.css";
+
+@source "../packages/react/src";
+@source ".";
+```
+
 | 項目 | 不做會怎樣 |
 | --- | --- |
 | **alias 指向原始碼** | 改一次元件要先 build 一次才看得到。開發回饋從 1 秒變成 30 秒，然後大家就不用 Storybook 了 |
-| **PostCSS 寫在 `viteFinal`** | 放在 repo 根目錄的 `postcss.config.cjs` 會被**同一個 repo 裡的其他工具沿目錄向上找到**（例如文件站），讓它套用到錯的設定。症狀是「文件站的樣式莫名其妙壞掉」，而且很難聯想到是 Storybook 的設定檔造成的 |
+| **掃描範圍明示**（`source(none)`＋`@source`） | v4 預設以工作目錄為基準自動掃整個 repo——連文件站散文裡的反例 class 都算進去，產出的 CSS 跟著文件內容飄 |
 | **`base: "./"`** | 發佈到靜態主機子路徑時，所有資源都去根目錄找，整站空白 |
+
+另一個容易踩的坑：**子路徑 alias 要排在套件 alias 之前**。Vite 的字串 alias 以前綴比對、先到先得——
+`"@dooping/tokens"` 排在前面時，`@dooping/tokens/tailwind.css` 會被改寫成 `index.ts/tailwind.css`。
+
+Storybook 是本書自己的第一個 Tailwind v4 宿主，刻意照 [AGENTS.md](https://kielchang.github.io/dooping-design-book/AGENTS.md)
+的取用契約接、不走捷徑：契約哪裡寫錯，這裡最先壞。
 
 ## storySort 必須涵蓋**所有**頂層分類
 

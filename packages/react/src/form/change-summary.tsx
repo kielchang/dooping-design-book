@@ -36,14 +36,14 @@ function RevertConfirm({
   from, to, onCancel, onConfirm, labels,
 }: { from: string; to: string; onCancel: () => void; onConfirm: () => void; labels: ChangeSummaryLabels }) {
   return (
-    <span className="flex flex-1 flex-wrap items-center gap-1.5 rounded border border-edit bg-edit-bg px-2 py-1">
+    <span className="flex flex-1 flex-wrap items-center gap-1.5 rounded-sm border border-edit bg-edit-bg px-2 py-1">
       <span className="font-medium text-edit-foreground">{labels.confirmRevert}</span>
       <span className="text-muted-foreground line-through">{from}</span>
       <ArrowRight className="size-3 shrink-0 text-warning" aria-hidden />
       <span className="font-medium text-edit-foreground">{to}</span>
       <span className="ml-auto flex gap-1">
-        <button type="button" onClick={onCancel} className="tap-target-y rounded border border-input bg-background px-2 py-0.5 hover:bg-accent">{labels.cancel}</button>
-        <button type="button" onClick={onConfirm} className="tap-target-y rounded bg-primary px-2 py-0.5 text-primary-foreground">{labels.confirm}</button>
+        <button type="button" onClick={onCancel} className="tap-target-y rounded-sm border border-input bg-background px-2 py-0.5 hover:bg-accent">{labels.cancel}</button>
+        <button type="button" onClick={onConfirm} className="tap-target-y rounded-sm bg-primary px-2 py-0.5 text-primary-foreground">{labels.confirm}</button>
       </span>
     </span>
   );
@@ -120,7 +120,7 @@ export function ChangeSummary({ changes, onRevertField, onRevertAll, className, 
                       onClick={() => setPending({ field: c.field, from: c.afterText, to: c.beforeText })}
                       title={L.revertFieldTitle}
                       aria-label={L.revertField(c.label)}
-                      className="tap-target ml-auto flex shrink-0 items-center justify-center rounded p-0.5 text-warning hover:bg-edit-bg"
+                      className="tap-target ml-auto flex shrink-0 items-center justify-center rounded-sm p-0.5 text-warning hover:bg-edit-bg"
                     >
                       <Undo2 className="size-3.5" aria-hidden />
                     </button>

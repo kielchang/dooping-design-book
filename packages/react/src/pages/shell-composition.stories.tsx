@@ -165,7 +165,7 @@ function Composed() {
         <Sidebar>
           <SidebarHeader>
             <div className="flex h-9 items-center gap-2 px-2 font-semibold">
-              <span className="flex size-6 shrink-0 items-center justify-center rounded bg-brand text-xs text-brand-foreground">帳</span>
+              <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-brand text-xs text-brand-foreground">帳</span>
               <span className="truncate group-data-[state=collapsed]/sidebar:sr-only">內部作業系統</span>
             </div>
           </SidebarHeader>

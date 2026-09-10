@@ -60,6 +60,30 @@ commit 本身記在 tag 描述裡，不會遺失。
 3. **為什麼改**：要統一的宿主多數已在 Tailwind v4，只出 v3 preset 等於照文件做也接不上——
    這是至今沒有元件層取用端的結構性原因。基線定為 v4 為主、v3 相容。
 
+### 本書自己升 Tailwind v4：Storybook 照取用端契約接＋v3／v4 相容守衛
+
+1. **改了什麼**：Storybook 改用 `@tailwindcss/vite`，`.storybook/styles.css` 換成與取用端逐字相同的
+   四行 `@import`（另明示 `@source` 掃描範圍），刪除根目錄 `tailwind.config.cjs`。根目錄相依換成
+   `tailwindcss@4`、`tw-animate-css`、`tailwind-merge@3`，並以 npm alias `tailwindcss3` 保留 v3 給守衛用。
+   元件內所有裸 `rounded`／`rounded-b` 改成 `rounded-sm`／`rounded-b-sm`：兩版值相同（0.25rem），
+   但裸 `rounded` 在 v4 掛在棄用區、也不接 `--radius`——改完後調圓角基準值會跟著走。
+   `cn()` 把 `text-micro`／`text-tiny` 登記進 tailwind-merge 的字級群組（原本被當成文字色，
+   `cn("text-sm", "text-tiny")` 會兩者並存）。
+   新增三支守衛：`tokens-v4`（真的用 v4 編 `dist/tailwind.css`，含未文件化的 `--transition-duration-*`
+   命名空間，以及 reference 不往 `:root` 吐變數）、`tokens-v3`（用 v3 帶 preset 編同一組 class，
+   斷言讀到同一批變數）、`tailwind-compat`（元件原始碼只准用兩版語意相同的 utility：
+   禁兩版值不同的裸 utility、禁 v4 限定語法、禁只靠 hover 揭露功能）。
+   `verify:storybook` 另加強制色彩模式的焦點哨兵：按鈕、輸入控制項、資料表三支 story 模擬
+   forced-colors、用 Tab 走一遍，outline 不得是 none。反向驗證：拿掉 tokens.css 的焦點備援後重建，
+   按鈕與輸入框共 10 個元素轉紅——沒有那段備援，v4 宿主的鍵盤使用者在高對比模式下看不到焦點。
+2. **我需要做什麼**：v4 宿主不需要。已抄走 callout／change-summary／coachmark／data-table／
+   editable-field／gantt／seg-group／toast／utils 的取用端，外觀不變、不必重抄；
+   想讓這些元件的圓角跟著 `--radius` 走時再重抄。`cn()` 的新寫法用 `classGroups`，
+   tailwind-merge v2 與 v3 是同一套 API。
+3. **為什麼改**：定了 v4 為主，本書自己卻不在 v4 上跑，契約寫錯也沒人會先發現。
+   而開發環境一旦升 v4，「只有 v4 才有」的 class 寫得出來、畫面也對，直到 v3 宿主抄走才安靜變形——
+   所以相容性要由守衛擋，不能靠開發環境。
+
 ### Token：`--sidebar-*` 八件組（tokens 0.7.0）
 
 1. **改了什麼**：新增 shadcn 相容的 `--sidebar-*` 八個 token。只有 `--sidebar` 是

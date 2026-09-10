@@ -1,20 +1,20 @@
 // 宿主基座守衛 — 「元件假設的樣式前提」與「宿主實際提供的 reset」是同一份事實的兩個所在。
 //
-// 事實一在 node_modules/tailwindcss 的 preflight.css（Storybook 靠 @tailwind base 直接拿到），
+// 事實一在 Tailwind v3 的 preflight.css（過渡期讀根目錄的 tailwindcss3 alias——Storybook 已升 v4，文件站仍在 v3），
 // 事實二在 book/src/css/demo-base.css（文件站關 preflight，改在 demo scope 內移植同一份）。
 // 依治理章的判準「同一份事實存在於兩個地方，就需要一支守衛」，這裡把兩者逐條對應：
 //   - Tailwind 升版改了 preflight → 這裡紅，提醒回去重新移植；
 //   - demo-base 被改壞、少一條、scope 前綴寫錯 → 這裡紅；
 //   - kit.css 的引入順序（基座必須在 utilities 之前）是承重結構 → 這裡鎖。
 //
-// 為什麼讀**根**的 node_modules：CI 的 npm test 跑在 book/ 的 npm ci 之前，
+// 為什麼讀**根**的 node_modules（tailwindcss3 alias）：CI 的 npm test 跑在 book/ 的 npm ci 之前，
 // book/node_modules 當下不存在。兩邊裝到同一版由「宣告範圍字串相等」那條保證。
 //
 // 背景與選項取捨見 ADR-0010；這支守衛的誕生原因：文件站上 demo 的按鈕吃到瀏覽器
 // 原生外框、表格吃到宿主格線、元件自畫的邊框整批消失——三者都是基座缺席的症狀，
 // 而先前沒有任何一道防線看得見「樣式前提」這一層。
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 
@@ -148,7 +148,7 @@ const HOST_EXTRA: Rule[] = [
   },
 ];
 
-const preflight = parseCss(read("node_modules/tailwindcss/lib/css/preflight.css"));
+const preflight = parseCss(read("node_modules/tailwindcss3/lib/css/preflight.css"));
 const demoBase = parseCss(read("book/src/css/demo-base.css"));
 
 describe("宿主基座：demo-base 與 preflight 逐條對應", () => {
@@ -188,19 +188,30 @@ describe("宿主基座：管線必要條件", () => {
     expect(read("book/tailwind.config.js")).toMatch(/preflight:\s*false/);
   });
 
-  it("Storybook 管線保有另一份基座（@tailwind base + border-color 預設）", () => {
-    const sb = read(".storybook/styles.css");
-    expect(sb).toContain("@tailwind base");
-    expect(sb).toContain("border-color: hsl(var(--border))");
+  it("Storybook 管線保有另一份基座（v4：@import tailwindcss 帶 preflight，tokens 的 tailwind.css 補邊框色）", () => {
+    const sb = read(".storybook/styles.css").replace(/\/\*[\s\S]*?\*\//g, "");
+    expect(sb).toMatch(/@import\s+"tailwindcss"/);
+    expect(sb).toContain('@import "@dooping/tokens/tailwind.css"');
+    expect(read("packages/tokens/dist/tailwind.css")).toContain("border-color: hsl(var(--border))");
   });
 
-  it("根與 book 宣告同一個 tailwindcss 範圍（守衛讀根的 preflight，兩邊必須同版）", () => {
+  // 過渡期（Storybook 已升 v4、文件站仍在 v3）：這支守衛讀的 v3 preflight 來自根目錄的
+  // tailwindcss3 alias，文件站實際裝的是 book/ 自己的 tailwindcss。兩者必須同一個小版系列；
+  // 本機裝得到 book/node_modules 時更要逐版號相等。文件站升 v4 時這條整條改寫。
+  it("守衛讀的 v3 preflight 與文件站實裝的 tailwindcss 同版", () => {
     const root = JSON.parse(read("package.json"));
     const book = JSON.parse(read("book/package.json"));
-    const rootRange = root.devDependencies?.tailwindcss;
-    const bookRange = book.devDependencies?.tailwindcss ?? book.dependencies?.tailwindcss;
-    expect(rootRange).toBeTruthy();
-    expect(rootRange).toBe(bookRange);
+    const rootRange: string = root.devDependencies?.tailwindcss3 ?? "";
+    const bookRange: string = book.devDependencies?.tailwindcss ?? book.dependencies?.tailwindcss ?? "";
+    const minor = (r: string) => /(\d+)\.(\d+)/.exec(r)?.slice(1, 3).join(".");
+    expect(rootRange, "根目錄缺少 tailwindcss3 alias").toMatch(/^npm:tailwindcss@/);
+    expect(minor(rootRange)).toBe(minor(bookRange));
+    const bookInstalled = join(ROOT, "book/node_modules/tailwindcss/package.json");
+    if (existsSync(bookInstalled)) {
+      expect(JSON.parse(read("node_modules/tailwindcss3/package.json")).version).toBe(
+        JSON.parse(readFileSync(bookInstalled, "utf8")).version,
+      );
+    }
   });
 });
 

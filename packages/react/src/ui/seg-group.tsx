@@ -81,7 +81,7 @@ export function SegGroup({
             onClick={() => !disabled && onPick(o.value)}
             onKeyDown={(e) => onKey(e, idx)}
             className={cn(
-              "state-layer tap-target-y inline-flex items-center justify-center gap-1 rounded px-3 py-1 text-sm",
+              "state-layer tap-target-y inline-flex items-center justify-center gap-1 rounded-sm px-3 py-1 text-sm",
               active ? "bg-primary text-primary-foreground" : "text-muted-foreground",
             )}
           >

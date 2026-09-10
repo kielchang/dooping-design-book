@@ -23,6 +23,8 @@ const KEY_THRESHOLD = 4;
 const SCAN = [
   { dir: "packages/react/src", match: (f: string) => f.endsWith(".stories.tsx") },
   { dir: "book/docs", match: (f: string) => extname(f) === ".mdx" },
+  // 內部試裝宿主的頁面：資料一律從同步進去的 @/demo/sample-data 取（它是唯一來源的逐字副本）
+  { dir: "apps/host-v4/src/routes", match: (f: string) => f.endsWith(".tsx") },
 ];
 
 /**

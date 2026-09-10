@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dooping 內部試裝宿主</title>
+    <script>
+      // 首次繪製前就套上主題，避免先閃一下預設主題（與 src/theme.tsx 同一個儲存鍵）。
+      // 掛在 documentElement：portal 浮層掛在 body，只切 wrapper 的屬性抓不到。
+      try {
+        var saved = JSON.parse(localStorage.getItem("dooping-host-theme") || "null");
+        if (saved) {
+          var root = document.documentElement;
+          if (saved.mode === "dark") root.classList.add("dark");
+          root.setAttribute("data-theme", saved.mode === "dark" ? "dark" : "light");
+          if (saved.color && saved.color !== saved.defaultColor) root.setAttribute("data-color-theme", saved.color);
+        }
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

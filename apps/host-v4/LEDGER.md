@@ -1,0 +1,42 @@
+# 符合性台帳（內部試裝宿主）
+
+上游版本：v0.13.0（tokens 0.7.0）　最後對照日：2026-09-10
+
+這個宿主是範本：**元件全部「遵循」、不允許刻意偏離**——`npm run host:check` 在 CI 擋任何差異。
+取用端自己的台帳會有「自製」與「刻意偏離」，格式照 AGENTS.md 的骨架。
+
+| 本地實作 | 狀態 | 上游對應 | 原因（偏離必填） |
+| --- | --- | --- | --- |
+| 五種頁型與外殼用到的全部元件 | 遵循 | `dooping.install.json` 的 item 與其遞移相依 | — |
+| 網址狀態 adapter（`src/url-adapter.ts`） | 自製 | `use-table-url-state` 的 `UrlStateAdapter` 注入點 | 元件庫刻意不綁路由，adapter 本來就由宿主提供 |
+| 主題切換（`src/theme.tsx`） | 自製 | 契約：主題掛 `documentElement` | 宿主的責任，元件庫不提供 |
+
+## 不需要對齊
+
+- 路由（react-router）、部署 base、示範資料的頁面組合方式——與上游無關的宿主本地決定。
+
+## 回饋（ADR-0011 的內部補充證據）
+
+> 以下是**內部試裝**的觀察，證據強度低於真實宿主；ADR-0011 判準②仍等真實子系統的導入回報。
+
+1. **BackLink 只渲染真 `<a>`，不吃路由元件。** SPA 宿主點下去是整頁重載，
+   而且 `href` 要自己帶上部署 base（預覽站在子路徑下）。範本不改元件，只能照做。
+   建議：`BackLink` 比照 `SidebarNav` 提供 `renderLink`。
+2. **`useTableUrlState` 的 prefix 只隔離讀、沒有隔離寫。** 預設 `historyAdapter.set` 整串覆寫網址參數，
+   同頁的其他參數（清單頁的 `view`）會被洗掉；兩張表各帶 prefix 也會互相覆蓋。
+   宿主 adapter 目前自行合併。建議：hook 在寫入前保留非本表的參數，並補一支測試。
+3. **`FormField` 包不了 Radix `Select`。** FormField 把 `id`／`aria-*` 注入唯一的子元素，
+   而 Select 能聚焦的是 `SelectTrigger`、不是根元件——表單頁與設定頁的下拉因此照 Label＋id 手接。
+   建議：文件講清楚，或讓 FormField 支援 render prop。
+4. **清單頁的兩條規範撞在一起：整列可點＋批次勾選。** 〈清單頁〉同時要求「整列可點」與
+   「勾選後出現批次列」；DataTable 同時開 `onRowClick` 與 `selectable` 時，可聚焦的列裡包著勾選框——
+   axe `nested-interactive`（serious），螢幕閱讀器把整列當成一個控制項，裡面的勾選框失去獨立語意。
+   `verify:host` 第一次跑就抓到；Storybook 沒有同時開兩者的 story，所以一直沒被發現。
+   宿主暫時只開整列可點。建議：DataTable 在 `selectable` 時改用首欄連結當列入口（或提供 grid 鍵盤模式），
+   〈清單頁〉同步寫清楚兩者怎麼並存，並補一支同時開兩者的 story。
+
+## 工具
+
+| 工具 | 版本 | 最後執行 | 結果 |
+| --- | --- | --- | --- |
+| shadcn CLI（`scripts/host-add.mjs`） | 4.21.0 | 尚未執行 | — |

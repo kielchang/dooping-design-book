@@ -7,13 +7,17 @@
 // 用法：
 //   node scripts/build-registry.mjs               # 用預設（GitHub Pages）base
 //   REGISTRY_BASE=http://localhost:4173 node scripts/build-registry.mjs
+//   REGISTRY_BASE=http://127.0.0.1:4173 REGISTRY_OUT=registry-local node scripts/build-registry.mjs
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, rmSync } from "node:fs";
 import { dirname, join, basename, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { rewrite } from "./lib/rewrite.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = join(ROOT, "packages/react/src");
-const OUT = join(ROOT, "registry");
+// REGISTRY_OUT：內部試裝宿主要一份「base 指向本機伺服器」的 registry（scripts/host-add.mjs），
+// 那份不能覆寫進版控的 registry/。預設值不變。
+const OUT = join(ROOT, process.env.REGISTRY_OUT ?? "registry");
 const BASE = (process.env.REGISTRY_BASE ?? "https://kielchang.github.io/dooping-design-book").replace(/\/$/, "");
 
 /** 目標專案的落點：元件一律 components/dooping/、工具一律 lib/dooping/。 */
@@ -58,16 +62,8 @@ function walk(dir) {
   return out;
 }
 
-/** 匯入路徑改寫：相對路徑 → 目標專案的 `@/` 別名。 */
-function rewrite(content) {
-  return content
-    .replace(/from\s+["']\.\.\/lib\/forms\/diff["']/g, 'from "@/lib/dooping/forms-diff"')
-    .replace(/from\s+["']\.\.\/\.\.\/lib\/forms\/diff["']/g, 'from "@/lib/dooping/forms-diff"')
-    .replace(/from\s+["']\.\.\/lib\/([a-z-]+)["']/g, 'from "@/lib/dooping/$1"')
-    .replace(/from\s+["']\.\.\/\.\.\/lib\/([a-z-]+)["']/g, 'from "@/lib/dooping/$1"')
-    .replace(/from\s+["']\.\.\/(?:ui|form)\/([a-z-]+)["']/g, 'from "@/components/dooping/$1"')
-    .replace(/from\s+["']\.\/([a-z-]+)["']/g, 'from "@/components/dooping/$1"');
-}
+// 匯入路徑改寫（相對路徑 → 目標專案的 `@/` 別名）在 scripts/lib/rewrite.mjs——
+// scripts/host-sync.mjs 同步示範資料時共用同一份規則。
 
 /** 從原始碼推導出這個檔案需要哪些 npm 套件與 registry 相依。 */
 function analyse(content) {

@@ -33,6 +33,8 @@ const SCAN_DIRS = [
   "templates",
   "scripts",
   "tests",
+  // 內部試裝宿主：頁面文案、README、台帳都是「新子系統整個目錄抄走」的範本，領域詞會跟著被抄走
+  "apps",
 ];
 const SCAN_FILES = [
   "README.md",

@@ -169,7 +169,7 @@ expect(missingInCss).toEqual([]);
 
 ```ts
 const FORBIDDEN_TERMS = ["…產業術語…", "…角色流程詞…"];
-// 掃描 packages/、book/docs、docs/adr、registry
+// 掃描 packages/、book/docs、.github、registry
 expect(hits).toEqual([]);
 ```
 
@@ -193,7 +193,7 @@ for (const file of shippedFiles) {
 
 **這支和防線 ① 不重複，它補的正是 ① 的盲點。** 清空預設色盤之後，
 `bg-amber-500` 只是**靜默產不出樣式**——不報錯、不紅燈，元件看起來「有點不對」而已。
-更要緊的是取用端：他們不一定套我們的 preset（[token 是唯一硬相依](/adr)），
+更要緊的是取用端：他們不一定套我們的 preset（[token 是唯一硬相依](/start/three-ways)），
 那時 `bg-amber-500` 會**真的渲染成琥珀色**，而且完全不跟主題走。
 
 token 守衛也擋不到：它檢查的是「token 本身完不完整、淺深有沒有成對」，
@@ -202,7 +202,7 @@ token 守衛也擋不到：它檢查的是「token 本身完不完整、淺深�
 而這正是最容易發生的漂移：趕時間的時候，`bg-amber-100` 比「先去查該用哪個語意 token」快，
 而且當下看起來一模一樣。等到有人換主題或切深色，才發現有十幾處顏色不會跟著變。
 
-**特別要盯琥珀**：`--edit` 是保留色（[ADR-0002](/adr)）。一旦有人用原始色階寫了一個
+**特別要盯琥珀**：`--edit` 是保留色（見[提醒色辭典](/foundations/alert-colors)）。一旦有人用原始色階寫了一個
 「順便也是琥珀色」的高亮，「已改動未送出」這個訊號就被稀釋了，而稀釋是不可逆的——
 使用者一旦學到「琥珀有時候沒有意義」，就再也不會相信它。
 

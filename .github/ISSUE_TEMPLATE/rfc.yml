@@ -10,7 +10,7 @@ body:
         五題判準與三次法則見文件站
         [〈回饋與 RFC 流程〉](https://kielchang.github.io/dooping-design-book/governance/rfc/)。
         **已知的無障礙或安全問題不必等三次，直接提。**
-        提案被接受後會開一則 ADR（提議中）記錄決策；婉拒會留下一句可被推翻的理由。
+        提案被接受後會在維護方的 PMIS 開一個有到期日的計畫；婉拒會留下一句可被推翻的理由。
   - type: textarea
     id: problem
     attributes:

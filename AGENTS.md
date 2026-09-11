@@ -19,8 +19,7 @@
 | `packages/react` | React 參考實作（registry 項目全清單見 [`/r/index.json`](https://kielchang.github.io/dooping-design-book/r/index.json)） | `npx shadcn add <URL>` | 複製後就是你的，隨便改 |
 | `book/docs`（模式與頁面章） | 操作模式（問題→做法→取捨→反例）＋五種頁型的組成規範 | 讀懂，用你的技術棧實作 | 不含程式碼 |
 
-理由見 [ADR-0004](https://kielchang.github.io/dooping-design-book/adr/registry-over-npm-package/)（元件一定會被改，所以不發套件）
-與 [ADR-0005](https://kielchang.github.io/dooping-design-book/adr/tokens-are-the-only-hard-dependency/)（token 幾乎不會被改，所以它才是契約）。
+理由：元件一定會被改，所以不發套件；token 幾乎不會被改，所以它才是契約。
 
 ## 取元件：shadcn registry
 
@@ -91,8 +90,8 @@ src/
   鋪等價基座——本 repo 的文件站就是這種宿主，作法照抄
   [`book/src/css/demo-base.css`](https://github.com/kielchang/dooping-design-book/blob/main/book/src/css/demo-base.css)。
   注意 **portal 內容**（Dialog／Select／Tooltip／資料表篩選面板）掛在 `body` 直下，
-  逃出容器子樹，scope 必須一併涵蓋。取捨與驗收方式見
-  [ADR-0010](https://kielchang.github.io/dooping-design-book/adr/demo-host-baseline-contract/)。
+  逃出容器子樹，scope 必須一併涵蓋。驗收方式：`npm run verify:host`
+  對內部試裝宿主跑的那一套（主題配色、頁面級 axe、強制色彩、行動版外殼），取捨見下方「宿主前置條件」。
 
 ## 取 token
 
@@ -162,7 +161,8 @@ document.documentElement.classList.toggle("dark");
 
 1. **語意色的名稱與意義。** `--danger` 就是危險、`--success` 就是良好。
    換品牌色請改 token 的**值**，不要改名字，也不要拿 `--warning` 去表示別的東西。
-2. **琥珀色是「已改動未送出」的保留色**，不作他用。見 [ADR-0002](https://kielchang.github.io/dooping-design-book/adr/amber-reserved-for-dirty-state/)。
+2. **琥珀色是「已改動未送出」的保留色**，不作他用——第二種意思會稀釋這個訊號，而稀釋不可逆
+   （見[提醒色辭典](https://kielchang.github.io/dooping-design-book/foundations/alert-colors/)）。
 3. **深色模式鉤子**掛在 `document.documentElement`，`.dark` class 與 `[data-theme="dark"]` 屬性擇一即可（兩種都內建支援）。
    掛在 wrapper 上會讓 Dialog / Select / Tooltip 這類 portal 浮層抓不到。
 4. **不要靠顏色單獨傳達語意。** 狀態要同時有文字或圖示——見[無障礙原則](https://kielchang.github.io/dooping-design-book/accessibility/principles/)。
@@ -287,8 +287,8 @@ npm run build:registry # 元件改了就要重新產生 registry JSON 並一起�
 | 新元件／新 token／改語意 | <https://github.com/kielchang/dooping-design-book/issues/new?template=rfc.yml>（五題逐欄） |
 | 頁面章缺件表的項目 | <https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml>（一則＝三次法則的一次證據） |
 
-守門人、狀態機與 RFC→ADR 的銜接見文件站「治理 → 回饋與 RFC 流程」；
-**未合併的提案不得在下游先行實作**（符合性台帳的鐵律）。
+守門人與狀態機見文件站「治理 → 回饋與 RFC 流程」；
+**先在宿主做、台帳記自製，三次法則過了再提回上游**（符合性台帳的順序）。
 
 ## 入口
 
@@ -296,6 +296,5 @@ npm run build:registry # 元件改了就要重新產生 registry JSON 並一起�
 - 🧩 Storybook <https://kielchang.github.io/dooping-design-book/storybook/>
 - 📦 Registry 索引 <https://kielchang.github.io/dooping-design-book/r/index.json>
 - 🤖 機器地圖 <https://kielchang.github.io/dooping-design-book/llms.txt>
-- 🧭 決策紀錄 [ADR 索引](https://kielchang.github.io/dooping-design-book/adr/) — 「為什麼是這樣」都寫在這裡（repo 內正本：`docs/adr/`）
 - 🏗 系統架構（想貢獻先讀）[ARCHITECTURE.md](https://github.com/kielchang/dooping-design-book/blob/main/ARCHITECTURE.md)
 - 💬 提出建議 <https://github.com/kielchang/dooping-design-book/issues/new/choose>

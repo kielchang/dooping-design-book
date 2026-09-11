@@ -111,16 +111,15 @@ v0.11.0 已收錄七件，替代方案功成身退：
 [DateRange 期間選擇](/components/date-range)、
 Form 包裝 → `FormField`／`FieldError`（見 [Input 的錯誤態](/components/input)）。
 
-v0.12.0（[ADR-0011](/adr)）再畢業兩件：
+v0.12.0 再畢業兩件：
 [Popover／DropdownMenu](/components/popover-dropdown)——並同批收錄
 Collapsible、Separator、[ConfirmDialog](/components/confirm-dialog)。
 
 v0.13.0 畢業第一列：[PageHeader／Breadcrumb](/components/page-header)（含 `BackLink`）。
-走的是 [ADR-0008](/adr) 自己寫下的解鎖條件——這五種頁型的組合 story 曾在**八處**
+走的是本章自己寫下的解鎖條件——這五種頁型的組合 story 曾在**八處**
 手排頁首並且已經漂移，證據滿了就收。同批把文件裡提過、但缺件表漏登記的
 **DefinitionList** 補進上表（只登記，尚未實作）。
 
-AppShell 與 Sidebar 原本刻意不收（ADR-0008），v0.12.0 起由
-[ADR-0011](/adr) 修訂、以**純呈現元件**收進[元件章](/components/app-shell-sidebar)
-（已採用；重新檢視條件＝第一個真實宿主依文件自行導入的回報）；站台層的規範正本不變，仍在
+AppShell 與 Sidebar 原本刻意不收，v0.12.0 起以**純呈現元件**收進[元件章](/components/app-shell-sidebar)
+（重新檢視條件＝第一個真實宿主依文件自行導入的回報）；站台層的規範正本不變，仍在
 [後台系統的資訊架構](/patterns/back-office-ia)。

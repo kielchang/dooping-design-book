@@ -29,7 +29,6 @@ packages/react/src ──(build:registry＝build-registry.mjs)──► registry
                                                                    ▼
                                                     站上 /r/index.json 與 /r/<name>.json
 
-docs/adr/*.md ──────────(book/scripts/sync-adr.mjs，build 前)──────► book/docs/8-adr/（gitignored）
 AGENTS.md、ARCHITECTURE.md ──(book/scripts/sync-root-docs.mjs)──► book/static/、book/docs/7-governance/
 ```
 
@@ -37,8 +36,8 @@ AGENTS.md、ARCHITECTURE.md ──(book/scripts/sync-root-docs.mjs)──► boo
 
 | 層 | 散佈方式 | 改動權 | 為什麼 |
 | --- | --- | --- | --- |
-| `packages/tokens` | 發佈到 npm（`@dooping/tokens`） | 不可改語意，只可改值 | token 幾乎不會被改，所以它才是契約（[ADR-0005](https://kielchang.github.io/dooping-design-book/adr/tokens-are-the-only-hard-dependency/)） |
-| `packages/react` | shadcn registry 複製原始碼，**刻意不發 npm** | 複製走就是取用端的，隨便改 | 元件一定會被改，所以不發套件（[ADR-0004](https://kielchang.github.io/dooping-design-book/adr/registry-over-npm-package/)） |
+| `packages/tokens` | 發佈到 npm（`@dooping/tokens`） | 不可改語意，只可改值 | token 幾乎不會被改，所以它才是契約 |
+| `packages/react` | shadcn registry 複製原始碼，**刻意不發 npm** | 複製走就是取用端的，隨便改 | 元件一定會被改，所以不發套件 |
 | `book/docs` 的模式與頁面章 | 讀懂，用自己的技術棧實作 | 不含程式碼 | 操作模式是框架無關的，最值錢也最不該綁實作 |
 
 ## Token 管線
@@ -157,8 +156,7 @@ build 之後（CI 跑，本機可單獨跑）：
 ## 文件站建置
 
 - `book/` **刻意不是 workspace 成員**：Docusaurus 的相依樹太大，分開安裝避免版本互相牽制。
-- prebuild 鏈：`build-css.mjs`（token 產物）→ `sync-adr.mjs`（ADR 副本）→
-  `sync-root-docs.mjs`（AGENTS.md／本檔的副本）。
+- prebuild 鏈：`build-css.mjs`（token 產物）→ `sync-root-docs.mjs`（AGENTS.md／本檔的副本）。
 - `kitPipeline` plugin（`book/docusaurus.config.ts`）：webpack alias 直指 `packages/*/src`，
   文件站的活範例渲染**真元件**，不是截圖或複本——元件改了，文件頁自動跟上。
 - `onBrokenLinks: "throw"`：站內死鏈直接紅 build。本檔正本因此**只用絕對 URL**，
@@ -191,8 +189,8 @@ dev  ──push──► ci.yml     ──► gh-pages 的 preview/   （預覽�
 | 新元件／新 token／改語意 | [rfc.yml](https://github.com/kielchang/dooping-design-book/issues/new?template=rfc.yml)（五題逐欄） |
 | 頁面章缺件表的項目 | [missing-piece.yml](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml)（一則＝三次法則的一次證據） |
 
-- **想推翻某條規則**：先讀 [ADR](https://kielchang.github.io/dooping-design-book/adr/)——
-  「為什麼當初這樣決定」都在那裡；何時該寫新 ADR 的三判準在 `docs/adr/README.md`。
-- **下游唯讀鐵律**：未合併的提案不得在下游先行實作
+- **想推翻某條規則**：先讀該規則的守衛檔頭與文件頁那一句——理由就寫在旁邊；
+  決定的來龍去脈記在維護方內部的 PMIS，本 repo 不放決策紀錄。
+- **下游唯讀鐵律**：先在宿主做、台帳記自製，三次法則過了再提回上游
   （[治理 → 符合性台帳](https://kielchang.github.io/dooping-design-book/governance/conformance-ledger/)）。
 - **改動前的驗證指令與環境啟動**：`CLAUDE.md`。

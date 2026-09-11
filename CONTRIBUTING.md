@@ -16,7 +16,7 @@
 缺件表的 **Drawer** 已經有一份實作草稿，保存在 tag `draft/drawer-on-0.11.0`：`packages/react/src/ui/drawer.tsx`（Radix Dialog 組成、右側滑出，檔頭有與 Dialog 的分工說明），連同 `overlay-panels.stories.tsx`、`registry/drawer.json` 與文件頁 `book/docs/3-components/31-overlays.mdx`。它基於 v0.11.0 舊底、**尚未收錄**，三次法則證據齊了再拿來重新底化。原本放草稿的分支 `claude/overlays-page-header` 已於 2026-09-10 改以 tag 保存並刪除——tag 不會在清理分支時被帶走，**不要刪這個 tag**。取回單檔：`git fetch origin tag draft/drawer-on-0.11.0` 後 `git show draft/drawer-on-0.11.0:packages/react/src/ui/drawer.tsx`。
 
 **下游唯讀鐵律**：取用端專案對這個 repo 只有「讀」與「提案」兩種關係，
-沒有 submodule、沒有自動同步；**未合併的提案不得在下游先行實作**
+沒有 submodule、沒有自動同步。**先在宿主做、記台帳，三次法則過了再提回上游**
 （理由見[符合性台帳](https://kielchang.github.io/dooping-design-book/governance/conformance-ledger/)）。
 
 ## 收錄三原則（全過才收）
@@ -41,7 +41,7 @@ npm run build:registry # 改了元件就要重新產生 registry JSON 並一起�
 | --- | --- | --- |
 | `bug`／`缺件`／`rfc` | 表單自動 | 類型標記，永不移除 |
 | `rfc:討論中` | 表單自動 | 開立即此態，任何人可討論 |
-| `rfc:已接受` | 守門人 | 三問通過；守門人同時開一則 ADR（提議中），實作 PR 合併時 ADR 改「已採用」、issue 關閉 |
+| `rfc:已接受` | 守門人 | 三問通過；在 PMIS 開一個有到期日的計畫；實作 PR 合併時關閉 issue，結案時成立了難回頭的決定才在 PMIS 記 ADR |
 | `rfc:已婉拒` | 守門人 | issue 留一句**可被推翻**的理由後關閉（「因 X 不收，待 Y 成立可重提」） |
 | `rfc:已擱置` | 守門人 | 通常是三次證據未滿；用缺件認領 issue 湊證據，齊了改回討論中 |
 

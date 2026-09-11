@@ -65,10 +65,6 @@
 - [漂移防護](https://kielchang.github.io/dooping-design-book/governance/drift-guards/)
 - [系統架構（想貢獻或提建議先讀）](https://kielchang.github.io/dooping-design-book/governance/architecture/)
 
-## 決策紀錄
-
-- [ADR 索引](https://kielchang.github.io/dooping-design-book/adr/)：想推翻某條規則前，先讀為什麼當初這樣決定
-
 ## Optional
 
 - [CHANGELOG](https://github.com/kielchang/dooping-design-book/blob/main/CHANGELOG.md)：每則回答「改了什麼／你要做什麼／為什麼改」

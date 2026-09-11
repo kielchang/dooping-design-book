@@ -1,5 +1,5 @@
 <!-- 進版 PR（dev → main）不適用此模板：整段刪掉、貼 CHANGELOG 的該節即可。 -->
-<!-- 新元件／新 token／改語意：請先開 RFC issue（issues/new?template=rfc.yml），合併過的 RFC 才實作。 -->
+<!-- 新元件／新 token／改語意：先在宿主做並記台帳，三次法則過了再開 RFC issue（issues/new?template=rfc.yml）提回上游。 -->
 
 ## 改了什麼／為什麼
 

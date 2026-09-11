@@ -17,7 +17,7 @@ title: 元件總覽
 | 表單 | Input、NumberInput、Label、Checkbox、Select、SegGroup、Chips |
 | 浮層 | Tooltip、Dialog、Popover、DropdownMenu、ConfirmDialog、Command |
 | 結構 | Collapsible |
-| 外殼 | AppShell、Sidebar、SidebarNav（[ADR-0011](/adr)，已採用）、PageHeader／BackLink／Breadcrumb |
+| 外殼 | AppShell、Sidebar、SidebarNav（v0.13.0 收錄）、PageHeader／BackLink／Breadcrumb |
 | 資料 | Table、DataTable、TabPills、Delta、EmptyState、Stepper |
 | 進階表單 | EditableField、ChangeSummary |
 | 引導 | Coachmark |
@@ -30,13 +30,13 @@ title: 元件總覽
   刻意不做縮放、刷選、圖內鑽取，資料點也只撐到百位數。
   需要分析型互動請直接用成熟圖表庫，不要改造這一組。
 - **ErrorBoundary、路由、資料抓取**——外殼元件（AppShell／Sidebar）收的是
-  **純呈現**的殼（[ADR-0011](/adr)）；路由、權限、資料抓取仍是宿主的職責，
+  **純呈現**的殼；路由、權限、資料抓取仍是宿主的職責，
   一律以 `renderLink`／props 注入。導覽層的**規範**正本仍在
   [後台系統的資訊架構](/patterns/back-office-ia)——元件是規範的載體，不是第二份規範。
 - **任何綁定特定業務流程的複合畫面**——它們在原專案裡是對的，抄到別的產業就是錯的。
   去領域化之後仍然成立的**頁型組成規範**（清單頁、明細頁、表單頁…）收在[頁面章](/pages)，
   以文件與組合 story 的形式存在，不發元件。**頁首是唯一的例外**：它被八處重複手排、
-  觸發了 [ADR-0008](/adr) 自己寫下的解鎖條件，因此以
+  觸發了頁面章自己寫下的解鎖條件（被重複手排就進元件章），因此以
   [PageHeader](/components/page-header) 進元件章；其餘骨架仍只有組合 story。
 
 ## 共同約定

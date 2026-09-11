@@ -1,6 +1,6 @@
 // repo 根的取用端／貢獻端文件 → 文件站副本（build 前同步）
 //
-// 與 sync-adr.mjs 同一個理由：正本放在 repo 根，因為它服務的不只是文件站讀者
+// 正本放在 repo 根，因為它服務的不只是文件站讀者
 // （AGENTS.md 給「只拿到 GitHub repo」的取用端與 AI；ARCHITECTURE.md 給
 // clone 下來就要理解系統的貢獻者）。文件站需要它，就在 build 前同步一份——
 // 單一來源，兩個出口，不用兩邊手動維護。
@@ -30,7 +30,7 @@ if (existsSync(agents)) {
   console.warn("[sync-root-docs] 找不到 AGENTS.md，略過");
 }
 
-// ARCHITECTURE.md → 治理章（front matter 注入手法同 sync-adr.mjs）
+// ARCHITECTURE.md → 治理章（注入 front matter 進側欄）
 const arch = join(ROOT, "ARCHITECTURE.md");
 if (existsSync(arch)) {
   const body = readFileSync(arch, "utf8");

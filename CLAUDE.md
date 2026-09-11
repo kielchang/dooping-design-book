@@ -81,10 +81,30 @@ token 配對／領先 commit／未發佈工作項／合併後會不會蓋 tag �
 `tests/de-domain.test.ts` 掃全庫 176 個領域詞，零容忍。寫範例時用中性詞
 （項目／單位／類別／批次／紀錄），示範資料**只能**來自
 `packages/react/src/demo/sample-data.ts`，stories 與文件不得自行宣告業務資料集。
-理由見 `docs/adr/0006-de-domainization-as-hard-gate.md`。
+理由在 `tests/de-domain.test.ts` 的檔頭。
 
 常見誤觸：一些中性詞含有領域詞的子字串（例如「部門」在「全部門檻」裡）。
 換句話說就好，不要為了通過而在詞表開白名單。
+
+## 計畫、規則、決定分三軌（repo 只放規則）
+
+| 軌 | 放哪裡 | 什麼時候寫 |
+| --- | --- | --- |
+| 計畫 | PMIS feature＋milestone（到期日）。規格寫：問題與假設、時間上限、最小試驗、成功訊號與門檻、這次不做什麼、沒達標時的預設結局 | 要動工但還沒有證據時。到期不原地延長——要繼續就開新 feature 引用舊的；被否決的不刪 |
+| 規則 | 守衛測試＋文件頁那一句。理由寫在守衛檔頭，失敗訊息用 `tests/lib/guard.ts` 的 `because()` 帶理由與規則正本 | 同一件事第二次需要人記得時。反向驗證過才算規則；沒有守衛的標「人工：由誰、何時」或「建議」 |
+| 決定 | PMIS ADR（context／options／decision／consequences），標題沿用 `ADR-NNNN：…` | 做決定的當下。只有難回頭、會被質疑的決定才記；採納後要改走修訂 |
+
+**agent 不得在 repo 開任何 ADR 或提案檔**（`docs/adr/`、`docs/rfc/`、`proposals/` 之類）。
+repo 留三樣東西：規則（守衛＋文件頁那一條）、架構描述（`ARCHITECTURE.md`、`AGENTS.md`、文件站各章）、使用說明。
+元件註解裡既有的 `ADR-00xx` 指向 PMIS 同號，不要改——改註解會動 registry 指紋。
+守衛的完整台帳在 `ARCHITECTURE.md`「守衛」節，`tests/guard-ledger.test.ts` 會核對它沒漏。
+
+## 換電腦接續
+
+狀態分三層：走 git 的（本 repo，clone `dev` 後 hook 會自動 `npm install && npm run build:tokens`）、
+走 PMIS 的（計畫、決定、dev log；MCP 定義在使用者層 `~/.claude.json`，連的是 pmis 專案 `.env` 的 `DATABASE_URL`）、
+走 inbox 的（還沒上傳 PMIS 的記錄與研究報告，在 repo 之外的 `pmis-inbox/dooping-design-book/`，讀它的 `HANDOFF.md`）。
+Claude 記憶在 `~/.claude/projects/<專案路徑 slug>/memory/`，clone 到不同路徑要把記憶檔搬到新 slug 的目錄。
 
 ## Git
 

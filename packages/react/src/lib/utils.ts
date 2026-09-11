@@ -47,7 +47,7 @@ export function formatMoney(n: number, opts?: { symbol?: string; locale?: string
   return n < 0 ? `(${symbol}${body})` : `${symbol}${body}`;
 }
 
-/** 比率→百分比字串。`0.085` → `"8.5%"`。比值一律以百分比呈現，見 ADR-0003 的顯示規約。 */
+/** 比率→百分比字串。`0.085` → `"8.5%"`。比值一律以百分比呈現，不在顯示端換算成小數。 */
 export function formatPercent(value: number, digits = 1): string {
   return `${(value * 100).toFixed(digits)}%`;
 }

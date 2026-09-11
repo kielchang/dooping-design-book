@@ -37,11 +37,10 @@ commit 本身記在 tag 描述裡，不會遺失。
 
 ---
 
-## v0.13.0 · 2026-09-10
+## v0.13.0 · 2026-09-11
 
-四條線：蒸餾 shadcn-admin（MIT）進本書（[ADR-0011](docs/adr/0011-adopt-app-shell.md)，
-提議中——2026-09 起先合併、在 main 上評估），缺件表第一列的
-[ADR-0008](docs/adr/0008-pages-chapter-scope.md) 解鎖（PageHeader），
+四條線：蒸餾 shadcn-admin（MIT）進本書（ADR-0011，已採用；重新檢視條件＝第一個真實宿主依文件自行導入的回報），
+缺件表第一列的 ADR-0008 解鎖（PageHeader），
 Tailwind v4 為主、v3 相容的取用路徑（token 入口，本書自己的 Storybook 與文件站一併升級），
 以及照取用端的路接上來的內部試裝宿主 `apps/host-v4`。
 規範 0.11.1 → 0.13.0、tokens 0.6.0 → 0.7.0。
@@ -151,7 +150,7 @@ Tailwind v4 為主、v3 相容的取用路徑（token 入口，本書自己的 S
 3. **為什麼改**：導覽資料單一來源同時餵側邊欄與指令面板，是 shadcn-admin
    最划算的原創 pattern；契約（lib/nav）先於外殼落地。
 
-### 應用外殼：Sidebar 家族＋SidebarNav＋AppShell（ADR-0011，評估中）
+### 應用外殼：Sidebar 家族＋SidebarNav＋AppShell（ADR-0011）
 
 1. **改了什麼**：新收外殼三件——Sidebar 家族（Provider／Trigger／結構件／選單鈕；
    桌面 icon 收合、行動版自動轉左滑抽屜＝既有 Radix Dialog 組成，焦點歸還自己記
@@ -160,8 +159,8 @@ Tailwind v4 為主、v3 相容的取用路徑（token 入口，本書自己的 S
    AppShell（純佈局，刻意小到宿主可自行重寫）。相對 shadcn 上游砍掉
    floating/inset variant、SidebarRail、cookie、Ctrl+B——皆為刻意決定（ADR-0011）。
    verify:visual 增第三支外殼哨兵（sidebar＋sidebar-accent 是主題指紋）。
-2. **我需要做什麼**：可以採用。ADR-0011 仍在評估（提議中，改在 main 上評估，見該 ADR「合併先於評估」一節）；
-   若評估不過，走〈版本策略〉的棄用流程（`@deprecated` → 保留至少一個 minor → 下個 major 移除），不會無預警消失。
+2. **我需要做什麼**：可以採用。ADR-0011 已採用；重新檢視條件＝第一個真實宿主依文件自行導入的回報，
+   屆時若決定退場，走〈版本策略〉的棄用流程（`@deprecated` → 保留至少一個 minor → 下個 major 移除），不會無預警消失。
 3. **為什麼改**：外殼是跨系統不一致成本最高的一塊；〈後台系統的資訊架構〉的
    規範從此有元件載體，行動版「分區順序不變」變成結構保證而不是紀律要求。
 

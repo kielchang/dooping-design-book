@@ -49,8 +49,9 @@ npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/data-tab
   [儀表板](https://kielchang.github.io/dooping-design-book/pages/dashboard/)、
   [設定頁](https://kielchang.github.io/dooping-design-book/pages/settings-page/)。
 
-**大相依提醒**：`graph-canvas` 會自動帶進 `@xyflow/react`（本 registry 唯一的大型外部相依，
-由邊界守衛隔離在單一檔案）。裝之前先確認你要的不是零相依的 `charts`（八種 SVG 圖）。
+**大相依提醒**：`graph-canvas` 會自動帶進 `@xyflow/react`、`command`／`command-palette`
+會自動帶進 `cmdk`（兩者都由邊界守衛隔離在單一檔案）。裝 graph-canvas 之前先確認
+你要的不是零相依的 `charts`（八種 SVG 圖）。
 
 **前置條件**：專案要有 `components.json` 與 `@/*` 路徑別名。沒有的話先 `npx shadcn@latest init`。
 Tailwind 的 `content` 掃描範圍要涵蓋落點（`./src/**/*.{ts,tsx}` 已含 `components/dooping/`）。
@@ -73,14 +74,17 @@ src/
 只會安靜地變形**：邊框整批消失（只有寬度沒有樣式）、裸按鈕露出瀏覽器原生
 灰底凸框、表格吃到宿主的格線。看到這三種症狀，先查基座，不是查元件。
 
-- **標準 Tailwind／shadcn 專案**：`shadcn init` 標配 `@tailwind base`，天然滿足。
-  建議再加一條（shadcn 慣例，把「不帶色的 border」接到 token）：
+- **標準 Tailwind／shadcn 專案**
+  - **Tailwind v4**：`@import "tailwindcss"` 內含 preflight；v4 preflight 拿掉的邊框預設色與
+    按鈕游標，由 `@dooping/tokens/tailwind.css` 的 `@layer base` 補齊。宿主不必再寫。
+  - **Tailwind v3**：`shadcn init` 標配 `@tailwind base`，天然滿足。
+    建議再加一條（shadcn 慣例，把「不帶色的 border」接到 token）：
 
-  ```css
-  @layer base {
-    * { border-color: hsl(var(--border)); }
-  }
-  ```
+    ```css
+    @layer base {
+      * { border-color: hsl(var(--border)); }
+    }
+    ```
 
 - **把元件嵌進有自己 CSS 的既有站台**（後台框架、文件站、CMS——關掉 preflight
   的宿主）：不要全站開 preflight（會打爆站台既有樣式），改在元件所在的 scope 內
@@ -96,7 +100,25 @@ src/
 npm install @dooping/tokens
 ```
 
-這是**唯一建議的硬相依**。四個進入點，挑你的宿主吃得下的用：
+這是**唯一建議的硬相依**。五個進入點，挑你的宿主吃得下的用：
+
+```css title="Tailwind v4（建議）：全域 CSS，順序是承重結構"
+@import "tailwindcss";
+@import "tw-animate-css";               /* 動畫 class，對應 v3 的 tailwindcss-animate */
+@import "@dooping/tokens/tokens.css";   /* 值 */
+@import "@dooping/tokens/tailwind.css"; /* token → utility 名稱對映 */
+```
+
+v4 宿主從 `npx shadcn init` 起手時，**刪掉**它產生的 `:root`／`.dark` 色值區塊、
+`@theme inline` 裡的 `--color-*` 對映與 `@custom-variant dark`——留著就是兩份真相，
+後宣告者蓋前者。已經 `@import "shadcn/tailwind.css"` 的宿主，把兩行 `@dooping/tokens` 放在它之後。
+
+v4 與 v3 的兩個語意差要知道：
+
+- `tokens.css` 在 v4 宿主裡是 unlayered，它的語意 class（`.field-editable`、`.state-layer`、
+  `.tap-target`…）會壓過 utilities（v3 相反）。元件已避開同屬性衝突；自己組合時留意。
+- `hover:` 在 v4 只在指標裝置生效（`@media (hover: hover)`）。觸控裝置沒有 hover 是正確行為，
+  回饋靠按住（pressed）態——**不要**把功能藏在只有 hover 才出現的地方。
 
 ```css title="純 CSS（任何宿主）"
 @import "@dooping/tokens/tokens.css";
@@ -154,7 +176,7 @@ document.documentElement.classList.toggle("dark");
 | 層 | 怎麼鎖 | 怎麼知道自己落後了 |
 | --- | --- | --- |
 | token | 鎖到 `/r/index.json` 的 `tokensVersion`（例：`"@dooping/tokens": "^0.6.0"`，以線上為準） | `npm outdated @dooping/tokens` |
-| 元件 | **鎖不了，也不需要**——複製走就是你的程式碼 | 比對戳記（見下） |
+| 元件 | **套件層面鎖不了，也不需要**——複製走就是你的程式碼；要記「抄的時候長什麼樣」用 `dooping.lock.json` | `node scripts/dooping-check.mjs`（見下方「怎麼知道有新版」） |
 
 元件複製進來時會帶著**規範版號**戳記（與 GitHub 上的 `vX.Y.Z` tag 同一個號碼）。
 要知道自己抄的是哪一版、線上又是哪一版：
@@ -180,8 +202,18 @@ npm ls @dooping/tokens; curl -s https://kielchang.github.io/dooping-design-book/
 ### 怎麼知道有新版
 
 - **推播（建議）**：repo 頁 Watch → Custom → **Releases**。每次進版自動發 Release，
-  **notes 就是 CHANGELOG 那一則全文**——通知本身回答三問，不用點連結。
+  **notes 就是 CHANGELOG 那一則全文**——通知本身回答三問，不用點連結；
+  末尾附「這一版動到的 registry item」（內容有變／只因相依受影響／新增／移除），對照自己抄過的就知道要不要重抄。
   RSS：`https://github.com/kielchang/dooping-design-book/releases.atom`
+- **例行檢查（建議放進 CI）**：裝 `dooping-check` 這個 registry item，`init` 列出你主動裝過的 item，
+  之後每週跑一次；每個 item 回報「已是最新／上游有更新／本地改過」，只提醒、不擋建置：
+
+  ```bash
+  npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/dooping-check.json
+  node scripts/dooping-check.mjs init data-table page-header   # 剛裝完元件時跑一次
+  node scripts/dooping-check.mjs                               # 例行檢查
+  ```
+
 - **拉式**：`gh release list -R kielchang/dooping-design-book`，
   或比對線上 `/r/index.json` 的 `version` 與你抄走那份的戳記
 

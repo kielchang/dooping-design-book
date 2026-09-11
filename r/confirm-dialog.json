@@ -1,0 +1,25 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "confirm-dialog",
+  "version": "0.13.0",
+  "type": "registry:ui",
+  "title": "ConfirmDialog 確認對話框",
+  "description": "破壞性操作確認：載入中鎖出口、可選硬確認輸入。",
+  "dependencies": [
+    "@dooping/tokens@^0.7.0"
+  ],
+  "registryDependencies": [
+    "https://kielchang.github.io/dooping-design-book/r/button.json",
+    "https://kielchang.github.io/dooping-design-book/r/dialog.json",
+    "https://kielchang.github.io/dooping-design-book/r/input.json",
+    "https://kielchang.github.io/dooping-design-book/r/label.json"
+  ],
+  "files": [
+    {
+      "path": "dooping/ui/confirm-dialog.tsx",
+      "content": "import * as React from \"react\";\nimport { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from \"@/components/dooping/dialog\";\nimport { Button } from \"@/components/dooping/button\";\nimport { Input } from \"@/components/dooping/input\";\nimport { Label } from \"@/components/dooping/label\";\n\nexport interface ConfirmDialogProps {\n  /** 受控開關——搭配 `useDialogState` 或宿主自己的狀態。 */\n  open: boolean;\n  onOpenChange: (open: boolean) => void;\n  title: React.ReactNode;\n  description?: React.ReactNode;\n  /** 額外內容（影響範圍清單、警示框…），插在描述與按鈕之間。 */\n  children?: React.ReactNode;\n  confirmText?: string;\n  cancelText?: string;\n  /**\n   * 破壞性確認：確認鈕改走 `destructive`。這是**控制項語意**（這顆按下去會刪東西），\n   * 與狀態語意 `danger` 分家——同 Button 的原則。\n   */\n  destructive?: boolean;\n  /**\n   * 操作進行中：確認鈕 `aria-busy` 且全部出口（確認、取消、Esc、點遮罩、右上關閉）\n   * 一律鎖住。進行中關掉對話框會讓使用者以為取消了——實際上沒有。\n   */\n  loading?: boolean;\n  disabled?: boolean;\n  /**\n   * 確認後**不會自動關閉**：成功才關、失敗留在原地顯示錯誤，時機由宿主決定。\n   * 刻意不吃 Promise——async 編排與錯誤呈現是應用層的事，元件不吞錯誤。\n   */\n  onConfirm: () => void;\n  /**\n   * 硬確認：輸入指定字串才解鎖確認鈕。「把危險操作變成刻意的決定」\n   * （硬鎖定模式）在對話框層的落地——用在影響半徑大、無法還原的操作。\n   */\n  typeToConfirm?: { expected: string; label?: string; placeholder?: string };\n}\n\n/**\n * 確認對話框。破壞性操作的固定寫法：標題講動作、描述講後果、\n * 確認鈕的字是動詞（「作廢」「刪除」），不是「確定」二字打發。\n */\nexport function ConfirmDialog({\n  open,\n  onOpenChange,\n  title,\n  description,\n  children,\n  confirmText = \"確定\",\n  cancelText = \"取消\",\n  destructive = false,\n  loading = false,\n  disabled = false,\n  onConfirm,\n  typeToConfirm,\n}: ConfirmDialogProps) {\n  const [typed, setTyped] = React.useState(\"\");\n  const inputId = React.useId();\n\n  // 關閉即重置硬確認輸入——下次打開不能繼承上次打了一半的字\n  React.useEffect(() => {\n    if (!open) setTyped(\"\");\n  }, [open]);\n\n  const typeLocked = typeToConfirm ? typed.trim() !== typeToConfirm.expected : false;\n  const confirmDisabled = disabled || loading || typeLocked;\n\n  // 進行中鎖住所有出口：Esc、遮罩、右上關閉鈕都經過 onOpenChange，一個口子擋完\n  const handleOpenChange = (next: boolean) => {\n    if (loading && !next) return;\n    onOpenChange(next);\n  };\n\n  return (\n    <Dialog open={open} onOpenChange={handleOpenChange}>\n      <DialogContent>\n        <DialogHeader>\n          <DialogTitle>{title}</DialogTitle>\n          {description ? <DialogDescription>{description}</DialogDescription> : null}\n        </DialogHeader>\n        {children}\n        {typeToConfirm ? (\n          <div className=\"space-y-1.5\">\n            <Label htmlFor={inputId}>\n              {typeToConfirm.label ?? `請輸入「${typeToConfirm.expected}」以確認`}\n            </Label>\n            <Input\n              id={inputId}\n              value={typed}\n              onChange={(e) => setTyped(e.target.value)}\n              placeholder={typeToConfirm.placeholder}\n              disabled={loading}\n              autoComplete=\"off\"\n            />\n          </div>\n        ) : null}\n        <DialogFooter>\n          <Button variant=\"outline\" onClick={() => handleOpenChange(false)} disabled={loading}>\n            {cancelText}\n          </Button>\n          <Button\n            variant={destructive ? \"destructive\" : \"default\"}\n            onClick={onConfirm}\n            disabled={confirmDisabled}\n            aria-busy={loading || undefined}\n          >\n            {confirmText}\n          </Button>\n        </DialogFooter>\n      </DialogContent>\n    </Dialog>\n  );\n}\n",
+      "type": "registry:ui",
+      "target": "components/dooping/confirm-dialog.tsx"
+    }
+  ]
+}

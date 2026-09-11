@@ -271,7 +271,7 @@ npm ls @dooping/tokens; curl -s https://kielchang.github.io/dooping-design-book/
 ```bash
 npm run build:tokens   # 其他步驟的前提
 npm run typecheck
-npm test               # 7 支守衛：邊界、token 一致性、色彩門檻、去領域化、示範資料單一來源、文件掛鉤、宿主基座
+npm test               # 守衛測試（每一支管什麼、不管什麼，見 ARCHITECTURE.md 的守衛台帳）
 npm run build:registry # 元件改了就要重新產生 registry JSON 並一起提交
 ```
 

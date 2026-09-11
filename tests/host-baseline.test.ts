@@ -164,7 +164,7 @@ const expected = [...port(preflight), ...port(tokensBase)];
 describe("宿主基座：demo-base 與 v4 preflight＋tokens 基座逐條對應", () => {
   it("移植段逐條相符（Tailwind 升版、tokens 基座改動、demo-base 被手改時此條會紅）", () => {
     const diffs = diffRules(expected, demoBase.slice(0, expected.length));
-    expect(diffs, `${diffs.join("\n\n")}\n\n→ 重跑 node book/scripts/port-preflight.mjs`).toEqual([]);
+    expect(diffs, `${diffs.join("\n\n")}\n\n→ 重跑 node book/scripts/port-preflight.mjs\n為什麼：宿主基座是元件的樣式契約，移植檔漏一條，文件站的活範例就安靜變形\n規則正本：AGENTS.md「宿主前置條件」、book/src/css/demo-base.css 檔頭`).toEqual([]);
   });
 
   it("守衛沒有空轉：規則數有下限", () => {

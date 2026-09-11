@@ -1,9 +1,10 @@
 import { createHash } from "node:crypto";
 
-// registry item 指紋（ADR-0013 第一層）。build-registry 寫進 /r/index.json 的 meta，
-// registry-changes 用它比對任意兩版，取用端的檢查腳本也照同一套規則算。
+// registry item 指紋。build-registry 寫進 /r/index.json 的 meta，
+// registry-changes 用它比對任意兩版，取用端的檢查腳本（dooping-check）也照同一套規則算。
 //
-// 串接規則是對外契約：改了等於讓所有取用端的 lock 一次失效——要改先修訂 ADR-0013。
+// 串接規則是對外契約：改了等於讓所有取用端的 lock 一次失效。
+// 規則正本：book/docs/7-governance/06-staying-current.mdx「指紋怎麼算」；要改先在 PMIS 對 ADR-0013 開修訂。
 // tests/registry-fingerprint.test.ts 用獨立寫的第二份實作逐 item 對過。
 
 const sha16 = (text) => createHash("sha256").update(text, "utf8").digest("hex").slice(0, 16);

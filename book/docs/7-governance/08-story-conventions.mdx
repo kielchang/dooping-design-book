@@ -107,6 +107,12 @@ render: (a) => {
 
 ## 命名慣例
 
+:::note story 的 title、export 名與 storySort 分類不翻譯
+它們是三支守衛的**鍵**：`tests/doc-hooks.test.ts` 用 title 推導文件裡 `<StoryFrame id>` 的合法集合，
+`tests/story-sort.test.ts` 逐字比對 `.storybook/preview.tsx` 的分類字串，`scripts/verify-storybook.mjs` 的 play 用中文可及名稱查元素。
+翻了 title，文件的嵌入範例會安靜地變成空白 iframe。元件內建文案的預設值同理——英文宿主走 `labels` prop 覆寫，不動預設值。
+:::
+
 | 場景 | 命名 | 例 |
 | --- | --- | --- |
 | 一般 story | 中文語意 | `完整功能`、`三種空狀態` |

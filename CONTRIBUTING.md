@@ -31,7 +31,7 @@
 ```bash
 npm run build:tokens   # 其他步驟的前提
 npm run typecheck
-npm test               # 7 支守衛（各守什麼見 ARCHITECTURE.md 的守衛一表）
+npm test               # 守衛測試（每一支管什麼、不管什麼，見 ARCHITECTURE.md 的守衛台帳）
 npm run build:registry # 改了元件就要重新產生 registry JSON 並一起提交
 ```
 

@@ -1,3 +1,4 @@
+// 規則正本：packages/react/src/lib/nav.ts 檔頭、book/docs/4-patterns/11-back-office-ia.mdx。
 // isNavActive 的多層 fallback 是純函式——側欄與指令面板共用的 active 判定，
 // 在這裡直接驗，不用開瀏覽器。判定錯的症狀是「使用者在 A 頁、側欄亮著 B」，
 // 那會直接摧毀「我在哪」的信任。

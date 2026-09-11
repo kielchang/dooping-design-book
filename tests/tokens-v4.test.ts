@@ -72,7 +72,7 @@ describe("Tailwind v4 可編譯守衛（真的用 tailwindcss v4 編 dist/tailwi
       const want = chart.has(k) ? `var(--${k})` : `hsl(var(--${k}))`;
       return !ruleFor(css, `bg-${k}`)?.includes(`background-color: ${want}`);
     });
-    expect(wrong, `產不出或值不對：${wrong.join(", ")}`).toEqual([]);
+    expect(wrong, `產不出或值不對：${wrong.join(", ")}\n為什麼：dist/tailwind.css 是取用端的四行 @import 之一，真的用 v4 編不出來就是契約壞了\n規則正本：packages/tokens/README.md「v4 入口」、AGENTS.md「取 token」`).toEqual([]);
   });
 
   it("透明度修飾可用（bg-primary/50 → color-mix）", () => {

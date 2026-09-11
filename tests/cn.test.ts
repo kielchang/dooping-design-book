@@ -1,3 +1,4 @@
+// 規則正本：packages/react/src/lib/utils.ts 的 twMerge 註解、book/docs/3-components/13-data-table.mdx「十字對準」。
 // cn()（lib/utils）是每個元件合併 class 的唯一入口，也是 registry 最多 item 相依的檔。
 // tailwind-merge 的分群一旦認錯，後面的 class 會**安靜地吃掉**前面的——畫面壞了、型別與測試全綠。
 // 這支盯住兩個實際踩過的分群：

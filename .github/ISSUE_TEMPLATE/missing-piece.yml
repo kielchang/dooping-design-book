@@ -2,6 +2,7 @@
 # 三個場景湊齊，就到了開 RFC 或直接動工的門檻。
 # 注意：piece 的選項字串必須與 book/docs/5-pages/00-overview.mdx 缺件表逐字一致——
 # 缺件表的「認領」欄用這些字串做 URL 預填（?piece=<encodeURIComponent(選項)>），改表要同步改這裡。
+# 這條「逐字一致」沒有守衛——人工：守門人，改缺件表時同步改這裡（tests/host-install-set.test.ts 只驗安裝集，不驗選項字串）。
 name: 缺件認領
 description: 頁面章缺件表的項目——回報使用場景、湊三次法則證據
 labels: ["缺件"]

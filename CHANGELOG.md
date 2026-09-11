@@ -37,6 +37,29 @@ commit 本身記在 tag 描述裡，不會遺失。
 
 ---
 
+## 未發佈（`dev`）
+
+### 規則軌：守衛台帳、失敗訊息帶理由、防空轉補齊（治理，版號不動）
+
+1. **改了什麼**：
+   - `ARCHITECTURE.md` 的守衛表改成台帳：`npm test` 全部測試＋build 後六支腳本，每支寫「管什麼／不管什麼」；
+     新守衛 `tests/guard-ledger.test.ts` 盯著它不漏列、不列不存在的檔。`AGENTS.md`、`CONTRIBUTING.md` 不再寫「7 支」。
+   - 失敗訊息帶理由與規則所在的文件頁（`tests/lib/guard.ts` 的 `because`）：boundary、tokens 三支、host-baseline、verify-host、verify-book 的訊息，
+     以及 cn／nav／table-url-state／dooping-check 的檔頭。
+   - 防空轉補齊：`expectedColorKeys()` 少於 40 個鍵就丟錯（三支 tokens 守衛一起受益）；淺色語意 token 下限 40；
+     `verify:color` 主題少於 6 或圖表色少於 8 直接不通過（單獨跑也擋）。
+   - `tests/boundary.test.ts` 新增「`pages/` 只放組合 story」——2026-08 就承諾要補的一條。
+   - 只寫在決策紀錄裡的規則搬到文件頁：指紋串接契約 → 〈跟上新版〉「指紋怎麼算」；
+     story title／storySort 分類不翻譯 → 〈story 慣例〉；`pages/` 不發 registry item → 〈頁面總覽〉。
+   - 沒有守衛的規則標清楚：〈漂移防護〉定義五種標示（✅ 在跑／部分／建議／不適用／人工：由誰、何時）；
+     琥珀保留、硬鎖定的資料層測試、缺件表↔表單逐字契約各自標「人工」。
+2. **我需要做什麼**：不需要。守衛與文件層，不影響任何取用端。
+3. **為什麼改**：守衛是這本書唯一不靠人數的治理機制，但「有哪些、各管什麼」寫死在一張過期的表上，
+   而三支 tokens 守衛在 tokens.json 讀壞時會零鍵全對而綠。反向驗證：三個下限各調高一次，對應守衛轉紅；
+   `pages/` 放一個非 story 檔轉紅；守衛台帳刪一列轉紅。
+
+---
+
 ## v0.13.0 · 2026-09-11
 
 四條線：蒸餾 shadcn-admin（MIT）進本書（ADR-0011，已採用；重新檢視條件＝第一個真實宿主依文件自行導入的回報），

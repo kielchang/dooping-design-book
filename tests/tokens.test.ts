@@ -98,6 +98,8 @@ describe("設計 token", () => {
 
   it("每個淺色語意 token 都有對應的深色值", () => {
     const light = Object.keys(semanticColors("light"));
+    // 防空轉：兩份鍵集同時為空也會「全部成對」。語意色現值 47，掉到 40 以下就是讀錯檔
+    expect(light.length, "淺色語意 token 少於 40 個——tokens.json 讀錯或結構變了，守衛不能空轉").toBeGreaterThanOrEqual(40);
     const dark = new Set(Object.keys(semanticColors("dark")));
     const missing = light.filter((k) => !dark.has(k));
     expect(missing, `深色缺少：${missing.join(", ")}`).toEqual([]);
@@ -125,7 +127,7 @@ describe("設計 token", () => {
   it("CSS 產物與來源同步（每個語意 token 都出現在 :root）", () => {
     const css = readFileSync(CSS_PATH, "utf8");
     const missing = Object.keys(semanticColors("light")).filter((k) => !css.includes(`--${k}:`));
-    expect(missing, `CSS 未包含：${missing.join(", ")}。請重新 npm run build:tokens`).toEqual([]);
+    expect(missing, `CSS 未包含：${missing.join(", ")}。請重新 npm run build:tokens\n為什麼：tokens.json 是唯一正本，CSS 產物少一個鍵，取用端的 var() 就落到瀏覽器預設值\n規則正本：packages/tokens/README.md、book/docs/2-foundations/01-color.mdx`).toEqual([]);
   });
 
   it("Tailwind preset 對映到每個語意色（少一個就會有人回頭硬編色）", () => {
@@ -163,7 +165,7 @@ describe("設計 token", () => {
     const names = Object.keys(preset.theme.colors);
     const leaked = ["red", "blue", "green", "slate", "gray", "zinc", "amber", "yellow"]
       .filter((c) => names.includes(c));
-    expect(leaked, `Tailwind 預設色盤外洩：${leaked.join(", ")}`).toEqual([]);
+    expect(leaked, `Tailwind 預設色盤外洩：${leaked.join(", ")}\n為什麼：語意色是唯一對外的色彩 API，色階一外洩就有人寫 bg-red-500，換品牌色時改不到\n規則正本：book/docs/2-foundations/01-color.mdx、book/docs/7-governance/03-drift-guards.mdx 防線①`).toEqual([]);
 
     // 這五個不承載品牌語意，拿掉只會逼人改用 hex 繞路
     for (const keep of ["transparent", "current", "inherit", "white", "black"]) {
@@ -219,7 +221,7 @@ describe("Tailwind v4 入口（dist/tailwind.css）", () => {
     const actual = v4ColorNames(v4ThemeDecls(readV4()))
       .filter((k) => k !== "white" && k !== "black")
       .sort();
-    expect(actual, "dist/tailwind.css 與 tokens.json 不同步，請重跑 npm run build:tokens").toEqual(expectedColorKeys());
+    expect(actual, "dist/tailwind.css 與 tokens.json 不同步，請重跑 npm run build:tokens\n為什麼：v4 入口只對映名稱，鍵集與 v3 preset 必須是同一份事實的兩個出口\n規則正本：packages/tokens/README.md（v4 與 v3 兩段）").toEqual(expectedColorKeys());
   });
 
   it("v3 preset 與 v4 入口對映同一組 class 名（同一份事實的兩個出口）", () => {

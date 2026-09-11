@@ -10,6 +10,7 @@ import { describe, it, expect } from "vitest";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join, relative } from "node:path";
+import { because } from "./lib/guard";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const KIT = join(ROOT, "packages/react/src");
@@ -97,7 +98,7 @@ describe("元件庫邊界", () => {
       for (const spec of imports(src)) {
         if (spec.startsWith(".")) continue; // 同伴模組
         const ok = ALLOWED_EXTERNAL.some((p) => spec === p || spec.startsWith(p));
-        expect(ok, `${rel} 匯入了未經允許的外部相依：${spec}`).toBe(true);
+        expect(ok, because(`${rel} 匯入了未經允許的外部相依：${spec}`, "token 是唯一的硬相依，其餘外部套件取用端裝不到、畫面安靜壞掉", "AGENTS.md「唯一的硬相依」／ARCHITECTURE.md 三層表")).toBe(true);
       }
     });
 
@@ -133,6 +134,18 @@ describe("barrel 覆蓋率", () => {
       .map((abs) => relative(KIT, abs).replace(/\\/g, "/").replace(/\.tsx?$/, ""))
       .filter((mod) => mod !== "index" && mod !== "version")
       .filter((mod) => !barrel.includes(`"./${mod}"`));
-    expect(missing, `未加入 barrel：${missing.join(", ")}`).toEqual([]);
+    expect(missing, because(`未加入 barrel：${missing.join(", ")}`, "沒進 index.ts 的元件不會有 story、文件與 registry item，等於不存在", "book/docs/7-governance/03-drift-guards.mdx「Barrel 覆蓋率」")).toEqual([]);
+  });
+});
+
+// 頁面章的 story 目錄只放組合 story：頁面章不發任何 registry item（5-pages/00-overview），
+// 所以這裡不能出現會被 build-registry 掃到的 .tsx／.ts。這條在 2026-08 就承諾要補，直到規則軌整理才補上。
+describe("pages/ 只放組合 story", () => {
+  it("packages/react/src/pages 底下全部是 .stories.tsx", () => {
+    const pagesDir = join(fileURLToPath(new URL("..", import.meta.url)), "packages/react/src/pages");
+    const names = readdirSync(pagesDir);
+    expect(names.length, "pages/ 少於 5 個檔——目錄讀錯，守衛不能空轉").toBeGreaterThanOrEqual(5);
+    const offenders = names.filter((n) => !n.endsWith(".stories.tsx"));
+    expect(offenders, because(`pages/ 出現非 story 檔：${offenders.join(", ")}`, "頁面章只收組成規範與組合 story，不發元件；放進來的 .tsx 會被 build-registry 當成 item", "book/docs/5-pages/00-overview.mdx「三層分工」")).toEqual([]);
   });
 });

@@ -46,6 +46,13 @@ export function runChecks() {
   const warn = [];
   const stats = { themes: {}, chart: {} };
 
+  // 防空轉：主題或圖表色票讀不到時，下面的迴圈一次都不跑、fail 是空的、報告全綠。
+  // 單獨跑這支也要擋（tests/color.test.ts 的主題數斷言只在 npm test 裡）。現值 6 主題、8 圖表色。
+  const themeCount = Object.keys(tokens.themes ?? {}).length;
+  const chartCount = Object.keys(tokens.chart?.light ?? {}).filter((k) => k.startsWith("chart-")).length;
+  if (themeCount < 6) fail.push(`只讀到 ${themeCount} 組色相主題（下限 6）——tokens.json 讀錯或結構變了，守衛不能空轉`);
+  if (chartCount < 8) fail.push(`只讀到 ${chartCount} 個圖表色（下限 8）——tokens.json 讀錯或結構變了，守衛不能空轉`);
+
   const px = (mode, name) => hslToRgb8(tokens.color[mode][name].value);
 
   /**

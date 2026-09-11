@@ -2,6 +2,7 @@
 //
 // 工具是抄進取用端的獨立腳本，不能 import 本 repo 的任何東西，所以指紋規則在工具裡另寫一份——
 // 這支先確認那一份與 registry 產生器一致，再拿內部試裝宿主當取用端，驗三種狀態分得出來。
+// 規則正本：book/docs/7-governance/06-staying-current.mdx「例行檢查：dooping-check」與「指紋怎麼算」。
 import { describe, it, expect, beforeAll } from "vitest";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";

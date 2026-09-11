@@ -29,7 +29,6 @@ packages/react/src ──(build:registry＝build-registry.mjs)──► registry
                                                                    ▼
                                                     站上 /r/index.json 與 /r/<name>.json
 
-docs/adr/*.md ──────────(book/scripts/sync-adr.mjs，build 前)──────► book/docs/8-adr/（gitignored）
 AGENTS.md、ARCHITECTURE.md ──(book/scripts/sync-root-docs.mjs)──► book/static/、book/docs/7-governance/
 ```
 
@@ -37,8 +36,8 @@ AGENTS.md、ARCHITECTURE.md ──(book/scripts/sync-root-docs.mjs)──► boo
 
 | 層 | 散佈方式 | 改動權 | 為什麼 |
 | --- | --- | --- | --- |
-| `packages/tokens` | 發佈到 npm（`@dooping/tokens`） | 不可改語意，只可改值 | token 幾乎不會被改，所以它才是契約（[ADR-0005](https://kielchang.github.io/dooping-design-book/adr/tokens-are-the-only-hard-dependency/)） |
-| `packages/react` | shadcn registry 複製原始碼，**刻意不發 npm** | 複製走就是取用端的，隨便改 | 元件一定會被改，所以不發套件（[ADR-0004](https://kielchang.github.io/dooping-design-book/adr/registry-over-npm-package/)） |
+| `packages/tokens` | 發佈到 npm（`@dooping/tokens`） | 不可改語意，只可改值 | token 幾乎不會被改，所以它才是契約 |
+| `packages/react` | shadcn registry 複製原始碼，**刻意不發 npm** | 複製走就是取用端的，隨便改 | 元件一定會被改，所以不發套件 |
 | `book/docs` 的模式與頁面章 | 讀懂，用自己的技術棧實作 | 不含程式碼 | 操作模式是框架無關的，最值錢也最不該綁實作 |
 
 ## Token 管線
@@ -82,21 +81,46 @@ AGENTS.md、ARCHITECTURE.md ──(book/scripts/sync-root-docs.mjs)──► boo
 
 判準與可抄清單的正本在
 [治理 → 漂移防護](https://kielchang.github.io/dooping-design-book/governance/drift-guards/)。
-`npm test` 的七支：
+這張表是守衛台帳：`npm test` 的每一支測試與 build 後的每一支腳本都要列在這裡，
+`tests/guard-ledger.test.ts` 盯著它不漏列（新增守衛沒登記就紅）。理由寫在各守衛的檔頭，失敗訊息會帶規則所在的文件頁。
 
-| 檔案 | 守住的兩個所在 | 壞掉時的症狀 |
+`npm test`：
+
+| 檔案 | 管什麼 | 不管什麼 |
 | --- | --- | --- |
-| `tests/boundary.test.ts` | 元件庫 ↔ 應用層／第三方相依 | `@xyflow/react`／`cmdk` 滲出隔離檔，取用端被迫吞大相依 |
-| `tests/tokens.test.ts` | tokens.json ↔ CSS 產物 ↔ preset ↔ 版號四處 | 淺深不成對、產物過期、版號漂移 |
-| `tests/color.test.ts` | 色彩生成參數 ↔ 無障礙門檻 | 對比不足、色覺混淆（接 `verify:color`） |
-| `tests/de-domain.test.ts` | 全庫文字 ↔ 176 詞黑名單 | 領域語彙被複製到取用端 |
-| `tests/demo-data.test.ts` | 示範資料 ↔ 唯一來源 `demo/sample-data.ts`（含 `demo/generate.ts`） | 各頁自己長出資料集，新領域從入口溜進來 |
-| `tests/doc-hooks.test.ts` | 文件引用的 story id ↔ stories 推導的合法集合 | 嵌入變空白 iframe、深連結 404，安靜無紅燈 |
-| `tests/host-baseline.test.ts` | Tailwind preflight ↔ `book/src/css/demo-base.css` | 文件站的活範例安靜變形 |
+| `tests/boundary.test.ts` | 元件庫只准依賴白名單外部套件；`@xyflow/react`／`cmdk` 只能在指定檔案 import；每個發佈檔都進 barrel；`pages/` 只放組合 story | 相依的版本範圍（package.json） |
+| `tests/tokens.test.ts` | tokens.json ↔ CSS 產物 ↔ v3 preset ↔ v4 入口 ↔ 版號四處；淺深成對；預設色盤不外洩；registry 的 tokens 配對 | 色值本身合不合格（`verify:color`） |
+| `tests/tokens-v3.test.ts` | 用 Tailwind v3＋preset 真的編一次，語意色與非色彩 token 都產得出來 | 元件有沒有用到 |
+| `tests/tokens-v4.test.ts` | 用 Tailwind v4 真的編 `dist/tailwind.css`：色鍵、透明度修飾、預設色盤清空、深色 variant、基座 | 同上 |
+| `tests/color.test.ts` | 把 `verify:color` 接進 `npm test`：無不合格項、六主題都在、brand 對比、聚焦環中性 | 門檻本身（在 `scripts/verify-color.mjs`） |
+| `tests/cn.test.ts` | `cn()` 的 tailwind-merge 分群：字級與文字色、漸層與底色互不吃 | 元件 class 的內容 |
+| `tests/tailwind-compat.test.ts` | 元件只用 v3／v4 語意相同的 utility：禁兩版值不同的裸 utility、v4 限定語法、只靠 hover 揭露 | 兩版共有且同值的 class |
+| `tests/de-domain.test.ts` | 全庫文字 ↔ 176 詞領域黑名單，零容忍 | 英文變體以外的拼法（詞表列什麼擋什麼） |
+| `tests/demo-data.test.ts` | 示範資料只能來自 `demo/sample-data.ts`（含 `demo/generate.ts`） | 資料值本身 |
+| `tests/doc-hooks.test.ts` | 文件的 `<StoryFrame／StoryLink id>` 都對到真的 story | story 內容是否正確 |
+| `tests/story-sort.test.ts` | `.storybook/preview.tsx` 的 storySort 涵蓋每個分類且字串逐字吻合 | story 的順序是否合理 |
+| `tests/play-conventions.test.ts` | stories 不用 `userEvent.type／clear／paste`（改 `setInputValue`） | play 的斷言內容 |
+| `tests/nav.test.ts` | `isNavActive` 的多層 fallback | 側欄的渲染 |
+| `tests/table-url-state.test.ts` | 表格狀態 ↔ 網址的 codec、prefix 隔離讀與寫、與 DataTableState 的型別相容 | adapter 的路由整合（宿主） |
+| `tests/host-baseline.test.ts` | Tailwind v4 preflight＋tokens 基座 ↔ `book/src/css/demo-base.css`；kit.css 的 import 順序與 layer | 渲染結果（`verify:book`） |
+| `tests/host-install-set.test.ts` | 頁面章的 `shadcn add` 指令 ⊆ 宿主安裝集；檔案真的在宿主裡；宿主的 tokens 配對與 workspace 連結 | 宿主頁面的行為（`verify:host`） |
+| `tests/registry-content.test.ts` | registry 檔案內容不以註解開頭（shadcn CLI 會刪） | 內容正確性 |
+| `tests/registry-fingerprint.test.ts` | `/r/index.json` 的逐 item 指紋＝第二份獨立實作；base 與說明不進指紋；相依變了 closureHash 跟著變 | 指紋的用途（`registry-changes`） |
+| `tests/registry-changes.test.ts` | 兩版 registry 的四類異動分類、Markdown 輸出、上一個 tag 照數字大小挑 | 真實歷史（CI 在 dev 預演） |
+| `tests/dooping-check.test.ts` | 取用端工具的內容指紋與產生器一致；路徑對應；已是最新／上游有更新／本地改過三態 | PMIS 或 lock 的到期 |
+| `tests/changelog.test.ts` | CHANGELOG 每節前是「空行、---、空行」；目前版號的 Release notes 只含自己這一節 | 內容是否回答三問 |
+| `tests/guard-ledger.test.ts` | 這張表列出每一支 `tests/*.test.ts` 與 `scripts/verify-*.mjs`、`host-sync.mjs` | 表格描述是否準確 |
 
-build 之後另有三支（CI 跑，本機可單獨跑）：`verify:storybook`（axe＋play 全量）、
-`verify:visual`（截圖掃 token 期望值，不是肉眼看）、`verify:book`（文件站渲染層驗
-computed style，[ADR-0010](https://kielchang.github.io/dooping-design-book/adr/demo-host-baseline-contract/)）。
+build 之後（CI 跑，本機可單獨跑）：
+
+| 指令 | 管什麼 | 不管什麼 |
+| --- | --- | --- |
+| `npm run verify:color`（`scripts/verify-color.mjs`） | 六主題×兩模式的 WCAG 對比、色覺 ΔE00、狀態層三階、圖表色距離；主題數與圖表色數下限 | 元件有沒有真的用上這些色（`verify:visual`） |
+| `npm run verify:storybook`（`scripts/verify-storybook.mjs`） | 全部 story 的 axe＋play 全數執行；強制色彩下焦點看得見 | 顏色對比、頁面級規則 |
+| `npm run verify:visual`（`scripts/verify-visual.mjs`） | 六主題×兩模式的截圖掃 token 期望色，其他主題的 brand 不滲入 | 版面位移、像素基準 |
+| `npm run verify:book`（`scripts/verify-book-host.mjs`） | 文件站每頁的 computed style 符合 token 有效值（邊框、底色、表格、步驟、portal） | Storybook |
+| `npm run verify:host`（`scripts/verify-host.mjs`） | 內部試裝宿主：主題套上、color-mix、頁面級 axe、強制色彩、行動版外殼、凍結欄 | 元件單元行為（story） |
+| `npm run host:check`（`scripts/host-sync.mjs --check`） | registry ↔ 宿主檔案逐位元組相同；宿主宣告的 npm 相依；`dooping.lock.json` 與 registry 對得上 | 宿主自己的頁面程式 |
 
 新增守衛的鐵律（`CLAUDE.md`）：**一定要反向驗證**——暫時把值改壞，確認那條真的會紅。
 
@@ -104,7 +128,7 @@ computed style，[ADR-0010](https://kielchang.github.io/dooping-design-book/adr/
 
 `.github/workflows/ci.yml`（push `dev` 與 PR → `main`）依序：
 
-1. typecheck → `npm test`（上表七支）
+1. typecheck → `npm test`（上表全部）
 2. **registry 同步**：重跑 `build:registry` 後 `git diff --exit-code -- registry/`
 3. **token 版號閘**：`tokens.json` 內容變了（`del(.meta)` 比對）但版號沒動 → 擋
 4. **規範版號閘**：監看清單**逐字等於**「會進 registry 的集合」
@@ -132,8 +156,7 @@ computed style，[ADR-0010](https://kielchang.github.io/dooping-design-book/adr/
 ## 文件站建置
 
 - `book/` **刻意不是 workspace 成員**：Docusaurus 的相依樹太大，分開安裝避免版本互相牽制。
-- prebuild 鏈：`build-css.mjs`（token 產物）→ `sync-adr.mjs`（ADR 副本）→
-  `sync-root-docs.mjs`（AGENTS.md／本檔的副本）。
+- prebuild 鏈：`build-css.mjs`（token 產物）→ `sync-root-docs.mjs`（AGENTS.md／本檔的副本）。
 - `kitPipeline` plugin（`book/docusaurus.config.ts`）：webpack alias 直指 `packages/*/src`，
   文件站的活範例渲染**真元件**，不是截圖或複本——元件改了，文件頁自動跟上。
 - `onBrokenLinks: "throw"`：站內死鏈直接紅 build。本檔正本因此**只用絕對 URL**，
@@ -166,8 +189,8 @@ dev  ──push──► ci.yml     ──► gh-pages 的 preview/   （預覽�
 | 新元件／新 token／改語意 | [rfc.yml](https://github.com/kielchang/dooping-design-book/issues/new?template=rfc.yml)（五題逐欄） |
 | 頁面章缺件表的項目 | [missing-piece.yml](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml)（一則＝三次法則的一次證據） |
 
-- **想推翻某條規則**：先讀 [ADR](https://kielchang.github.io/dooping-design-book/adr/)——
-  「為什麼當初這樣決定」都在那裡；何時該寫新 ADR 的三判準在 `docs/adr/README.md`。
-- **下游唯讀鐵律**：未合併的提案不得在下游先行實作
+- **想推翻某條規則**：先讀該規則的守衛檔頭與文件頁那一句——理由就寫在旁邊；
+  決定的來龍去脈記在維護方內部的 PMIS，本 repo 不放決策紀錄。
+- **下游唯讀鐵律**：先在宿主做、台帳記自製，三次法則過了再提回上游
   （[治理 → 符合性台帳](https://kielchang.github.io/dooping-design-book/governance/conformance-ledger/)）。
 - **改動前的驗證指令與環境啟動**：`CLAUDE.md`。

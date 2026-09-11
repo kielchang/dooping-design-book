@@ -21,8 +21,8 @@
 | `packages/react` | React 參考實作（項目清單見 [`/r/index.json`](https://kielchang.github.io/dooping-design-book/r/index.json)） | registry 複製原始碼進你的專案 |
 | `book/docs/4-patterns` | 操作模式（問題→做法→取捨→反例） | 讀懂，用你自己的技術棧實作 |
 
-理由：**元件一定會被改，token 幾乎不會。** 詳見 [ADR-0004](docs/adr/0004-registry-over-npm-package.md)
-與 [ADR-0005](docs/adr/0005-tokens-are-the-only-hard-dependency.md)。
+理由：**元件一定會被改，token 幾乎不會。** 複製走的程式碼沒有升級壓力，
+發成套件的 token 才守得住名稱契約。
 
 ## 快速開始
 
@@ -46,8 +46,7 @@ packages/
 └── react/         @dooping/react  — React 參考實作（元件 ＋ stories ＋ 示範資料）
 registry/          shadcn registry JSON（由 scripts/build-registry.mjs 產生）
 book/              Docusaurus 文件站（中文搜尋、可列印、內嵌真元件）
-docs/adr/          決策紀錄正本（build 時同步到文件站）
-tests/             守衛測試（7 支）：邊界、token、色彩、去領域化、示範資料、文件掛鉤、宿主基座
+tests/             守衛測試：邊界、token、色彩、去領域化、示範資料、文件掛鉤、宿主基座、守衛台帳（全表見 ARCHITECTURE.md）
 .storybook/        Storybook 設定
 ```
 
@@ -82,8 +81,8 @@ npm workspaces 已經滿足，而且**不需要在每個 CI／每台機器多裝
 2. **通用性** —— 換一個後台系統會用到嗎？
 3. **三次法則** —— 實際用過三次以上且穩定才收。投機性抽象不收。
 
-第 1 條由 `tests/de-domain.test.ts` 自動把關，零容忍。
-見 [ADR-0006](docs/adr/0006-de-domainization-as-hard-gate.md)。
+第 1 條由 `tests/de-domain.test.ts` 自動把關，零容忍——
+領域詞一旦進了範例，複製出去的元件就帶著別人的業務假設；理由寫在該守衛的檔頭。
 
 ## 回饋與貢獻
 

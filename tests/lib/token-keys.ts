@@ -24,13 +24,23 @@ export const tokenKeys = (obj: Group | undefined): string[] =>
 
 export const chartKeys = (): string[] => tokenKeys(tokensJson.chart.light);
 
-/** 對映成 utility 的全部色鍵：語意層 ∪ 只存在於主題層的鍵 ∪ 圖表，排序後回傳。 */
+/**
+ * 對映成 utility 的全部色鍵：語意層 ∪ 只存在於主題層的鍵 ∪ 圖表，排序後回傳。
+ *
+ * 下限 40 是防空轉：tokens.json 的結構一改（例如 `value` 改名），tokenKeys 會安靜地回空陣列，
+ * 靠這份鍵集比對的三支守衛（tokens、tokens-v3、tokens-v4）就會「零鍵全對」而綠。
+ * 現值 47＋8＋11＝66；真的要砍到 40 以下，先來改這個數字並在 CHANGELOG 說明。
+ */
 export function expectedColorKeys(): string[] {
   const semantic = tokenKeys(tokensJson.color.light);
   const set = new Set(semantic);
   const themes = Object.values(tokensJson.themes as Record<string, { light: Group }>);
   const themeOnly = [...new Set(themes.flatMap((t) => tokenKeys(t.light)))].filter((k) => !set.has(k));
-  return [...semantic, ...themeOnly, ...chartKeys()].sort();
+  const keys = [...semantic, ...themeOnly, ...chartKeys()].sort();
+  if (keys.length < 40) {
+    throw new Error(`expectedColorKeys 只推導出 ${keys.length} 個色鍵（下限 40）——tokens.json 的結構壞了或讀錯檔，守衛不能空轉`);
+  }
+  return keys;
 }
 
 /** Tailwind 產出的 class selector 跳脫：/ : . [ ] ( ) % 前面加反斜線。 */

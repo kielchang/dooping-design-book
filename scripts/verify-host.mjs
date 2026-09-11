@@ -337,6 +337,7 @@ async function main() {
   );
   if (fails.length) {
     console.error(`\n✗ 內部試裝宿主渲染守衛不通過（${fails.length} 條）：\n` + fails.map((f) => "  " + f).join("\n"));
+    console.error("\n每一項驗什麼、為什麼：本檔檔頭；宿主怎麼接、元件怎麼進來：apps/host-v4/README.md。");
     process.exit(1);
   }
   console.log("✓ 內部試裝宿主渲染守衛通過：主題套上、透明度可用、頁面結構無障礙、強制色彩、行動版外殼與凍結欄行為正確。");

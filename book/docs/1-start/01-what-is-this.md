@@ -40,7 +40,7 @@ title: 這本書是什麼
 | 前端工程師 | [三種取用方式](/start/three-ways) → [元件](/components) → [模式](/patterns) |
 | 設計師 | [基礎](/foundations) → [模式](/patterns) → [無障礙](/accessibility) |
 | PM／需求方 | [模式](/patterns)（每則都是一個「這個功能該怎麼運作」的答案） |
-| 技術負責人 | [治理](/governance) → [ADR](/adr) |
+| 技術負責人 | [治理](/governance) → [架構](/governance/architecture) |
 
 ## 它的來歷
 

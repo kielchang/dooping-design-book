@@ -1,3 +1,4 @@
+// 規則正本：book/docs/3-components/13-data-table.mdx「狀態同步網址」、4-patterns/11-back-office-ia.mdx 深連結規範。
 // useTableUrlState 的 codec 是純函式，直接驗。
 // 另外用型別斷言盯住 TableUrlState ↔ DataTableState 的結構相容——
 // lib 刻意不 import ui（registry 相依不拖整張表），兩份結構型別的漂移

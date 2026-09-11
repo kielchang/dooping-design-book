@@ -407,7 +407,7 @@ async function main() {
   console.log(`\n掃描 ${pages.length} 頁（淺色全頁 + 深色抽驗 + portal 互動）`);
   if (allFails.length) {
     console.error(`\n✗ 渲染守衛不通過（${allFails.length} 條）：\n` + allFails.map((f) => "  " + f).join("\n"));
-    console.error("\n宿主基座說明見 ADR-0010 與 book/src/css/demo-base.css。");
+    console.error("\n宿主基座是元件的樣式契約：說明見 AGENTS.md「宿主前置條件」與 book/src/css/demo-base.css 檔頭。");
     process.exit(1);
   }
   console.log("✓ demo 宿主基座驗收通過：邊框、底色、表格與步驟的渲染結果符合 token 有效值。");

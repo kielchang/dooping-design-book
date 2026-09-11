@@ -12,8 +12,7 @@ npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/data-tab
 
 相依會自動一起裝（DataTable 會帶上 table / input / button / select / tooltip / utils…）。
 
-理由見 [ADR-0004](../../docs/adr/0004-registry-over-npm-package.md)：
-元件一定會被改，複製走之後它就是你的程式碼，沒有升級壓力、沒有 fork 的必要。
+理由：元件一定會被改，複製走之後它就是你的程式碼，沒有升級壓力、沒有 fork 的必要。
 
 這個 workspace 套件存在的目的是：Storybook、文件站活範例、守衛測試的單一來源。
 

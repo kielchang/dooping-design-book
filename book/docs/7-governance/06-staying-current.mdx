@@ -53,7 +53,21 @@ node scripts/dooping-check.mjs
 | 本地改過 | 本地檔案的內容與 lock 記的不同 | 刻意偏離就記進[符合性台帳](/governance/conformance-ledger)；不是刻意的，重抄即可 |
 
 `dooping-check` 本身也是 registry item：它有更新時，檢查會把它列成「上游有更新」。
-想讓提醒擋 PR 就加 `--strict`（不建議當預設）。指紋怎麼算、為什麼含相依，見[決策紀錄](/adr)的 ADR-0013。
+想讓提醒擋 PR 就加 `--strict`（不建議當預設）。
+
+### 指紋怎麼算
+
+`/r/index.json` 每個 item 的 `meta` 有兩個指紋，`dooping-check` 與 Release 的異動清單都靠它們：
+
+- **`hash`**：取用端抄走的東西。依序串接下列各行（以換行分隔），取 SHA-256 的前 16 個十六進位字元：
+  `name <名稱>`、`type <型別>`、`deps <npm 相依，排序後以空白串接>`、`registryDeps <registry 相依的 item 名稱，排序後以空白串接>`，
+  然後每個檔依 `target` 排序各一段 `file <target> <type> <內容長度>` 接內容。排序照字元碼位。
+  **不含**版號、標題、說明與 URL——預覽站與正式站的同一份內容必須同一個指紋，只改說明文字也不該叫你重抄。
+- **`closureHash`**：自己加上所有遞移 registry 相依的名稱，排序後每行 `<名稱>:<hash>`，再取 SHA-256 前 16 字元。
+  **任何一個相依變了它就變**：`utils` 修了，`data-table` 的 `closureHash` 跟著變、`hash` 不變。這就是「只因相依受影響」那一類的來源。
+
+這套串接規則是對外契約：改了等於讓所有取用端的 lock 一次失效。實作在 `scripts/lib/fingerprint.mjs`，
+`tests/registry-fingerprint.test.ts` 用獨立寫的第二份實作逐 item 對過；`dooping-check` 內另有第三份，`tests/dooping-check.test.ts` 確認一致。
 
 裝不了腳本的專案，退而求其次比對規範版號——粒度只到「規範動了」，看不出動到哪些 item：
 

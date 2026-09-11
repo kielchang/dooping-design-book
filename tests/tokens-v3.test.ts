@@ -52,7 +52,7 @@ describe("Tailwind v3 可編譯守衛（用 tailwindcss v3 帶 preset 編一次�
       const rule = ruleFor(css, `bg-${k}`) ?? "";
       return chart.has(k) ? !rule.includes(`var(--${k})`) : !rule.includes(`hsl(var(--${k}) /`);
     });
-    expect(wrong, `產不出或值不對：${wrong.join(", ")}`).toEqual([]);
+    expect(wrong, `產不出或值不對：${wrong.join(", ")}\n為什麼：v3 宿主（preset）與 v4 宿主要編出同一組 class，否則同一份元件在兩種宿主長得不一樣\n規則正本：packages/tokens/README.md「v3 相容」`).toEqual([]);
   });
 
   it("透明度修飾可用（bg-primary/50 → hsl(var(--primary) / 0.5)）", () => {

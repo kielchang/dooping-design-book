@@ -14,7 +14,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/app-shell.json",
       "meta": {
         "hash": "906cc1abd89ac714",
-        "closureHash": "47a0bf1a2fc93bd0"
+        "closureHash": "395eab801539548b"
       }
     },
     {
@@ -26,7 +26,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/badge.json",
       "meta": {
         "hash": "69715c6174b37be5",
-        "closureHash": "62f2a9e6b18f84b1"
+        "closureHash": "713a1f6962250b05"
       }
     },
     {
@@ -38,7 +38,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/button.json",
       "meta": {
         "hash": "530bc83c77e8111e",
-        "closureHash": "d89b86f5903eaa79"
+        "closureHash": "9962e847425f1e87"
       }
     },
     {
@@ -50,7 +50,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/callout.json",
       "meta": {
         "hash": "3567df0c12264925",
-        "closureHash": "1c8c74f8eb6c856b"
+        "closureHash": "2e2f1b1a91766f7e"
       }
     },
     {
@@ -62,7 +62,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/card.json",
       "meta": {
         "hash": "e0413fd2ebeba75c",
-        "closureHash": "bf7a76f60db5c03a"
+        "closureHash": "c0107132ba0be6c9"
       }
     },
     {
@@ -74,7 +74,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/change-summary.json",
       "meta": {
         "hash": "e24dd6427379f84a",
-        "closureHash": "7c78dcaa939d4e9f"
+        "closureHash": "3f9b3b0c515b03da"
       }
     },
     {
@@ -86,7 +86,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/charts.json",
       "meta": {
         "hash": "11cb0f26cf392252",
-        "closureHash": "ceb345e456f5c8ba"
+        "closureHash": "530c40d1b1ca213e"
       }
     },
     {
@@ -98,7 +98,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/checkbox.json",
       "meta": {
         "hash": "cd65d5023dc565df",
-        "closureHash": "bfa678ae9c6f2161"
+        "closureHash": "3b5e9cdc9253d427"
       }
     },
     {
@@ -110,7 +110,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/chips.json",
       "meta": {
         "hash": "24ce0005f97496bd",
-        "closureHash": "a845ef88de8d4826"
+        "closureHash": "041b4422c7c57de5"
       }
     },
     {
@@ -122,7 +122,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/coachmark.json",
       "meta": {
         "hash": "1a930da4e6999138",
-        "closureHash": "bf634355b8928d0b"
+        "closureHash": "fa7491a16fba832b"
       }
     },
     {
@@ -146,7 +146,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/command.json",
       "meta": {
         "hash": "d61a156a881aef7f",
-        "closureHash": "626a11928dd8a2c9"
+        "closureHash": "1c193bd12976509d"
       }
     },
     {
@@ -158,7 +158,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/command-palette.json",
       "meta": {
         "hash": "4b7a2223f85a15fd",
-        "closureHash": "1d7f2caa3e51b396"
+        "closureHash": "3af56e7fc6a88246"
       }
     },
     {
@@ -170,7 +170,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/confirm-dialog.json",
       "meta": {
         "hash": "e1ee336670a97e6e",
-        "closureHash": "696bdc755ec4d443"
+        "closureHash": "5c8eff72b6913993"
       }
     },
     {
@@ -194,7 +194,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/data-table.json",
       "meta": {
         "hash": "a3144dabdd7f2758",
-        "closureHash": "97500d2953960851"
+        "closureHash": "1a500e7a6390f1ae"
       }
     },
     {
@@ -206,7 +206,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/date-range.json",
       "meta": {
         "hash": "2a157089f190754a",
-        "closureHash": "8661af6aa49143bb"
+        "closureHash": "305271ef57069345"
       }
     },
     {
@@ -218,7 +218,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/delta.json",
       "meta": {
         "hash": "359ecb8fb1f338da",
-        "closureHash": "a77a5cb8bf065711"
+        "closureHash": "f7764d2c98fde4c3"
       }
     },
     {
@@ -230,7 +230,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/dialog.json",
       "meta": {
         "hash": "9aae5950f0224574",
-        "closureHash": "d6002120d8f9fab9"
+        "closureHash": "5546795121dd90ea"
       }
     },
     {
@@ -266,7 +266,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/dropdown-menu.json",
       "meta": {
         "hash": "3e1cd0359525b42d",
-        "closureHash": "e3af8dd1d1a48a40"
+        "closureHash": "ee26ec0a27454a32"
       }
     },
     {
@@ -278,7 +278,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/editable-field.json",
       "meta": {
         "hash": "00d417154c595329",
-        "closureHash": "a6e6dda58b0421cb"
+        "closureHash": "6dd5764751123c7f"
       }
     },
     {
@@ -290,7 +290,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/empty-state.json",
       "meta": {
         "hash": "bb03d4dbdb6f0fca",
-        "closureHash": "264223b298240584"
+        "closureHash": "d33f635047778f85"
       }
     },
     {
@@ -302,7 +302,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/form-field.json",
       "meta": {
         "hash": "0616f262be7f3058",
-        "closureHash": "1689a906ffdf19f4"
+        "closureHash": "684e6e0fe15e4d95"
       }
     },
     {
@@ -326,7 +326,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/gantt.json",
       "meta": {
         "hash": "caac3b5831210a54",
-        "closureHash": "1f1f209ca6618a71"
+        "closureHash": "73dd4aefb3ae900e"
       }
     },
     {
@@ -338,7 +338,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/graph-canvas.json",
       "meta": {
         "hash": "aeea0d3126c20512",
-        "closureHash": "84db4873924059c7"
+        "closureHash": "a9c9da59dce74263"
       }
     },
     {
@@ -350,7 +350,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/input.json",
       "meta": {
         "hash": "a42e317c8acafbcf",
-        "closureHash": "17a1aba49f9103f0"
+        "closureHash": "052f5819464e1ca3"
       }
     },
     {
@@ -362,7 +362,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/label.json",
       "meta": {
         "hash": "c72e2fba1f2f9252",
-        "closureHash": "1f23cc117b370de1"
+        "closureHash": "f0a9c03ddb8cb415"
       }
     },
     {
@@ -374,7 +374,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/mockup.json",
       "meta": {
         "hash": "61daa81eb4636abc",
-        "closureHash": "4863090becea3f83"
+        "closureHash": "e389df1ac4d5e796"
       }
     },
     {
@@ -398,7 +398,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/number-input.json",
       "meta": {
         "hash": "ded2b0e00c1665c8",
-        "closureHash": "9d673d77f93b227e"
+        "closureHash": "853e58f7d0b50ddd"
       }
     },
     {
@@ -410,7 +410,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/page-header.json",
       "meta": {
         "hash": "6e31b06bd9e0994d",
-        "closureHash": "10014a51a7284f00"
+        "closureHash": "8c48bbc7a81b0093"
       }
     },
     {
@@ -422,7 +422,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/popover.json",
       "meta": {
         "hash": "d64684689fb58b19",
-        "closureHash": "7401c1f00891b88b"
+        "closureHash": "8c1fa3156b2b8694"
       }
     },
     {
@@ -434,7 +434,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/radio-group.json",
       "meta": {
         "hash": "f692f72218ea48ca",
-        "closureHash": "408bbce0f189a4db"
+        "closureHash": "485bc193518b70d9"
       }
     },
     {
@@ -446,7 +446,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/seg-group.json",
       "meta": {
         "hash": "8354a33c171a8d31",
-        "closureHash": "e6a23af457a3a600"
+        "closureHash": "95486c58355690c8"
       }
     },
     {
@@ -458,7 +458,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/select.json",
       "meta": {
         "hash": "d3ea2d2930e734af",
-        "closureHash": "93acb0b1278d6420"
+        "closureHash": "23d3b649a63f9683"
       }
     },
     {
@@ -470,7 +470,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/separator.json",
       "meta": {
         "hash": "0d642e124cd49d0c",
-        "closureHash": "2e6766fd746a1bcf"
+        "closureHash": "3aa05c30a7099ef4"
       }
     },
     {
@@ -482,7 +482,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/sidebar.json",
       "meta": {
         "hash": "5130edb5cae63768",
-        "closureHash": "a68ee7d74af16e5a"
+        "closureHash": "f1db4051eec4eac1"
       }
     },
     {
@@ -494,7 +494,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/sidebar-nav.json",
       "meta": {
         "hash": "08129e6493da4136",
-        "closureHash": "6b10a66e69a7066e"
+        "closureHash": "f12cdb04faa78af9"
       }
     },
     {
@@ -506,7 +506,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/skeleton.json",
       "meta": {
         "hash": "6804569f1adeee5c",
-        "closureHash": "9c480f9e18d628d3"
+        "closureHash": "553e784c485519e1"
       }
     },
     {
@@ -518,7 +518,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/stepper.json",
       "meta": {
         "hash": "80760c8091d14480",
-        "closureHash": "91210399f9c1f60d"
+        "closureHash": "ce81704240cbdb08"
       }
     },
     {
@@ -530,7 +530,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/switch.json",
       "meta": {
         "hash": "4a1a39d33b2646eb",
-        "closureHash": "9728975b5630e4c9"
+        "closureHash": "08e9cdef4e7a1a10"
       }
     },
     {
@@ -542,7 +542,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/tab-pills.json",
       "meta": {
         "hash": "5875f02f41bceedd",
-        "closureHash": "9a98920e30858696"
+        "closureHash": "d2ceb62e4f21a7a3"
       }
     },
     {
@@ -554,7 +554,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/table.json",
       "meta": {
         "hash": "fa5679c4989d6948",
-        "closureHash": "cf13a498127b93d9"
+        "closureHash": "38ef546aa8871250"
       }
     },
     {
@@ -566,7 +566,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/textarea.json",
       "meta": {
         "hash": "0bdebc5a00fb8c4e",
-        "closureHash": "889805a2d8dc5176"
+        "closureHash": "a75b5211c5fe7126"
       }
     },
     {
@@ -578,7 +578,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/toast.json",
       "meta": {
         "hash": "ff28232c8475e770",
-        "closureHash": "751df418ad5ccaa6"
+        "closureHash": "e34faca2822e6e09"
       }
     },
     {
@@ -590,7 +590,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/tooltip.json",
       "meta": {
         "hash": "920fb25cb4d8c82f",
-        "closureHash": "ab6a0a5afe2bab86"
+        "closureHash": "13eefd8d70e03541"
       }
     },
     {
@@ -649,8 +649,8 @@
       "description": "cn 與數值／金額／百分比格式化。",
       "url": "https://kielchang.github.io/dooping-design-book/r/utils.json",
       "meta": {
-        "hash": "bf9c4e22214bec0f",
-        "closureHash": "2fe5673cf754ad13"
+        "hash": "b948853a6ce3c72d",
+        "closureHash": "097e7397a8735a4b"
       }
     }
   ]

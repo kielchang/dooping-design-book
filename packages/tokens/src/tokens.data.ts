@@ -3,7 +3,7 @@ export default {
   "$comment": "Dooping 設計 token 唯一來源（框架中立）。CSS 變數與 Tailwind preset 皆由此檔產生，勿直接改 dist/。色彩值以 HSL 三元組字串表示（可被 hsl(var(--x) / <alpha>) 套用透明度）；chart.* 例外為 hex（SVG fill/stroke 直接吃 var()，不經 hsl() 包裝）。",
   "meta": {
     "name": "dooping",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "defaultTheme": "graphite"
   },
   "color": {
@@ -180,6 +180,22 @@ export default {
       "success-subtle-foreground": {
         "value": "157.8 67.6% 26.7%",
         "desc": "success-subtle 上的文字"
+      },
+      "sidebar": {
+        "value": "210 100% 98.4%",
+        "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+      },
+      "sidebar-foreground": {
+        "value": "222.2 84% 4.9%",
+        "desc": "sidebar 上的文字＝foreground 別名（生成器保證同值）"
+      },
+      "sidebar-border": {
+        "value": "214.3 31.8% 91.4%",
+        "desc": "側欄邊線＝border 別名（生成器保證同值）"
+      },
+      "sidebar-ring": {
+        "value": "222.2 84% 4.9%",
+        "desc": "側欄聚焦環＝ring 別名（ADR-0007：中性、不進主題）"
       }
     },
     "dark": {
@@ -321,6 +337,22 @@ export default {
       "success-subtle-foreground": {
         "value": "155.5 38.9% 55.7%",
         "desc": "success-subtle 上的文字"
+      },
+      "sidebar": {
+        "value": "222.9 26.9% 10.2%",
+        "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+      },
+      "sidebar-foreground": {
+        "value": "210 40% 98%",
+        "desc": "sidebar 上的文字＝foreground 別名（生成器保證同值）"
+      },
+      "sidebar-border": {
+        "value": "222 16% 22%",
+        "desc": "側欄邊線＝border 別名（生成器保證同值）"
+      },
+      "sidebar-ring": {
+        "value": "210 30% 80%",
+        "desc": "側欄聚焦環＝ring 別名（ADR-0007：中性、不進主題）"
       }
     }
   },
@@ -626,6 +658,14 @@ export default {
           "value": "220 12% 95%",
           "desc": "欄位語意：唯讀／計算值"
         },
+        "sidebar": {
+          "value": "222.9 100% 98.6%",
+          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+        },
+        "sidebar-border": {
+          "value": "221.5 30.2% 91.6%",
+          "desc": "側欄邊線＝border 別名（生成器保證同值）"
+        },
         "brand": {
           "value": "222.2 47.4% 11.2%",
           "desc": "主題色：本組無品牌色，鏡射 primary"
@@ -641,6 +681,22 @@ export default {
         "brand-subtle-foreground": {
           "value": "221.5 11.9% 42.7%",
           "desc": "brand-subtle 上的文字"
+        },
+        "sidebar-primary": {
+          "value": "222.2 47.4% 11.2%",
+          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
+        },
+        "sidebar-primary-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+        },
+        "sidebar-accent": {
+          "value": "220.6 100% 93.3%",
+          "desc": "選中的側欄項底色＝brand-subtle 別名"
+        },
+        "sidebar-accent-foreground": {
+          "value": "221.5 11.9% 42.7%",
+          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
         }
       },
       "dark": {
@@ -680,6 +736,14 @@ export default {
         "field-readonly": {
           "value": "220 16% 15%"
         },
+        "sidebar": {
+          "value": "222.9 26.9% 10.2%",
+          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+        },
+        "sidebar-border": {
+          "value": "220 16% 22%",
+          "desc": "側欄邊線＝border 別名（生成器保證同值）"
+        },
         "brand": {
           "value": "210 40% 98%",
           "desc": "主題色：本組無品牌色，鏡射 primary"
@@ -695,6 +759,22 @@ export default {
         "brand-subtle-foreground": {
           "value": "219 8.3% 52.9%",
           "desc": "brand-subtle 上的文字"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
+        },
+        "sidebar-primary-foreground": {
+          "value": "222.2 47.4% 11.2%",
+          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+        },
+        "sidebar-accent": {
+          "value": "222.9 58.3% 14.1%",
+          "desc": "選中的側欄項底色＝brand-subtle 別名"
+        },
+        "sidebar-accent-foreground": {
+          "value": "219 8.3% 52.9%",
+          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
         }
       }
     },
@@ -750,6 +830,14 @@ export default {
           "value": "220 12% 95%",
           "desc": "欄位語意：唯讀／計算值"
         },
+        "sidebar": {
+          "value": "230 100% 98.8%",
+          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+        },
+        "sidebar-border": {
+          "value": "225 28.6% 91.8%",
+          "desc": "側欄邊線＝border 別名（生成器保證同值）"
+        },
         "brand": {
           "value": "229.7 55.5% 58.6%",
           "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
@@ -765,6 +853,22 @@ export default {
         "brand-subtle-foreground": {
           "value": "230.5 47.5% 52.9%",
           "desc": "brand-subtle 上的文字"
+        },
+        "sidebar-primary": {
+          "value": "229.7 55.5% 58.6%",
+          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
+        },
+        "sidebar-primary-foreground": {
+          "value": "0 0% 100%",
+          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+        },
+        "sidebar-accent": {
+          "value": "226.5 100% 93.9%",
+          "desc": "選中的側欄項底色＝brand-subtle 別名"
+        },
+        "sidebar-accent-foreground": {
+          "value": "230.5 47.5% 52.9%",
+          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
         }
       },
       "dark": {
@@ -804,6 +908,14 @@ export default {
         "field-readonly": {
           "value": "224 14% 15%"
         },
+        "sidebar": {
+          "value": "226.2 24.5% 10.4%",
+          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+        },
+        "sidebar-border": {
+          "value": "228.8 14% 22.4%",
+          "desc": "側欄邊線＝border 別名（生成器保證同值）"
+        },
         "brand": {
           "value": "228.5 39.2% 55.5%",
           "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
@@ -819,6 +931,22 @@ export default {
         "brand-subtle-foreground": {
           "value": "227.5 45.3% 60.6%",
           "desc": "brand-subtle 上的文字"
+        },
+        "sidebar-primary": {
+          "value": "228.5 39.2% 55.5%",
+          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
+        },
+        "sidebar-primary-foreground": {
+          "value": "0 0% 100%",
+          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+        },
+        "sidebar-accent": {
+          "value": "229 50% 15%",
+          "desc": "選中的側欄項底色＝brand-subtle 別名"
+        },
+        "sidebar-accent-foreground": {
+          "value": "227.5 45.3% 60.6%",
+          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
         }
       }
     },
@@ -874,6 +1002,14 @@ export default {
           "value": "260 12% 95%",
           "desc": "欄位語意：唯讀／計算值"
         },
+        "sidebar": {
+          "value": "240 100% 99%",
+          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+        },
+        "sidebar-border": {
+          "value": "247 22% 92%",
+          "desc": "側欄邊線＝border 別名（生成器保證同值）"
+        },
         "brand": {
           "value": "254.3 49.3% 59.8%",
           "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
@@ -889,6 +1025,22 @@ export default {
         "brand-subtle-foreground": {
           "value": "254.5 42.5% 54.3%",
           "desc": "brand-subtle 上的文字"
+        },
+        "sidebar-primary": {
+          "value": "254.3 49.3% 59.8%",
+          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
+        },
+        "sidebar-primary-foreground": {
+          "value": "0 0% 100%",
+          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+        },
+        "sidebar-accent": {
+          "value": "247.5 100% 95.3%",
+          "desc": "選中的側欄項底色＝brand-subtle 別名"
+        },
+        "sidebar-accent-foreground": {
+          "value": "254.5 42.5% 54.3%",
+          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
         }
       },
       "dark": {
@@ -928,6 +1080,14 @@ export default {
         "field-readonly": {
           "value": "247.5 10.3% 15.3%"
         },
+        "sidebar": {
+          "value": "246 18.5% 10.6%",
+          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+        },
+        "sidebar-border": {
+          "value": "249.2 11.3% 22.5%",
+          "desc": "側欄邊線＝border 別名（生成器保證同值）"
+        },
         "brand": {
           "value": "252.2 33.6% 56.9%",
           "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
@@ -943,6 +1103,22 @@ export default {
         "brand-subtle-foreground": {
           "value": "252 38.5% 61.8%",
           "desc": "brand-subtle 上的文字"
+        },
+        "sidebar-primary": {
+          "value": "252.2 33.6% 56.9%",
+          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
+        },
+        "sidebar-primary-foreground": {
+          "value": "0 0% 100%",
+          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+        },
+        "sidebar-accent": {
+          "value": "255 42% 15%",
+          "desc": "選中的側欄項底色＝brand-subtle 別名"
+        },
+        "sidebar-accent-foreground": {
+          "value": "252 38.5% 61.8%",
+          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
         }
       }
     },
@@ -998,6 +1174,14 @@ export default {
           "value": "260 12% 95%",
           "desc": "欄位語意：唯讀／計算值"
         },
+        "sidebar": {
+          "value": "264 71.4% 98.6%",
+          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+        },
+        "sidebar-border": {
+          "value": "266.7 20.9% 91.6%",
+          "desc": "側欄邊線＝border 別名（生成器保證同值）"
+        },
         "brand": {
           "value": "269.4 44.5% 56.9%",
           "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
@@ -1013,6 +1197,22 @@ export default {
         "brand-subtle-foreground": {
           "value": "269.7 39.6% 52%",
           "desc": "brand-subtle 上的文字"
+        },
+        "sidebar-primary": {
+          "value": "269.4 44.5% 56.9%",
+          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
+        },
+        "sidebar-primary-foreground": {
+          "value": "0 0% 100%",
+          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+        },
+        "sidebar-accent": {
+          "value": "266.1 100% 95.5%",
+          "desc": "選中的側欄項底色＝brand-subtle 別名"
+        },
+        "sidebar-accent-foreground": {
+          "value": "269.7 39.6% 52%",
+          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
         }
       },
       "dark": {
@@ -1052,6 +1252,14 @@ export default {
         "field-readonly": {
           "value": "270 11% 15%"
         },
+        "sidebar": {
+          "value": "264 19.2% 10.2%",
+          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+        },
+        "sidebar-border": {
+          "value": "267.7 11.5% 22.2%",
+          "desc": "側欄邊線＝border 別名（生成器保證同值）"
+        },
         "brand": {
           "value": "268.3 31% 54.5%",
           "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
@@ -1067,6 +1275,22 @@ export default {
         "brand-subtle-foreground": {
           "value": "268.3 35% 59.6%",
           "desc": "brand-subtle 上的文字"
+        },
+        "sidebar-primary": {
+          "value": "268.3 31% 54.5%",
+          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
+        },
+        "sidebar-primary-foreground": {
+          "value": "0 0% 100%",
+          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+        },
+        "sidebar-accent": {
+          "value": "271 44% 14%",
+          "desc": "選中的側欄項底色＝brand-subtle 別名"
+        },
+        "sidebar-accent-foreground": {
+          "value": "268.3 35% 59.6%",
+          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
         }
       }
     },
@@ -1122,6 +1346,14 @@ export default {
           "value": "165 14.3% 94.5%",
           "desc": "欄位語意：唯讀／計算值"
         },
+        "sidebar": {
+          "value": "180 50% 97.6%",
+          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+        },
+        "sidebar-border": {
+          "value": "180 22.2% 89.4%",
+          "desc": "側欄邊線＝border 別名（生成器保證同值）"
+        },
         "brand": {
           "value": "180.5 100% 26.1%",
           "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
@@ -1137,6 +1369,22 @@ export default {
         "brand-subtle-foreground": {
           "value": "180.5 100% 24.9%",
           "desc": "brand-subtle 上的文字"
+        },
+        "sidebar-primary": {
+          "value": "180.5 100% 26.1%",
+          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
+        },
+        "sidebar-primary-foreground": {
+          "value": "0 0% 100%",
+          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+        },
+        "sidebar-accent": {
+          "value": "178.6 100% 91.6%",
+          "desc": "選中的側欄項底色＝brand-subtle 別名"
+        },
+        "sidebar-accent-foreground": {
+          "value": "180.5 100% 24.9%",
+          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
         }
       },
       "dark": {
@@ -1176,6 +1424,14 @@ export default {
         "field-readonly": {
           "value": "175 18% 13%"
         },
+        "sidebar": {
+          "value": "180 40.5% 7.3%",
+          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+        },
+        "sidebar-border": {
+          "value": "180 18.8% 18.8%",
+          "desc": "側欄邊線＝border 別名（生成器保證同值）"
+        },
         "brand": {
           "value": "180.5 100% 26.1%",
           "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
@@ -1191,6 +1447,22 @@ export default {
         "brand-subtle-foreground": {
           "value": "179.5 47.8% 45.1%",
           "desc": "brand-subtle 上的文字"
+        },
+        "sidebar-primary": {
+          "value": "180.5 100% 26.1%",
+          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
+        },
+        "sidebar-primary-foreground": {
+          "value": "0 0% 100%",
+          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+        },
+        "sidebar-accent": {
+          "value": "180 100% 11.4%",
+          "desc": "選中的側欄項底色＝brand-subtle 別名"
+        },
+        "sidebar-accent-foreground": {
+          "value": "179.5 47.8% 45.1%",
+          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
         }
       }
     },
@@ -1246,6 +1518,14 @@ export default {
           "value": "90 7.1% 94.5%",
           "desc": "欄位語意：唯讀／計算值"
         },
+        "sidebar": {
+          "value": "96 45.5% 97.8%",
+          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+        },
+        "sidebar-border": {
+          "value": "97.5 15.4% 89.8%",
+          "desc": "側欄邊線＝border 別名（生成器保證同值）"
+        },
         "brand": {
           "value": "96 48% 34.7%",
           "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
@@ -1261,6 +1541,22 @@ export default {
         "brand-subtle-foreground": {
           "value": "95.6 51.8% 32.5%",
           "desc": "brand-subtle 上的文字"
+        },
+        "sidebar-primary": {
+          "value": "96 48% 34.7%",
+          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
+        },
+        "sidebar-primary-foreground": {
+          "value": "0 0% 100%",
+          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+        },
+        "sidebar-accent": {
+          "value": "100 100% 92%",
+          "desc": "選中的側欄項底色＝brand-subtle 別名"
+        },
+        "sidebar-accent-foreground": {
+          "value": "95.6 51.8% 32.5%",
+          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
         }
       },
       "dark": {
@@ -1300,6 +1596,14 @@ export default {
         "field-readonly": {
           "value": "97.5 11.8% 13.3%"
         },
+        "sidebar": {
+          "value": "100 22% 8%",
+          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+        },
+        "sidebar-border": {
+          "value": "100 12% 19.6%",
+          "desc": "側欄邊線＝border 別名（生成器保證同值）"
+        },
         "brand": {
           "value": "98.4 31% 38.6%",
           "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
@@ -1315,6 +1619,22 @@ export default {
         "brand-subtle-foreground": {
           "value": "98.4 26.9% 44.5%",
           "desc": "brand-subtle 上的文字"
+        },
+        "sidebar-primary": {
+          "value": "98.4 31% 38.6%",
+          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
+        },
+        "sidebar-primary-foreground": {
+          "value": "0 0% 100%",
+          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+        },
+        "sidebar-accent": {
+          "value": "97.5 84.2% 7.5%",
+          "desc": "選中的側欄項底色＝brand-subtle 別名"
+        },
+        "sidebar-accent-foreground": {
+          "value": "98.4 26.9% 44.5%",
+          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
         }
       }
     }

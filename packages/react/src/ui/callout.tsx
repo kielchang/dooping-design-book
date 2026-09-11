@@ -110,7 +110,7 @@ export function Callout({
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold">
           {tag && (
-            <span className="mr-1.5 rounded bg-background/70 px-1 py-0.5 align-middle text-micro font-medium">
+            <span className="mr-1.5 rounded-sm bg-background/70 px-1 py-0.5 align-middle text-micro font-medium">
               {tag}
             </span>
           )}

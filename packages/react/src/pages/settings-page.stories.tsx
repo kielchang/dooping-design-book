@@ -8,6 +8,7 @@ import { Checkbox } from "../ui/checkbox";
 import { Chips } from "../ui/chips";
 import { Label } from "../ui/label";
 import { NumberInput } from "../ui/number-input";
+import { PageHeader } from "../ui/page-header";
 import { SegGroup } from "../ui/seg-group";
 import {
   Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose,
@@ -40,10 +41,7 @@ export const 典型組成: Story = {
 
     return (
       <div className="mx-auto max-w-2xl space-y-4">
-        <div>
-          <h1 className="text-2xl font-semibold">設定</h1>
-          <p className="text-sm text-muted-foreground">{demoProfile.name}・{demoProfile.code}</p>
-        </div>
+        <PageHeader title="設定" meta={`${demoProfile.name}・${demoProfile.code}`} />
 
         {/* 立即生效區：改了就生效，所以沒有儲存鈕——要在標題旁講清楚 */}
         <Card>

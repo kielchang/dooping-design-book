@@ -1,13 +1,20 @@
-/* Storybook 樣式管線：token（CSS 變數）＋ Tailwind utilities。
-   preflight（reset）在這裡是需要的——Storybook canvas 是乾淨的頁面。 */
-@import "@dooping/tokens/tokens.css";
+/* Storybook 樣式管線（Tailwind v4）：與取用端完全同一套四行 @import。
+   Storybook 是本書自己的第一個 v4 宿主——照 AGENTS.md 的取用契約接，不走捷徑，
+   契約哪裡寫錯，這裡最先壞。
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+   preflight 在這裡是需要的（Storybook canvas 是乾淨的頁面），由 @import "tailwindcss" 提供；
+   v4 preflight 拿掉的邊框預設色與按鈕游標，由 @dooping/tokens/tailwind.css 的 @layer base 補齊。 */
+@import "tailwindcss" source(none);
+@import "tw-animate-css";
+@import "@dooping/tokens/tokens.css";
+@import "@dooping/tokens/tailwind.css";
+
+/* 掃描範圍明示：元件原始碼＋本目錄（preview.tsx 的 decorator class）。
+   不用自動偵測——它以工作目錄為基準掃整個 repo，連文件站散文裡的反例 class 都會算進去。 */
+@source "../packages/react/src";
+@source ".";
 
 @layer base {
-  * { border-color: hsl(var(--border)); }
   body {
     background: hsl(var(--background));
     color: hsl(var(--foreground));

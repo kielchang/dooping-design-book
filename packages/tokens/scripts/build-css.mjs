@@ -29,13 +29,14 @@ lines.push(" */");
 lines.push("");
 
 // ── 多色相主題 ────────────────────────────────────────────────
-// 主題只影響 5 個 token（brand 三件組 + ring），其餘語意色與主題無關——
-// 背景、邊框、狀態色在所有主題之間完全相同。因此主題層很薄，
-// 而且**取用端不設定 data-color-theme 時，輸出與沒有主題功能之前一模一樣**。
+// 主題層覆蓋的 token 分三類（實際清單以 tokens.json 的 themes.* 為準，不在這裡寫死數字）：
+// brand 家族（完整反解生成）、帶色調的中性色（只轉色相，L/C 不動）、
+// sidebar-primary/accent 家族（＝brand 家族的字面值別名）。狀態色、圖表色票、
+// --ring（ADR-0007）與主題無關，在所有主題之間完全相同。
 //
-// --ring 是唯一被主題覆蓋的既有 token：它在 color.* 裡仍保有中性值當後備，
-// 主題層宣告在後面把它蓋掉。宿主若只引 tokens.css 而不設任何主題屬性，
-// 拿到的就是預設主題（石墨）——觀感與原本的中性殼一致。
+// 被主題覆蓋的 token 在 color.* 裡仍保有基準值當後備，主題層宣告在後面把它蓋掉。
+// 宿主若只引 tokens.css 而不設任何主題屬性，拿到的就是預設主題（石墨）——
+// 觀感與沒有主題功能時一致。
 const THEMES = tokens.themes ?? {};
 const DEFAULT_THEME = tokens.meta.defaultTheme;
 const themeVars = (name, mode) => vars(THEMES[name]?.[mode] ?? {});
@@ -184,6 +185,21 @@ lines.push(`/* 互動狀態層：hover／pressed／selected 三級，疊在元�
 .state-layer[data-disabled] { --state-layer-alpha: 0%; }
 @media (prefers-reduced-motion: reduce) {
   .state-layer { transition: none; }
+}
+`);
+
+// ── 強制色彩模式的焦點備援 ────────────────────────────────────
+// Tailwind v4 的 outline-none 是 outline-style: none（v3 是 2px 透明 outline）。
+// 強制色彩模式（Windows 高對比）會移除 box-shadow——元件的聚焦環整個消失——
+// 而 v3 那層「透明 outline 在強制色彩下由系統色顯形」的備援也跟著沒了。
+// 這裡把它補回所有宿主：一般模式完全不可見；v3 宿主重複宣告無害。
+// !important 是必要的：focus-visible:outline-none 的特異度（0,2,0）高於這裡。
+lines.push(`/* 強制色彩模式的焦點備援：透明 outline 由系統色顯形（v4 的 outline-none 不再保留它）。 */
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid transparent !important;
+    outline-offset: 2px !important;
+  }
 }
 `);
 

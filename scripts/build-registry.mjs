@@ -7,13 +7,18 @@
 // 用法：
 //   node scripts/build-registry.mjs               # 用預設（GitHub Pages）base
 //   REGISTRY_BASE=http://localhost:4173 node scripts/build-registry.mjs
+//   REGISTRY_BASE=http://127.0.0.1:4173 REGISTRY_OUT=registry-local node scripts/build-registry.mjs
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, rmSync } from "node:fs";
 import { dirname, join, basename, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { rewrite } from "./lib/rewrite.mjs";
+import { fingerprints } from "./lib/fingerprint.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = join(ROOT, "packages/react/src");
-const OUT = join(ROOT, "registry");
+// REGISTRY_OUT：內部試裝宿主要一份「base 指向本機伺服器」的 registry（scripts/host-add.mjs），
+// 那份不能覆寫進版控的 registry/。預設值不變。
+const OUT = join(ROOT, process.env.REGISTRY_OUT ?? "registry");
 const BASE = (process.env.REGISTRY_BASE ?? "https://kielchang.github.io/dooping-design-book").replace(/\/$/, "");
 
 /** 目標專案的落點：元件一律 components/dooping/、工具一律 lib/dooping/。 */
@@ -24,6 +29,9 @@ const LIB_TARGET = (name) => `lib/dooping/${name}.ts`;
 const LIB_MODULES = {
   "lib/utils": "utils",
   "lib/use-sort": "use-sort",
+  "lib/use-dialog-state": "use-dialog-state",
+  "lib/nav": "nav",
+  "lib/use-table-url-state": "use-table-url-state",
   "lib/csv": "csv",
   "lib/download": "download",
   "lib/forms/diff": "forms-diff",
@@ -36,6 +44,9 @@ const NPM_DEPS = [
   // 不在這份白名單裡的外部套件不會被寫進 registry item——取用端就裝不到，
   // 所以「收了新相依卻忘了加這裡」的症狀是 shadcn add 之後畫布整個沒樣式。
   { re: /from\s+["']@xyflow\/react["']/, name: () => "@xyflow/react" },
+  // Command 的隔離相依（同上，boundary 守衛保證只有 command.tsx import 它）。
+  // 漏了這行的症狀是取用端裝完指令面板直接渲染爆炸——比沒樣式更響，但一樣要防。
+  { re: /from\s+["']cmdk["']/, name: () => "cmdk" },
   { re: /from\s+["']lucide-react["']/, name: () => "lucide-react" },
   { re: /from\s+["']clsx["']/, name: () => "clsx" },
   { re: /from\s+["']tailwind-merge["']/, name: () => "tailwind-merge" },
@@ -52,16 +63,8 @@ function walk(dir) {
   return out;
 }
 
-/** 匯入路徑改寫：相對路徑 → 目標專案的 `@/` 別名。 */
-function rewrite(content) {
-  return content
-    .replace(/from\s+["']\.\.\/lib\/forms\/diff["']/g, 'from "@/lib/dooping/forms-diff"')
-    .replace(/from\s+["']\.\.\/\.\.\/lib\/forms\/diff["']/g, 'from "@/lib/dooping/forms-diff"')
-    .replace(/from\s+["']\.\.\/lib\/([a-z-]+)["']/g, 'from "@/lib/dooping/$1"')
-    .replace(/from\s+["']\.\.\/\.\.\/lib\/([a-z-]+)["']/g, 'from "@/lib/dooping/$1"')
-    .replace(/from\s+["']\.\.\/(?:ui|form)\/([a-z-]+)["']/g, 'from "@/components/dooping/$1"')
-    .replace(/from\s+["']\.\/([a-z-]+)["']/g, 'from "@/components/dooping/$1"');
-}
+// 匯入路徑改寫（相對路徑 → 目標專案的 `@/` 別名）在 scripts/lib/rewrite.mjs——
+// scripts/host-sync.mjs 同步示範資料時共用同一份規則。
 
 /** 從原始碼推導出這個檔案需要哪些 npm 套件與 registry 相依。 */
 function analyse(content) {
@@ -95,7 +98,7 @@ const TITLES = {
   "seg-group": ["SegGroup 分段選擇", "少量互斥選項，radiogroup ＋ roving tabindex。"],
   chips: ["Chips 多選標籤片", "已選與未選同時可見的多選控制項。"],
   table: ["Table 表格基礎件", "表格語意元素＋數字欄／凍結首欄／可排序表頭。"],
-  "data-table": ["DataTable 資料表", "搜尋・單欄篩選・排序・分頁・合計・凍結首欄・CSV 匯出。"],
+  "data-table": ["DataTable 資料表", "搜尋・篩選（表頭＋facet 鈕）・排序・分頁・合計・多選批次・欄位顯示・CSV 匯出・可同步網址。"],
   "tab-pills": ["TabPills 分頁膠囊", "分頁切換的統一元件，含 tablist 語意。"],
   delta: ["Delta 變異顯示", "箭頭＋文字＋顏色三重編碼的差異呈現。"],
   "empty-state": ["EmptyState 空狀態", "圖示＋標題＋說明＋行動呼籲。"],
@@ -111,10 +114,25 @@ const TITLES = {
   "use-record-diff": ["useRecordDiff 變更追蹤", "草稿 vs 原始值的差異與還原 hook。"],
   utils: ["utils 通用工具", "cn 與數值／金額／百分比格式化。"],
   "use-sort": ["useSort 排序 hook", "無→大到小→小到大 的三態排序。"],
+  popover: ["Popover 彈出面板", "錨定在觸發元素旁的浮層容器（Radix Popover）。"],
+  "dropdown-menu": ["DropdownMenu 下拉選單", "動作選單與勾選項（Radix DropdownMenu），單層。"],
+  collapsible: ["Collapsible 摺疊區", "展開／收合容器（Radix Collapsible），無自帶視覺。"],
+  separator: ["Separator 分隔線", "水平／垂直分隔（Radix Separator），預設裝飾性。"],
+  "confirm-dialog": ["ConfirmDialog 確認對話框", "破壞性操作確認：載入中鎖出口、可選硬確認輸入。"],
+  "use-dialog-state": ["useDialogState 對話框開關", "多種對話框的集中開關：天然單開、同值再設即關。"],
+  nav: ["nav 導覽契約", "NavGroup 型別與 isNavActive()：側邊欄與指令面板共用的導覽資料形狀。"],
+  "use-table-url-state": ["useTableUrlState 網址同步", "表格狀態 ↔ 網址：預設值省略、條件變更回第 1 頁、adapter 可注入。"],
+  command: ["Command 指令清單", "可過濾的指令清單與對話框殼（cmdk 薄封裝，隔離相依）。"],
+  "command-palette": ["CommandPalette 指令面板", "全域搜尋：⌘K 開啟，導覽資料與側邊欄單一來源。"],
+  sidebar: ["Sidebar 側邊欄", "外殼側欄家族：Provider、收合圖示欄、行動版左滑抽屜（純呈現，不綁路由）。"],
+  "sidebar-nav": ["SidebarNav 導覽渲染", "NavGroup[] 的三態渲染：連結／展開群組／收合態右彈選單，含例行・試算標籤。"],
+  "app-shell": ["AppShell 外殼容器", "側欄＋頂列＋主內容的佈局容器，刻意小到宿主可自行重寫。"],
+  "page-header": ["PageHeader 頁首", "頁首骨架三件：PageHeader（一頁一個 h1）、BackLink（真連結返回）、Breadcrumb（三層以上）。"],
   csv: ["csv 序列化", "含 UTF-8 BOM 的 CSV 產出與解析。"],
   download: ["download 下載工具", "觸發瀏覽器下載 Blob。"],
   "forms-diff": ["forms/diff 欄位比對", "FieldSpec 驅動的變更偵測與顯示格式化。"],
   charts: ["Charts 圖表", "後台閱讀型的八種零相依圖＋圖例＋色票工具，含文字與鍵盤等價。"],
+  "dooping-check": ["dooping-check 更新檢查", "取用端的 lock 與例行檢查：已是最新／上游有更新／本地改過（ADR-0013 第二層）。"],
 };
 
 /**
@@ -161,6 +179,8 @@ rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 
 const items = [];
+// 完整的 item（含檔案與相依）：算指紋要用，index 只放摘要（ADR-0013）
+const fullItems = [];
 for (const abs of walk(SRC)) {
   const rel = relative(SRC, abs).replace(/\\/g, "/");
   if (rel === "index.ts" || rel === "version.ts" || rel.startsWith("demo/")) continue;
@@ -170,6 +190,12 @@ for (const abs of walk(SRC)) {
 
   const modKey = rel.replace(/\.tsx?$/, "");
   const isLib = modKey in LIB_MODULES;
+  // lib/ 檔案漏登錄 LIB_MODULES 的症狀很陰：item 會以 registry:ui 型別產出、
+  // 落點變 components/dooping/*.tsx，但其他檔改寫後的 import 指向 @/lib/dooping/*——
+  // 取用端裝完直接斷鏈，而本 repo 所有守衛照樣全綠。所以在產生端直接擋下。
+  if (rel.startsWith("lib/") && !isLib) {
+    throw new Error(`lib/ 下的 ${rel} 不在 LIB_MODULES 裡——新增 lib 模組必須同時登錄（否則取用端 import 斷鏈）`);
+  }
   const name = isLib ? LIB_MODULES[modKey] : basename(modKey);
   // 換行一律正規化成 LF。registry JSON 是**散佈產物**——內容是字串，
   // 換行會被逐字寫進 JSON 裡送給取用端。Windows 上 git 以 CRLF 簽出原始碼，
@@ -198,6 +224,7 @@ for (const abs of walk(SRC)) {
     ],
   };
   writeFileSync(join(OUT, `${name}.json`), `${JSON.stringify(item, null, 2)}\n`, "utf8");
+  fullItems.push(item);
   items.push({ name, version: SPEC_VERSION, type: item.type, title, description });
 }
 
@@ -242,9 +269,38 @@ for (const abs of walk(SRC)) {
       files,
     };
     writeFileSync(join(OUT, "charts.json"), `${JSON.stringify(item, null, 2)}\n`, "utf8");
+    fullItems.push(item);
     items.push({ name: "charts", version: SPEC_VERSION, type: item.type, title, description });
   }
 }
+
+// ── 取用端工具：registry:file（ADR-0013 第二層）──────────────────────
+//
+// dooping-check 是給取用端專案用的 Node 腳本，不是元件：target 以 ~/ 開頭＝專案根目錄，
+// shadcn CLI 對 registry:file 不做任何改寫、原樣寫檔。它本身也是 registry item——更新了，取用端用同一套檢查就會知道。
+// 不相依 @dooping/tokens（它不是元件，tokens.test 對 registry:file 放行）。
+const TOOL_FILES = [{ name: "dooping-check", source: "templates/dooping-check.mjs", target: "~/scripts/dooping-check.mjs" }];
+for (const tool of TOOL_FILES) {
+  const content = readFileSync(join(ROOT, tool.source), "utf8").replace(/\r\n/g, "\n");
+  const [title, description] = TITLES[tool.name];
+  const item = {
+    $schema: "https://ui.shadcn.com/schema/registry-item.json",
+    name: tool.name,
+    version: SPEC_VERSION,
+    type: "registry:file",
+    title,
+    description,
+    dependencies: [],
+    registryDependencies: [],
+    files: [{ path: `dooping/${tool.source}`, content, type: "registry:file", target: tool.target }],
+  };
+  writeFileSync(join(OUT, `${tool.name}.json`), `${JSON.stringify(item, null, 2)}\n`, "utf8");
+  fullItems.push(item);
+  items.push({ name: tool.name, version: SPEC_VERSION, type: item.type, title, description });
+}
+
+// 逐 item 指紋（ADR-0013 第一層）：相依指到不存在的 item 會在這裡直接丟錯。
+const prints = fingerprints(fullItems);
 
 // registry 索引（給人看、也給工具列舉用）。
 // 索引上的 version 是「main 目前發佈的版本」——取用端拿它跟自己抄走那份比對，
@@ -259,9 +315,14 @@ const index = {
   // 機器可讀的欄位，取用端一個端點就能問到配對，不必翻 CHANGELOG。
   tokensVersion: TOKENS_VERSION,
   homepage: BASE,
+  // meta.hash：取用端抄走的內容與相依；meta.closureHash：再把遞移相依的指紋算進去——
+  // utils 修了，抄了 data-table 的人也看得出要重抄。版號、標題、說明與 base 都不進指紋。
   items: items
     .sort((a, b) => a.name.localeCompare(b.name))
-    .map((i) => ({ ...i, url: `${BASE}/r/${i.name}.json` })),
+    .map((i) => {
+      const fp = prints.get(i.name);
+      return { ...i, url: `${BASE}/r/${i.name}.json`, meta: { hash: fp.hash, closureHash: fp.closureHash } };
+    }),
 };
 writeFileSync(join(OUT, "index.json"), `${JSON.stringify(index, null, 2)}\n`, "utf8");
 

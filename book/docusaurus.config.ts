@@ -15,8 +15,15 @@ const SITE_URL = process.env.BOOK_SITE_URL ?? "https://kielchang.github.io";
 // 站台自己要說。用 baseUrl 判斷：只有 /preview/ 建置掛橫幅，正式站與本機都不出現。
 const IS_PREVIEW = BASE_URL.includes("/preview/");
 const PROD_URL = "https://kielchang.github.io/dooping-design-book/";
-const STORYBOOK_URL = `${SITE_URL.replace(/\/$/, "")}${BASE_URL}storybook/`;
-const REGISTRY_BASE = `${SITE_URL.replace(/\/$/, "")}${BASE_URL}r`;
+// Storybook 與 registry 都不在文件站的 dev server 裡——本機 build/start（BASE_URL 為 `/`）
+// 時照 SITE_URL+BASE_URL 組出來的是 https://kielchang.github.io/storybook/ 這種不存在的
+// 網址，所以外連一律退回正式站。
+const IS_LOCAL = !process.env.BOOK_SITE_URL && BASE_URL === "/";
+const PUBLIC_BASE = IS_LOCAL
+  ? PROD_URL
+  : `${SITE_URL.replace(/\/$/, "")}${BASE_URL}`;
+const STORYBOOK_URL = `${PUBLIC_BASE}storybook/`;
+const REGISTRY_BASE = `${PUBLIC_BASE}r`;
 
 const config: Config = {
   title: "Dooping Design Book",
@@ -62,11 +69,11 @@ const config: Config = {
             },
           };
         },
+        // Tailwind v4：設定全在 src/css/kit.css（CSS-first），這裡只掛 PostCSS 外掛。
+        // 外掛只處理含 Tailwind 指令的檔案（kit.css），Infima 與 custom.css 原樣通過；
+        // 瀏覽器前綴由 Tailwind 內建的 Lightning CSS 處理，不再需要 autoprefixer。
         configurePostCss(opts: { plugins: unknown[] }) {
-          opts.plugins.push(
-            require("tailwindcss")(require(path.resolve(__dirname, "tailwind.config.js"))),
-            require("autoprefixer"),
-          );
+          opts.plugins.push(require("@tailwindcss/postcss")());
           return opts;
         },
       };

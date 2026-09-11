@@ -57,12 +57,14 @@ export function BarChart({
   const plotH = height - pad.top - pad.bottom;
   const W = items.length * slot;
   const peak = items.reduce((a, b) => (b.value > a.value ? b : a), items[0]);
+  const chartLabel = `${title}，共 ${items.length} 項，最高為 ${peak.label} ${valueFmt(peak.value)}`;
 
   return (
-    <div className={cn("overflow-x-auto", className)}>
+    // tabIndex：類別一多，寬度會超出容器觸發水平捲動——沒有它，鍵盤使用者碰不到捲出畫面的長條。
+    <div className={cn("overflow-x-auto", className)} tabIndex={0} role="group" aria-label={chartLabel}>
       <svg
         role="img"
-        aria-label={`${title}，共 ${items.length} 項，最高為 ${peak.label} ${valueFmt(peak.value)}`}
+        aria-label={chartLabel}
         viewBox={`0 0 ${W} ${height}`}
         width={W}
         height={height}

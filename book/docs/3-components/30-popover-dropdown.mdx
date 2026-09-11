@@ -1,0 +1,98 @@
+---
+title: Popover／DropdownMenu 浮層選單
+---
+
+# Popover／DropdownMenu 浮層選單
+
+錨定在觸發元素旁的兩種浮層：**Popover 裝內容，DropdownMenu 裝動作**。
+
+<StoryLink id="元件-浮層-彈出面板・下拉選單--彈出面板" />
+
+## 用途
+
+| 元件 | 裝什麼 | 典型場景 |
+| --- | --- | --- |
+| `Popover` | 一小塊就地內容 | 表格的 faceted 篩選面板、欄位說明、迷你設定 |
+| `DropdownMenu` | 一組動作或開關 | 列操作選單（⋯）、欄位顯示切換、側欄收合態的子選單 |
+
+判準：**按下去會發生事情的是選單項，攤開來看的是面板。**
+兩個混用的症狀是「選單裡出現輸入框」或「面板裡整排按鈕」。
+
+## 何時不要用
+
+<Rules>
+  <Do><p>就地的小決定：篩選、切換、單筆操作。開著浮層時背景仍看得到、仍有脈絡。</p></Do>
+  <Dont><p>要使用者做完整決定的內容（確認後果、填表單）不要塞浮層——
+  用 <a href="/components/dialog">Dialog</a>。浮層點外面就散掉，
+  填到一半消失的表單是最惹人厭的表單。</p></Dont>
+</Rules>
+
+<Rules>
+  <Do><p>DropdownMenu 保持單層。目前全書沒有任何場景需要子選單。</p></Do>
+  <Dont><p>不要做巢狀選單。滑鼠要沿著走廊走直角的選單，是桌面軟體的遺物，
+  在觸控裝置上完全不能用。動作多到需要分層，代表該收斂動作，不是加層。</p></Dont>
+</Rules>
+
+## 狀態
+
+<Demo title="彈出面板：就地篩選">
+  <Popover>
+    <PopoverTrigger asChild><Button variant="outline">篩選條件</Button></PopoverTrigger>
+    <PopoverContent>
+      <p className="text-sm font-medium">顯示範圍</p>
+      <div className="mt-3 space-y-2">
+        <div className="flex items-center gap-2"><Checkbox id="pd-1" /><Label htmlFor="pd-1">草稿</Label></div>
+        <div className="flex items-center gap-2"><Checkbox id="pd-2" defaultChecked /><Label htmlFor="pd-2">已確認</Label></div>
+        <div className="flex items-center gap-2"><Checkbox id="pd-3" defaultChecked /><Label htmlFor="pd-3">已完成</Label></div>
+      </div>
+    </PopoverContent>
+  </Popover>
+</Demo>
+
+<Demo title="下拉選單：列操作">
+  <DropdownMenu>
+    <DropdownMenuTrigger asChild><Button variant="outline">R-2403 的操作</Button></DropdownMenuTrigger>
+    <DropdownMenuContent align="start">
+      <DropdownMenuLabel>R-2403</DropdownMenuLabel>
+      <DropdownMenuItem>查看明細</DropdownMenuItem>
+      <DropdownMenuItem>複製編號</DropdownMenuItem>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem className="text-destructive">作廢</DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
+</Demo>
+
+### 勾選項預設不關閉選單
+
+`DropdownMenuCheckboxItem` 勾選後選單**留在原地**——連續切換多個開關
+（例如欄位顯示）是它存在的理由，每勾一下就關等於逼使用者重開 N 次。
+要恢復「選了就關」，傳自己的 `onSelect` 蓋掉即可。
+
+<Rules>
+  <Do><p>破壞性動作放選單最下面、加 <code>text-destructive</code>，並在點擊後走
+  <a href="/components/confirm-dialog">ConfirmDialog</a> 的分級確認。</p></Do>
+  <Dont><p>不要把「刪除」跟「編輯」排在相鄰兩行的中間位置——選單是肌肉記憶操作，
+  手滑的代價要與位置的順手程度成反比。</p></Dont>
+</Rules>
+
+## 無障礙
+
+- Radix 保證：焦點管理、方向鍵移動（DOM 焦點跟著走）、Esc 關閉、焦點歸還觸發鈕、
+  `role="menu"` 與 `aria-checked`。
+- 選單項的 highlight 走狀態層的**已選**強度——「按 Enter 會執行這個」比
+  「這個可以互動」強一階，與 Select 同一條規則。
+- 圖示型觸發鈕（⋯）必須有 `aria-label`：「更多操作」不是裝飾。
+
+## 取用
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/popover.json
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/dropdown-menu.json
+```
+
+Collapsible（摺疊區）與 Separator（分隔線）同批收錄，是這兩個浮層與側欄的組合零件：
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/collapsible.json
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/separator.json
+```

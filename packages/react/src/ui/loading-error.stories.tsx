@@ -8,6 +8,7 @@ import { Button } from "./button";
 import { Input } from "./input";
 import { NumberInput } from "./number-input";
 import { Callout } from "./callout";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./select";
 import { FormField, FieldError } from "../form/form-field";
 import { formatNumber } from "../lib/utils";
 import { demoRecords, type DemoRecord } from "../demo/sample-data";
@@ -42,7 +43,7 @@ export const 載入的三種手段: Story = {
       <div className="max-w-xl space-y-8">
         <div>
           <p className="mb-1 text-sm font-medium">
-            1・首載＝骨架（版面已知不跳動）　2・重查＝就地變暗（舊資料仍可讀）
+            1・首載＝骨架（版面已知不跳動）　2・重查＝變暗＋列脈動（舊資料仍可讀）
           </p>
           <DataTable
             rows={phase === "first" ? [] : demoRecords.slice(0, 5)}
@@ -60,7 +61,7 @@ export const 載入的三種手段: Story = {
             onClick={() => setPhase("refetch")}
           >
             <RotateCw className="mr-1 size-3.5" aria-hidden />
-            重新查詢（看變暗態）
+            重新查詢（看變暗＋脈動態）
           </Button>
         </div>
         <div>
@@ -91,11 +92,28 @@ export const 欄位錯誤態: Story = {
       <FormField label="數量" required error="必須大於 0">
         <NumberInput value={0} onChange={() => {}} />
       </FormField>
+      {/* 可聚焦的是 SelectTrigger、不是 Select 根元件：children 傳函式，把 id／aria 展開到 trigger 上 */}
+      <FormField label="所屬單位" required error="請選擇單位">
+        {(control) => (
+          <Select>
+            <SelectTrigger {...control}>
+              <SelectValue placeholder="選擇單位" />
+            </SelectTrigger>
+            <SelectContent>
+              {[...new Set(demoRecords.map((r) => r.unit))].map((u) => (
+                <SelectItem key={u} value={u}>
+                  {u}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      </FormField>
       <FormField label="備註（獨立 FieldError 的長相）">
         <Input defaultValue="！！！" aria-invalid />
       </FormField>
       <FieldError>含有不允許的字元</FieldError>
-      <Callout variant="danger" title="有 2 個欄位需要修正" live>
+      <Callout variant="danger" title="有 3 個欄位需要修正" live>
         錯誤欄位已就地標示——這一層是彙總，不取代欄位下的訊息。
       </Callout>
       <p className="text-xs text-muted-foreground">
@@ -114,6 +132,13 @@ export const 欄位錯誤態: Story = {
     await expect(describedBy).toBeTruthy();
     const errorEl = canvasElement.querySelector(`#${CSS.escape(describedBy!.split(" ").pop()!)}`);
     await expect(errorEl).toHaveTextContent("必須大於 0");
+    // 複合控制項（render prop）：Label 指向可聚焦的 SelectTrigger，aria 也接在它身上
+    const unit = canvas.getByRole("combobox", { name: /所屬單位/ });
+    await expect(unit).toHaveAttribute("aria-invalid", "true");
+    const unitDescribedBy = unit.getAttribute("aria-describedby");
+    await expect(unitDescribedBy).toBeTruthy();
+    const unitError = canvasElement.querySelector(`#${CSS.escape(unitDescribedBy!)}`);
+    await expect(unitError).toHaveTextContent("請選擇單位");
     // 沒有錯誤的欄位不得帶 aria-invalid
     const name = canvas.getByLabelText(/名稱/);
     await expect(name).not.toHaveAttribute("aria-invalid");

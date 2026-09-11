@@ -10,13 +10,14 @@ npm install
 npm run build:tokens
 ```
 
-`dist/` 在 `.gitignore` 裡，但 `packages/tokens/dist/tokens.css` 是**三個地方的硬相依**：
+`dist/` 在 `.gitignore` 裡，但 `packages/tokens/dist/` 的兩個 CSS 產物（`tokens.css` 值、
+`tailwind.css` v4 名稱對映）是**三個地方的硬相依**：
 
 | 誰 | 怎麼用 |
 | --- | --- |
-| `tests/tokens.test.ts` | 直接讀檔比對 |
-| `.storybook/main.ts` | alias 到它 |
-| `book/src/css/kit.css` | `@import` 它 |
+| `tests/tokens.test.ts`、`tests/tokens-v4.test.ts` | 直接讀檔比對、真的用 Tailwind v4 編一次 |
+| `.storybook/styles.css`（＋`main.ts` 的 alias） | `@import` 兩個產物——與取用端同一套四行 |
+| `book/src/css/kit.css` | `@import` 兩個產物（v4 管線；demo-base 由 `book/scripts/port-preflight.mjs` 產生） |
 
 所以乾淨 clone 之後不先跑 `build:tokens`，`npm test`、Storybook、文件站**三者都會失敗**。
 `.claude/hooks/session-start.sh` 會自動處理，手動操作時要自己記得。
@@ -38,6 +39,9 @@ npm run build:registry     # registry JSON — 改過元件就要重跑並提交
 npm run build-storybook
 npm run verify:storybook   # 無障礙行為守衛（axe＋play functions）— 需先 build-storybook
 npm run verify:visual      # 視覺回歸：token 期望值掃描 — 需先 build-storybook
+npm run host:sync          # 內部試裝宿主：registry → apps/host-v4，並重建它的 dooping.lock.json（改過元件或安裝集要重跑並提交）
+npm run registry:changes -- --before vX.Y.Z   # 相對上一個 v* tag 動到哪些 registry item（Release notes 會附同一份）
+npm run host:build && npm run verify:host   # 宿主渲染守衛：主題配色、頁面級 axe、強制色彩、行動版外殼
 BOOK_BASE_URL=/dooping-design-book/preview/ npm run build:book   # onBrokenLinks: throw
 ```
 

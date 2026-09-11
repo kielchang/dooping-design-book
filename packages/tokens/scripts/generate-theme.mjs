@@ -77,6 +77,7 @@ const NEUTRAL_TINT = [
   "border", "input", "field-border",        // 線
   "muted-foreground",                       // 次要文字
   "field-editable", "field-readonly",       // 欄位底
+  "sidebar", "sidebar-border",              // 外殼表面與其邊線（由 buildSidebarBase 先生成）
 ];
 
 function tintNeutral(mode, hue) {
@@ -137,7 +138,12 @@ function buildTheme({ hue, cap, neutralBrand = false }) {
     // 藍紫系主題用固定值產出的淡底會與 muted 幾乎同色（實測石墨只差 ΔE00 3.2），
     // 於是「這一項被選中」看起來只是「這一項有點灰」。
     // 改成解出來：從最淡開始往下探，找第一個與 muted 拉開 SUBTLE_MIN 的值。
+    //
+    // 自 0.7.0 起多一個對象：選中的導覽項（`--sidebar-accent` ≡ brand-subtle）實際
+    // 坐在 sidebar 表面上，不只坐在 muted 旁——「對比是生成參數」的原則落到新表面，
+    // 判準因此是「與 muted **且**與該主題的 sidebar 皆拉開 SUBTLE_MIN」。
     const muted = nx("muted");
+    const sidebarSurf = nx("sidebar");
     const subtle = (() => {
       const from = mode === "light" ? 0.970 : 0.230;
       const dir = mode === "light" ? -1 : 1;      // 淺色往下探、深色往上探
@@ -145,9 +151,10 @@ function buildTheme({ hue, cap, neutralBrand = false }) {
       for (let i = 0; i < 60; i++) {
         const L = from + dir * i * 0.004;
         const rgb = oklchToRgb8(L, Math.min(maxChroma(L, hue), capC), hue);
-        if (deltaE00(lab(rgb), lab(muted)) >= SUBTLE_MIN) return rgb;
+        if (deltaE00(lab(rgb), lab(muted)) >= SUBTLE_MIN &&
+            deltaE00(lab(rgb), lab(sidebarSurf)) >= SUBTLE_MIN) return rgb;
       }
-      throw new Error(`${mode} brand-subtle 與 muted 拉不開（hue ${hue}）`);
+      throw new Error(`${mode} brand-subtle 與 muted／sidebar 拉不開（hue ${hue}）`);
     })();
 
     // subtle 上的文字：對該淡底達 4.5:1。淺色往暗解、深色往亮解。
@@ -173,6 +180,25 @@ function buildTheme({ hue, cap, neutralBrand = false }) {
       "brand-foreground": { value: brandFg, desc: "brand 上的文字" },
       "brand-subtle": { value: rgb8ToHsl(subtle), desc: "主題色淡底：選中的導覽項、分頁底線區" },
       "brand-subtle-foreground": { value: rgb8ToHsl(onSubtle.rgb), desc: "brand-subtle 上的文字" },
+    };
+
+    // 側欄的主題層別名（ADR-0011）。名稱沿用 shadcn 慣例讓上游 sidebar 生態的
+    // class 逐字可用，值卻**不是**新顏色——sidebar-primary ≡ brand（側欄是識別層，
+    // 不是動作層，ADR-0007 的色相預算）、sidebar-accent ≡ brand-subtle（它的 desc
+    // 本來就是「選中的導覽項」）。用字面值複製而不是 CSS var() 別名：
+    // semanticColors()／verify-color／tokens.data.ts 三個消費端都要 HSL 三元組。
+    // 恆等關係由 verify-color 的別名守衛盯住，手改必紅。
+    out[mode]["sidebar-primary"] = {
+      value: out[mode].brand.value, desc: "側欄的品牌強調＝brand 別名（生成器保證同值）",
+    };
+    out[mode]["sidebar-primary-foreground"] = {
+      value: out[mode]["brand-foreground"].value, desc: "sidebar-primary 上的文字＝brand-foreground 別名",
+    };
+    out[mode]["sidebar-accent"] = {
+      value: out[mode]["brand-subtle"].value, desc: "選中的側欄項底色＝brand-subtle 別名",
+    };
+    out[mode]["sidebar-accent-foreground"] = {
+      value: out[mode]["brand-subtle-foreground"].value, desc: "sidebar-accent 上的文字＝brand-subtle-foreground 別名",
     };
   }
   return out;
@@ -370,6 +396,75 @@ function buildAlertSubtle() {
 }
 const alertLog = buildAlertSubtle();
 
+// ── 側邊欄表面（ADR-0011） ─────────────────────────────────
+//
+// 八個 `--sidebar-*` token 裡只有 `--sidebar` 是真正的新顏色，其餘全是別名：
+//   sidebar-foreground ≡ foreground、sidebar-border ≡ border、
+//   sidebar-ring ≡ ring（ADR-0007：聚焦環中性、不進主題），
+//   sidebar-primary/accent 家族 ≡ brand/brand-subtle 家族（在 buildTheme 內逐主題複製）。
+//
+// `--sidebar` 的定位是「比頁面底沉一階的安靜區」——全天候大面積，要看得出
+// 「這是另一個區」但遠低於 muted 的響度。與本檔其他值一樣是目標反解不是挑色：
+// 解 ΔE00(sidebar, background) 命中目標，hue/chroma 取 muted 家族（同一家中性）。
+//
+// 目標值的由來（實測 8-bit 網格，見 PR 討論）：淺色的近白區有感知壓縮，
+// ΔE00 2.5 已是「可辨但安靜」的位置（#f7fbff）；深色 3.0 落在 bg 與 card 之間
+// （#131721），保住表面抬升階——sidebar 上的卡片與浮層仍然「浮得起來」。
+const SIDEBAR_TINT = { light: 2.5, dark: 3.0 };
+
+function buildSidebarBase() {
+  const log = [];
+  for (const mode of ["light", "dark"]) {
+    const bg = px({ mode, name: "background" });
+    const [, C, H] = rgb8ToOklch(px({ mode, name: "muted" }));
+    const [Lbg] = rgb8ToOklch(bg);
+    const dir = mode === "light" ? -1 : 1;   // 淺色往暗探、深色往亮探
+    let solved = null;
+    for (let i = 1; i < 80; i++) {
+      const L = Lbg + dir * i * 0.002;
+      const rgb = oklchToRgb8(L, Math.min(C, maxChroma(L, H)), H);
+      if (deltaE00(lab(rgb), lab(bg)) >= SIDEBAR_TINT[mode]) { solved = rgb; break; }
+    }
+    if (!solved) throw new Error(`${mode} sidebar 與 background 拉不開（目標 ΔE00 ${SIDEBAR_TINT[mode]}）`);
+
+    // rung 序斷言：sidebar 必須留在既有的表面階梯**之內**，不能自成一階。
+    // 淺色要比 muted 亮（弱化表面仍是最沉的中性）；深色要比 card 暗
+    // （否則 sidebar 上的卡片失去抬升差，「浮起來」的語言在外殼裡失效）。
+    const Ls = rgb8ToOklch(solved)[0];
+    if (mode === "light") {
+      const Lmuted = rgb8ToOklch(px({ mode, name: "muted" }))[0];
+      if (!(Lmuted < Ls && Ls < Lbg)) {
+        throw new Error(`light sidebar 越出階梯：需 L(muted) ${Lmuted.toFixed(3)} < ${Ls.toFixed(3)} < L(bg) ${Lbg.toFixed(3)}`);
+      }
+    } else {
+      const Lcard = rgb8ToOklch(px({ mode, name: "card" }))[0];
+      if (!(Lbg < Ls && Ls < Lcard)) {
+        throw new Error(`dark sidebar 越出階梯：需 L(bg) ${Lbg.toFixed(3)} < ${Ls.toFixed(3)} < L(card) ${Lcard.toFixed(3)}`);
+      }
+    }
+
+    tokens.color[mode]["sidebar"] = {
+      value: rgb8ToHsl(solved),
+      desc: "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）",
+    };
+    tokens.color[mode]["sidebar-foreground"] = {
+      value: tokens.color[mode].foreground.value, desc: "sidebar 上的文字＝foreground 別名（生成器保證同值）",
+    };
+    tokens.color[mode]["sidebar-border"] = {
+      value: tokens.color[mode].border.value, desc: "側欄邊線＝border 別名（生成器保證同值）",
+    };
+    tokens.color[mode]["sidebar-ring"] = {
+      value: tokens.color[mode].ring.value, desc: "側欄聚焦環＝ring 別名（ADR-0007：中性、不進主題）",
+    };
+    log.push(
+      `  sidebar/${mode}  ${rgb8ToHex(solved)}  距頁面底 Δ${deltaE00(lab(solved), lab(bg)).toFixed(1)}` +
+      `  文字 ${contrast(px({ mode, name: "foreground" }), solved).toFixed(2)}:1`,
+    );
+  }
+  return log;
+}
+const sidebarLog = buildSidebarBase();
+
 // ── 圖表分類色票 ───────────────────────────────────────────
 //
 // 舊色票 8 色中有 6 色淺深共用同一 hex。那不是省事，是**結構性的錯**：
@@ -531,6 +626,9 @@ if (statusLog.length) {
   for (const l of statusLog) console.log(l);
   console.log("");
 }
+console.log("側邊欄表面（唯一新顏色是 --sidebar，其餘七個是別名）");
+for (const l of sidebarLog) console.log(l);
+console.log("");
 console.log("主題色（brand 對其前景 4.5:1／中性 ring 對各主題最亮表面 3:1）");
 for (const t of THEMES) {
   const th = themes[t.name];

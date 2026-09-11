@@ -37,6 +37,322 @@ commit 本身記在 tag 描述裡，不會遺失。
 
 ---
 
+## v0.13.0 · 2026-09-11
+
+四條線：蒸餾 shadcn-admin（MIT）進本書（ADR-0011，已採用；重新檢視條件＝第一個真實宿主依文件自行導入的回報），
+缺件表第一列的 ADR-0008 解鎖（PageHeader），
+Tailwind v4 為主、v3 相容的取用路徑（token 入口，本書自己的 Storybook 與文件站一併升級），
+以及照取用端的路接上來的內部試裝宿主 `apps/host-v4`。
+規範 0.11.1 → 0.13.0、tokens 0.6.0 → 0.7.0。
+
+### Token：Tailwind v4 入口＋強制色彩模式的焦點備援（tokens 0.7.0）
+
+1. **改了什麼**：`@dooping/tokens` 新增第五個進入點 `@dooping/tokens/tailwind.css`——由
+   `build-tailwind-v4.mjs` 從 tokens.json 生成的 `@theme inline reference` 名稱對映，定位與 v3 preset
+   相同（只對映名稱，值一律 `var()` 回 `tokens.css`）：清空預設色盤、`@custom-variant dark` 同認
+   `.dark` 與 `[data-theme="dark"]`、`@layer base` 補 v4 preflight 拿掉的邊框預設色與按鈕游標。
+   用 `reference` 是實測結果：只寫 `inline` 時，v4 會把 `--shadow-sm: var(--shadow-sm)` 這類同名對映
+   吐進 `:root, :host`，在 shadow DOM 宿主裡自我參照而失效。`tokens.css` 另加強制色彩模式的焦點備援
+   （v4 的 `outline-none` 不再保留透明 outline，而強制色彩模式會移除聚焦環的 box-shadow）。
+   守衛：JSON 推導鍵集＝v4 `--color-*`＝v3 preset 攤平，三方逐鍵比對；非色彩 token 逐鍵；
+   `reference`、深色 variant、基座、焦點備援各一條。
+2. **我需要做什麼**：v3 宿主不需要。v4 宿主改用四行 `@import`（見 AGENTS.md「取 token」），
+   並刪掉 `shadcn init` 產生的 `:root`／`.dark` 色值與 `@theme inline` 的 `--color-*`。
+3. **為什麼改**：要統一的宿主多數已在 Tailwind v4，只出 v3 preset 等於照文件做也接不上——
+   這是至今沒有元件層取用端的結構性原因。基線定為 v4 為主、v3 相容。
+
+### 本書自己升 Tailwind v4：Storybook 照取用端契約接＋v3／v4 相容守衛
+
+1. **改了什麼**：Storybook 改用 `@tailwindcss/vite`，`.storybook/styles.css` 換成與取用端逐字相同的
+   四行 `@import`（另明示 `@source` 掃描範圍），刪除根目錄 `tailwind.config.cjs`。根目錄相依換成
+   `tailwindcss@4`、`tw-animate-css`、`tailwind-merge@3`，並以 npm alias `tailwindcss3` 保留 v3 給守衛用。
+   元件內所有裸 `rounded`／`rounded-b` 改成 `rounded-sm`／`rounded-b-sm`：兩版值相同（0.25rem），
+   但裸 `rounded` 在 v4 掛在棄用區、也不接 `--radius`——改完後調圓角基準值會跟著走。
+   `cn()` 把 `text-micro`／`text-tiny` 登記進 tailwind-merge 的字級群組（原本被當成文字色，
+   `cn("text-sm", "text-tiny")` 會兩者並存）。
+   新增三支守衛：`tokens-v4`（真的用 v4 編 `dist/tailwind.css`，含未文件化的 `--transition-duration-*`
+   命名空間，以及 reference 不往 `:root` 吐變數）、`tokens-v3`（用 v3 帶 preset 編同一組 class，
+   斷言讀到同一批變數）、`tailwind-compat`（元件原始碼只准用兩版語意相同的 utility：
+   禁兩版值不同的裸 utility、禁 v4 限定語法、禁只靠 hover 揭露功能）。
+   `verify:storybook` 另加強制色彩模式的焦點哨兵：按鈕、輸入控制項、資料表三支 story 模擬
+   forced-colors、用 Tab 走一遍，outline 不得是 none。反向驗證：拿掉 tokens.css 的焦點備援後重建，
+   按鈕與輸入框共 10 個元素轉紅——沒有那段備援，v4 宿主的鍵盤使用者在高對比模式下看不到焦點。
+2. **我需要做什麼**：v4 宿主不需要。已抄走 callout／change-summary／coachmark／data-table／
+   editable-field／gantt／seg-group／toast／utils 的取用端，外觀不變、不必重抄；
+   想讓這些元件的圓角跟著 `--radius` 走時再重抄。`cn()` 的新寫法用 `classGroups`，
+   tailwind-merge v2 與 v3 是同一套 API。
+3. **為什麼改**：定了 v4 為主，本書自己卻不在 v4 上跑，契約寫錯也沒人會先發現。
+   而開發環境一旦升 v4，「只有 v4 才有」的 class 寫得出來、畫面也對，直到 v3 宿主抄走才安靜變形——
+   所以相容性要由守衛擋，不能靠開發環境。
+
+### 內部試裝宿主 apps/host-v4：照取用端的路接上來的 v4 應用（ADR-0011 內部補充證據）
+
+1. **改了什麼**：新增 `apps/host-v4`（Vite＋React 19＋Tailwind v4），`src/globals.css` 就是 AGENTS.md 的四行
+   `@import`；五種頁型各一頁組進 AppShell，側欄 `renderLink` 注入 react-router，表格狀態經宿主 adapter 寫進網址。
+   元件由 `scripts/host-sync.mjs` 從 registry JSON 決定性同步（`host:check` 擋任何差異），
+   `scripts/host-add.mjs` 保留真的 `npx shadcn add` 路徑。新守衛：`host-install-set`（頁面章五條安裝指令
+   都被宿主涵蓋、檔案都在；宿主的 tokens 配對與 workspace 連結）、`verify:host`（六主題×兩模式×五頁的
+   token 期望值、color-mix 探針、頁面級 axe、強制色彩焦點、行動版抽屜焦點歸還）。去領域化與示範資料守衛
+   把 `apps/` 納入掃描。registry 產生器的匯入改寫抽成 `scripts/lib/rewrite.mjs` 與宿主共用，並支援 `REGISTRY_OUT`。
+2. **我需要做什麼**：不需要。要開新子系統時，可以把 `apps/host-v4` 整個目錄複製走當起手範本（見其 README）。
+3. **為什麼改**：零取用端時，「照文件接得上」從來沒被證明過。第一次跑就抓到四個缺口
+   （記在 `apps/host-v4/LEDGER.md`），其中「整列可點＋批次勾選」的巢狀互動是 Storybook 一直沒看見的無障礙缺陷。
+   它不計入 ADR-0011 判準②——內部試裝證明不了別人接得上。
+
+### 文件站升 Tailwind v4：demo 宿主基座改由產生器移植
+
+1. **改了什麼**：文件站改掛 `@tailwindcss/postcss`，刪除 `book/tailwind.config.js` 與 autoprefixer。
+   `kit.css` 的順序改為 tokens → demo-base → `tailwindcss/theme.css`（layer）→ tokens 的 `tailwind.css` →
+   `tailwindcss/utilities.css`（**不進 layer**——ADR-0010「utilities 較晚所以勝出」的前提才保得住），並明示 `@source`。
+   `demo-base.css` 改由 `book/scripts/port-preflight.mjs` 從 v4 preflight＋tokens 基座機械產生：
+   v4 的 preflight 有巢狀 `@supports` 與括號內的逗號，手抄一定會錯。`host-baseline` 守衛改用獨立寫的第二份
+   移植規則逐條比對；`verify:book` 的頁內色彩解析器看得懂 v4 透明度修飾算出來的 `oklab()`／`color(srgb …)`。
+   文件站的 prebuild 補建 `tailwind.css`。
+2. **我需要做什麼**：不需要。照抄 `demo-base.css` 當宿主基座的取用端，下次重抄會拿到 v4 版本
+   （全元素 margin／padding 歸零、placeholder 改用 currentcolor 50%）。
+3. **為什麼改**：規劃決定本書自己一次到位升 v4。文件站留在 v3，活範例與 Storybook、宿主拿到的就是兩套基座，
+   ADR-0010 要守的「同一份樣式前提」不成立。
+
+### Token：`--sidebar-*` 八件組（tokens 0.7.0）
+
+1. **改了什麼**：新增 shadcn 相容的 `--sidebar-*` 八個 token。只有 `--sidebar` 是
+   新顏色（「比頁面底沉一階的安靜區」，目標 ΔE00 反解：淺 2.5／深 3.0，
+   rung 序斷言保住表面抬升階）；其餘七個是別名——`sidebar-ring ≡ ring`（ADR-0007）、
+   `sidebar-foreground ≡ foreground`、`sidebar-border ≡ border`、
+   `sidebar-primary/accent 家族 ≡ brand/brand-subtle 家族`（識別層色相預算，零新增色相出口）。
+   主題層 token 每組 16 → 22。verify:color 新增側欄檢查組（文字 4.5:1、ring 3:1、
+   區域可辨 ΔE00 ≥2、選中項區分度 ≥6、七組別名恆等）；brand-subtle 求解器
+   多一個對象（與該主題 sidebar 亦拉開 ≥8，既有值零變動）。
+2. **我需要做什麼**：合併前不需要。preview 期間 tokens 0.7.0 **不發 npm**——
+   評估不過會整組收回，發佈壓在 dev→main 之後。
+3. **為什麼改**：外殼元件（見 ADR-0011）需要側欄表面的語意層；沿用 shadcn 命名
+   讓上游 sidebar 生態的 class 逐字可用。
+
+### 浮層基座：Popover／DropdownMenu 自缺件表畢業＋ConfirmDialog
+
+1. **改了什麼**：新收六件——Popover、DropdownMenu（單層，勾選項預設不關閉）、
+   Collapsible、Separator、ConfirmDialog（確認不自動關、loading 鎖全部出口、
+   typeToConfirm 硬確認）、useDialogState（多對話框集中開關：天然單開、同值再設即關）。
+   缺件表「Drawer／Popover／DropdownMenu」列改「Drawer」單獨列（issue 表單同步）；
+   build-registry 加 lib/ 漏登錄防呆（未登錄 LIB_MODULES 直接 throw）。
+2. **我需要做什麼**：不需要。全部是新增，既有元件 API 零變更。
+3. **為什麼改**：缺件表對 Popover／DropdownMenu 已有場景證據；外殼與 DataTable
+   強化（同批後續工作項）都以它們為零件，先行落地。
+
+### 指令面板：cmdk 單檔隔離＋導覽契約
+
+1. **改了什麼**：新收 Command（cmdk 薄封裝，對話框殼組合本書 Dialog）、
+   CommandPalette（⌘K、執行即關、兩層項顯示「父 › 子」）、`lib/nav`
+   （NavGroup discriminated union＋isNavActive 多層 fallback）。cmdk 比照
+   `@xyflow/react` 隔離在 `command.tsx` 單檔（boundary 守衛，反向驗證過）。
+2. **我需要做什麼**：不需要。裝 `command-palette` 會自動帶 cmdk——大相依提醒
+   見 AGENTS.md。
+3. **為什麼改**：導覽資料單一來源同時餵側邊欄與指令面板，是 shadcn-admin
+   最划算的原創 pattern；契約（lib/nav）先於外殼落地。
+
+### 應用外殼：Sidebar 家族＋SidebarNav＋AppShell（ADR-0011）
+
+1. **改了什麼**：新收外殼三件——Sidebar 家族（Provider／Trigger／結構件／選單鈕；
+   桌面 icon 收合、行動版自動轉左滑抽屜＝既有 Radix Dialog 組成，焦點歸還自己記
+   開啟者）、SidebarNav（NavGroup[] 三態渲染：連結／展開 Collapsible／收合態右彈
+   DropdownMenu，〔例行〕〔試算〕標籤、renderLink 注入、收合態名稱走 sr-only）、
+   AppShell（純佈局，刻意小到宿主可自行重寫）。相對 shadcn 上游砍掉
+   floating/inset variant、SidebarRail、cookie、Ctrl+B——皆為刻意決定（ADR-0011）。
+   verify:visual 增第三支外殼哨兵（sidebar＋sidebar-accent 是主題指紋）。
+2. **我需要做什麼**：可以採用。ADR-0011 已採用；重新檢視條件＝第一個真實宿主依文件自行導入的回報，
+   屆時若決定退場，走〈版本策略〉的棄用流程（`@deprecated` → 保留至少一個 minor → 下個 major 移除），不會無預警消失。
+3. **為什麼改**：外殼是跨系統不一致成本最高的一塊；〈後台系統的資訊架構〉的
+   規範從此有元件載體，行動版「分區順序不變」變成結構保證而不是紀律要求。
+
+### DataTable 強化＋狀態同步網址
+
+1. **改了什麼**：DataTable 新增四能力——`selectable`＋`bulkActions`（表頭勾選
+   只切當頁、選取跨頁保留、批次列 role=toolbar＋方向鍵）、`facets`（faceted 鈕
+   與表頭篩選共用同一份狀態、逐值計數排除本欄）、`columnVisibility`（配
+   Column.hideable/defaultHidden，凍結欄不可隱藏）、**逐鍵受控** `state`／
+   `onStateChange`。新增 `useTableUrlState`（框架無關：預設 history adapter
+   可注入、預設值不進網址、條件變更回第 1 頁、prefix 隔離同頁多表；
+   selection/hiddenColumns 依深連結判準不進網址）。useSort 加可選受控參數
+   （非破壞性）。
+2. **我需要做什麼**：不需要。全部是新增 props，預設行為與舊版完全相同；
+   已抄走 data-table 的取用端要吃新能力請重抄並比對自己的修改。
+3. **為什麼改**：shadcn-admin 最有價值的原創 pattern 是表格狀態進網址；
+   深連結規範（back-office-ia）從此在資料表上有落地實作，
+   「篩完的清單可以貼給同事」不再靠宿主自己刻。
+
+### 再查詢載入態：變暗＋資料列脈動（規範不加號，隨 0.12.0 出）
+
+1. **改了什麼**：DataTable `loading` 且已有資料時，在既有「就地變暗＋鎖互動＋
+   `aria-busy`」之上，資料列加上與骨架同一套 `animate-pulse` 脈動（表頭與工具列
+   不動，呼應首載骨架「表頭是真的、列在閃」）；`motion-reduce` 停動畫、變暗仍在。
+   載入手段分工的三處正本（色彩頁、DataTable 頁、Skeleton 檔頭）同步改寫；
+   新增「重新查詢載入模擬」story——排序／篩選／搜尋變更凍結舊狀態 900ms 再套用，
+   與真後端時序一致，play 驗「重查期間舊內容舊排序保留、完成後新排序生效」。
+2. **我需要做什麼**：不需要。視覺語彙變更，API 與語意（`aria-busy`／`role="status"`）
+   不變；已抄走 data-table 的取用端重抄即得。
+3. **為什麼改**：只變暗與唯讀／禁用難以區分——使用者看不出「這是在等」還是
+   「這不能動」。脈動借骨架已建立的動畫語彙說「正在工作」，零新 token。
+
+### Gantt 空資料內建空狀態（patch → 0.12.1）
+
+1. **改了什麼**：`items=[]` 時，視窗推導原本走 `Math.min(...[])` → `Infinity` →
+   `Invalid Date` → 版面全 `NaN`——正是壓力測試規範預言的「取 `Math.max` 於空陣列」
+   型錯誤。修在元件層：空陣列直接出內建 `EmptyState`、不畫空刻度（`viewStart`／
+   `viewEnd` 有給也一樣——沒有列的刻度表看起來像壞掉，不是「還沒有資料」）；
+   新增 `empty` prop（與 `DataTable` 同形）與 `labels.emptyTitle`。時間軸互動
+   playground 拆掉 story 端的空狀態繞路，筆數 0 直接餵空陣列驗元件行為。
+2. **我需要做什麼**：不需要。純修正，`empty` 是新增的可選 prop，預設行為
+   （顯示「尚無資料」空狀態）零破壞。
+3. **為什麼改**：規範文件（壓力測試 Story）已經預言了這個型別的錯誤，
+   Gantt 卻是唯一還沒補防護的視窗推導元件；修在元件層，所有取用端一起受益。
+
+### 壓力測試 Story：七類極端值＋兩處元件無障礙修正
+
+1. **改了什麼**：依治理章〈壓力測試 Story〉補上七類極端值 story（超長文字值／
+   超長標籤／超大數值／超多選項／超多欄位／超多筆／多類別圖形），每類都含
+   「很多」與「沒有」兩個極端；資料來自新增的確定性生成器 `demo/generate-stress.ts`
+   （固定種子、配額制的長文字比例）。新增 `tests/story-sort.test.ts`，靜態核對
+   `storySort` 涵蓋度與字串吻合（跟 `npm test` 一起跑，不用等 `build-storybook`）。
+   跑無障礙守衛時抓到兩條真違規，修在元件層：`TabPills` 的 `label` 為空字串時
+   按鈕沒有可及名稱，補退一個序數當保底（分頁 N）；`BarChart` 類別一多觸發水平
+   捲動，捲動容器補 `tabIndex`＋`role="group"`，鍵盤使用者才碰得到捲出畫面的內容。
+2. **我需要做什麼**：不需要。新增的都是 story／測試層；兩處元件修正是無障礙
+   保底，預設行為與既有 API 零變更。
+3. **為什麼改**：壓力測試 story 是本書第一批刻意餵極端值的 story，也是無障礙
+   守衛第一次真的照到這兩個元件的邊界情況——修在元件層，所有取用端一起受益。
+
+### 頁首元件化：PageHeader／BackLink／Breadcrumb（缺件表第一列，minor → 0.13.0）
+
+1. **改了什麼**：新收頁首骨架三件——`PageHeader`（五個 slot：`nav`／`title`／
+   `badges`／`meta`／`actions`；渲染整頁唯一的 h1，版型固定不留給呼叫端決定）、
+   `BackLink`（兩層 IA 的返回，渲染**真 `<a href>`**）、`Breadcrumb`（三層以上，
+   末項 `aria-current="page"` 且不可點）。五支頁面組合 story 的**八處**手排頁首
+   全部換成真元件（+38／−58，淨減 20 行）；明細頁那個自家函式也叫 `PageHeader`
+   的巧合就此消失。缺件表劃掉第一列、補上文件裡提過但漏登記的 `DefinitionList`
+   （只登記不實作），`missing-piece.yml` 選項同步逐字一致。
+   新增「五種頁型組進外殼」組合 story（`頁面/`），play 驗切換分區後
+   h1 恆為一個、頂列不重複頁面標題。
+2. **我需要做什麼**：不需要。全部是新增，既有元件 API 零變更。想把自己的頁首
+   換過來就抄 `page-header`——`href` 由你給，`<a>` 換成自家 Link 是預期改法。
+3. **為什麼改**：走的是 [ADR-0008](docs/adr/0008-pages-chapter-scope.md) 自己寫下的
+   解鎖條件。證據不是推測：八處手排已經漂移（四處 `items-end`、一處 `items-center`、
+   兩處漏 `flex-wrap`），明細頁的「返回清單」甚至是 `<button>`——違反該頁自己寫的
+   「返回入口是真連結不是 JS 後退」。**規範沒有載體時，漂移就長這樣。**
+   與原文設想的差異（「三個宿主」vs「一個 repo 八處」）記在 ADR-0008 後記，不粉飾。
+
+### ADR-0011 判準①的措辭修正（治理，非程式碼）
+
+1. **改了什麼**：ADR-0011 的去留判準①原文是「頁面章組合 story 改組 AppShell 後
+   **刪除的重複手排行數**」。驗收時發現前提不成立——五支頁面 story 從來沒有手排過
+   外殼，包進 `AppShell` 只會增加行數。判準①拆成兩條：(i) 頁首收斂的處數
+   （可量測）、(ii) 五種頁型組得進 `AppShell` 的可執行 story。判準②（真實宿主
+   回饋）與③（`verify:storybook` 全綠）未動。
+2. **我需要做什麼**：不需要。這是治理紀錄，不影響任何取用端程式碼。
+3. **為什麼改**：原文挑錯了量尺，照字面執行永遠拿不到分子。**修正記錄在 ADR 裡
+   而不是默默換一個好過的指標**——偷偷放寬判準與「為了美感放寬無障礙門檻」
+   是同一種錯。
+
+### 去領域化守衛的重算修正（守衛效能）
+
+1. **改了什麼**：`tests/de-domain.test.ts` 的 176 個詞改成預先小寫一次（`FORBIDDEN_LOWER`），每行也只 `toLowerCase()` 一次。比對行為逐字相同。
+2. **我需要做什麼**：不需要。純守衛內部修正，不影響任何取用端。
+3. **為什麼改**：本批新增的檔把這支守衛推到 4.9 秒，貼著 vitest 預設的 5 秒 timeout——**會隨機紅的守衛比慢的守衛更糟**，最後一定會被加 timeout 蓋掉而空轉。改完 4.9 秒 → 2.6 秒。修的是重算，不是門檻。
+
+### registry 檔頭註解搬到 import 之後：shadcn CLI 會刪掉檔案開頭的註解
+
+1. **改了什麼**：`command`／`sidebar`／`sidebar-nav`／`mockup` 的檔頭設計說明移到最後一個 import 之後；
+   沒有 import 的 `csv`／`forms-diff` 併進後面 export 的 JSDoc，`download` 寫進函式內。說明文字一字未刪，
+   程式碼零變更。新守衛 `tests/registry-content.test.ts`：registry 裡任何檔案內容以 `//` 或 `/*` 開頭就紅
+   （先寫守衛、確認七個檔都紅，再搬註解轉綠）。
+2. **我需要做什麼**：不需要。這七個 item 的行為不變；想把說明補進自己的副本就重抄。
+3. **為什麼改**：內部試裝宿主實跑 `npx shadcn@4.21.0 add`、與 registry 逐位元組比對，發現 CLI 會刪掉
+   第一個程式 token 之前的全部註解——連掛在第一個 export 上的 JSDoc 也一起消失。走 CLI 的取用端因此拿不到
+   「為什麼這樣設計」，而 host-sync 那條路照樣保留，兩條安裝路徑悄悄分岔。修完重跑 CLI，56 個檔逐位元組相同。
+
+### 守衛：CHANGELOG 分節對得上 Release notes 的抽取規則
+
+1. **改了什麼**：新增 `tests/changelog.test.ts`——逐行移植 deploy.yml 抽 Release notes 的 awk，
+   斷言目前版號的 notes 不含其他節的標題、每一節前面都是「空行、`---`、空行」。
+   補回兩處缺的節尾分隔線（本節與 2026-07-29 那一節）。
+2. **我需要做什麼**：不需要。守衛與 CHANGELOG 格式修正，不影響任何取用端。
+3. **為什麼改**：deploy.yml 遇到第一條 `---` 才停。本節節尾原本少了分隔線，合併後 Release notes 會安靜地
+   吃進 v0.11.1 整節；合併前人工抓到，這支守衛讓它下次在本機就紅。
+
+### SPA 宿主的三個接縫：頁首連結注入、FormField 包複合控制項、表格網址狀態只寫本表參數
+
+1. **改了什麼**：
+   - `BackLink`／`Breadcrumb` 新增 `renderLink`（比照 `SidebarNav`），預設仍是真 `<a href>`；
+     匯出注入端收到的 `PageLinkProps`。新 story「注入路由連結」的 play 驗注入的元件拿到 href 與按鈕外觀、
+     點擊交給注入端處理、麵包屑末項不經注入。
+   - `FormField` 的 `children` 可以傳函式：收到 `id`／`aria-describedby`／`aria-invalid`，展開到真正可聚焦的元素
+     （Radix Select 的 `SelectTrigger`）。「欄位錯誤態」story 補一個下拉欄位，play 驗 aria 接在 trigger 上。
+   - `useTableUrlState` 寫入時只替換本表的參數（新增並匯出 `mergeTableSearch`）。prefix 以前只隔離讀，
+     預設 `historyAdapter` 又整串覆寫，同頁的 `view` 與另一張表的參數會被洗掉。`UrlStateAdapter.set` 從此收到整串 search；
+     測試除了純函式，另用 `renderToString` 跑一次 hook 驗寫入路徑。
+   - 內部試裝宿主拿掉三處繞道：adapter 不再自行合併參數、明細頁返回改注入 react-router 的 `Link`、兩處下拉改走 FormField。
+2. **我需要做什麼**：不需要，三項都是新增或修正，既有寫法照常可用。自訂 `UrlStateAdapter` 若自己合併過參數，
+   可以拿掉合併、直接寫回收到的字串（留著也不會錯）。
+3. **為什麼改**：內部試裝宿主照文件接 react-router 時一次撞到這三個缺口（`apps/host-v4/LEDGER.md` 回饋 1–3）。
+   範本不能改元件，只能在宿主繞道——每一個繞道，都是其他 SPA 子系統會各自重寫一次的東西。
+
+### DataTable：整列可點與批次勾選並存——列入口改成首欄的真按鈕
+
+1. **改了什麼**：`onRowClick` 的鍵盤與讀屏入口從「整列 `role="button"`＋`tabIndex`」改成**首個可見欄的真 `<button>`**
+   （Tab 得到、Enter／Space 觸發、名字就是首欄內容）。列本身只保留滑鼠點擊，點到列裡的控制項
+   （勾選框、入口按鈕、欄內按鈕與連結）交給控制項自己。原本同時開 `selectable` 時，可聚焦的列裡包著勾選框
+   （axe `nested-interactive`，serious）；`<tr>` 被蓋成 button 後，讀屏也念不出這是表格的第幾列。
+   新 story「整列可點與批次勾選」：play 驗列不是 button、勾選不開啟、按首欄按鈕／鍵盤 Enter／點列上非互動區域都開同一筆。
+   〈清單頁〉與 DataTable 文件的無障礙段同步改寫；內部試裝宿主的清單頁恢復批次勾選。
+2. **我需要做什麼**：props 不變。首欄的 `cell` 若自己渲染了連結或按鈕，開了 `onRowClick` 之後會被包進入口按鈕——
+   改成純文字，或把那個動作移到明細頁。測試若用整列文字當名字找 `button`，改用首欄內容找。
+3. **為什麼改**：〈清單頁〉同時要求「整列可點」與「勾選後出現批次列」，元件卻讓兩者不能並存。
+   Storybook 從沒有同時開兩者的 story，一直沒被發現；內部試裝宿主的頁面級 axe 第一次跑就抓到（LEDGER 回饋 4）。
+
+### DataTable：窄螢幕水平捲動時，捲過去的欄位不再從凍結欄透出來
+
+1. **改了什麼**：兩個原因各修一處。
+   - `cn()`（`utils`）把 `bg-gradient-to-*` 登記回 tailwind-merge 的背景圖片群組。tailwind-merge v3 預設把它當底色，
+     十字對準疊到凍結格時會合併掉凍結格的 `bg-background`，捲過去的欄位直接從凍結欄透出來。
+   - 勾選欄固定 `w-10 min-w-10`。表格一窄，自動版面會把它壓到 32px，而凍結首欄 sticky 在 `left: 2.5rem`，中間多出 8px 縫。
+   新守衛：`tests/cn.test.ts`（漸層方向不吃底色、token 字級不吃文字色、同屬性仍由後者覆蓋）；
+   `verify:host` 加「凍結欄」情境：390px 寬、水平捲動、指向一般儲存格，斷言同列與表頭的凍結格不透明且彼此無縫。
+2. **我需要做什麼**：用了 DataTable 凍結欄（`freeze`）的取用端，重抄 `data-table` 時**連同 `utils` 與 `table` 一起覆寫**——
+   主要的修正在 `utils`，只重抄 `data-table` 修不到。自己換掉 `cn` 的宿主，照 `utils` 檔內的註解補登記。
+3. **為什麼改**：在手機上看預覽站的內部試裝宿主時抓到（LEDGER 回饋 6）。回歸來自本版把 tailwind-merge 從 v2 升到 v3。
+   Storybook 與桌面寬度都看不到：表格不需要捲，凍結格底下沒有東西可以透。
+
+### 元件更新訊號（一）：registry 逐 item 指紋＋Release 列出這一版動到的 item（ADR-0013）
+
+1. **改了什麼**：
+   - `/r/index.json` 每個 item 多了 `meta.hash`（抄走的內容與相依）與 `meta.closureHash`（再把遞移相依的指紋算進去）。
+     版號、標題、說明與 base 不進指紋——預覽站與正式站的同一份內容，同一個指紋。
+   - 發 Release 時自動附上「這一版動到的 registry item」，相對上一個 `v*` tag 分四類：內容有變、只因相依變了而受影響、新增、移除。
+     dev 上的 CI 先在 step summary 預演；`npm run status` 在合併前印出四類數量；`npm run registry:changes` 看完整清單。
+   - 守衛：`tests/registry-fingerprint.test.ts` 用第二份獨立實作逐 item 重算 index 的指紋，並盯住「base 與說明不進指紋、相依變了 closureHash 跟著變」；
+     `tests/registry-changes.test.ts` 驗四類分類、Markdown 輸出、上一個 tag 照數字大小挑。
+2. **我需要做什麼**：不需要。訂閱了 Release 的話，之後每一版的通知會直接列出動到哪些 item，對照自己抄過的就知道要不要重抄。
+3. **為什麼改**：凍結欄那一次的修正主要落在 `utils`，取用端從來不會主動去抄它。整個規範一個版號，看不出動到哪幾個 item；
+   只比對自己抄的 `data-table` 也找不到。拿 dev 上凍結欄修正前後實跑：內容有變 3 個（`data-table`、`table`、`utils`），只因相依受影響 41 個。
+
+### 元件更新訊號（二）：取用端的 dooping-check——lock＋例行檢查（ADR-0013）
+
+1. **改了什麼**：新增 registry item `dooping-check`（`registry:file`，裝進專案根目錄的 `scripts/dooping-check.mjs`，零相依）。
+   - `init <item…>`：剛 `npx shadcn add` 完，以這幾個 item 建立 `dooping.lock.json`——記上游的 `closureHash`，
+     以及它（含相依）寫進專案的每個檔的內容指紋。
+   - 不帶參數＝例行檢查：每個 item 回報「已是最新／上游有更新／本地改過」，上游有更新時印出看差異與跟進的指令；
+     預設只提醒，加 `--strict` 才以結束碼 1 結束。
+   - `update [item…]`：重抄完更新紀錄。
+   路徑對應照 `components.json` 的 aliases 與 tsconfig 的 `@/*`，與 shadcn CLI 同一套。
+   內部試裝宿主是第一個取用端：`host:sync` 重建它的 lock，`host:check` 以 `--strict` 跑例行檢查（CI 已經在跑 `host:check`）。
+   守衛：`tests/dooping-check.test.ts`（工具與 registry 產生器的指紋規則一致、路徑對應、三種狀態分得出來）。
+2. **我需要做什麼**：可選。想讓 CI 在上游動到你抄過的 item 時提醒你，照文件站〈跟上新版〉的「例行檢查」裝一次、
+   列出你主動裝過的 item，之後每週在 CI 跑一次。
+3. **為什麼改**：第一、三層讓上游說得出「動到哪些 item」，但取用端還得自己記得裝過哪些、逐一對照。
+   lock 把「我裝了什麼、裝的時候長什麼樣」變成機器可讀，檢查才分得出「上游有更新」與「本地改過」——
+   後者就是符合性台帳「刻意偏離」的機器版。
+
+---
+
 ## v0.11.1 · 2026-08-08
 
 三個工作項的合併發佈（守衛基建＋元件無障礙修正＋文件體系雙軌強化）。
@@ -1263,6 +1579,8 @@ Okabe–Ito（11.6）同級，紅綠色盲下沒有任何一對低於 10。
 小＝修正。日期式 tag 回答不了這題；統一成規範版號後，tag、registry 戳記與
 `/r/index.json` 的 `version` 是同一個號碼，判斷與比對都只看一處。
 版號判斷是工程師的、確認是維護者在 GitHub 上的合併、蓋章是自動的。
+
+---
 
 ## 2026-07-29 · fdda051
 

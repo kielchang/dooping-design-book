@@ -16,9 +16,9 @@
 ```
 packages/tokens/src/tokens.json ◄──(build:theme＝generate-theme.mjs 以目標對比反解生成，不是手挑)
      │
-     │ build:tokens＝build-css.mjs
+     │ build:tokens＝build-css.mjs ＋ build-tailwind-v4.mjs
      ▼
-packages/tokens/dist/tokens.css ＋ src/tokens.data.ts   （dist/ 不進版控）
+packages/tokens/dist/tokens.css ＋ dist/tailwind.css ＋ src/tokens.data.ts   （dist/ 不進版控）
      ├── tests/tokens.test.ts 直接讀檔比對
      ├── .storybook/main.ts alias 到它
      └── book/src/css/kit.css @import 它        ◄── 三處硬相依：乾淨 clone 必先 build:tokens
@@ -48,8 +48,10 @@ AGENTS.md、ARCHITECTURE.md ──(book/scripts/sync-root-docs.mjs)──► boo
   要改就改生成器參數再重跑，不是挑好看的顏色填進去。
 - **閘門**：`scripts/verify-color.mjs`（六主題 × 兩模式的對比／色覺／狀態層門檻）。
   門檻優先序寫死：無障礙門檻不得為美感放寬；擠不下去時放寬的是美感約束。
-- **四個進入點**：`tokens.css`（純 CSS 變數）、`tailwind-preset.cjs`（覆蓋而非 extend，
-  清空 Tailwind 預設色盤——這是取用端的第一道漂移防線）、TS API、`tokens.json` 正本。
+- **五個進入點**：`tokens.css`（純 CSS 變數，值的唯一所在）、`tailwind.css`（Tailwind v4 的
+  `@theme inline reference` 名稱對映，`build-tailwind-v4.mjs` 產生）、`tailwind-preset.cjs`（v3，
+  覆蓋而非 extend）、TS API、`tokens.json` 正本。v4 與 v3 兩個出口都清空 Tailwind 預設色盤——
+  這是取用端的第一道漂移防線；兩者的鍵集由 `tests/tokens.test.ts` 與 tokens.json 三方逐鍵比對。
 - **發佈**：唯一路徑是 `tokens-v*` tag → `.github/workflows/publish-tokens.yml`
   （npm Trusted Publishing／OIDC，repo 不存長期 token）。兩道配對硬閘：
   tag 名必須等於 token 版號、tag 必須指向 `main` 上的 commit。
@@ -64,8 +66,9 @@ AGENTS.md、ARCHITECTURE.md ──(book/scripts/sync-root-docs.mjs)──► boo
 2. **import 改寫**：相對路徑 → `@/components/dooping/*`、`@/lib/dooping/*`（落點固定，
    之後同步 diff 才乾淨）。
 3. **相依推導**：外部套件走白名單（`NPM_DEPS`）；不在白名單的不會寫進 registry，
-   取用端就裝不到——症狀是「畫布整個沒樣式」。`@xyflow/react` 是唯一的大型外部相依，
-   由 `tests/boundary.test.ts` 隔離在一個檔案裡。
+   取用端就裝不到——症狀是「畫布整個沒樣式」。大型外部相依有兩個：
+   `@xyflow/react`（graph-canvas）與 `cmdk`（command），都由 `tests/boundary.test.ts`
+   隔離在各自的一個檔案裡。`lib/` 檔案漏登錄 `LIB_MODULES` 會在產生端直接 throw。
 4. **token 相依注入**：每個 item 硬加 `@dooping/tokens@^x`（版號取自
    `packages/react/package.json` 的宣告，不寫第二份真相）。這是 v0.6.0 事故的修正：
    當年 item 沒宣告 token，元件裝進去吃不到變數，**畫面壞掉且不報錯**，漂移了四個版本。
@@ -83,7 +86,7 @@ AGENTS.md、ARCHITECTURE.md ──(book/scripts/sync-root-docs.mjs)──► boo
 
 | 檔案 | 守住的兩個所在 | 壞掉時的症狀 |
 | --- | --- | --- |
-| `tests/boundary.test.ts` | 元件庫 ↔ 應用層／第三方相依 | `@xyflow/react` 滲出隔離檔，取用端被迫吞大相依 |
+| `tests/boundary.test.ts` | 元件庫 ↔ 應用層／第三方相依 | `@xyflow/react`／`cmdk` 滲出隔離檔，取用端被迫吞大相依 |
 | `tests/tokens.test.ts` | tokens.json ↔ CSS 產物 ↔ preset ↔ 版號四處 | 淺深不成對、產物過期、版號漂移 |
 | `tests/color.test.ts` | 色彩生成參數 ↔ 無障礙門檻 | 對比不足、色覺混淆（接 `verify:color`） |
 | `tests/de-domain.test.ts` | 全庫文字 ↔ 176 詞黑名單 | 領域語彙被複製到取用端 |

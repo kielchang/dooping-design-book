@@ -6,6 +6,7 @@ import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { TabPills } from "../ui/tab-pills";
 import { EmptyState } from "../ui/empty-state";
+import { PageHeader } from "../ui/page-header";
 import { formatMoney, formatNumber } from "../lib/utils";
 import { demoRecords, STATUS_LABEL, type DemoRecord, type RecordStatus } from "../demo/sample-data";
 
@@ -47,14 +48,12 @@ export const 典型組成: Story = {
     const count = (s: RecordStatus) => demoRecords.filter((r) => r.status === s).length;
     return (
       <div className="mx-auto max-w-5xl space-y-4">
-        {/* 頁首區：識別＋筆數＋唯一的主要動作（固定右上） */}
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-semibold">項目清單</h1>
-            <p className="text-sm text-muted-foreground">共 {demoRecords.length} 筆・最後更新 2024-02-07</p>
-          </div>
-          <Button><Plus /> 新增項目</Button>
-        </div>
+        {/* 頁首區：識別＋筆數＋唯一的主要動作（固定右上）。版型由 PageHeader 定型 */}
+        <PageHeader
+          title="項目清單"
+          meta={`共 ${demoRecords.length} 筆・最後更新 2024-02-07`}
+          actions={<Button><Plus /> 新增項目</Button>}
+        />
 
         {/* 工具區：檢視切換（實務上這個狀態要寫進網址，深連結才回得來） */}
         <TabPills
@@ -97,13 +96,7 @@ export const 空與載入: Story = {
     <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
       <div className="space-y-4">
         <p className="text-sm font-medium">首次進入（真的沒有資料）：頁首照常、內容區給下一步</p>
-        <div className="flex items-end justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-semibold">項目清單</h1>
-            <p className="text-sm text-muted-foreground">共 0 筆</p>
-          </div>
-          <Button><Plus /> 新增項目</Button>
-        </div>
+        <PageHeader title="項目清單" meta="共 0 筆" actions={<Button><Plus /> 新增項目</Button>} />
         <div className="rounded-lg border">
           <EmptyState
             icon={<PackageOpen className="size-7" />}
@@ -115,13 +108,7 @@ export const 空與載入: Story = {
       </div>
       <div className="space-y-4">
         <p className="text-sm font-medium">載入中：保留版面高度，不讓頁面跳動（Skeleton 元件尚未收錄）</p>
-        <div className="flex items-end justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-semibold">項目清單</h1>
-            <p className="text-sm text-muted-foreground">載入中…</p>
-          </div>
-          <Button disabled><Plus /> 新增項目</Button>
-        </div>
+        <PageHeader title="項目清單" meta="載入中…" actions={<Button disabled><Plus /> 新增項目</Button>} />
         <div className="flex min-h-64 items-center justify-center rounded-lg border" role="status">
           <p className="text-sm text-muted-foreground">正在載入清單…</p>
         </div>

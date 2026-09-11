@@ -1,3 +1,6 @@
+import type { ReactNode } from "react";
+import { cn } from "../lib/utils";
+
 // 模擬畫面積木 — **寫文件的工具，不是產品元件**。
 //
 // 為什麼要有這一組：操作手冊配截圖，截圖第一天就開始過期。改一次按鈕位置，
@@ -8,8 +11,6 @@
 //
 // 用法規約：重點控制項＝真元件包 `<Spotlight>`；其餘一律 `<Placeholder>` 留白。
 // 不要用 Placeholder 去「假裝」一個真元件——那又變成一種會過期的截圖。
-import type { ReactNode } from "react";
-import { cn } from "../lib/utils";
 
 /** 佔位塊：非重點區域一律留白（muted 圓角塊，可帶淡字標籤）。 */
 export function Placeholder({

@@ -95,6 +95,7 @@ npx shadcn@latest add \
 
 ## 缺件與替代
 
-PageHeader、Breadcrumb、DefinitionList（鍵值對展示）尚未收錄：頁首照本頁規範手排、
-上層路徑用一顆「返回清單」ghost 按鈕、鍵值對用兩欄 grid。完整缺件表見
-[頁面總覽](/pages/overview)。
+頁首與上層路徑已元件化：用 [PageHeader](/components/page-header) 的 `nav` slot
+搭 `BackLink`（兩層）或 `Breadcrumb`（三層以上）——**返回是真連結不是 ghost 按鈕**，
+這一頁的無障礙規範從此由元件保證。DefinitionList（鍵值對展示）仍未收錄，
+先用兩欄 grid。完整缺件表見[頁面總覽](/pages/overview)。

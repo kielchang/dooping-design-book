@@ -43,6 +43,11 @@ colors.brand = {
   subtle: hsl("brand-subtle"),
   "subtle-foreground": hsl("brand-subtle-foreground"),
 };
+// 側欄的主題層 token（ADR-0011）：sidebar／sidebar-border／sidebar-ring 在 color.* 裡，
+// colorScale() 已自動對映；這四個只存在於主題層，比照 brand 手動列。
+// 產出的 utility 與 shadcn sidebar 慣用類名逐字相容（bg-sidebar-accent 等）。
+colors["sidebar-primary"] = { DEFAULT: hsl("sidebar-primary"), foreground: hsl("sidebar-primary-foreground") };
+colors["sidebar-accent"] = { DEFAULT: hsl("sidebar-accent"), foreground: hsl("sidebar-accent-foreground") };
 // 提醒視窗的低強度層：`bg-danger-subtle text-danger-subtle-foreground`
 // colorScale() 已經自動把 `X-subtle` 與 `X-subtle-foreground` 配成一組，這裡不用再手動列。
 // 圖表色票是 hex（SVG 直接吃），不包 hsl()

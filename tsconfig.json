@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
@@ -14,14 +18,32 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "paths": {
-      "@dooping/tokens": ["./packages/tokens/src/index.ts"],
-      "@dooping/react": ["./packages/react/src/index.ts"],
-      "@dooping/react/*": ["./packages/react/src/*"]
+      "@dooping/tokens": [
+        "./packages/tokens/src/index.ts"
+      ],
+      "@dooping/react": [
+        "./packages/react/src/index.ts"
+      ],
+      "@dooping/react/*": [
+        "./packages/react/src/*"
+      ]
     },
     "baseUrl": "."
   },
-  "include": ["packages/*/src", "tests", ".storybook", "scripts"],
-  "exclude": ["**/node_modules", "**/dist", "book"]
+  "include": [
+    "packages/*/src",
+    "tests",
+    ".storybook",
+    "scripts"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/dist",
+    "book",
+    "apps"
+  ]
 }

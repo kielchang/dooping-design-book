@@ -21,6 +21,7 @@
     "verify:visual": "node scripts/verify-visual.mjs",
     "verify:host": "node scripts/verify-host.mjs",
     "status": "node scripts/version-status.mjs",
+    "release:gate": "node scripts/release-gate.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json && npm run typecheck --workspace @dooping/host-v4",
     "test": "vitest run",
     "storybook": "storybook dev -p 6006",

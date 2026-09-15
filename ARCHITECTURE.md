@@ -108,7 +108,9 @@ AGENTS.md、ARCHITECTURE.md ──(book/scripts/sync-root-docs.mjs)──► boo
 | `tests/registry-fingerprint.test.ts` | `/r/index.json` 的逐 item 指紋＝第二份獨立實作；base 與說明不進指紋；相依變了 closureHash 跟著變 | 指紋的用途（`registry-changes`） |
 | `tests/registry-changes.test.ts` | 兩版 registry 的四類異動分類、Markdown 輸出、上一個 tag 照數字大小挑 | 真實歷史（CI 在 dev 預演） |
 | `tests/dooping-check.test.ts` | 取用端工具的內容指紋與產生器一致；路徑對應；已是最新／上游有更新／本地改過三態 | PMIS 或 lock 的到期 |
-| `tests/changelog.test.ts` | CHANGELOG 每節前是「空行、---、空行」；目前版號的 Release notes 只含自己這一節 | 內容是否回答三問 |
+| `tests/changelog.test.ts` | CHANGELOG 每節前是「空行、---、空行」；目前版號的 Release notes 只含自己這一節（測的是 deploy 實際呼叫的 `scripts/lib/changelog.mjs`） | 內容是否回答三問 |
+| `tests/deploy-gh-pages.test.ts` | 部署腳本對臨時 bare repo 實跑：根目錄部署保留 `preview/`、`staging/`；段部署只動自己的目錄；目標不在清單上就拒絕；push 被拒時重抓重套再推 | Pages 有沒有真的建置出來（部署後冒煙） |
+| `tests/release-gate.test.ts` | 發版閘每條規則各轉紅一次：版號遞增、tag 未被佔、CHANGELOG 已改名且標題對得上版號、分支只准 staging←dev／main←staging、合併後樹＝來源、核准清單勾完；抓不到 main 時 release 失敗 | git 那一層（CI 實跑）；CHANGELOG 內容是否回答三問 |
 | `tests/guard-ledger.test.ts` | 這張表列出每一支 `tests/*.test.ts` 與 `scripts/verify-*.mjs`、`host-sync.mjs` | 表格描述是否準確 |
 
 build 之後（CI 跑，本機可單獨跑）：
@@ -121,6 +123,7 @@ build 之後（CI 跑，本機可單獨跑）：
 | `npm run verify:book`（`scripts/verify-book-host.mjs`） | 文件站每頁的 computed style 符合 token 有效值（邊框、底色、表格、步驟、portal） | Storybook |
 | `npm run verify:host`（`scripts/verify-host.mjs`） | 內部試裝宿主：主題套上、color-mix、頁面級 axe、強制色彩、行動版外殼、凍結欄 | 元件單元行為（story） |
 | `npm run host:check`（`scripts/host-sync.mjs --check`） | registry ↔ 宿主檔案逐位元組相同；宿主宣告的 npm 相依；`dooping.lock.json` 與 registry 對得上 | 宿主自己的頁面程式 |
+| `npm run release:gate`（`scripts/release-gate.mjs`） | dev push 的 bump 守衛；staging 與 PR 的發版閘（規則見 `tests/release-gate.test.ts` 那一列） | 候選版裝不裝得起來（套用驗收） |
 
 新增守衛的鐵律（`CLAUDE.md`）：**一定要反向驗證**——暫時把值改壞，確認那條真的會紅。
 

@@ -40,6 +40,7 @@ const actual = [
   ...readdirSync(join(ROOT, "tests")).filter((n) => n.endsWith(".test.ts")).map((n) => `tests/${n}`),
   ...readdirSync(join(ROOT, "scripts")).filter((n) => /^verify-.*\.mjs$/.test(n)).map((n) => `scripts/${n}`),
   "scripts/host-sync.mjs",
+  "scripts/release-gate.mjs",
 ].sort();
 
 describe("ledgerEntries 自測", () => {

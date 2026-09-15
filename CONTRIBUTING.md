@@ -8,7 +8,7 @@
 | 類型 | 門口 | 期望回應 |
 | --- | --- | --- |
 | **Bug**（行為與規範不符） | [Bug 回報表單](https://github.com/kielchang/dooping-design-book/issues/new?template=bug.yml) | 直接修 |
-| **小調整**（文案、對比、一個 prop） | 直接[開 PR](https://github.com/kielchang/dooping-design-book/compare)，附截圖或說明 | Review 後合併 |
+| **小調整**（文案、對比、一個 prop） | 直接[開 PR 到 `dev`](https://github.com/kielchang/dooping-design-book/compare/dev...)，附截圖或說明 | Review 後合併進 dev，隨下一個候選版發布 |
 | **新元件／新 token／改語意** | [RFC 提案表單](https://github.com/kielchang/dooping-design-book/issues/new?template=rfc.yml) | 討論後決定 |
 
 另有一個低門檻入口：[**缺件認領**](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml)——頁面章缺件表的項目，回報一個使用場景就是三次法則的一次證據，證據齊了就會動工。

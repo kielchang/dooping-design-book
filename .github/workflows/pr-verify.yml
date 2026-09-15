@@ -1,0 +1,21 @@
+name: verify
+
+# 開到 dev 的 PR（外部貢獻、功能分支）：跑與預覽站相同的守衛，但不部署。
+# 開到 staging／main 的 PR 不走這支——那兩種 PR 由 pr-gate.yml 把關，
+# 內容驗證靠同一個 SHA 在 push 時已經跑過的 preview／staging 結果。
+on:
+  pull_request:
+    branches: [dev]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-verify-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    uses: ./.github/workflows/_pipeline.yml
+    with:
+      stage: pr

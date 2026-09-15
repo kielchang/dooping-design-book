@@ -1,7 +1,7 @@
 # 取用指南（給其他專案）
 
 > 本檔網路正本：<https://kielchang.github.io/dooping-design-book/AGENTS.md>（與 GitHub repo 根同步；
-> 若你讀到的是 `/preview/` 底下的副本，那是開發中的版本，取用一律以正式站為準）。
+> 若你讀到的是 `/preview/`（開發中）或 `/staging/`（驗收中的候選版）底下的副本，取用一律以正式站為準）。
 > 機器地圖：<https://kielchang.github.io/dooping-design-book/llms.txt>
 
 這個 repo 是**設計方向的正本**。其他專案不在自己的 repo 裡重新發明按鈕、表格與確認流程，
@@ -169,7 +169,8 @@ document.documentElement.classList.toggle("dark");
 
 ## 相容性與版本
 
-**以 `main` 為參照。** `dev` 是開發中的分支，不要拿它當來源。
+**以 `main` 為參照——它是最新核准版。** `dev` 是開發中、`staging` 是驗收中的候選版，都不要拿來當來源；
+想提前試下一版，可以在自己的分支從 `/staging/r/` 裝來回報問題，正式導入一律用 `/r/`。
 
 兩層的版本模型不同，因為相依模型不同：
 

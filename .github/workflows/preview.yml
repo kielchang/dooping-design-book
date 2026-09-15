@@ -1,0 +1,25 @@
+name: preview
+
+# dev 的預覽站：每次 push dev 跑全部守衛與內部試裝宿主，部署到 /preview/。
+# 預覽站是 dev 的工作狀態，隨時被下一次 push 覆蓋——不是發布，其他系統一律不得參照。
+# 流程共用 _pipeline.yml；三段式發布的正本：book/docs/7-governance/01-versioning.mdx「三段式發布」。
+on:
+  push:
+    branches: [dev]
+
+permissions:
+  contents: write # 推 gh-pages 分支的 preview/
+
+# 每段一組：只序列化自己這一段的部署。GitHub 一個 group 只留一個等待中的 run——
+# 以前三段共用一組時，dev 連推兩次可能把等待中的 main 部署（連同 tag／Release）取消掉。
+# 各段只動 gh-pages 上自己的目錄，同時推的衝突由 scripts/deploy-gh-pages.sh 重抓重套再推處理。
+concurrency:
+  group: pages-preview
+  cancel-in-progress: false
+
+jobs:
+  preview:
+    uses: ./.github/workflows/_pipeline.yml
+    with:
+      stage: preview
+      deploy: true

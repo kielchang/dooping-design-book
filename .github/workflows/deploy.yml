@@ -1,140 +1,73 @@
 name: Deploy Design Book
 
-# main＝其他系統參照的規範正本。這支把它發佈到 gh-pages 分支的根目錄：
+# main＝核准版，其他系統參照的正本。只收 staging → main 的核准合併（ruleset＋pr-gate）。
 #   /            → 文件站（Docusaurus）
-#   /storybook/  → Storybook 活元件展示
+#   /storybook/  → Storybook
 #   /r/*.json    → shadcn registry（npx shadcn add <URL> 可安裝）
-#
-# gh-pages 上還有一個 /preview/，那是 dev 的預覽站（由 ci.yml 部署）。
-# 這支只動根目錄、絕不碰 preview/，反之亦然——邊界寫在 scripts/deploy-gh-pages.sh。
-# 兩支共用 concurrency group「gh-pages-write」序列化寫入，避免同時 push 互撞。
-#
-# 三個產物互相依賴（文件站與 Storybook 都吃元件原始碼、registry 由原始碼產生），
-# 所以刻意放在同一個 job 依序建置，避免版本不一致。
+# gh-pages 上還有 /preview/（dev，preview.yml）與 /staging/（候選版，staging.yml），這支只動根目錄、絕不碰它們——
+# 邊界寫在 scripts/deploy-gh-pages.sh 的 STAGE_DIRS。
+# 流程正本：book/docs/7-governance/01-versioning.mdx「三段式發布」。
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: write # 推 gh-pages 分支
+  contents: write # 推 gh-pages 分支、蓋 v* tag
 
 concurrency:
-  group: gh-pages-write
+  group: pages-production
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  # 手動觸發可以選任何分支——對著 dev 或 staging 按下去，會把那個分支部署到正式站根目錄、還蓋上它的版號 tag。
+  production-ref-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 只能對 main 分支執行
+        run: |
+          if [ "$GITHUB_REF" != "refs/heads/main" ]; then
+            echo "::error::deploy.yml 只能對 main 分支執行（收到 $GITHUB_REF）"
+            exit 1
+          fi
+
+  production:
+    needs: production-ref-guard
+    uses: ./.github/workflows/_pipeline.yml
+    with:
+      stage: production
+      deploy: true
+
+  release:
+    needs: production
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          # 要讀上一個 v* tag 的 registry/ 來列 registry 異動（ADR-0013 第三層）
+          # 要讀上一個 v* tag 的 registry/ 來列 registry 異動
           fetch-depth: 0
       - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: npm }
-
-      - run: npm ci
-      - name: 建置 token（CSS 產物是後續所有步驟的前提）
-        run: npm run build:tokens
-      - name: 型別檢查
-        run: npm run typecheck
-      - name: 守衛測試（元件庫邊界、token 一致性、去領域化詞彙）
-        run: npm test
-
-      - name: 產生 registry JSON（base 指向正式站）
-        run: node scripts/build-registry.mjs
-        env:
-          REGISTRY_BASE: https://kielchang.github.io/dooping-design-book
-
-      - name: 建置文件站
-        working-directory: book
-        run: |
-          npm ci
-          npm run build
-        env:
-          BOOK_BASE_URL: /dooping-design-book/
-          BOOK_SITE_URL: https://kielchang.github.io
-
-      # 渲染守衛：正式站的建置產物也要過同一道驗收（ADR-0010）
-      #
-      # 快取鍵只綁 playwright 自己的版本，不要綁整包 lockfile：進版一定 bump 版號、
-      # lockfile 一定變，綁 hashFiles('package-lock.json') 等於每次進版都白白重抓
-      # Chromium。命中時只補系統相依（apt 套件不在快取路徑裡，每次都要裝）。
-      # 重抓的實際秒數波動極大（同一天量到 19 秒與 30 分鐘兩種），理由與量測見 ci.yml。
-      - name: 取出 Playwright 版本（快取鍵用）
-        id: pw-version
-        run: |
-          PW=$(node -p "require('./package-lock.json').packages['node_modules/playwright'].version")
-          echo "version=$PW" >> "$GITHUB_OUTPUT"
-          echo "Playwright $PW"
-      - name: 快取 Playwright Chromium
-        id: pw-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.pw-version.outputs.version }}
-      - name: 安裝 Playwright Chromium（渲染守衛用）
-        run: |
-          if [ "${{ steps.pw-cache.outputs.cache-hit }}" = "true" ]; then
-            npx playwright install-deps chromium
-          else
-            npx playwright install --with-deps chromium
-          fi
-      - name: 渲染守衛：demo 宿主基座（verify:book）
-        run: npm run verify:book
-        env:
-          BOOK_BASE_URL: /dooping-design-book/
-
-      - name: 建置 Storybook → /storybook
-        run: npm run build-storybook -- -o book/build/storybook
-
-      - name: 無障礙行為守衛（60+ story 的 axe＋play functions）
-        run: npm run verify:storybook
-        env:
-          STORYBOOK_DIR: book/build/storybook
-
-      - name: 視覺回歸：token 期望值掃描（六主題×兩模式）
-        run: npm run verify:visual
-        env:
-          STORYBOOK_DIR: book/build/storybook
-
-      - name: 放置 registry → /r
-        run: |
-          mkdir -p book/build/r
-          cp registry/*.json book/build/r/
-
-      - name: 發佈到 gh-pages 根目錄（保留 preview/）
-        run: |
-          bash scripts/deploy-gh-pages.sh book/build . "deploy(main) ${{ github.sha }}"
+        with: { node-version: 22 }
 
       # 規範版號 tag（vX.Y.Z）——給取用端的訊號，不是部署紀錄。
-      #
-      # 版號正本是根目錄 package.json 的 version：工程師在 dev 依大中小判準 bump
-      # 並寫 CHANGELOG（提議），使用者在 dev → main 的 PR 上確認（合併＝確認），
-      # 這裡只負責把已確認的版號蓋成 tag。版號沒動的進版（純文件）不產生新 tag——
-      # 取用端看不到新版號，就代表不需要動作。日期在 tag 描述裡，不佔名稱。
+      # 版號正本是根目錄 package.json 的 version：在 dev 依大中小判準 bump 並寫 CHANGELOG，
+      # 候選版過了 staging 的套用驗收、守門人在 staging → main 的 PR 勾完核准清單合併，這裡才把版號蓋成 tag。
+      # 版號沒動的進版（純文件／純 CI）不產生新 tag——取用端看不到新版號，就代表不需要動作。
       #
       # 這個 tag 不觸發任何東西：v* 不符合 publish-tokens.yml 的 tokens-v* 比對，
       # 而且 GITHUB_TOKEN 建立的 ref 依 GitHub 防遞迴機制不會觸發其他 workflow。
-      # npm 發佈仍然只有人工的 tokens-v* 或 workflow_dispatch 那兩條路。
       - name: 蓋上規範版號 tag（vX.Y.Z）
-        id: tag
         run: |
           git fetch --tags -q origin
           TAG="v$(node -p "require('./package.json').version")"
-          echo "name=$TAG" >> "$GITHUB_OUTPUT"
           if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
-            echo "tag $TAG 已存在——版號未變的進版（純文件）或重跑，都不另打 tag"
-            echo "created=false" >> "$GITHUB_OUTPUT"
+            echo "tag $TAG 已存在——版號未變的進版（純文件／純 CI）或重跑，都不另打 tag"
             exit 0
           fi
-          echo "created=true" >> "$GITHUB_OUTPUT"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # tag 訊息帶上配對的 tokens 版本——「這一版規範配哪一版 token」從此
-          # 可以直接從 git tag 稽核（git tag -n），不必翻 CHANGELOG。
-          TOKENS_VER=$(jq -r '.dependencies["@dooping/tokens"]' packages/react/package.json | sed 's/^[~^>=< ]*//')
+          # tag 訊息帶上配對的 tokens 版本——「這一版規範配哪一版 token」可以直接從 git tag -n 稽核
+          TOKENS_VER=$(node -p "require('./packages/react/package.json').dependencies['@dooping/tokens'].replace(/^[~^>=< ]*/, '')")
           git tag -a "$TAG" -m "進版 $TAG（$(TZ=Asia/Taipei date +%F)）" \
             -m "tokens 配對版：$TOKENS_VER" \
             -m "commit ${{ github.sha }}" \
@@ -142,16 +75,10 @@ jobs:
           git push origin "$TAG"
           echo "### 🏷 $TAG（tokens 配對版 $TOKENS_VER）" >> "$GITHUB_STEP_SUMMARY"
 
-      # Release＝tag 的推播通道。tag 給機器（git tag -n 可稽核），Release 給人——
-      # 取用端在 repo 頁 Watch → Custom → Releases 就會收到新版通知
-      # （光打 tag 不會通知任何人；見治理章「跟上新版」的訊號表）。
-      # 純文件進版不打 tag、也就不發 Release：安靜本身就是「不需動作」的訊號。
-      # 冪等：tag 已有 Release 就跳過，重跑不會重複發；上一步早退（沒有新 tag）
-      # 但 tag 存在而 Release 缺的情況（歷史 tag、上次半途失敗）也會在這裡補上。
-      #
-      # notes 直接抽 CHANGELOG 該則全文——通知本身就回答三問，取用端不必點連結。
-      # CHANGELOG 仍是唯一正本，這裡是發佈時的自動投影；抽不到（改名步驟被跳過）
-      # 才退回連結並出 warning。
+      # Release＝tag 的推播通道：取用端 Watch → Custom → Releases 就會收到新版通知。
+      # 冪等：tag 已有 Release 就跳過；歷史 tag 缺 Release 的情況也會在這裡補上。
+      # notes 直接抽 CHANGELOG 該則全文（scripts/lib/changelog.mjs，與 tests/changelog.test.ts 測的是同一段程式），
+      # 抽不到才退回連結並出 warning。
       - name: 建立 GitHub Release（讓 Watch → Releases 通知生效）
         env:
           GH_TOKEN: ${{ github.token }}
@@ -159,23 +86,19 @@ jobs:
           git fetch --tags -q origin
           TAG="v$(node -p "require('./package.json').version")"
           if ! git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
-            echo "沒有 $TAG 這個 tag（不該發生：上一步要嘛打了 tag、要嘛 tag 已存在）"
+            echo "沒有 $TAG 這個 tag（上一步要嘛打了 tag、要嘛 tag 已存在）"
             exit 0
           fi
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG 已存在——純文件進版或重跑，不另發"
             exit 0
           fi
-          # 抽出「## vX.Y.Z · 日期」到下一個 --- 之間的內容（不含標題行）
-          awk -v tag="$TAG" 'index($0, "## " tag " ") == 1 {f=1; next} f && /^---$/ {exit} f' \
-            CHANGELOG.md > /tmp/release-notes.md
-          if [ ! -s /tmp/release-notes.md ]; then
-            echo "::warning::CHANGELOG 找不到 $TAG 的段落——請回頭補查「合併前改名」步驟"
+          node scripts/release-gate.mjs notes "$TAG" > /tmp/release-notes.md
+          if ! grep -q '[^[:space:]]' /tmp/release-notes.md; then
+            echo "::warning::CHANGELOG 找不到 $TAG 的段落——請回頭補查「開 dev → staging PR 前改名」步驟"
             echo "改了什麼、你需要做什麼：讀 [CHANGELOG](${{ github.server_url }}/${{ github.repository }}/blob/main/CHANGELOG.md) 的 $TAG 一則。" > /tmp/release-notes.md
           fi
-          # ADR-0013 第三層：附上這一版動到的 registry item（相對上一個 v* tag）。
-          # 取用端看 Release 就知道自己抄的 item 有沒有被動到——包括只有相依變了的
-          # （例：修正落在 utils，抄了 data-table 的人一樣要重抄）。算不出來不擋發佈，只出 warning。
+          # 附上這一版動到的 registry item（相對上一個 v* tag）：取用端看 Release 就知道自己抄的 item 有沒有被動到。
           if node scripts/registry-changes.mjs --before "$TAG" --markdown > /tmp/registry-changes.md 2> /tmp/registry-changes.err; then
             { echo ""; cat /tmp/registry-changes.md; } >> /tmp/release-notes.md
             cat /tmp/registry-changes.md >> "$GITHUB_STEP_SUMMARY"
@@ -187,19 +110,17 @@ jobs:
             echo "---"
             echo "判斷要不要跟進：[跟上新版](https://kielchang.github.io/dooping-design-book/governance/staying-current/)"
           } >> /tmp/release-notes.md
-          TOKENS_VER=$(jq -r '.dependencies["@dooping/tokens"]' packages/react/package.json | sed 's/^[~^>=< ]*//')
+          TOKENS_VER=$(node -p "require('./packages/react/package.json').dependencies['@dooping/tokens'].replace(/^[~^>=< ]*/, '')")
           gh release create "$TAG" --verify-tag \
             --title "$TAG（tokens 配對版 $TOKENS_VER）" \
             --notes-file /tmp/release-notes.md
           echo "### 📣 Release $TAG 已發佈" >> "$GITHUB_STEP_SUMMARY"
 
-      # 進版當下的配對狀態。ci.yml 的漂移警告只跑在 dev push／PR——
-      # 但「該去推 tokens-v* 了」這件事最該被看見的時刻是**進版成功的這一刻**。
-      # 永遠 exit 0：這是提示，不是閘門（發佈本來就是合併之後的下一步）。
+      # 進版當下的配對狀態：「該去推 tokens-v* 了」最該被看見的時刻是核准版上線的這一刻。永遠 exit 0。
       - name: 配對狀態（宣告版 vs npm，僅提示）
         continue-on-error: true
         run: |
-          DECLARED=$(jq -r '.dependencies["@dooping/tokens"] // empty' packages/react/package.json | sed 's/^[~^>=< ]*//')
+          DECLARED=$(node -p "require('./packages/react/package.json').dependencies['@dooping/tokens'].replace(/^[~^>=< ]*/, '')")
           PUBLISHED=$(npm view @dooping/tokens version 2>/dev/null || true)
           {
             echo "### @dooping/tokens 配對狀態"
@@ -207,18 +128,8 @@ jobs:
             echo "| 宣告（本次進版） | npm latest |"
             echo "| --- | --- |"
             echo "| \`${DECLARED:-查不到}\` | \`${PUBLISHED:-查不到}\` |"
-            echo ""
           } >> "$GITHUB_STEP_SUMMARY"
           if [ -n "$DECLARED" ] && [ -n "$PUBLISHED" ] && [ "$DECLARED" != "$PUBLISHED" ]; then
-            {
-              echo "⚠️ **npm 還沒有 \`$DECLARED\`。** 這次進版包含 token 變更的話，現在就是發佈的時刻："
-              echo ""
-              echo '```bash'
-              echo "git tag -a tokens-v$DECLARED -m \"tokens $DECLARED\" && git push origin tokens-v$DECLARED"
-              echo '```'
-            } >> "$GITHUB_STEP_SUMMARY"
             echo "::warning::npm 上的 @dooping/tokens 是 $PUBLISHED，本次進版宣告 $DECLARED——請推 tokens-v$DECLARED 發佈。"
-          else
-            echo "✅ 配對一致。" >> "$GITHUB_STEP_SUMMARY"
           fi
           exit 0

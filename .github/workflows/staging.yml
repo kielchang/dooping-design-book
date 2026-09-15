@@ -1,0 +1,38 @@
+name: staging
+
+# 候選版：dev → staging 的 PR 合併後，staging 前進一次就跑一次——
+#   全部守衛＋內部試裝宿主＋發版閘＋套用驗收（乾淨的取用端專案）→ 部署 /staging/（registry 以 staging 網址建置，可安裝）→ 部署後冒煙。
+# 綠了才能開 staging → main 的 PR；main 的 ruleset 要求的就是這一支產生的「staging / build｜consumer｜smoke」。
+# 驗收紅了修在 dev、再開一次 dev → staging 的 PR，不在 staging 上直接改。
+# 流程正本：book/docs/7-governance/01-versioning.mdx「三段式發布」。
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+
+permissions:
+  contents: write # 推 gh-pages 分支的 staging/
+
+concurrency:
+  group: pages-staging
+  cancel-in-progress: false
+
+jobs:
+  # 手動觸發可以選任何分支——對著 dev 或功能分支按下去，就會把未驗收的內容部署成「候選版」。
+  staging-ref-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 只能對 staging 分支執行
+        run: |
+          if [ "$GITHUB_REF" != "refs/heads/staging" ]; then
+            echo "::error::staging.yml 只能對 staging 分支執行（收到 $GITHUB_REF）"
+            exit 1
+          fi
+
+  staging:
+    needs: staging-ref-guard
+    uses: ./.github/workflows/_pipeline.yml
+    with:
+      stage: staging
+      deploy: true
+      consumer: true

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-dialog-state",
+  "version": "0.13.0",
+  "type": "registry:lib",
+  "title": "useDialogState 對話框開關",
+  "description": "多種對話框的集中開關：天然單開、同值再設即關。",
+  "dependencies": [
+    "@dooping/tokens@^0.7.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "dooping/lib/use-dialog-state.ts",
+      "content": "import * as React from \"react\";\n\n/**\n * 一個畫面裡多種對話框的集中開關（蒸餾自 shadcn-admin 的 dialog-state pattern）。\n *\n * 值是「目前開著哪一種」（union 字串）或 null（全關）。兩條內建規則：\n * - **天然單開**：設新值會自動蓋掉舊值，同時只有一個對話框開著。\n * - **同值再設即關**：`set(\"delete\")` 兩次等於開了再關——觸發端不必自己判斷。\n *\n * 用法：對話框集中掛載在一處，依值決定渲染哪一個；\n * 觸發端（列操作、批次操作、主要按鈕）只呼叫 `set(\"create\")`。\n * 新增一種對話框只改 union 型別與集中掛載點兩處，不會散落在表格列裡。\n *\n * ```tsx\n * const [dialog, setDialog] = useDialogState<\"create\" | \"edit\" | \"void\">();\n * <ConfirmDialog open={dialog === \"void\"} onOpenChange={(o) => !o && setDialog(null)} … />\n * ```\n */\nexport function useDialogState<T extends string = string>(\n  initial: T | null = null,\n): [T | null, (value: T | null) => void] {\n  const [open, setOpen] = React.useState<T | null>(initial);\n  const set = React.useCallback((value: T | null) => {\n    setOpen((prev) => (prev === value ? null : value));\n  }, []);\n  return [open, set];\n}\n",
+      "type": "registry:lib",
+      "target": "lib/dooping/use-dialog-state.ts"
+    }
+  ]
+}

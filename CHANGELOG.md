@@ -1,27 +1,21 @@
 # CHANGELOG
 
-這份設計規範每次「進版」的紀錄。進版＝`dev` 併進 `main`，其他系統以 `main` 為參照。
+這份設計規範每次「進版」的紀錄。進版＝核准版（`main`）前進一次：dev → staging（套用驗收）→ main。
+其他系統以 `main` 為參照。流程正本：[版本策略「三段式發布」](book/docs/7-governance/01-versioning.mdx)。
 
-每則回答三個問題（格式見[版本策略](book/docs/7-governance/01-versioning.mdx)）：
+每則回答三個問題：
 
 1. **改了什麼**
 2. **我需要做什麼**（不需要就明說）
 3. **為什麼改**
 
-條目標題是 `## vX.Y.Z · YYYY-MM-DD`，`vX.Y.Z` 對應部署自動蓋上的規範版號 tag；
-純文件進版（版號未動、無新 tag）標題只寫日期。
+格式規則（`scripts/release-gate.mjs` 在候選版與 PR 上檢查）：
 
-**`· <short-sha>` 是選填的。** 那個 SHA 是 `dev → main` 的 merge commit，
-**合併前拿不到**——所以它不能是「合併前改名」的前置條件，合併後想補再補。
-commit 本身記在 tag 描述裡，不會遺失。
-（原本的規則把它寫成必填，結果連續三次進版都乾脆跳過改名這一步，
-於是 v0.2.1 與 v0.4.0 兩個已發佈版本一直躺在「未發佈」底下。已於 v0.6.0 修正。）
-
-日常變更先累積在「未發佈（`dev`）」一節，**合併進 `main` 前把該節改名**。
-
-**`dev` 上的中間版號不是發佈。** 一次 `dev → main` 就是一次進版，只會蓋一個 tag。
-過程中在 `dev` 累積的版號（例如 v0.6.0 那次的 0.4.1、0.5.0）沒有任何取用端拿得到，
-它們是工作狀態；CHANGELOG 用 `###` 分工作項記在同一則裡，不各自算一次發佈。
+- 標題兩種：有 bump 寫 `## vX.Y.Z · YYYY-MM-DD`（對應自動蓋上的 tag，後面可選填 merge commit 的 short SHA）；
+  版號沒動寫 `## YYYY-MM-DD（說明）`。
+- 日常變更先累積在「未發佈（`dev`）」一節，**開 dev → staging 的 PR 之前改名**。
+- 每一節結尾是「空行、`---`、空行」——Release notes 抽到第一條 `---` 就停。
+- `dev` 上累積的中間版號不是發佈：一次進版只蓋一個 tag，工作項用 `###` 記在同一則裡。
 
 ## 兩條散佈通道，版號意義不同
 
@@ -34,6 +28,32 @@ commit 本身記在 tag 描述裡，不會遺失。
 
 取用端怎麼訂閱新版訊號、收到之後怎麼判斷要不要跟、每層怎麼跟——
 見文件站的[跟上新版](book/docs/7-governance/06-staying-current.mdx)。
+
+---
+
+## 未發佈（`dev`）
+
+### 三段式發布：dev → staging（套用驗收）→ main（核准版）
+
+1. **改了什麼**：
+   - 新增長期分支 `staging`＝候選版，部署到 `/staging/`（文件站、Storybook、內部試裝宿主，以及用 staging 網址建置、可以真的安裝的 registry）。
+     `main` 只收 staging 的核准合併，`staging` 只收 dev。
+   - **套用驗收** `npm run verify:consumer`：在 repo 外建乾淨的 Vite＋Tailwind v4 專案，token 用 `npm pack` 的套件、元件用真的 shadcn CLI 從 registry 裝，
+     型別檢查＋建置，瀏覽器量三組主題×模式的 token 值、Dialog／Select 面板、console 與 axe。staging 每次前進都跑。
+   - **發版閘** `scripts/release-gate.mjs`：候選版要版號遞增、tag 未被佔、CHANGELOG 已改名；PR 只准 staging ← dev、main ← staging、合併後內容＝來源分支；
+     開到 main 的 PR 要勾完「核准清單」。Release notes 的抽取也改用同一份 CHANGELOG 程式。
+   - **部署後冒煙** `npm run verify:deployed`：上線的 `deploy.json` sha 對上、registry 指紋＝repo、相依都指向同一段、段標記（橫幅與 noindex）正確。
+   - workflow 改成共用的 `_pipeline.yml`＋每段一支呼叫端（`preview`／`pr-verify`／`pr-gate`／`staging`／`deploy`），取代 `ci.yml`；
+     每段各自一個 concurrency group（以前三段共用一組，dev 連推可能取消等待中的 main 部署）。
+     `deploy.yml`、`staging.yml` 手動觸發只能對自己的分支；`publish-tokens` 手動發佈也要過配對閘。
+   - 部署腳本只允許 `preview`／`staging` 兩個段目錄、根目錄部署保留它們，push 被拒時重抓重套再推；
+     預覽站與候選版掛橫幅並加 noindex；`npm run status` 改成 main／staging／dev 三欄與下一步。
+   - 文件：「main＝最新核准版」與「檢查／驗收／核准」三個詞寫進〈版本策略〉的「三段式發布」，其他地方只留一句指向。
+   - 守衛：`tests/release-gate.test.ts`、`tests/deploy-gh-pages.test.ts`、`tests/workflow-contract.test.ts`，以及 `verify:consumer`、`verify:deployed`，皆反向驗證過。
+2. **我需要做什麼**：取用端不需要。仍然只參照正式站（`/r/`、npm、Releases）；`/staging/` 可以在自己的分支試裝回報，但它不是核准版。
+3. **為什麼改**：dev 到 main 之間只有 CI，沒有任何檢查從乾淨專案真的裝過一次——內部宿主靠 workspace 連結與直接寫檔，
+   取用端才會碰到的問題（套件漏檔、CLI 改寫檔案、嚴格 TypeScript 設定、相依沒宣告）要等別的系統導入才會發現。
+   「main 是核准版」也從來沒有定義、沒有保護、沒有紀錄。
 
 ---
 

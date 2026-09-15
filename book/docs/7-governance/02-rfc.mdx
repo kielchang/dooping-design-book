@@ -9,7 +9,7 @@ title: 回饋與 RFC 流程
 | 類型 | 路徑 | 入口 | 期望回應 |
 | --- | --- | --- | --- |
 | **Bug** | Issue，附最小重現 | [Bug 回報表單](https://github.com/kielchang/dooping-design-book/issues/new?template=bug.yml) | 直接修 |
-| **小調整**（文案、對比、一個 prop） | PR，附截圖或說明 | [開 PR](https://github.com/kielchang/dooping-design-book/compare)（模板自帶自查清單） | Review 後合併 |
+| **小調整**（文案、對比、一個 prop） | PR 開到 `dev`，附截圖或說明 | [開 PR](https://github.com/kielchang/dooping-design-book/compare/dev...)（模板自帶自查清單） | Review 後合併進 dev |
 | **新元件 / 新 token / 改語意** | **RFC** | [RFC 提案表單](https://github.com/kielchang/dooping-design-book/issues/new?template=rfc.yml) | 討論後決定 |
 
 另有一個低門檻入口：[**缺件認領表單**](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml)——
@@ -65,7 +65,8 @@ API 長什麼樣？舉一個真實的使用情境。
 2. 拿掉領域脈絡還成立嗎？
 3. 現有元件真的做不到嗎？
 
-**本 repo 的守門人：[@kielchang](https://github.com/kielchang)**（`.github/CODEOWNERS` 落地）。
+**本 repo 的守門人：[@kielchang](https://github.com/kielchang)**（`.github/CODEOWNERS` 宣告；
+核准版的閘門——staging → main 的合併——由 ruleset 與 PR 上的核准清單強制，見[版本策略「三段式發布」](/governance/versioning)）。
 token 與基礎章是全系統契約，與其他部分同一位守門人——分開設的前提是有第二位維護者。
 
 ## 提案的狀態機

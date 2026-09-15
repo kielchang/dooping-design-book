@@ -22,13 +22,13 @@ import { createServer } from "node:http";
 import { dirname, extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
-import { hslToRgb8 } from "../packages/tokens/scripts/lib/color.mjs";
 import { forcedColorsFocusFailures } from "./lib/forced-colors.mjs";
+import { loadTokens, near as nearRgb, parseColor, resolveTokenRgb, rgbStr } from "./lib/token-expect.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = join(ROOT, "apps/host-v4/dist");
 const BASE = (process.env.HOST_BASE ?? "/").replace(/\/?$/, "/");
-const tokens = JSON.parse(readFileSync(join(ROOT, "packages/tokens/src/tokens.json"), "utf8"));
+const tokens = loadTokens(ROOT);
 const THEMES = Object.keys(tokens.themes);
 const DEFAULT_THEME = tokens.meta.defaultTheme;
 const MODES = ["light", "dark"];
@@ -54,11 +54,8 @@ const MIME = {
   ".woff": "font/woff", ".woff2": "font/woff2",
 };
 
-/** 主題有效值：themes 覆蓋鏈 → color 基準值（與 verify-visual.mjs 同款反解） */
-const resolve = (theme, mode, name) => {
-  const t = tokens.themes?.[theme]?.[mode]?.[name];
-  return hslToRgb8((t ?? tokens.color[mode][name]).value);
-};
+/** 主題有效值：themes 覆蓋鏈 → color 基準值（scripts/lib/token-expect.mjs，與 verify-consumer 共用） */
+const resolve = (theme, mode, name) => resolveTokenRgb(tokens, theme, mode, name);
 
 function serve() {
   const server = createServer((req, res) => {
@@ -88,19 +85,7 @@ async function launch() {
   }
 }
 
-const parseAlpha = (s) => (s.endsWith("%") ? parseFloat(s) / 100 : parseFloat(s));
-/**
- * computed color → { rgb, alpha }。實色是 rgb()／rgba()；color-mix 的 computed 值在 Chromium
- * 可能是 oklab()／color()——那種格式不比 rgb（rgb 為 null），alpha 從尾端的「/ x」抓。
- */
-function parseColor(str) {
-  const m = /^rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:\s*[,/]\s*([\d.]+%?))?\s*\)$/.exec(str ?? "");
-  if (m) return { rgb: [m[1], m[2], m[3]].map((v) => Math.round(Number(v))), alpha: m[4] === undefined ? 1 : parseAlpha(m[4]) };
-  const tail = /\/\s*([\d.]+%?)\s*\)$/.exec(str ?? "");
-  return { rgb: null, alpha: tail ? parseAlpha(tail[1]) : 1 };
-}
-const near = (a, b) => Array.isArray(a) && a.every((v, i) => Math.abs(v - b[i]) <= TOL);
-const rgbStr = (c) => `rgb(${c.join(",")})`;
+const near = (a, b) => nearRgb(a, b, TOL);
 
 /** 開一個預先寫好主題的瀏覽器分頁（在 app 讀 localStorage 之前就寫入） */
 async function openPage(browser, { theme, mode, contextOptions = {} }) {

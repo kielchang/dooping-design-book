@@ -2,8 +2,8 @@
 
 > **這不是真實子系統。** 它是本 repo 裡「照取用端的路接上來」的最小應用：
 > Vite＋React 19＋Tailwind v4＋shadcn CLI，裝 `@dooping/tokens`、從 registry 抄元件、
-> 組出五種頁型並包進 AppShell。與真實宿主唯一的差別，是 `@dooping/tokens` 走 workspace 連結
-> ——這一版合併前 npm 上還裝不到。
+> 組出五種頁型並包進 AppShell。與真實宿主的差別：`@dooping/tokens` 走 workspace 連結、元件由 `host:sync` 直接寫入
+> ——「從乾淨專案用 npm 套件與真的 shadcn CLI 裝起」由套用驗收（`npm run verify:consumer`，staging 上跑）負責。
 
 它同時是三件事：
 

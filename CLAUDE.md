@@ -42,6 +42,8 @@ npm run verify:visual      # 視覺回歸：token 期望值掃描 — 需先 bui
 npm run host:sync          # 內部試裝宿主：registry → apps/host-v4，並重建它的 dooping.lock.json（改過元件或安裝集要重跑並提交）
 npm run registry:changes -- --before vX.Y.Z   # 相對上一個 v* tag 動到哪些 registry item（Release notes 會附同一份）
 npm run host:build && npm run verify:host   # 宿主渲染守衛：主題配色、頁面級 axe、強制色彩、行動版外殼
+npm run verify:consumer    # 套用驗收：repo 外的乾淨 Vite＋v4 專案用 tarball＋真的 shadcn CLI 裝起、建置、量顏色（約 2 分鐘，要網路）
+npm run release:gate -- release   # 發版閘：候選版能不能發（版號、tag、CHANGELOG 標題）；bump-guard 是 dev 上的版號守衛
 BOOK_BASE_URL=/dooping-design-book/preview/ npm run build:book   # onBrokenLinks: throw
 ```
 
@@ -69,12 +71,11 @@ BOOK_BASE_URL=/dooping-design-book/preview/ npm run build:book   # onBrokenLinks
 判準與「什麼不該發版」見 `book/docs/7-governance/01-versioning.mdx`；
 每次進版都要在 `CHANGELOG.md` 回答三個問題（改了什麼／我需要做什麼／為什麼改）。
 
-CI 有守衛：元件或 token 相對 `main` 有變但版號沒動，直接擋 PR。
+CI 有守衛（`scripts/release-gate.mjs`）：dev 上元件或 token 相對 `main` 有變但版號沒動就紅；
+候選版（staging）還要版號遞增、tag 未被佔、CHANGELOG「未發佈」已改名。
 
-**版本狀態速查**：`npm run status` 一次印出「已發佈（main）／工作中（dev）／
-token 配對／領先 commit／未發佈工作項／合併後會不會蓋 tag 發 Release」。
-設計端看的是 dev−main 的差距（提議中的未來）；取用端只看 main
-（Releases／`/r/index.json`／npm），他們的正本在文件站「治理 → 跟上新版」。
+**版本狀態速查**：`npm run status` 印出 main（核准版）／staging（候選版）／dev（工作中）三欄、
+token 配對與下一步。取用端只看 main（Releases／`/r/index.json`／npm），他們的正本在文件站「治理 → 跟上新版」。
 
 ## 去領域化是硬閘門
 
@@ -102,8 +103,8 @@ repo 留三樣東西：規則（守衛＋文件頁那一條）、架構描述（
 ## 換電腦接續
 
 狀態分三層：走 git 的（本 repo，clone `dev` 後 hook 會自動 `npm install && npm run build:tokens`）、
-走 PMIS 的（計畫、決定、dev log；MCP 定義在使用者層 `~/.claude.json`，連的是 pmis 專案 `.env` 的 `DATABASE_URL`）、
-走 inbox 的（還沒上傳 PMIS 的記錄與研究報告，在 repo 之外的 `pmis-inbox/dooping-design-book/`，讀它的 `HANDOFF.md`）。
+走 PMIS 的（計畫、決定、dev log；系統代號 `DESIGN`；MCP 定義在使用者層 `~/.claude.json`，連的是 pmis 專案 `.env` 的 `DATABASE_URL`）、
+走 inbox 的（PMIS 連不上時的離線紀錄與研究報告，在 repo 之外的 `pmis-inbox/dooping-design-book/`，格式見它的 `HANDOFF.md`）。
 Claude 記憶在 `~/.claude/projects/<專案路徑 slug>/memory/`，clone 到不同路徑要把記憶檔搬到新 slug 的目錄。
 
 ## Git
@@ -111,9 +112,11 @@ Claude 記憶在 `~/.claude/projects/<專案路徑 slug>/memory/`，clone 到不
 - 正式 remote：`https://github.com/kielchang/dooping-design-book.git`
   （**兩個 o**。repo 曾叫 `doping-design-book`，舊名靠 GitHub 轉址還能推，
   但會噴 `This repository moved`；看到就把 origin 換成上面那個。）
-- `dev` 推上去會部署預覽站到 `/preview/`；`main` 部署正式站根目錄。
-  兩支 workflow 共用同一個 concurrency group，寫入會被序列化。
-- 預覽站：<https://kielchang.github.io/dooping-design-book/preview/>
+- **三段式發布**：功能分支做完才併進 `dev` → PR `dev → staging`（候選版，跑套用驗收）→ PR `staging → main`（勾核准清單＝核准）。
+  流程正本：`book/docs/7-governance/01-versioning.mdx`「三段式發布」。`main` 與 `staging` 受 ruleset 保護，不要直接 push。
+- `dev` push 部署預覽站 `/preview/`；`staging` push 部署候選版 `/staging/`；`main` push 部署正式站根目錄並蓋 tag。
+  每段各自一個 concurrency group；三段共用 gh-pages 分支，由 `scripts/deploy-gh-pages.sh` 的 `STAGE_DIRS` 劃界。
+- 預覽站：<https://kielchang.github.io/dooping-design-book/preview/>；候選版：<https://kielchang.github.io/dooping-design-book/staging/>
 
 ## 截圖驗證的方法論
 

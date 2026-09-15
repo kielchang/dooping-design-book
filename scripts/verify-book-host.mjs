@@ -276,6 +276,30 @@ function portalChecks(exp) {
   return { fails, hasCheckbox: boxes.length > 0 };
 }
 
+// ── 段標記（三段式發布） ───────────────────────────────────────
+// preview（dev）與 staging（候選版）必須帶 noindex 與該段的橫幅；production（核准版）兩者都不能有。
+// 段由 BOOK_STAGE 決定，沒設時由 base 推斷——與 book/docusaurus.config.ts 同一條推斷規則。
+const BANNER_TEXT = { preview: "dev 預覽站", staging: "候選版 v" };
+
+function stageFailures(base) {
+  const stage =
+    process.env.BOOK_STAGE ?? (base.includes("/preview/") ? "preview" : base.includes("/staging/") ? "staging" : "production");
+  const html = readFileSync(join(BUILD, "index.html"), "utf8");
+  const noindex = (html.match(/<meta\b[^>]*>/gi) ?? []).some((tag) => /name="robots"/i.test(tag) && /noindex/i.test(tag));
+  const fails = [];
+  if (stage === "production") {
+    if (noindex) fails.push("正式站的 index.html 帶了 noindex——核准版會從搜尋引擎消失");
+    for (const [name, text] of Object.entries(BANNER_TEXT))
+      if (html.includes(text)) fails.push(`正式站出現 ${name} 的橫幅文字「${text}」`);
+  } else if (!(stage in BANNER_TEXT)) {
+    fails.push(`BOOK_STAGE 不認得：${stage}`);
+  } else {
+    if (!noindex) fails.push(`${stage} 站的 index.html 沒有 noindex——不該被搜尋引擎收錄`);
+    if (!html.includes(BANNER_TEXT[stage])) fails.push(`${stage} 站的 index.html 沒有橫幅「${BANNER_TEXT[stage]}…」`);
+  }
+  return { stage, fails };
+}
+
 // ── 主流程 ────────────────────────────────────────────────────
 const sleep = (ms) => new Promise((ok) => setTimeout(ok, ms));
 
@@ -328,6 +352,8 @@ async function main() {
 
   const allFails = [];
   const record = (page, fails) => { for (const f of fails) allFails.push(`${page}  ${f}`); };
+  const stageCheck = stageFailures(base);
+  record(`[${stageCheck.stage}] index.html`, stageCheck.fails);
 
   // 淺色：全部 demo 頁
   const light = await browser.newContext({ colorScheme: "light" });
@@ -404,7 +430,7 @@ async function main() {
   await browser.close();
   server.close();
 
-  console.log(`\n掃描 ${pages.length} 頁（淺色全頁 + 深色抽驗 + portal 互動）`);
+  console.log(`\n掃描 ${pages.length} 頁（淺色全頁 + 深色抽驗 + portal 互動）；段標記：${stageCheck.stage}`);
   if (allFails.length) {
     console.error(`\n✗ 渲染守衛不通過（${allFails.length} 條）：\n` + allFails.map((f) => "  " + f).join("\n"));
     console.error("\n宿主基座是元件的樣式契約：說明見 AGENTS.md「宿主前置條件」與 book/src/css/demo-base.css 檔頭。");

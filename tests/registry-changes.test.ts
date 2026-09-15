@@ -1,5 +1,5 @@
 // 兩版 registry 之間的異動分類（ADR-0013 第三層）——Release notes 附的就是這份清單。
-// 用小型合成 registry 驗四類分類、Markdown 輸出、上一個 tag 的挑法；真實歷史由 ci.yml 在 dev 上預演。
+// 用小型合成 registry 驗四類分類、Markdown 輸出、上一個 tag 的挑法；真實歷史由 _pipeline.yml 在 dev 與 staging 上預演。
 import { describe, it, expect } from "vitest";
 import { classify, previousTag, renderMarkdown } from "../scripts/lib/registry-changes.mjs";
 

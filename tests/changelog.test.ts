@@ -1,39 +1,17 @@
-// CHANGELOG 的分節與 deploy.yml 抽 Release notes 的規則，是同一份事實的兩處。
-// deploy.yml 從「## v<版號> 」那行之後開始讀、遇到第一條恰為 `---` 的行停——
+// CHANGELOG 的分節與 Release notes 的抽取規則。
+// Release notes 從「## v<版號> 」那行之後開始讀、遇到第一條恰為 `---` 的行停——
 // 某一節漏了節尾分隔線，notes 就會一路吃進下一個版本，而且不會有任何錯誤訊息。
 // 2026-09-10 的 v0.13.0 實際發生過（模擬抽出 275 行、18 個工作項，正確是 221 行、15 個），
 // 合併前人工抓到；這支守衛讓它下次在本機就紅。
+// 抽取邏輯只有一份：scripts/lib/changelog.mjs——deploy 發 Release（release-gate.mjs notes）與這裡測的是同一段程式。
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { extractReleaseNotes, toLines } from "../scripts/lib/changelog.mjs";
 
 const ROOT = join(__dirname, "..");
 const CR = String.fromCharCode(13);
 const LF = String.fromCharCode(10);
-
-// 工作目錄在 Windows 是 CRLF、CI checkout 是 LF——比對前一律去掉行尾 CR
-const toLines = (text: string) => text.split(LF).map((l) => (l.endsWith(CR) ? l.slice(0, -1) : l));
-
-/**
- * deploy.yml「建立 GitHub Release」那一步 awk 的逐行移植：
- *   index($0, "## " tag " ") == 1 {f=1; next}   以「## <tag> 」開頭的行開始（該行本身不輸出）
- *   f && /^---$/ {exit}                          開始之後第一條恰為 --- 的行結束（不含）
- *   f                                            其間每一行輸出
- * 找不到標題回傳 null（deploy.yml 會發 warning，Release 沒有 notes）。
- */
-function extractReleaseNotes(text: string, tag: string): string[] | null {
-  let started = false;
-  const out: string[] = [];
-  for (const line of toLines(text)) {
-    if (line.startsWith(`## ${tag} `)) {
-      started = true;
-      continue;
-    }
-    if (started && line === "---") break;
-    if (started) out.push(line);
-  }
-  return started ? out : null;
-}
 
 const changelog = readFileSync(join(ROOT, "CHANGELOG.md"), "utf8");
 const version: string = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")).version;

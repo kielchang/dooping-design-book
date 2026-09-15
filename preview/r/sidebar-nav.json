@@ -10,11 +10,11 @@
     "lucide-react"
   ],
   "registryDependencies": [
-    "https://kielchang.github.io/dooping-design-book/r/badge.json",
-    "https://kielchang.github.io/dooping-design-book/r/collapsible.json",
-    "https://kielchang.github.io/dooping-design-book/r/dropdown-menu.json",
-    "https://kielchang.github.io/dooping-design-book/r/nav.json",
-    "https://kielchang.github.io/dooping-design-book/r/sidebar.json"
+    "https://kielchang.github.io/dooping-design-book/preview/r/badge.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/collapsible.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/dropdown-menu.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/nav.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/sidebar.json"
   ],
   "files": [
     {

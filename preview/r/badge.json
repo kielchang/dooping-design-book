@@ -10,7 +10,7 @@
     "class-variance-authority"
   ],
   "registryDependencies": [
-    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+    "https://kielchang.github.io/dooping-design-book/preview/r/utils.json"
   ],
   "files": [
     {

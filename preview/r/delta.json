@@ -9,7 +9,7 @@
     "@dooping/tokens@^0.7.0"
   ],
   "registryDependencies": [
-    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+    "https://kielchang.github.io/dooping-design-book/preview/r/utils.json"
   ],
   "files": [
     {

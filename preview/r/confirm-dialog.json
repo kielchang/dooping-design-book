@@ -9,10 +9,10 @@
     "@dooping/tokens@^0.7.0"
   ],
   "registryDependencies": [
-    "https://kielchang.github.io/dooping-design-book/r/button.json",
-    "https://kielchang.github.io/dooping-design-book/r/dialog.json",
-    "https://kielchang.github.io/dooping-design-book/r/input.json",
-    "https://kielchang.github.io/dooping-design-book/r/label.json"
+    "https://kielchang.github.io/dooping-design-book/preview/r/button.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/dialog.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/input.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/label.json"
   ],
   "files": [
     {

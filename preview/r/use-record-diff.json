@@ -9,7 +9,7 @@
     "@dooping/tokens@^0.7.0"
   ],
   "registryDependencies": [
-    "https://kielchang.github.io/dooping-design-book/r/forms-diff.json"
+    "https://kielchang.github.io/dooping-design-book/preview/r/forms-diff.json"
   ],
   "files": [
     {

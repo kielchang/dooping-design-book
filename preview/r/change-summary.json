@@ -10,9 +10,9 @@
     "lucide-react"
   ],
   "registryDependencies": [
-    "https://kielchang.github.io/dooping-design-book/r/forms-diff.json",
-    "https://kielchang.github.io/dooping-design-book/r/tooltip.json",
-    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+    "https://kielchang.github.io/dooping-design-book/preview/r/forms-diff.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/tooltip.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/utils.json"
   ],
   "files": [
     {

@@ -10,8 +10,8 @@
     "lucide-react"
   ],
   "registryDependencies": [
-    "https://kielchang.github.io/dooping-design-book/r/label.json",
-    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+    "https://kielchang.github.io/dooping-design-book/preview/r/label.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/utils.json"
   ],
   "files": [
     {

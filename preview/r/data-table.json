@@ -10,20 +10,20 @@
     "lucide-react"
   ],
   "registryDependencies": [
-    "https://kielchang.github.io/dooping-design-book/r/button.json",
-    "https://kielchang.github.io/dooping-design-book/r/checkbox.json",
-    "https://kielchang.github.io/dooping-design-book/r/csv.json",
-    "https://kielchang.github.io/dooping-design-book/r/download.json",
-    "https://kielchang.github.io/dooping-design-book/r/dropdown-menu.json",
-    "https://kielchang.github.io/dooping-design-book/r/empty-state.json",
-    "https://kielchang.github.io/dooping-design-book/r/input.json",
-    "https://kielchang.github.io/dooping-design-book/r/popover.json",
-    "https://kielchang.github.io/dooping-design-book/r/select.json",
-    "https://kielchang.github.io/dooping-design-book/r/skeleton.json",
-    "https://kielchang.github.io/dooping-design-book/r/table.json",
-    "https://kielchang.github.io/dooping-design-book/r/tooltip.json",
-    "https://kielchang.github.io/dooping-design-book/r/use-sort.json",
-    "https://kielchang.github.io/dooping-design-book/r/utils.json"
+    "https://kielchang.github.io/dooping-design-book/preview/r/button.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/checkbox.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/csv.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/download.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/dropdown-menu.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/empty-state.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/input.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/popover.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/select.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/skeleton.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/table.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/tooltip.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/use-sort.json",
+    "https://kielchang.github.io/dooping-design-book/preview/r/utils.json"
   ],
   "files": [
     {

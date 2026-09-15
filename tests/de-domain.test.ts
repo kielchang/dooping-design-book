@@ -35,6 +35,8 @@ const SCAN_DIRS = [
   "tests",
   // 內部試裝宿主：頁面文案、README、台帳都是「新子系統整個目錄抄走」的範本，領域詞會跟著被抄走
   "apps",
+  // 套用驗收的乾淨專案範本：取用端導入時的第一個樣子，示範文案同樣會被照抄
+  "fixtures",
 ];
 const SCAN_FILES = [
   "README.md",

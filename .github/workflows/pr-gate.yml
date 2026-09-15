@@ -1,0 +1,40 @@
+name: pr-gate
+
+# 開到 staging（候選版）與 main（核准版）的 PR 的發版閘：
+#   - 來源分支只能是 staging ← dev、main ← staging，而且同一個 repo
+#   - 合併後的內容＝來源分支（驗過的就是合併後拿到的）
+#   - 版號嚴格遞增、tag 未被佔、CHANGELOG 已改名且標題對得上
+#   - 開到 main 的 PR：內文的「核准清單」勾完（edited 觸發：勾完就自動重跑）
+# 內容本身的驗證不在這裡重跑：PR 的 head 就是 dev／staging 的 tip，那個 SHA 在 push 時已經跑過
+# preview／staging 的全部守衛與套用驗收，ruleset 要求的就是那些檢查。
+# 規則正本：book/docs/7-governance/01-versioning.mdx「三段式發布」；實作與測試：scripts/release-gate.mjs、tests/release-gate.test.ts。
+on:
+  pull_request:
+    branches: [staging, main]
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  pr-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      # PR 內文走環境變數，不直接內插進 shell——內文是使用者輸入
+      - name: 發版閘（來源分支、樹相等、版號、CHANGELOG、核准清單）
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_REF: ${{ github.head_ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: node scripts/release-gate.mjs pr

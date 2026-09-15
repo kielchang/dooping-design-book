@@ -2,8 +2,8 @@
 
 > 跨專案後台系統的設計語言正本（繁體中文）：設計 token（npm：@dooping/tokens）、
 > React 參考實作（shadcn registry 複製原始碼，不發 npm）、操作模式與五種頁型的組成規範。
-> 取用端不重新發明按鈕與表格，從這裡取用；一律以 main／正式站為唯一參照，
-> /preview/ 底下是開發中的預覽站，不得參照。
+> 取用端不重新發明按鈕與表格，從這裡取用；一律以 main（最新核准版）／正式站為唯一參照，
+> /preview/（開發中）與 /staging/（驗收中的候選版）都不得參照。
 
 - 機器可讀索引：https://kielchang.github.io/dooping-design-book/r/index.json
   （version＝規範版、tokensVersion＝配對的 token 版、items[]＝全部元件項目，

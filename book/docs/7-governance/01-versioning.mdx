@@ -12,19 +12,58 @@ title: 版本策略
 | `@dooping/react` | 參考實作。使用者複製走之後就與版號脫鉤 |
 | 文件站 | 跟著 repo，不獨立發版 |
 
-## 進版是什麼事件
+## 三段式發布：dev → staging → main
 
 ```
-dev ──開發、CI 確認──▶ main ──▶ 文件站／Storybook／registry 自動更新
-                        │
-                        └─ token 內容有變才 bump npm 版號
+dev（工作中）──PR──▶ staging（候選版：套用驗收）──PR＋核准──▶ main（核准版）──▶ 其他系統
+  │                     │                                       │
+  ▼                     ▼                                       ▼
+/preview/            /staging/（registry 可試裝）             正式站、/r/、npm、tag／Release
 ```
 
-**`dev` 併進 `main` 就是一次進版。** 其他系統一律以 `main` 為參照，不看 `dev`。
+| 分支 | 代表什麼 | 部署到 | 能不能參照 | 能不能安裝 | 誰讓它前進 |
+| --- | --- | --- | --- | --- | --- |
+| `dev` | 最新功能開發 | `/preview/` | 不能 | 不供安裝 | 功能分支做完才併進來；外部 PR 開到這裡 |
+| `staging` | 候選版，正在做套用驗收 | `/staging/` | 不能 | 可以在自己的分支試裝回報，不可正式導入 | 只收 dev 的 PR |
+| `main` | **最新核准版** | 正式站根目錄 | **其他系統只參照這裡** | `/r/`、npm | 只收 staging 的 PR，守門人核准後合併 |
 
-一次進版對應
+**進版＝核准版前進一次。** 一次 staging → main 的合併就是一次進版，對應
 [CHANGELOG](https://github.com/kielchang/dooping-design-book/blob/main/CHANGELOG.md) 的一則。
 寫不出「取用者要做什麼」的變更，就不是一次進版，繼續留在 `dev`。
+
+### 三個詞各一個意思
+
+| 詞 | 意思 | 在哪一段 |
+| --- | --- | --- |
+| **檢查** | CI 守衛全綠：測試、渲染、無障礙、視覺、內部試裝宿主 | 每一段都跑 |
+| **驗收** | 候選版真的能被其他系統套用：自動的套用驗收，加上人工的核准清單 | staging |
+| **核准** | 守門人 [@kielchang](https://github.com/kielchang) 在 staging → main 的 PR 上勾完核准清單、必過檢查全綠後合併 | main |
+
+以前這三件事都叫「確認」——「CI 綠了」「手機看過預覽站」「合併了」分不清哪一個才是閘門。
+
+### 流程
+
+```
+① dev 上開發：功能分支做完才併進 dev；改到元件或 token 就依判準表 bump 版號（CI 擋漏 bump）
+② 切候選版：在 dev 把 CHANGELOG「## 未發佈」改名——有 bump 寫「## vX.Y.Z · 日期」，
+   版號沒動寫「## 日期（說明）」——然後開 dev → staging 的 PR
+     └ pr-gate：只准 staging ← dev、版號遞增、tag 未被佔、CHANGELOG 標題對得上
+③ 合併 → staging 建置、發版閘、套用驗收、部署 /staging/、部署後冒煙
+④ 開 staging → main 的 PR，照 PR 模板的「核准清單」逐項驗收並打勾
+     └ pr-gate：只准 main ← staging、合併後內容＝staging、核准清單勾完
+⑤ 合併＝核准 → 部署正式站、冒煙、自動蓋 tag vX.Y.Z、發 GitHub Release（版號沒動就不打、不發）
+```
+
+- **套用驗收**（`npm run verify:consumer`）在 repo 外建一個乾淨的 Vite＋Tailwind v4 專案：token 用 `npm pack` 出來的套件、
+  元件用真的 shadcn CLI 從候選版的 registry 裝，型別檢查、建置，再到瀏覽器量顏色——證明別的系統照
+  [AGENTS.md](https://kielchang.github.io/dooping-design-book/AGENTS.md) 做真的接得上。
+  還**不涵蓋** Next.js App Router、Tailwind v3 宿主、Base UI 共存。
+- **驗收沒過**：修在 dev、推上去，再開一次 dev → staging 的 PR，staging 會重跑全部驗收。不在 staging 上直接改；
+  版號不必再 bump，除非那個 tag 已經被佔。
+- **dev 永遠是可發布的狀態**——這是「修在 dev 再送一次」成立的前提。做到一半的東西留在功能分支。
+- **部署失敗的窗口**：合併進 main 但部署紅了＝main 已含內容、正式站還沒動。修好原因後重跑 deploy（手動觸發只能對 main），不是 revert。
+- **強制**：main 與 staging 由 GitHub ruleset 保護（必須 PR、只允許 merge commit、必過檢查、禁止強推與刪除），來源分支由 pr-gate 擋。
+  設定正本在 `.github/rulesets/`，`tests/workflow-contract.test.ts` 核對它與 workflow 對得上。
 
 **兩條散佈通道的更新時機不同**，這個區分很重要：
 
@@ -33,18 +72,18 @@ dev ──開發、CI 確認──▶ main ──▶ 文件站／Storybook／reg
 | 文件站 / Storybook / registry | 每次進版都更新（它們反映 `main` 的當下狀態） |
 | npm `@dooping/tokens` | **只在 token 內容真的變更時** bump |
 
-### 預覽站不是進版
+### 預覽站與候選版都不是進版
 
-`dev` 推上去後會部署到 **`/preview/`**，給維護者在真實裝置上確認 UI——
-尤其是響應式與觸控目標，那是開發機看不出來的。
+`dev` 推上去後部署到 **`/preview/`**，給維護者在真實裝置上看 UI——尤其是響應式與觸控目標，那是開發機看不出來的。
+`staging` 前進後部署到 **`/staging/`**，那是等待核准的候選版。
 
-:::danger 預覽站不可被參照
-`/preview/` 的內容隨時會被下一次 `dev` push 覆蓋，而且沒有經過進版。
-**其他系統一律以 `main` 的正式網址為準**，不得參照任何 `/preview/` 底下的東西。
+:::danger 只參照正式站
+`/preview/` 隨時會被下一次 `dev` push 覆蓋；`/staging/` 還沒核准，隨時會被下一個候選版取代。
+**其他系統一律以 `main` 的正式網址為準。** 兩個站都掛著不可關的橫幅，也不給搜尋引擎收錄。
 :::
 
-預覽站的 registry 檔案雖然存在，內容裡的相依網址仍指向**正式站**——
-就算誤複製了安裝指令，裝到的也是正式版本。
+每一段的 registry 都用自己的網址建置，相依指回同一段——從 `/staging/r/` 裝，拿到的全部是候選版，不會混到別段的版本。
+想提前試下一版，就在自己的分支從 `/staging/r/` 裝，把問題回報到 issue；正式導入一律用 `/r/`。
 
 ### 兩個對外訊號
 
@@ -110,31 +149,22 @@ npm ls @dooping/tokens; curl -s https://kielchang.github.io/dooping-design-book/
 | **發佈硬閘**（tag 名＝package.json 版本、commit 在 main 上） | 推錯 tag 發出錯的版本；對未進版的 commit 發佈 |
 | 兩處軟閘（PR 與進版當下的漂移提示） | 宣告了卻忘記發佈——不擋，但一直出聲到發為止 |
 
-### 進版流程：工程師提議，維護者在 GitHub 上確認
+### tag 與 Release：核准之後的自動蓋章
 
-```
-① dev 上：依判準表 bump 規範版號 ＋ 寫 CHANGELOG（這是「提議」）
-② 開 dev → main 的 Pull Request
-     └ CI 在 PR 上把關：守衛全綠？內容變了版號有沒有跟上？
-③ 在 GitHub 看 PR（版號、CHANGELOG、檢查結果）→ 合併 ＝ 確認
-④ 部署成功後自動蓋上 tag vX.Y.Z（版號沒動就不打，重跑不重複打）
-⑤ 自動發 GitHub Release：notes＝CHANGELOG 該則，標題帶 tokens 配對版
-```
-
-tag 是**自動蓋章**，不是閘門——閘門是第 ③ 步的合併。日期不佔 tag 名稱，
+tag 是**自動蓋章**，不是閘門——閘門是核准（上面流程的第 ⑤ 步合併）。日期不佔 tag 名稱，
 在 tag 描述與 CHANGELOG 裡。
 
-第 ⑤ 步是給取用端的**推播訊號**：Watch 這個 repo 的 Releases（或訂
+GitHub Release 是給取用端的**推播訊號**：Watch 這個 repo 的 Releases（或訂
 `releases.atom`）就會在每次進版時被主動告知，notes 直接是 CHANGELOG 該則全文——
-通知本身回答三問。純文件進版不發 Release，「沒有訊號＝不需要動作」。
+通知本身回答三問。版號沒動的進版不發 Release，「沒有訊號＝不需要動作」。
 訂閱方式、收到訊號後的判斷與每層更新程序，見[跟上新版](/governance/staying-current)。
 
-:::warning 一次合併只會蓋一個 tag
-第 ④ 步讀的是**合併當下**根目錄 `package.json` 的 `version`。所以如果 `dev` 上累積了
-好幾次 bump 才併，只有**最後那一個**版號會有 tag。
+:::warning 一次進版只會蓋一個 tag
+蓋 tag 讀的是**合併進 main 當下**根目錄 `package.json` 的 `version`。所以如果 `dev` 上累積了
+好幾次 bump 才送出候選版，只有**最後那一個**版號會有 tag。
 
-這不是缺陷——依上面第一條，**`dev` 併進 `main` 才算一次進版**，中間那些版號從來沒有
-任何取用端拿得到，它們是工作狀態。CHANGELOG 要照這個事實寫：**一次合併一則**，
+這不是缺陷——**核准版前進一次才算一次進版**，中間那些版號從來沒有
+任何取用端拿得到，它們是工作狀態。CHANGELOG 要照這個事實寫：**一次進版一則**，
 底下用 `###` 分工作項，不要把中間版號寫成好幾則發佈。
 
 實際發生過：`v0.3.0` 沒有 tag，因為它是隨 `v0.4.0` 那次合併一起釋出的。
@@ -143,8 +173,8 @@ tag 是**自動蓋章**，不是閘門——閘門是第 ③ 步的合併。日�
 :::tip CHANGELOG 標題裡的 SHA 是選填的
 標題格式是 `## vX.Y.Z · YYYY-MM-DD`，後面可以再加 merge commit 的 short SHA。
 
-**但它不能是「合併前改名」的前置條件**——那個 SHA 是 `dev → main` 的 merge commit，
-合併前根本不存在。原本的規則把它寫成必填，結果連續三次進版都乾脆跳過改名，
+**但它不能是「改名」的前置條件**——那個 SHA 是 staging → main 的 merge commit，
+改名的時候（開 dev → staging 的 PR 之前）根本不存在。原本的規則把它寫成必填，結果連續三次進版都乾脆跳過改名，
 於是 `v0.2.1` 與 `v0.4.0` 兩個已發佈版本一直躺在 CHANGELOG 的「未發佈」一節底下。
 
 commit 本身記在 tag 描述裡，不會遺失。合併後想補 SHA 再補。
@@ -227,6 +257,9 @@ curl -s https://kielchang.github.io/dooping-design-book/r/index.json | jq -r .ve
 3. 為什麼改（有對應的 PMIS ADR 就附編號）
 
 ## 文件版本對映產品版號
+
+> 這一節與下一節是**給取用端系統**的做法（設定頁、列印頁尾）。本書自己不做文件快照：
+> 下一版看 `/staging/`，舊版看 git tag。
 
 上面講的是三層各自怎麼編號。但有兩個問題**完全在讀者那一側**，規則本身回答不了：
 我現在讀的這頁文件對應哪一版產品？我手上這份產出物是哪一版產的？

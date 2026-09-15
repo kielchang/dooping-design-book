@@ -108,7 +108,10 @@ AGENTS.md、ARCHITECTURE.md ──(book/scripts/sync-root-docs.mjs)──► boo
 | `tests/registry-fingerprint.test.ts` | `/r/index.json` 的逐 item 指紋＝第二份獨立實作；base 與說明不進指紋；相依變了 closureHash 跟著變 | 指紋的用途（`registry-changes`） |
 | `tests/registry-changes.test.ts` | 兩版 registry 的四類異動分類、Markdown 輸出、上一個 tag 照數字大小挑 | 真實歷史（CI 在 dev 預演） |
 | `tests/dooping-check.test.ts` | 取用端工具的內容指紋與產生器一致；路徑對應；已是最新／上游有更新／本地改過三態 | PMIS 或 lock 的到期 |
-| `tests/changelog.test.ts` | CHANGELOG 每節前是「空行、---、空行」；目前版號的 Release notes 只含自己這一節 | 內容是否回答三問 |
+| `tests/changelog.test.ts` | CHANGELOG 每節前是「空行、---、空行」；目前版號的 Release notes 只含自己這一節（測的是 deploy 實際呼叫的 `scripts/lib/changelog.mjs`） | 內容是否回答三問 |
+| `tests/deploy-gh-pages.test.ts` | 部署腳本對臨時 bare repo 實跑：根目錄部署保留 `preview/`、`staging/`；段部署只動自己的目錄；目標不在清單上就拒絕；push 被拒時重抓重套再推 | Pages 有沒有真的建置出來（部署後冒煙） |
+| `tests/workflow-contract.test.ts` | `.github/rulesets/` 要求的必過檢查都對得到真的 job 與觸發事件；檢查名不重複；必過 job 不會被 `if:` 跳過（staging 一定傳 `consumer`／`deploy`）；沒有 paths 過濾；concurrency 每段一組；手動觸發有分支守門；publish-tokens 手動發佈過配對閘；部署目錄＝`STAGE_DIRS` | GitHub 上的 ruleset 有沒有真的套用（`gh api …/rules/branches/main`） |
+| `tests/release-gate.test.ts` | 發版閘每條規則各轉紅一次：版號遞增、tag 未被佔、CHANGELOG 已改名且標題對得上版號、分支只准 staging←dev／main←staging、合併後樹＝來源、核准清單勾完；抓不到 main 時 release 失敗 | git 那一層（CI 實跑）；CHANGELOG 內容是否回答三問 |
 | `tests/guard-ledger.test.ts` | 這張表列出每一支 `tests/*.test.ts` 與 `scripts/verify-*.mjs`、`host-sync.mjs` | 表格描述是否準確 |
 
 build 之後（CI 跑，本機可單獨跑）：
@@ -121,22 +124,28 @@ build 之後（CI 跑，本機可單獨跑）：
 | `npm run verify:book`（`scripts/verify-book-host.mjs`） | 文件站每頁的 computed style 符合 token 有效值（邊框、底色、表格、步驟、portal） | Storybook |
 | `npm run verify:host`（`scripts/verify-host.mjs`） | 內部試裝宿主：主題套上、color-mix、頁面級 axe、強制色彩、行動版外殼、凍結欄 | 元件單元行為（story） |
 | `npm run host:check`（`scripts/host-sync.mjs --check`） | registry ↔ 宿主檔案逐位元組相同；宿主宣告的 npm 相依；`dooping.lock.json` 與 registry 對得上 | 宿主自己的頁面程式 |
+| `npm run verify:consumer`（`scripts/verify-consumer.mjs`） | 套用驗收：repo 外的乾淨 Vite＋Tailwind v4 專案（`fixtures/consumer-vite-v4`），token 用 `npm pack` 的 tarball、元件用真的 shadcn CLI 從本機 registry 裝宿主安裝集；檔案＝registry、globals.css／components.json 沒被改寫、`tsc -b`＋`vite build`、dooping-check `--strict`、三組主題×模式的 token 期望值與 portal 面板、零 console error、axe | Next.js App Router、Tailwind v3、Base UI 共存；npm 上已發佈的版本 |
+| `npm run verify:deployed`（`scripts/verify-deployed.mjs`） | 部署後冒煙（對真的網址）：`deploy.json` 的 sha 對上才算上線；`/r/index.json` 版號、tokensVersion、homepage＝本段；每個 item 指紋＝repo、相依都指向本段且 200；非正式站有 noindex＋橫幅、正式站沒有；dooping-check 走 HTTP 讀得到一致的指紋 | 瀏覽器渲染（部署前的 `verify:book`／`verify:host`／`verify:consumer`） |
+| `npm run release:gate`（`scripts/release-gate.mjs`） | dev push 的 bump 守衛；staging 與 PR 的發版閘（規則見 `tests/release-gate.test.ts` 那一列） | 候選版裝不裝得起來（套用驗收） |
 
 新增守衛的鐵律（`CLAUDE.md`）：**一定要反向驗證**——暫時把值改壞，確認那條真的會紅。
 
 ## CI 閘門
 
-`.github/workflows/ci.yml`（push `dev` 與 PR → `main`）依序：
+三段共用 `.github/workflows/_pipeline.yml`，呼叫端各一支：`preview.yml`（push `dev`）、`pr-verify.yml`（PR → `dev`）、
+`staging.yml`（push `staging`）、`deploy.yml`（push `main`，另有 `release` job 蓋 tag 發 Release）；
+`pr-gate.yml` 把關開到 `staging`／`main` 的 PR；`publish-tokens.yml` 發 npm。`_pipeline.yml` 的 `build` 依序：
 
 1. typecheck → `npm test`（上表全部）
 2. **registry 同步**：重跑 `build:registry` 後 `git diff --exit-code -- registry/`
-3. **token 版號閘**：`tokens.json` 內容變了（`del(.meta)` 比對）但版號沒動 → 擋
-4. **規範版號閘**：監看清單**逐字等於**「會進 registry 的集合」
-   （`packages/react/src` 排除 demo/、stories、index.ts、version.ts，
-   加上 tokens 來源與 `templates/`）有變但規範版號沒動 → 擋。
-   **純文件變更不觸發**——文件修訂不必進版。
-5. **npm 漂移檢查**：宣告的 token 版落後 npm latest → 只警告不擋（發佈順序不該死結）
-6. build 後守衛（渲染／a11y／視覺）→ push `dev` 才部署 preview
+3. **版號閘**（`scripts/release-gate.mjs`）：dev 上是 bump 守衛——token 內容或「會進 registry 的集合」
+   （`scripts/lib/release-watch.mjs`）有變但版號沒動 → 擋，**純文件變更不觸發**；staging 上是發版閘——版號遞增、tag 未佔、CHANGELOG 已改名
+4. **npm 漂移檢查**：宣告的 token 版落後 npm latest → 只警告不擋（發佈順序不該死結）
+5. 這一段自己的 registry（base＝本段網址）→ build 後守衛（渲染／a11y／視覺／宿主）→ `deploy.json` 戳記 → 部署
+
+另兩個 job：`consumer`（套用驗收，只有 staging 傳開）與 `smoke`（部署後冒煙，staging 與 main）。
+必過檢查的名字是「呼叫端 job / `_pipeline.yml` 的 job」（例如 `staging / consumer`）；
+ruleset 在 `.github/rulesets/`，`tests/workflow-contract.test.ts` 核對兩邊對得上。
 
 ## 版號模型
 
@@ -146,12 +155,11 @@ build 之後（CI 跑，本機可單獨跑）：
 - **配對樞紐**＝`packages/react/package.json` 對 `@dooping/tokens` 的宣告那一行，
   曝露為 `/r/index.json` 的 `tokensVersion`。每版規範恰好配對一個 token 版；
   多版規範對同一 token 版合法，反過來非法。
-- **事件鏈**：dev 上 bump＋寫 CHANGELOG（提議）→ 合併進 `main`（確認）→
-  `deploy.yml` 自動蓋 `vX.Y.Z` tag ＋ 抽 CHANGELOG 該則全文發 GitHub Release。
-  純文件進版不打 tag、不發 Release——**安靜就是「不需要動作」的訊號**。
-- **儀表板**：`npm run status`（`scripts/version-status.mjs`）一次印出已發佈／工作中／
-  配對／領先 commit。判準正本在
-  [治理 → 版本策略](https://kielchang.github.io/dooping-design-book/governance/versioning/)。
+- **事件鏈**：dev 上 bump＋寫 CHANGELOG → 候選版進 `staging` 跑套用驗收 → 核准合併進 `main` →
+  `deploy.yml` 的 `release` job 蓋 `vX.Y.Z` tag、以 `scripts/lib/changelog.mjs` 抽 CHANGELOG 該則發 GitHub Release。
+- **儀表板**：`npm run status`（`scripts/version-status.mjs`）印出 main／staging／dev 三欄、配對與下一步。
+  流程與判準正本在
+  [治理 → 版本策略「三段式發布」](https://kielchang.github.io/dooping-design-book/governance/versioning/)。
 
 ## 文件站建置
 
@@ -161,21 +169,23 @@ build 之後（CI 跑，本機可單獨跑）：
   文件站的活範例渲染**真元件**，不是截圖或複本——元件改了，文件頁自動跟上。
 - `onBrokenLinks: "throw"`：站內死鏈直接紅 build。本檔正本因此**只用絕對 URL**，
   相對連結在同步後的副本位置會解析失敗——這是刻意留著的守衛。
-- `BOOK_BASE_URL` 注入雙站：正式 `/dooping-design-book/`、預覽 `/dooping-design-book/preview/`
-  （預覽站掛不可關的警示橫幅，取用一律以正式站為準）。
+- `BOOK_BASE_URL`／`BOOK_STAGE` 注入三站：正式 `/dooping-design-book/`、候選版 `/dooping-design-book/staging/`、
+  預覽 `/dooping-design-book/preview/`。後兩者掛不可關的橫幅並加 noindex；`verify:book` 驗段標記。
 
 ## 分支與部署拓樸
 
 ```
-dev  ──push──► ci.yml     ──► gh-pages 的 preview/   （預覽站，隨時被覆蓋，不得參照）
+dev ─push─► preview.yml ─► gh-pages 的 preview/        （預覽站）
  │
- └─PR─► main ──► deploy.yml ──► gh-pages 根          （正式站＋tag＋Release）
+ └─PR（pr-gate）─► staging ─push─► staging.yml ─► gh-pages 的 staging/   （候選版＋套用驗收＋冒煙）
+                      │
+                      └─PR（pr-gate＋核准清單）─► main ─push─► deploy.yml ─► gh-pages 根（正式站）＋tag＋Release
 ```
 
-兩支 workflow 共用 concurrency group `gh-pages-write`，寫入序列化——
-曾發生 PR 驗證擠掉 dev 部署、預覽站安靜停在上一版的實際事故，
-細節寫在 `.github/workflows/ci.yml` 的註解。部署腳本 `scripts/deploy-gh-pages.sh`
-用 git worktree 手寫：正式站與預覽站共用同一分支、誰都不能清掉對方。
+每段各自一個 concurrency group（`pages-preview`／`pages-staging`／`pages-production`）——以前共用一組，
+GitHub 一組只留一個等待中的 run，dev 連推會取消等待中的 main 部署。部署腳本 `scripts/deploy-gh-pages.sh`
+用 git worktree 手寫：三段共用 gh-pages 分支，`STAGE_DIRS` 列的段目錄在根目錄部署時保留，同時推的衝突靠重抓、重套、再推。
+流程規則的正本在[治理 → 版本策略「三段式發布」](https://kielchang.github.io/dooping-design-book/governance/versioning/)。
 
 ## 如何提出建議
 
@@ -185,7 +195,7 @@ dev  ──push──► ci.yml     ──► gh-pages 的 preview/   （預覽�
 | 要提的是 | 門口 |
 | --- | --- |
 | Bug（行為與規範不符） | [bug.yml](https://github.com/kielchang/dooping-design-book/issues/new?template=bug.yml) |
-| 小調整（文案、對比、一個 prop） | 直接開 PR |
+| 小調整（文案、對比、一個 prop） | 直接開 PR 到 `dev` |
 | 新元件／新 token／改語意 | [rfc.yml](https://github.com/kielchang/dooping-design-book/issues/new?template=rfc.yml)（五題逐欄） |
 | 頁面章缺件表的項目 | [missing-piece.yml](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml)（一則＝三次法則的一次證據） |
 

@@ -20,7 +20,7 @@ title: 跟上新版
 | `dooping-check` | 元件層：**你抄過的 item**（含相依）上游動了沒、本地改了沒 | 下面的「例行檢查」，放進宿主 CI |
 | `/r/index.json` | 機器可讀正本：規範 `version`、配對的 `tokensVersion`、每個 item 的指紋 `meta.closureHash` | 自己寫檢查時讀 |
 
-三個刻意設計要知道：
+四個刻意設計要知道：
 
 - **純文件進版不打 tag、不發 Release。** 版號沒動＝取用端不需要任何動作，
   所以你不會收到通知——安靜本身就是訊號。
@@ -28,6 +28,9 @@ title: 跟上新版
   正本在 `/r/index.json` 的 `tokensVersion`（見[版本策略](/governance/versioning)的配對模型）。
 - **Release 的 item 清單分四類**：內容有變、只因相依變了而受影響、新增、移除。
   最容易漏的是「只因相依受影響」——修正落在 `utils` 時，抄了 `data-table` 的人一樣要重抄。
+- **訊號只來自核准版（`main`）。** 上游每一版先進 `/staging/` 做套用驗收，核准後才進正式站、才發 Release。
+  想提前試下一版，可以在自己的分支從 `/staging/r/` 裝來回報問題；正式導入與例行檢查一律對 `/r/`
+  （流程見[版本策略「三段式發布」](/governance/versioning)）。
 
 ### 例行檢查：dooping-check
 

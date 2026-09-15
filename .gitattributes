@@ -2,3 +2,10 @@
 apps/host-v4/src/components/dooping/** text eol=lf
 apps/host-v4/src/lib/dooping/** text eol=lf
 apps/host-v4/src/demo/** text eol=lf
+
+# shell 腳本一律 LF：core.autocrlf=true 的 Windows 工作目錄會把它轉成 CRLF，sh 讀到 \r 就壞
+# （tests/deploy-gh-pages.test.ts 在本機用 Git for Windows 的 sh 實跑部署腳本）
+*.sh text eol=lf
+
+# 套用驗收的乾淨專案範本：驗收時逐位元組比對 globals.css 與 components.json 有沒有被 CLI 改寫
+fixtures/** text eol=lf

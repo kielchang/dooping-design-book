@@ -11,10 +11,29 @@ import type * as Preset from "@docusaurus/preset-classic";
 
 const BASE_URL = process.env.BOOK_BASE_URL ?? "/";
 const SITE_URL = process.env.BOOK_SITE_URL ?? "https://kielchang.github.io";
-// 預覽站＝dev 的工作狀態，不是發佈。文件寫了「不可參照」，但誤入的人不會先讀文件——
-// 站台自己要說。用 baseUrl 判斷：只有 /preview/ 建置掛橫幅，正式站與本機都不出現。
-const IS_PREVIEW = BASE_URL.includes("/preview/");
 const PROD_URL = "https://kielchang.github.io/dooping-design-book/";
+
+// 三段式發布：preview＝dev 的工作狀態、staging＝候選版（驗收中）、production＝核准版（main）。
+// 文件寫了「只參照正式站」，但誤入的人不會先讀文件——站台自己要說它是哪一段，而且不給搜尋引擎收錄。
+// BOOK_STAGE 由 workflow 明確設定；本機沒設時由 baseUrl 推斷。規則正本：治理章〈版本策略〉「三段式發布」。
+const STAGES = ["preview", "staging", "production"] as const;
+type Stage = (typeof STAGES)[number];
+const STAGE = (process.env.BOOK_STAGE ??
+  (BASE_URL.includes("/preview/") ? "preview" : BASE_URL.includes("/staging/") ? "staging" : "production")) as Stage;
+if (!STAGES.includes(STAGE)) throw new Error(`BOOK_STAGE 只能是 ${STAGES.join("／")}（收到：${STAGE}）`);
+const SPEC_VERSION: string = require("../package.json").version;
+const COMMIT = (process.env.BOOK_COMMIT ?? "").slice(0, 7);
+const BANNERS: Partial<Record<Stage, { id: string; content: string }>> = {
+  preview: {
+    id: "dev-preview",
+    content: `dev 預覽站——非發佈版、隨時被下一次 push 覆蓋。取用一律以 <a href="${PROD_URL}"><b>正式站</b></a> 為準。`,
+  },
+  staging: {
+    id: "staging-candidate",
+    content: `候選版 v${SPEC_VERSION}${COMMIT ? `・${COMMIT}` : ""} 驗收中、尚未核准，隨時被下一個候選版取代。取用一律以 <a href="${PROD_URL}"><b>正式站</b></a> 為準。`,
+  },
+};
+const BANNER = BANNERS[STAGE];
 // Storybook 與 registry 都不在文件站的 dev server 裡——本機 build/start（BASE_URL 為 `/`）
 // 時照 SITE_URL+BASE_URL 組出來的是 https://kielchang.github.io/storybook/ 這種不存在的
 // 網址，所以外連一律退回正式站。
@@ -34,6 +53,8 @@ const config: Config = {
   organizationName: "kielchang",
   projectName: "dooping-design-book",
   trailingSlash: true,
+  // 預覽站與候選版不給搜尋引擎收錄：搜尋進來的人只該落在核准版
+  noIndex: STAGE !== "production",
   onBrokenLinks: "throw",
   markdown: { hooks: { onBrokenMarkdownLinks: "throw" } },
   i18n: { defaultLocale: "zh-Hant", locales: ["zh-Hant"] },
@@ -89,7 +110,7 @@ const config: Config = {
           sidebarPath: "./sidebars.ts",
           // 每頁的「編輯此頁」。治理章的架構頁是 sync script 的建置產物
           // （gitignored），對它的編輯要導向正本，否則連到一個不存在的檔案。
-          // 指向 dev：日常修訂都在 dev 累積，main 只收進版合併。
+          // 指向 dev：日常修訂都在 dev 累積；staging 只收 dev、main 只收 staging 的核准合併。
           editUrl: ({ docPath }) =>
             docPath === "7-governance/10-architecture.md"
               ? "https://github.com/kielchang/dooping-design-book/edit/dev/ARCHITECTURE.md"
@@ -111,11 +132,10 @@ const config: Config = {
 
   themeConfig: {
     // 常駐、不可關——它就是提醒色辭典「低強度提醒」的用例（warning 淡底＋同色相深墨），
-    // 站台自己是驗收宿主，橫幅顏色也吃 token。
-    ...(IS_PREVIEW && {
+    // 站台自己是驗收宿主，橫幅顏色也吃 token。正式站沒有橫幅。
+    ...(BANNER && {
       announcementBar: {
-        id: "dev-preview",
-        content: `dev 預覽站——非發佈版、隨時被下一次 push 覆蓋。取用一律以 <a href="${PROD_URL}"><b>正式站</b></a> 為準。`,
+        ...BANNER,
         backgroundColor: "hsl(var(--warning-subtle))",
         textColor: "hsl(var(--warning-subtle-foreground))",
         isCloseable: false,

@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { fingerprints } from "./fingerprint.mjs";
 
 // 兩版 registry 之間的異動分類（ADR-0013 第三層）：deploy.yml 附進 Release notes、
-// ci.yml 在 dev 預演、npm run status 印數量。純函式在上半、git／檔案讀取在下半。
+// _pipeline.yml 在 dev 與 staging 預演、npm run status 印數量。純函式在上半、git／檔案讀取在下半。
 
 const byCodeUnit = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 

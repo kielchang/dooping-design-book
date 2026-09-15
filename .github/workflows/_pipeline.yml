@@ -1,0 +1,263 @@
+name: pipeline
+
+# 三段式發布共用的建置／驗證／部署流程——preview.yml、pr-verify.yml、staging.yml、deploy.yml 都呼叫這一份。
+# 以前 ci.yml 與 deploy.yml 各寫一份，已經漂移過（正式站沒有宿主步驟、沒有版號閘）；第三段再複製一份只會更糟。
+#
+# 段（stage）一個輸入決定 base path、部署目錄、橫幅、要跑哪些閘，彼此不可能矛盾：
+#   preview     push dev：守衛＋宿主＋bump 守衛 → 部署 /preview/（dev 的工作狀態，不可參照）
+#   pr          PR → dev：同上，不部署
+#   staging     push staging：守衛＋宿主＋發版閘＋套用驗收 → 部署 /staging/（候選版，registry 可安裝）→ 部署後冒煙
+#   production  push main：守衛 → 部署根目錄（核准版）→ 部署後冒煙；tag 與 Release 在 deploy.yml 的 release job
+#
+# 寫給改這支的人：
+# - 這裡不設 concurrency 與 permissions，由呼叫端設定（GitHub 文件警告呼叫端與被呼叫端共用 group 會互相取消）。
+# - 呼叫端的 job id＋這裡的 job id 就是 ruleset 要求的檢查名（例如「staging / consumer」）。
+#   改名前先看 .github/rulesets/ 與 tests/workflow-contract.test.ts。
+# - 被 if: 跳過的 job 會對必過檢查回報「成功」——consumer 由呼叫端傳入開關，契約測試盯著 staging 一定傳 true。
+# 流程正本：book/docs/7-governance/01-versioning.mdx「三段式發布」。
+on:
+  workflow_call:
+    inputs:
+      stage:
+        description: preview｜pr｜staging｜production
+        type: string
+        required: true
+      deploy:
+        type: boolean
+        default: false
+      consumer:
+        description: 跑套用驗收（乾淨的取用端專案）
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # 要讀上一個 v* tag 的 registry/（registry 異動清單）與 origin/main（發版閘）
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+
+      - name: 段設定（base path、部署目錄、網址）
+        env:
+          STAGE: ${{ inputs.stage }}
+          DEPLOY: ${{ inputs.deploy }}
+        run: |
+          case "$STAGE" in
+            preview)    P=/dooping-design-book/preview/; DEST=preview; HOST=1; BOOK_STAGE=preview ;;
+            pr)         P=/dooping-design-book/preview/; DEST=;        HOST=1; BOOK_STAGE=preview ;;
+            staging)    P=/dooping-design-book/staging/; DEST=staging; HOST=1; BOOK_STAGE=staging ;;
+            production) P=/dooping-design-book/;         DEST=.;       HOST=;  BOOK_STAGE=production ;;
+            *) echo "::error::未知的 stage：$STAGE"; exit 1 ;;
+          esac
+          if [ "$DEPLOY" = "true" ] && [ -z "$DEST" ]; then echo "::error::stage $STAGE 不部署"; exit 1; fi
+          {
+            echo "SITE_PATH=$P"
+            echo "SITE_URL=https://kielchang.github.io$P"
+            echo "DEPLOY_DEST=$DEST"
+            echo "WITH_HOST=$HOST"
+            echo "BOOK_STAGE=$BOOK_STAGE"
+          } >> "$GITHUB_ENV"
+
+      - run: npm ci
+      - name: 建置 token（CSS 產物是後續所有步驟的前提）
+        run: npm run build:tokens
+      - name: 型別檢查
+        run: npm run typecheck
+      - name: 守衛測試
+        run: npm test
+
+      # registry/*.json 是進版控的產物。改了 packages/react/src 卻沒重跑產生器，線上 registry 就會跟原始碼對不起來。
+      - name: registry 與原始碼一致
+        run: |
+          npm run build:registry
+          git diff --exit-code -- registry/ || {
+            echo "::error::registry/ 與原始碼不同步。請執行 npm run build:registry 並提交結果。"
+            exit 1
+          }
+
+      # dev 上：元件或 token 相對 main 有變就必須 bump（抓不到 main 放行——候選版會在 staging 嚴格檢查）
+      - name: 版號守衛（元件或 token 有變就要 bump）
+        if: inputs.stage == 'preview' || inputs.stage == 'pr'
+        run: node scripts/release-gate.mjs bump-guard
+
+      # 候選版：版號嚴格遞增、tag 未被佔、CHANGELOG 已改名且標題對得上（抓不到 main 直接失敗）
+      - name: 發版閘（候選版）
+        if: inputs.stage == 'staging'
+        run: node scripts/release-gate.mjs release
+
+      # 合併進 main 時 Release 會附的 registry 異動清單，在 dev 與 staging 先算一次。
+      # checkout 的 fetch-depth: 0 不保證帶 tag（2026-09 實測 CI 裡一個 v* tag 都沒有，這一步安靜略過、照樣綠），所以明確抓。
+      - name: registry 異動預覽（相對上一個 v* tag，寫進 step summary）
+        if: inputs.stage != 'production'
+        run: |
+          set -o pipefail
+          git fetch --tags --force -q origin
+          if ! git tag --list 'v*' | grep -q .; then
+            echo "::error::抓不到任何 v* tag——registry 異動預覽會空轉"
+            exit 1
+          fi
+          node scripts/registry-changes.mjs --before "v$(node -p "require('./package.json').version")" --markdown | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # npm 上的 @dooping/tokens 落後 repo 宣告時出聲。刻意只警告：正確順序是先合併進 main、再推 tokens-v* 發佈。
+      - name: "npm 上的 tokens 版本是否落後（僅警告）"
+        if: inputs.stage != 'production'
+        continue-on-error: true
+        run: |
+          DECLARED=$(node -p "require('./packages/react/package.json').dependencies['@dooping/tokens'].replace(/^[~^>=< ]*/, '')")
+          PUBLISHED=$(npm view @dooping/tokens version 2>/dev/null || true)
+          {
+            echo "### @dooping/tokens 散佈狀態"
+            echo ""
+            echo "| repo 宣告 | npm latest |"
+            echo "| --- | --- |"
+            echo "| \`${DECLARED:-查不到}\` | \`${PUBLISHED:-查不到}\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$DECLARED" ] && [ -n "$PUBLISHED" ] && [ "$DECLARED" != "$PUBLISHED" ]; then
+            echo "::warning::npm 上的 @dooping/tokens 是 $PUBLISHED，repo 宣告 $DECLARED——核准進 main 之後要推 tokens-v$DECLARED 才會發佈。"
+          fi
+
+      # 每一段的 registry 用自己的網址建：候選版的相依指回候選版，裝得起來也不會混到別段的版本。
+      # 正式站這一份必須與進版控的 registry/ 逐位元組相同（registry/ 的 base 就是正式站）。
+      - name: 產生這一段的 registry（base＝本段網址）
+        run: |
+          REGISTRY_BASE="${SITE_URL%/}" REGISTRY_OUT=registry-public node scripts/build-registry.mjs
+          if [ "${{ inputs.stage }}" = "production" ]; then
+            git diff --no-index --quiet registry registry-public || { echo "::error::正式站的 registry 與 registry/ 不同"; exit 1; }
+          fi
+
+      - name: 建置文件站
+        working-directory: book
+        run: |
+          npm ci
+          npm run build
+        env:
+          BOOK_BASE_URL: ${{ env.SITE_PATH }}
+          BOOK_SITE_URL: https://kielchang.github.io
+          BOOK_COMMIT: ${{ github.sha }}
+
+      # 快取鍵只綁 playwright 自己的版本（lockfile 每次進版都會變）。重抓的實際代價很飄：同一天量到 19 秒與 30 分鐘兩種，
+      # 差別在 CDN 當下的狀況——CI 突然變慢時先看這一步的 log，不要先改快取鍵。
+      - name: 取出 Playwright 版本（快取鍵用）
+        id: pw-version
+        run: echo "version=$(node -p "require('./package-lock.json').packages['node_modules/playwright'].version")" >> "$GITHUB_OUTPUT"
+      - name: 快取 Playwright Chromium
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw-version.outputs.version }}
+      - name: 安裝 Playwright Chromium
+        run: |
+          if [ "${{ steps.pw-cache.outputs.cache-hit }}" = "true" ]; then
+            npx playwright install-deps chromium
+          else
+            npx playwright install --with-deps chromium
+          fi
+
+      # 渲染守衛：逐頁驗 computed style（表格、按鈕、portal 面板）＋段標記（noindex 與橫幅）
+      - name: 渲染守衛：文件站（verify:book）
+        run: npm run verify:book
+        env:
+          BOOK_BASE_URL: ${{ env.SITE_PATH }}
+
+      - name: 建置 Storybook
+        run: npm run build-storybook -- -o book/build/storybook
+      - name: 無障礙行為守衛（axe＋play functions）
+        run: npm run verify:storybook
+        env:
+          STORYBOOK_DIR: book/build/storybook
+      - name: 視覺回歸：token 期望值掃描（六主題×兩模式）
+        run: npm run verify:visual
+        env:
+          STORYBOOK_DIR: book/build/storybook
+
+      # 內部試裝宿主（apps/host-v4）：照取用端的路接上來的 Tailwind v4 應用。只在 preview／staging 部署；正式站只放規範。
+      - name: 內部試裝宿主：同步檢查（registry ↔ 宿主）
+        if: env.WITH_HOST == '1'
+        run: npm run host:check
+      - name: 內部試裝宿主：建置
+        if: env.WITH_HOST == '1'
+        run: npm run host:build
+        env:
+          VITE_BASE: ${{ env.SITE_PATH }}host/
+      - name: 內部試裝宿主：渲染守衛（verify:host）
+        if: env.WITH_HOST == '1'
+        run: npm run verify:host
+        env:
+          HOST_BASE: ${{ env.SITE_PATH }}host/
+
+      - name: 放置 registry、宿主與部署戳記
+        run: |
+          mkdir -p book/build/r
+          cp registry-public/*.json book/build/r/
+          if [ "$WITH_HOST" = "1" ]; then
+            mkdir -p book/build/host
+            cp -r apps/host-v4/dist/. book/build/host/
+          fi
+          node scripts/verify-deployed.mjs --stamp book/build
+
+      - name: 部署 → gh-pages
+        if: inputs.deploy
+        run: |
+          sh scripts/deploy-gh-pages.sh book/build "$DEPLOY_DEST" "deploy(${{ inputs.stage }}) ${{ github.sha }}"
+          echo "### 已部署 $SITE_URL" >> "$GITHUB_STEP_SUMMARY"
+
+  # 套用驗收：repo 外建一個乾淨的 Vite＋Tailwind v4 專案，token 用 npm pack 的 tarball、元件用真的 shadcn CLI 裝，
+  # 建置後在瀏覽器量顏色。與 build 平行跑；紅了是真的取用端訊號（npm 網路問題時可單獨重跑這個 job）。
+  consumer:
+    if: inputs.consumer
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: 建置 token
+        run: npm run build:tokens
+      - name: 取出 Playwright 版本（快取鍵用）
+        id: pw-version
+        run: echo "version=$(node -p "require('./package-lock.json').packages['node_modules/playwright'].version")" >> "$GITHUB_OUTPUT"
+      - name: 快取 Playwright Chromium
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw-version.outputs.version }}
+      - name: 安裝 Playwright Chromium
+        run: |
+          if [ "${{ steps.pw-cache.outputs.cache-hit }}" = "true" ]; then
+            npx playwright install-deps chromium
+          else
+            npx playwright install --with-deps chromium
+          fi
+      - name: 套用驗收（verify:consumer）
+        run: npm run verify:consumer
+        env:
+          CONSUMER_DIR: ${{ runner.temp }}/consumer
+
+  # 部署後冒煙：對真的網址確認上線的就是這一版（deploy.json 的 sha、registry 指紋、相依指向本段、段標記）。
+  # preview 不跑（dev 的預覽站隨時被覆蓋）；build 或 consumer 失敗時不跑（它們本身已經擋住了）。
+  smoke:
+    needs: [build, consumer]
+    if: ${{ !cancelled() && inputs.deploy && inputs.stage != 'preview' && needs.build.result == 'success' && contains(fromJSON('["success","skipped"]'), needs.consumer.result) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: 部署後冒煙（verify:deployed）
+        run: |
+          case "${{ inputs.stage }}" in
+            staging) SUB=staging/ ;;
+            *) SUB= ;;
+          esac
+          DEPLOY_URL="https://kielchang.github.io/dooping-design-book/$SUB" \
+          EXPECT_STAGE="${{ inputs.stage }}" \
+          EXPECT_SHA="${{ github.sha }}" \
+          node scripts/verify-deployed.mjs

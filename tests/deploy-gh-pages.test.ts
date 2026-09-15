@@ -4,7 +4,7 @@
 // 規則正本：scripts/deploy-gh-pages.sh 檔頭；段目錄清單 STAGE_DIRS。
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { because } from "./lib/guard";
@@ -120,8 +120,11 @@ describe("scripts/deploy-gh-pages.sh", () => {
   }, 60000);
 
   it("push 被拒一次：重抓重套再推，成功且沒有蓋掉別段", () => {
-    // 遠端第一次拒收（模擬別段剛好推過、或暫時性錯誤），第二次放行
-    write(join(remote, "hooks/pre-receive"), "#!/bin/sh\nif [ ! -f \"$GIT_DIR/rejected-once\" ]; then touch \"$GIT_DIR/rejected-once\"; echo 'reject once' >&2; exit 1; fi\nexit 0\n");
+    // 遠端第一次拒收（模擬別段剛好推過、或暫時性錯誤），第二次放行。
+    // hook 一定要有執行權限：Linux 上沒有 +x 的 hook 會被 git 安靜略過，重試路徑就沒被走到（Windows 不看這個位元）。
+    const hook = join(remote, "hooks/pre-receive");
+    write(hook, "#!/bin/sh\nif [ ! -f \"$GIT_DIR/rejected-once\" ]; then touch \"$GIT_DIR/rejected-once\"; echo 'reject once' >&2; exit 1; fi\nexit 0\n");
+    chmodSync(hook, 0o755);
     const r = deploy(build("preview", { "index.html": "預覽-新" }), "preview");
     expect(r.status, r.output).toBe(0);
     expect(r.output, because("沒有走到重試", "push 被拒時要重抓、重套、再推", RULE)).toContain("push 被拒");

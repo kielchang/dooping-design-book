@@ -122,7 +122,7 @@ build 之後（CI 跑，本機可單獨跑）：
 | `npm run verify:storybook`（`scripts/verify-storybook.mjs`） | 全部 story 的 axe＋play 全數執行；強制色彩下焦點看得見 | 顏色對比、頁面級規則 |
 | `npm run verify:visual`（`scripts/verify-visual.mjs`） | 六主題×兩模式的截圖掃 token 期望色，其他主題的 brand 不滲入 | 版面位移、像素基準 |
 | `npm run verify:book`（`scripts/verify-book-host.mjs`） | 文件站每頁的 computed style 符合 token 有效值（邊框、底色、表格、步驟、portal） | Storybook |
-| `npm run verify:host`（`scripts/verify-host.mjs`） | 內部試裝宿主：主題套上、color-mix、頁面級 axe、強制色彩、行動版外殼、凍結欄 | 元件單元行為（story） |
+| `npm run verify:host`（`scripts/verify-host.mjs`） | 內部試裝宿主：主題套上、color-mix、頁面級 axe、強制色彩、行動版外殼、凍結欄、多應用外殼（切應用換選單、選單鍵盤路、接真路由後選了就關） | 元件單元行為（story） |
 | `npm run host:check`（`scripts/host-sync.mjs --check`） | registry ↔ 宿主檔案逐位元組相同；宿主宣告的 npm 相依；`dooping.lock.json` 與 registry 對得上 | 宿主自己的頁面程式 |
 | `npm run verify:consumer`（`scripts/verify-consumer.mjs`） | 套用驗收：repo 外的乾淨 Vite＋Tailwind v4 專案（`fixtures/consumer-vite-v4`），token 用 `npm pack` 的 tarball、元件用真的 shadcn CLI 從本機 registry 裝宿主安裝集；檔案＝registry、globals.css／components.json 沒被改寫、`tsc -b`＋`vite build`、dooping-check `--strict`、三組主題×模式的 token 期望值與 portal 面板、零 console error、axe | Next.js App Router、Tailwind v3、Base UI 共存；npm 上已發佈的版本 |
 | `npm run verify:deployed`（`scripts/verify-deployed.mjs`） | 部署後冒煙（對真的網址）：`deploy.json` 的 sha 對上才算上線；`/r/index.json` 版號、tokensVersion、homepage＝本段；每個 item 指紋＝repo、相依都指向本段且 200；非正式站有 noindex＋橫幅、正式站沒有；dooping-check 走 HTTP 讀得到一致的指紋 | 瀏覽器渲染（部署前的 `verify:book`／`verify:host`／`verify:consumer`） |

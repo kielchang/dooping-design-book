@@ -1,7 +1,7 @@
 import * as React from "react";
 import type { LucideIcon } from "lucide-react";
 import { ChevronRight } from "lucide-react";
-import type { NavGroup, NavLeaf } from "../lib/nav";
+import { isNavAction, type NavAction, type NavGroup, type NavLeaf } from "../lib/nav";
 import {
   CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandShortcut,
 } from "./command";
@@ -29,6 +29,8 @@ export interface CommandPaletteProps {
   actions?: CommandActionGroup[];
   /** 選中導覽項時呼叫。palette 內的項目是 option 不是連結——導航方式由宿主決定。 */
   onNavigate?: (url: string, item: NavLeaf) => void;
+  /** 選中 groups 裡的動作項（NavAction）時呼叫——與頂部功能選單同一個出口。 */
+  onAction?: (action: string, item: NavAction) => void;
   /** 受控開關；不給就用內部狀態（配 hotkey 即可獨立運作）。 */
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -52,6 +54,7 @@ export function CommandPalette({
   groups = [],
   actions = [],
   onNavigate,
+  onAction,
   open: openProp,
   onOpenChange,
   hotkey = "k",
@@ -101,7 +104,19 @@ export function CommandPalette({
         {groups.map((group) => (
           <CommandGroup key={group.title} heading={group.title}>
             {group.items.flatMap((item) =>
-              item.items
+              isNavAction(item)
+                ? [
+                    <CommandItem
+                      key={item.title}
+                      value={item.title}
+                      onSelect={() => runCommand(() => onAction?.(item.action, item))}
+                    >
+                      {item.icon ? <item.icon /> : null}
+                      {item.title}
+                      {item.shortcut ? <CommandShortcut>{item.shortcut}</CommandShortcut> : null}
+                    </CommandItem>,
+                  ]
+                : item.items
                 ? item.items.map((sub) => (
                     <CommandItem
                       key={`${item.title}-${sub.title}`}

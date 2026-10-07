@@ -210,3 +210,88 @@ export const demoNavGroups: NavGroup[] = [
     ],
   },
 ];
+
+/**
+ * 多應用外殼示範：側欄的應用清單——與導覽同一份 NavGroup[] 契約，一個應用＝一個葉節點。
+ * 應用名稱一律用中性詞；icon 一樣在 stories／宿主端以標題對映。
+ */
+export const demoApps: NavGroup[] = [
+  {
+    title: "常用",
+    items: [
+      { title: "作業中心", url: "/workbench" },
+      { title: "文件庫", url: "/apps/library" },
+      { title: "排程", url: "/apps/schedule" },
+    ],
+  },
+  {
+    title: "管理",
+    items: [{ title: "系統管理", url: "/apps/admin" }],
+  },
+];
+
+/**
+ * 每個應用的頂部功能選單，以應用的 url 為鍵。
+ * 「作業中心」的選單就是 demoNavGroups 那五區——工作節奏分區原封不動從側欄搬到頂部，
+ * 另在〈每日作業〉補一個動作項示範「開對話框」（標題結尾的 … 表示還要再填東西）。
+ */
+export const demoAppMenus: Record<string, NavGroup[]> = {
+  "/workbench": demoNavGroups.map((g) =>
+    g.title === "每日作業"
+      ? { ...g, items: [...g.items, { title: "新增紀錄…", action: "new-record", shortcut: "Ctrl N" }] }
+      : g,
+  ),
+  "/apps/library": [
+    {
+      title: "瀏覽",
+      items: [
+        { title: "全部文件", url: "/apps/library" },
+        { title: "最近開啟", url: "/apps/library/recent" },
+      ],
+    },
+    {
+      title: "整理",
+      items: [
+        { title: "新增資料夾…", action: "new-folder" },
+        { title: "標籤", url: "/apps/library/tags" },
+      ],
+    },
+  ],
+  "/apps/schedule": [
+    {
+      title: "檢視",
+      items: [
+        { title: "本週", url: "/apps/schedule" },
+        { title: "本月", url: "/apps/schedule/month" },
+      ],
+    },
+    {
+      title: "排程",
+      items: [{ title: "新增排程…", action: "new-schedule", shortcut: "Ctrl N" }],
+    },
+  ],
+  "/apps/admin": [
+    {
+      title: "帳號",
+      items: [
+        { title: "使用者", url: "/apps/admin" },
+        { title: "角色", url: "/apps/admin/roles" },
+      ],
+    },
+    {
+      title: "系統",
+      items: [
+        { title: "異動紀錄", url: "/apps/admin/audit" },
+        { title: "一般設定", url: "/apps/admin/general" },
+      ],
+    },
+  ],
+};
+
+/** 頂列右段的通知示範：未讀數＝鈴鐺上的徽章（取代舊的「待處理 N 項」常駐狀態列）。 */
+export const demoNotifications = [
+  { id: "n1", title: "批次 B-0217 已結算完成", time: "5 分鐘前", unread: true, url: "/settlement" },
+  { id: "n2", title: "3 筆紀錄等待確認", time: "1 小時前", unread: true, url: "/stock-check" },
+  { id: "n3", title: "類別「甲」的設定已變更", time: "昨天", unread: false, url: "/master" },
+  { id: "n4", title: "本期報表已產出", time: "2 天前", unread: false, url: "/reports" },
+];

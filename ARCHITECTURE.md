@@ -108,6 +108,7 @@ AGENTS.md、ARCHITECTURE.md ──(book/scripts/sync-root-docs.mjs)──► boo
 | `tests/registry-fingerprint.test.ts` | `/r/index.json` 的逐 item 指紋＝第二份獨立實作；base 與說明不進指紋；相依變了 closureHash 跟著變 | 指紋的用途（`registry-changes`） |
 | `tests/registry-changes.test.ts` | 兩版 registry 的四類異動分類、Markdown 輸出、上一個 tag 照數字大小挑 | 真實歷史（CI 在 dev 預演） |
 | `tests/dooping-check.test.ts` | 取用端工具的內容指紋與產生器一致；路徑對應；已是最新／上游有更新／本地改過三態 | PMIS 或 lock 的到期 |
+| `tests/feedback-intake.test.ts` | 取用端回饋的格式正本只在 AGENTS.md「回饋到上游」一份：create_task 參數是合法 JSON（`DESIGN`、`[回饋]` 前綴、`agent:` 署名、不帶狀態與計畫連結）、骨架八段依序；台帳四題各處同一說法；流程頁指向正本；別處沒有第二份 | PMIS 實際收到的內容與 PMIS 端 schema；守門人的分流節奏（人工） |
 | `tests/changelog.test.ts` | CHANGELOG 每節前是「空行、---、空行」；目前版號的 Release notes 只含自己這一節（測的是 deploy 實際呼叫的 `scripts/lib/changelog.mjs`） | 內容是否回答三問 |
 | `tests/deploy-gh-pages.test.ts` | 部署腳本對臨時 bare repo 實跑：根目錄部署保留 `preview/`、`staging/`；段部署只動自己的目錄；目標不在清單上就拒絕；push 被拒時重抓重套再推 | Pages 有沒有真的建置出來（部署後冒煙） |
 | `tests/workflow-contract.test.ts` | `.github/rulesets/` 要求的必過檢查都對得到真的 job 與觸發事件；檢查名不重複；必過 job 不會被 `if:` 跳過（staging 一定傳 `consumer`／`deploy`）；沒有 paths 過濾；concurrency 每段一組；手動觸發有分支守門；publish-tokens 手動發佈過配對閘；部署目錄＝`STAGE_DIRS` | GitHub 上的 ruleset 有沒有真的套用（`gh api …/rules/branches/main`） |
@@ -189,18 +190,13 @@ GitHub 一組只留一個等待中的 run，dev 連推會取消等待中的 main
 
 ## 如何提出建議
 
-三條收錄原則（去領域化／通用性／三次法則）與門口的正本在 `CONTRIBUTING.md` 與
+三條收錄原則（去領域化／通用性／三次法則）、兩個入口與分流的正本在
 [治理 → 回饋與 RFC 流程](https://kielchang.github.io/dooping-design-book/governance/rfc/)，這裡只導流：
 
-| 要提的是 | 門口 |
-| --- | --- |
-| Bug（行為與規範不符） | [bug.yml](https://github.com/kielchang/dooping-design-book/issues/new?template=bug.yml) |
-| 小調整（文案、對比、一個 prop） | 直接開 PR 到 `dev` |
-| 新元件／新 token／改語意 | [rfc.yml](https://github.com/kielchang/dooping-design-book/issues/new?template=rfc.yml)（五題逐欄） |
-| 頁面章缺件表的項目 | [missing-piece.yml](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml)（一則＝三次法則的一次證據） |
-
+- **取用端的 AI agent**：照 [AGENTS.md「回饋到上游」](https://kielchang.github.io/dooping-design-book/AGENTS.md)在維護方的 PMIS 開 task。
+- **人**：GitHub 表單或 PR，門口列在 [CONTRIBUTING.md](https://github.com/kielchang/dooping-design-book/blob/main/CONTRIBUTING.md)。
 - **想推翻某條規則**：先讀該規則的守衛檔頭與文件頁那一句——理由就寫在旁邊；
   決定的來龍去脈記在維護方內部的 PMIS，本 repo 不放決策紀錄。
-- **下游唯讀鐵律**：先在宿主做、台帳記自製，三次法則過了再提回上游
+- **下游唯讀鐵律**：先在宿主做、台帳記自製，同時回饋；三次法則由上游數
   （[治理 → 符合性台帳](https://kielchang.github.io/dooping-design-book/governance/conformance-ledger/)）。
 - **改動前的驗證指令與環境啟動**：`CLAUDE.md`。

@@ -1,7 +1,8 @@
 # 貢獻指南
 
-> 給要回饋這套設計語言的人——不管你是取用端專案的工程師、設計師，還是 AI agent。
-> 完整規範在文件站[〈回饋與 RFC 流程〉](https://kielchang.github.io/dooping-design-book/governance/rfc/)；這一頁是「怎麼提、提到哪」的操作版。
+> 給要回饋這套設計語言的人——取用端專案的工程師、設計師，以及沒有維護方 PMIS 的外部讀者。
+> **取用端的 AI agent**（連得到 PMIS）不走這一頁：照 [AGENTS.md「回饋到上游」](https://kielchang.github.io/dooping-design-book/AGENTS.md)在 PMIS 開 task。
+> 完整規範在文件站[〈回饋與 RFC 流程〉](https://kielchang.github.io/dooping-design-book/governance/rfc/)；這一頁是「人怎麼提、提到哪」的操作版。
 
 ## 三種回饋，三個門口
 
@@ -15,8 +16,9 @@
 
 缺件表的 **Drawer** 已經有一份實作草稿，保存在 tag `draft/drawer-on-0.11.0`：`packages/react/src/ui/drawer.tsx`（Radix Dialog 組成、右側滑出，檔頭有與 Dialog 的分工說明），連同 `overlay-panels.stories.tsx`、`registry/drawer.json` 與文件頁 `book/docs/3-components/31-overlays.mdx`。它基於 v0.11.0 舊底、**尚未收錄**，三次法則證據齊了再拿來重新底化。原本放草稿的分支 `claude/overlays-page-header` 已於 2026-09-10 改以 tag 保存並刪除——tag 不會在清理分支時被帶走，**不要刪這個 tag**。取回單檔：`git fetch origin tag draft/drawer-on-0.11.0` 後 `git show draft/drawer-on-0.11.0:packages/react/src/ui/drawer.tsx`。
 
-**下游唯讀鐵律**：取用端專案對這個 repo 只有「讀」與「提案」兩種關係，
-沒有 submodule、沒有自動同步。**先在宿主做、記台帳，三次法則過了再提回上游**
+**下游唯讀鐵律**：取用端專案對這個 repo 只有「讀」與「回饋」兩種關係，
+沒有 submodule、沒有自動同步。**先在宿主做、記台帳，同時回饋；三次法則由上游數**——
+台帳那一列的四題（問題、建議、影響範圍、如果不改會怎樣）就是回饋的內容
 （理由見[符合性台帳](https://kielchang.github.io/dooping-design-book/governance/conformance-ledger/)）。
 
 ## 收錄三原則（全過才收）

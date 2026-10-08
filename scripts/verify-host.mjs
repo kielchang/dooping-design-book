@@ -93,6 +93,21 @@ async function launch() {
 const near = (a, b) => nearRgb(a, b, TOL);
 
 /** 開一個預先寫好主題的瀏覽器分頁（在 app 讀 localStorage 之前就寫入） */
+/**
+ * 焦點歸還要「等到」，不能讀一次：Radix 在關閉流程（關閉動畫、FocusScope 卸載）結束後才還焦點，
+ * 浮層從 DOM 消失與焦點回到觸發者之間有一段空檔。單次讀取在 CI 忙的時候會撞進這段空檔而假性失敗——
+ * 2026-10-08 的 preview 就紅在「Esc 後焦點沒回到選單標題」，同一個 SHA 在 PR 上是綠的。
+ * 等的是「最終狀態成立」（有上限），不是加長固定等待。
+ */
+async function focusReturnsTo(locator, timeout = 3000) {
+  const deadline = Date.now() + timeout;
+  for (;;) {
+    if (await locator.evaluate((el) => el === document.activeElement).catch(() => false)) return true;
+    if (Date.now() > deadline) return false;
+    await locator.page().waitForTimeout(50);
+  }
+}
+
 async function openPage(browser, { theme, mode, contextOptions = {} }) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, ...contextOptions });
   await context.addInitScript(
@@ -227,7 +242,7 @@ async function main() {
       await drawerNav().waitFor({ timeout: 5000 });
       await page.keyboard.press("Escape");
       await page.getByRole("dialog").waitFor({ state: "detached", timeout: 5000 });
-      if (!(await trigger.evaluate((el) => el === document.activeElement))) {
+      if (!(await focusReturnsTo(trigger))) {
         const focused = await page.evaluate(() => {
           const el = document.activeElement;
           return el ? `<${el.tagName.toLowerCase()}>${(el.getAttribute("aria-label") ?? "").slice(0, 30)}` : "（無）";
@@ -283,7 +298,7 @@ async function main() {
       await trigger("規劃與分析").and(page.locator('[aria-expanded="true"]')).waitFor({ timeout: 5000 });
       await page.keyboard.press("Escape");
       await page.getByRole("menu").waitFor({ state: "detached", timeout: 5000 });
-      if (!(await trigger("規劃與分析").evaluate((el) => el === document.activeElement)))
+      if (!(await focusReturnsTo(trigger("規劃與分析"))))
         fails.push(`${tag} Esc 關閉後焦點沒有回到「規劃與分析」標題`);
 
       // 選連結：真的 react-router 導航、選單關閉、一頁一個 h1

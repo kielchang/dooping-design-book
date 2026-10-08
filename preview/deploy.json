@@ -1,8 +1,8 @@
 {
   "stage": "preview",
-  "sha": "77dc9842cf3964fda42cec9c759e511dbcc57ac1",
-  "version": "0.13.0",
+  "sha": "f1fbc209e6ef314f689583c077c732cfd9ff8e2d",
+  "version": "0.14.0",
   "tokensVersion": "0.7.0",
-  "run": "https://github.com/kielchang/dooping-design-book/actions/runs/34964946495",
-  "builtAt": "2026-09-15T11:49:22.175Z"
+  "run": "https://github.com/kielchang/dooping-design-book/actions/runs/37733233242",
+  "builtAt": "2026-10-08T05:40:38.796Z"
 }

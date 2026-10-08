@@ -19,16 +19,27 @@ function useHoverTouch() {
   return { open, setOpen, handlers };
 }
 
-const bubbleCls =
-  "pointer-events-none absolute bottom-full left-0 z-50 mb-1 w-max max-w-[260px] whitespace-normal break-words rounded-md bg-foreground px-2 py-1 text-xs font-normal leading-snug text-background shadow-lg";
+const bubbleBase =
+  "pointer-events-none z-50 w-max max-w-[260px] whitespace-normal break-words rounded-md bg-foreground px-2 py-1 text-xs font-normal leading-snug text-background shadow-lg";
+const bubbleCls = cn(bubbleBase, "absolute bottom-full left-0 mb-1");
 
-/** 泡泡：掛載後量測自身，溢出視窗左右緣就水平夾擠、上緣不足就翻到下方。 */
-function Bubble({ id, children }: { id?: string; children: ReactNode }) {
+/**
+ * 泡泡：掛載後量測自身，溢出視窗左右緣就水平夾擠、上緣不足就翻到下方。
+ * side="right" 改用 fixed 定位貼在觸發器右側——垂直排列的圖示欄裡，
+ * 泡泡在上方會蓋住上一項；而且側欄內容區會捲動，absolute 會被它裁掉。
+ */
+function Bubble({ id, children, side = "top", anchor }: { id?: string; children: ReactNode; side?: "top" | "right"; anchor?: React.RefObject<HTMLSpanElement | null> }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [style, setStyle] = useState<React.CSSProperties>({ visibility: "hidden" });
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
+    if (side === "right") {
+      const a = anchor?.current?.getBoundingClientRect();
+      if (!a) return;
+      setStyle({ visibility: "visible", position: "fixed", left: a.right + 8, top: a.top + a.height / 2, transform: "translateY(-50%)" });
+      return;
+    }
     const r = el.getBoundingClientRect();
     const pad = 8;
     let dx = 0;
@@ -40,9 +51,9 @@ function Bubble({ id, children }: { id?: string; children: ReactNode }) {
       transform: dx ? `translateX(${dx}px)` : undefined,
       ...(flipDown ? { top: "100%", bottom: "auto", marginTop: 4, marginBottom: 0 } : {}),
     });
-  }, []);
+  }, [side, anchor]);
   return (
-    <span ref={ref} role="tooltip" id={id} style={style} className={bubbleCls}>
+    <span ref={ref} role="tooltip" id={id} style={style} className={side === "right" ? bubbleBase : bubbleCls}>
       {children}
     </span>
   );
@@ -58,14 +69,18 @@ export interface TooltipProps {
    * 否則會產生巢狀可聚焦元素，鍵盤使用者要多按一次 Tab 才走得掉。
    */
   focusable?: boolean;
+  /** 泡泡位置：預設在上方；"right" 給垂直排列的觸發器（側欄圖示欄）。 */
+  side?: "top" | "right";
 }
 
-export function Tooltip({ content, children, className, focusable }: TooltipProps) {
+export function Tooltip({ content, children, className, focusable, side = "top" }: TooltipProps) {
   const { open, setOpen, handlers } = useHoverTouch();
   const id = useId();
+  const anchor = useRef<HTMLSpanElement>(null);
   if (content == null || content === "") return <>{children}</>;
   return (
     <span
+      ref={anchor}
       className={cn("relative inline-flex max-w-full select-none", className)}
       {...handlers}
       {...(focusable
@@ -73,7 +88,7 @@ export function Tooltip({ content, children, className, focusable }: TooltipProp
         : {})}
     >
       {children}
-      {open && <Bubble id={focusable ? id : undefined}>{content}</Bubble>}
+      {open && <Bubble id={focusable ? id : undefined} side={side} anchor={anchor}>{content}</Bubble>}
     </span>
   );
 }

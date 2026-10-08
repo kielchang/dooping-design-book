@@ -45,7 +45,8 @@ dev（工作中）──PR──▶ staging（候選版：套用驗收）──P
 
 ```
 ① dev 上開發：功能分支做完才併進 dev；改到元件或 token 就依判準表 bump 版號（CI 擋漏 bump）
-② 切候選版：在 dev 把 CHANGELOG「## 未發佈」改名——有 bump 寫「## vX.Y.Z · 日期」，
+② 切候選版：守門人先分流 PMIS 裡新進的取用端回饋（見〈回饋與 RFC 流程〉）；
+   在 dev 把 CHANGELOG「## 未發佈」改名——有 bump 寫「## vX.Y.Z · 日期」，
    版號沒動寫「## 日期（說明）」——然後開 dev → staging 的 PR
      └ pr-gate：只准 staging ← dev、版號遞增、tag 未被佔、CHANGELOG 標題對得上
 ③ 合併 → staging 建置、發版閘、套用驗收、部署 /staging/、部署後冒煙
@@ -83,7 +84,7 @@ dev（工作中）──PR──▶ staging（候選版：套用驗收）──P
 :::
 
 每一段的 registry 都用自己的網址建置，相依指回同一段——從 `/staging/r/` 裝，拿到的全部是候選版，不會混到別段的版本。
-想提前試下一版，就在自己的分支從 `/staging/r/` 裝，把問題回報到 issue；正式導入一律用 `/r/`。
+想提前試下一版，就在自己的分支從 `/staging/r/` 裝，把問題回饋上游（入口見[回饋與 RFC 流程](/governance/rfc)）；正式導入一律用 `/r/`。
 
 ### 兩個對外訊號
 

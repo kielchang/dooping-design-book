@@ -14,6 +14,11 @@
 //   5. 行動版外殼：窄螢幕側欄轉成抽屜、開得起來、Esc 關閉後焦點回到開關。
 //   6. 每一頁零 pageerror、零 console error。
 //   7. 凍結欄：窄螢幕水平捲動＋十字對準時，凍結格仍不透明、彼此之間沒有縫（捲過去的欄位不會透出來）。
+//   8. 多應用外殼：側欄切應用 → 頂部功能選單整組換掉；選單的鍵盤路（Enter 開、→ 換下一個、
+//      Esc 焦點回標題）；選連結即導航並關選單、一頁仍一個 h1；動作項開對話框。
+//      行動版（第 5 項）另驗功能選單收成單一「選單」鈕、依原順序列出每一區。
+//      Storybook 驗元件契約；這裡驗「接上真的 react-router Link 之後」還成立——選了就關選單
+//      靠 Link 先呼叫轉發來的 onClick 再導航，順序錯了只有在真路由上才看得到。
 //
 // 讀 computed style 不讀截圖：宿主頁面的實色面積小（卡片、表格），掃圖容易被反鋸齒湊巧命中。
 // 主題由 useEffect 非同步套上——驗到相符為止（bounded retry），不靠長等待。
@@ -88,6 +93,21 @@ async function launch() {
 const near = (a, b) => nearRgb(a, b, TOL);
 
 /** 開一個預先寫好主題的瀏覽器分頁（在 app 讀 localStorage 之前就寫入） */
+/**
+ * 焦點歸還要「等到」，不能讀一次：Radix 在關閉流程（關閉動畫、FocusScope 卸載）結束後才還焦點，
+ * 浮層從 DOM 消失與焦點回到觸發者之間有一段空檔。單次讀取在 CI 忙的時候會撞進這段空檔而假性失敗——
+ * 2026-10-08 的 preview 就紅在「Esc 後焦點沒回到選單標題」，同一個 SHA 在 PR 上是綠的。
+ * 等的是「最終狀態成立」（有上限），不是加長固定等待。
+ */
+async function focusReturnsTo(locator, timeout = 3000) {
+  const deadline = Date.now() + timeout;
+  for (;;) {
+    if (await locator.evaluate((el) => el === document.activeElement).catch(() => false)) return true;
+    if (Date.now() > deadline) return false;
+    await locator.page().waitForTimeout(50);
+  }
+}
+
 async function openPage(browser, { theme, mode, contextOptions = {} }) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, ...contextOptions });
   await context.addInitScript(
@@ -208,7 +228,7 @@ async function main() {
     if (await page.evaluate(() => !!document.querySelector("aside")))
       fails.push("[行動版] 窄螢幕仍渲染桌面側欄 <aside>——應轉成抽屜");
     const trigger = page.getByRole("button", { name: /切換側邊欄/ });
-    const drawerNav = () => page.getByRole("dialog").getByRole("navigation", { name: "主導覽" });
+    const drawerNav = () => page.getByRole("dialog").getByRole("navigation", { name: "應用程式" });
     try {
       // 觸控：點得開、Esc 關得掉。觸控點擊不保證讓按鈕取得焦點，所以這條路不驗焦點歸還。
       await trigger.tap();
@@ -222,7 +242,7 @@ async function main() {
       await drawerNav().waitFor({ timeout: 5000 });
       await page.keyboard.press("Escape");
       await page.getByRole("dialog").waitFor({ state: "detached", timeout: 5000 });
-      if (!(await trigger.evaluate((el) => el === document.activeElement))) {
+      if (!(await focusReturnsTo(trigger))) {
         const focused = await page.evaluate(() => {
           const el = document.activeElement;
           return el ? `<${el.tagName.toLowerCase()}>${(el.getAttribute("aria-label") ?? "").slice(0, 30)}` : "（無）";
@@ -232,7 +252,78 @@ async function main() {
     } catch (e) {
       fails.push(`[行動版] 抽屜開關流程失敗：${String(e.message).split("\n")[0]}`);
     }
+    // 功能選單收成單一「選單」鈕，裡面依原順序列出每一區
+    try {
+      const bar = page.getByRole("menubar", { name: "應用功能" });
+      const triggers = await bar.getByRole("menuitem").allTextContents();
+      if (triggers.length !== 1 || !triggers[0].includes("選單"))
+        fails.push(`[行動版] 功能選單沒有收成單一「選單」鈕（看到 ${triggers.length} 個：${triggers.join("、")}）`);
+      await bar.getByRole("menuitem", { name: "選單" }).tap();
+      const menu = page.getByRole("menu");
+      await menu.waitFor({ timeout: 5000 });
+      const text = (await menu.textContent()) ?? "";
+      const order = ["每日作業", "規劃與分析", "報表", "主檔與設定", "說明"].map((t) => text.indexOf(t));
+      if (order.some((i) => i < 0) || order.some((i, k) => k > 0 && i < order[k - 1]))
+        fails.push(`[行動版] 單一選單裡的分區缺漏或順序不對（位置 ${order.join(",")}）`);
+      await page.keyboard.press("Escape");
+      await menu.waitFor({ state: "detached", timeout: 5000 });
+    } catch (e) {
+      fails.push(`[行動版] 功能選單流程失敗：${String(e.message).split("\n")[0]}`);
+    }
     for (const e of errors) fails.push(`[行動版]  ${e}`);
+    await context.close();
+  }
+
+  // ── 8：多應用外殼——切應用換選單、選單鍵盤路、選了就導航並關選單 ──────────
+  {
+    const { context, page, errors } = await openPage(browser, {
+      theme: DEFAULT_THEME,
+      mode: "light",
+      contextOptions: { viewport: { width: 1280, height: 800 } },
+    });
+    const tag = "[多應用外殼]";
+    try {
+      await page.goto(url("workbench"), { waitUntil: "load" });
+      await page.waitForSelector("main h1", { timeout: 10000 });
+      const bar = page.getByRole("menubar", { name: "應用功能" });
+      const trigger = (name) => bar.getByRole("menuitem", { name, exact: true });
+      if ((await trigger("每日作業").getAttribute("data-current")) === null)
+        fails.push(`${tag} /workbench 的所在分區「每日作業」沒有被標出（data-current）`);
+
+      // 鍵盤：Enter 開、→ 換到下一個頂層選單、Esc 關閉且焦點回到那個標題
+      await trigger("每日作業").focus();
+      await page.keyboard.press("Enter");
+      await page.getByRole("menu").waitFor({ timeout: 5000 });
+      await page.keyboard.press("ArrowRight");
+      await trigger("規劃與分析").and(page.locator('[aria-expanded="true"]')).waitFor({ timeout: 5000 });
+      await page.keyboard.press("Escape");
+      await page.getByRole("menu").waitFor({ state: "detached", timeout: 5000 });
+      if (!(await focusReturnsTo(trigger("規劃與分析"))))
+        fails.push(`${tag} Esc 關閉後焦點沒有回到「規劃與分析」標題`);
+
+      // 選連結：真的 react-router 導航、選單關閉、一頁一個 h1
+      await trigger("每日作業").click();
+      await page.getByRole("menu").getByRole("menuitem", { name: "存量清查" }).click();
+      await page.waitForURL((u) => u.pathname.endsWith("/stock-check"), { timeout: 5000 });
+      await page.getByRole("menu").waitFor({ state: "detached", timeout: 5000 });
+      if ((await page.locator("main h1").count()) !== 1) fails.push(`${tag} 從選單導航到 /stock-check 後 h1 不是一個`);
+
+      // 切應用：頂部選單整組換掉
+      await page.getByRole("navigation", { name: "應用程式" }).getByRole("link", { name: /文件庫/ }).click();
+      await page.waitForURL((u) => u.pathname.endsWith("/apps/library"), { timeout: 5000 });
+      await trigger("整理").waitFor({ timeout: 5000 });
+      if ((await trigger("每日作業").count()) !== 0) fails.push(`${tag} 切到「文件庫」後頂部選單仍是「作業中心」的`);
+
+      // 動作項：開對話框（元件交回代號，宿主決定開什麼）
+      await trigger("整理").click();
+      await page.getByRole("menu").getByRole("menuitem", { name: "新增資料夾…" }).click();
+      await page.getByRole("dialog", { name: "新增資料夾" }).waitFor({ timeout: 5000 });
+      await page.keyboard.press("Escape");
+      await page.getByRole("dialog").waitFor({ state: "detached", timeout: 5000 });
+    } catch (e) {
+      fails.push(`${tag} 流程失敗：${String(e.message).split("\n")[0]}`);
+    }
+    for (const e of errors) fails.push(`${tag}  ${e}`);
     await context.close();
   }
 
@@ -318,14 +409,14 @@ async function main() {
 
   console.log(
     `token 期望值 ${combos} 組（${THEMES.length} 主題 × ${MODES.length} 模式 × ${PAGES.length} 頁）；` +
-      `頁面級 axe ${PAGES.length} 頁；強制色彩焦點 ${FORCED_COLORS_PAGES.length} 頁；行動版外殼 1 個情境；凍結欄 1 個情境`,
+      `頁面級 axe ${PAGES.length} 頁；強制色彩焦點 ${FORCED_COLORS_PAGES.length} 頁；行動版外殼 1 個情境；凍結欄 1 個情境；多應用外殼 1 個情境`,
   );
   if (fails.length) {
     console.error(`\n✗ 內部試裝宿主渲染守衛不通過（${fails.length} 條）：\n` + fails.map((f) => "  " + f).join("\n"));
     console.error("\n每一項驗什麼、為什麼：本檔檔頭；宿主怎麼接、元件怎麼進來：apps/host-v4/README.md。");
     process.exit(1);
   }
-  console.log("✓ 內部試裝宿主渲染守衛通過：主題套上、透明度可用、頁面結構無障礙、強制色彩、行動版外殼與凍結欄行為正確。");
+  console.log("✓ 內部試裝宿主渲染守衛通過：主題套上、透明度可用、頁面結構無障礙、強制色彩、行動版外殼、凍結欄與多應用外殼行為正確。");
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

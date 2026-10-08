@@ -10,6 +10,8 @@
   含 name/title/description/url；單品一律 /r/<name>.json，
   用 `npx shadcn@latest add <單品URL>` 安裝。版本數字問這個檔，本文件刻意不寫死。）
 - AI／agent 一頁式取用契約：https://kielchang.github.io/dooping-design-book/AGENTS.md
+- 回饋上游：用的過程中遇到不符規範、想改設計、缺件，有維護方 PMIS 工具的 agent 照 AGENTS.md
+  「回饋到上游」在 PMIS 開 task（用的當下就送，不必等三次）；沒有 PMIS 的人走 GitHub 表單。
 - 四條不可改契約：語意色的名稱與意義不可改（換品牌改值不改名）；琥珀色保留給
   「已改動未送出」；深色鉤子掛 document.documentElement（.dark class 或
   [data-theme="dark"]）；不得只靠顏色傳達語意。
@@ -69,4 +71,4 @@
 
 - [CHANGELOG](https://github.com/kielchang/dooping-design-book/blob/main/CHANGELOG.md)：每則回答「改了什麼／你要做什麼／為什麼改」
 - [原始碼](https://github.com/kielchang/dooping-design-book)
-- [提出建議（三分流表單）](https://github.com/kielchang/dooping-design-book/issues/new/choose)
+- [提出建議（人用的三分流表單；agent 走 AGENTS.md「回饋到上游」）](https://github.com/kielchang/dooping-design-book/issues/new/choose)

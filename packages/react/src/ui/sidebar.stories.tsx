@@ -157,6 +157,21 @@ export const 收合成完全隱藏: Story = {
     const noTransition = doc.createElement("style");
     noTransition.textContent = "*, *::before, *::after { transition: none !important; }";
     doc.head.append(noTransition);
+    // DIAG（暫時，不併）：CI 才紅的窺看收不掉——記下指標／焦點事件與 data-peek 的時間線
+    const trace: string[] = [];
+    const t0 = performance.now();
+    const log = (s: string) => trace.push(`${Math.round(performance.now() - t0)}ms ${s}`);
+    const tag = (n: EventTarget | null) =>
+      n instanceof Element ? `${n.tagName}${n.hasAttribute("data-sidebar-edge") ? "[edge]" : ""}${n.getAttribute("aria-label") ? `(${n.getAttribute("aria-label")})` : ""}` : String(n);
+    for (const type of ["pointerover", "pointerout", "pointerenter", "pointerleave", "pointermove", "focusin", "focusout", "keydown"]) {
+      doc.addEventListener(type, (e) => {
+        const el = e.target as Element;
+        if (type === "keydown" || el?.closest?.("aside,[data-sidebar-edge]"))
+          log(`${type} ${tag(el)} trusted=${e.isTrusted} pt=${(e as PointerEvent).pointerType ?? "-"} rel=${tag((e as PointerEvent).relatedTarget)}`);
+      }, true);
+    }
+    new MutationObserver(() => log(`data-peek=${aside.hasAttribute("data-peek")} inert=${aside.hasAttribute("inert")}`))
+      .observe(aside, { attributes: true, attributeFilter: ["data-peek", "inert"] });
     try {
       await userEvent.click(trigger);
       await waitFor(() => expect(aside).toHaveAttribute("inert"));
@@ -190,7 +205,14 @@ export const 收合成完全隱藏: Story = {
       // 從已卸載的熱區離開不會經過側欄（CI 實測窺看因此收不掉；本機是被瀏覽器自己的指標事件掩蓋）。
       await userEvent.hover(aside);
       await userEvent.unhover(aside);
-      await waitFor(() => expect(aside).not.toHaveAttribute("data-peek"));
+      try {
+        await waitFor(() => expect(aside).not.toHaveAttribute("data-peek"));
+      } catch {
+        throw new Error(
+          `DIAG 窺看沒收：active=${tag(doc.activeElement)} insideAside=${aside.contains(doc.activeElement)} ` +
+            `| ${trace.slice(-40).join(" | ")}`,
+        );
+      }
       await expect(aside).toHaveAttribute("inert");
 
       // 收尾：釘選展開回來（推開內容），別讓視覺掃描拿到收合畫面

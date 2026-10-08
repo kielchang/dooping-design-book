@@ -42,13 +42,23 @@ const storyLink = (props: SidebarNavLinkProps) => (
 // 觀看者的視窗寬度改變（窄視口下桌面斷言會找不到地標而假性失敗）。
 const FORCE_DESKTOP = "(max-width: 0px)";
 
-function Shell({ currentPath, mobileQuery = FORCE_DESKTOP, defaultOpen }: { currentPath: string; mobileQuery?: string; defaultOpen?: boolean }) {
+function Shell({
+  currentPath,
+  mobileQuery = FORCE_DESKTOP,
+  defaultOpen,
+  collapsible,
+}: {
+  currentPath: string;
+  mobileQuery?: string;
+  defaultOpen?: boolean;
+  collapsible?: "icon" | "offcanvas";
+}) {
   return (
     <AppShell
       mobileQuery={mobileQuery}
       defaultOpen={defaultOpen}
       sidebar={
-        <Sidebar>
+        <Sidebar collapsible={collapsible}>
           <SidebarHeader>
             <div className="flex h-9 items-center gap-2 px-2 font-semibold">
               <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-brand text-xs text-brand-foreground">帳</span>
@@ -125,6 +135,57 @@ export const 收合成圖示欄: Story = {
     // 收尾：展開回來，別讓視覺掃描拿到收合畫面
     await userEvent.click(trigger);
     await waitFor(() => expect(aside).toHaveAttribute("data-state", "expanded"));
+  },
+};
+
+export const 收合成完全隱藏: Story = {
+  render: () => <Shell currentPath="/workbench" collapsible="offcanvas" />,
+  // 契約：offcanvas 收合後側欄整塊移出畫面與 Tab 順序（inert）；滑鼠碰左緣窺看——
+  // 浮在內容上、不推版面；Esc 或滑鼠離開就收；釘選展開走 SidebarTrigger（鍵盤與觸控的路）。
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const doc = canvasElement.ownerDocument;
+    const trigger = canvas.getByRole("button", { name: "切換側邊欄" });
+    const aside = canvasElement.querySelector("aside") as HTMLElement;
+    const main = canvasElement.querySelector("main") as HTMLElement;
+    const mainLeft = () => main.getBoundingClientRect().left;
+    const pinnedLeft = mainLeft();
+
+    await userEvent.click(trigger);
+    await waitFor(() => expect(aside).toHaveAttribute("inert"));
+    await waitFor(() => expect(aside.getBoundingClientRect().right).toBeLessThanOrEqual(0));
+    // 工作區拿回整個寬度
+    await waitFor(() => expect(mainLeft()).toBeLessThan(pinnedLeft));
+    const collapsedLeft = mainLeft();
+    // 移出畫面不等於鍵盤走不進去——inert 要真的擋住焦點
+    const link = within(aside).getByRole("link", { name: /工作台/, hidden: true });
+    link.focus();
+    await expect(doc.activeElement).not.toBe(link);
+
+    // 碰左緣窺看：浮層、不推版面
+    const edge = canvasElement.querySelector("[data-sidebar-edge]") as HTMLElement;
+    await userEvent.hover(edge);
+    await waitFor(() => expect(aside).toHaveAttribute("data-peek"));
+    await expect(aside).not.toHaveAttribute("inert");
+    await waitFor(() => expect(aside.getBoundingClientRect().left).toBe(0));
+    expect(mainLeft()).toBe(collapsedLeft);
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+    // Esc 收（焦點不在側欄裡也要收得掉）
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(aside).toHaveAttribute("inert"));
+
+    // 再叫出來，滑鼠離開就收
+    await userEvent.hover(canvasElement.querySelector("[data-sidebar-edge]") as HTMLElement);
+    await waitFor(() => expect(aside).toHaveAttribute("data-peek"));
+    await userEvent.unhover(aside);
+    await waitFor(() => expect(aside).not.toHaveAttribute("data-peek"));
+    await expect(aside).toHaveAttribute("inert");
+
+    // 收尾：釘選展開回來（推開內容），別讓視覺掃描拿到收合畫面
+    await userEvent.click(trigger);
+    await waitFor(() => expect(aside).not.toHaveAttribute("inert"));
+    await waitFor(() => expect(mainLeft()).toBe(pinnedLeft));
   },
 };
 

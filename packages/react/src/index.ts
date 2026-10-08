@@ -40,6 +40,8 @@ export * from "./ui/command-palette";
 export * from "./ui/sidebar";
 export * from "./ui/sidebar-nav";
 export * from "./ui/app-shell";
+// 多應用外殼的頂部功能選單（側欄切應用、頂部切功能，見〈後台系統的資訊架構〉）
+export * from "./ui/app-menubar";
 
 // 頁面骨架（ADR-0008 解鎖：PageHeader 被重複手排八次，走解鎖條件進元件章）
 export * from "./ui/page-header";

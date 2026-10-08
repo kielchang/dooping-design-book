@@ -2,13 +2,28 @@
   "$comment": "由 scripts/dooping-check.mjs 產生（init／update），請勿手改。每個 item 記上游的 closureHash，以及它（含相依）寫進專案的每個檔的內容指紋。",
   "registry": "../../registry",
   "items": {
-    "app-shell": {
-      "closureHash": "395eab801539548b",
+    "app-menubar": {
+      "closureHash": "7f8018a796aea310",
       "files": {
-        "src/components/dooping/app-shell.tsx": "0aa104f12be8009a",
+        "src/components/dooping/app-menubar.tsx": "13e6bb4122e23cc3",
+        "src/components/dooping/badge.tsx": "b3a68cb4ab43a47f",
         "src/components/dooping/button.tsx": "a9d5979132efdbf2",
-        "src/components/dooping/sidebar.tsx": "abe93194d0ed77ec",
-        "src/components/dooping/tooltip.tsx": "65615ae220cd3823",
+        "src/components/dooping/collapsible.tsx": "d610c15a4541a713",
+        "src/components/dooping/dropdown-menu.tsx": "fa04330ac405e0af",
+        "src/components/dooping/sidebar-nav.tsx": "675e0de608946b5e",
+        "src/components/dooping/sidebar.tsx": "89ae1660a747005f",
+        "src/components/dooping/tooltip.tsx": "cf077bd029612af1",
+        "src/lib/dooping/nav.ts": "1dad79b222e0ef27",
+        "src/lib/dooping/utils.ts": "4183e1ff9acda6ee"
+      }
+    },
+    "app-shell": {
+      "closureHash": "face1b8b297eebc3",
+      "files": {
+        "src/components/dooping/app-shell.tsx": "2dad5f97f6d96131",
+        "src/components/dooping/button.tsx": "a9d5979132efdbf2",
+        "src/components/dooping/sidebar.tsx": "89ae1660a747005f",
+        "src/components/dooping/tooltip.tsx": "cf077bd029612af1",
         "src/lib/dooping/utils.ts": "4183e1ff9acda6ee"
       }
     },
@@ -41,10 +56,10 @@
       }
     },
     "change-summary": {
-      "closureHash": "3f9b3b0c515b03da",
+      "closureHash": "9ea07d81182d44bf",
       "files": {
         "src/components/dooping/change-summary.tsx": "c4de7b37c8eb3906",
-        "src/components/dooping/tooltip.tsx": "65615ae220cd3823",
+        "src/components/dooping/tooltip.tsx": "cf077bd029612af1",
         "src/lib/dooping/forms-diff.ts": "780ebaf87e38ffb5",
         "src/lib/dooping/utils.ts": "4183e1ff9acda6ee"
       }
@@ -81,12 +96,12 @@
       }
     },
     "command-palette": {
-      "closureHash": "3af56e7fc6a88246",
+      "closureHash": "b6dc5e5650e06bdd",
       "files": {
-        "src/components/dooping/command-palette.tsx": "4965ab6da8a19d2a",
+        "src/components/dooping/command-palette.tsx": "26216e9a85b22f7c",
         "src/components/dooping/command.tsx": "d64996ae14a67b93",
         "src/components/dooping/dialog.tsx": "c807ec330ce0705a",
-        "src/lib/dooping/nav.ts": "9ce24315e6468c92",
+        "src/lib/dooping/nav.ts": "1dad79b222e0ef27",
         "src/lib/dooping/utils.ts": "4183e1ff9acda6ee"
       }
     },
@@ -102,19 +117,19 @@
       }
     },
     "data-table": {
-      "closureHash": "1a500e7a6390f1ae",
+      "closureHash": "30e305d88e75dadc",
       "files": {
         "src/components/dooping/button.tsx": "a9d5979132efdbf2",
         "src/components/dooping/checkbox.tsx": "500a5c85eb380044",
         "src/components/dooping/data-table.tsx": "43a2b014ee5b61ca",
-        "src/components/dooping/dropdown-menu.tsx": "77e3f5c33753bd7a",
+        "src/components/dooping/dropdown-menu.tsx": "fa04330ac405e0af",
         "src/components/dooping/empty-state.tsx": "b640ef2bfb251657",
         "src/components/dooping/input.tsx": "cc0cf4da27071fe5",
         "src/components/dooping/popover.tsx": "bb6032c57d2d5954",
         "src/components/dooping/select.tsx": "d5b125881b18cecf",
         "src/components/dooping/skeleton.tsx": "c22cbdad532999b0",
         "src/components/dooping/table.tsx": "2e524eb6b3a57974",
-        "src/components/dooping/tooltip.tsx": "65615ae220cd3823",
+        "src/components/dooping/tooltip.tsx": "cf077bd029612af1",
         "src/lib/dooping/csv.ts": "24213c9bdf49ebc3",
         "src/lib/dooping/download.ts": "7e499a67009cc876",
         "src/lib/dooping/use-sort.ts": "ac9d366370153f12",
@@ -141,8 +156,15 @@
         "scripts/dooping-check.mjs": "727056a412064926"
       }
     },
+    "dropdown-menu": {
+      "closureHash": "8cb734458520dc27",
+      "files": {
+        "src/components/dooping/dropdown-menu.tsx": "fa04330ac405e0af",
+        "src/lib/dooping/utils.ts": "4183e1ff9acda6ee"
+      }
+    },
     "editable-field": {
-      "closureHash": "6dd5764751123c7f",
+      "closureHash": "2d9e3df8ae5485c9",
       "files": {
         "src/components/dooping/chips.tsx": "b7804017575a5d7d",
         "src/components/dooping/editable-field.tsx": "a5e6bb2462f8ec1d",
@@ -150,7 +172,7 @@
         "src/components/dooping/label.tsx": "c83329e0a596a6da",
         "src/components/dooping/seg-group.tsx": "25c493fece75c003",
         "src/components/dooping/select.tsx": "d5b125881b18cecf",
-        "src/components/dooping/tooltip.tsx": "65615ae220cd3823",
+        "src/components/dooping/tooltip.tsx": "cf077bd029612af1",
         "src/lib/dooping/forms-diff.ts": "780ebaf87e38ffb5",
         "src/lib/dooping/utils.ts": "4183e1ff9acda6ee"
       }
@@ -200,6 +222,13 @@
         "src/lib/dooping/utils.ts": "4183e1ff9acda6ee"
       }
     },
+    "popover": {
+      "closureHash": "8c1fa3156b2b8694",
+      "files": {
+        "src/components/dooping/popover.tsx": "bb6032c57d2d5954",
+        "src/lib/dooping/utils.ts": "4183e1ff9acda6ee"
+      }
+    },
     "seg-group": {
       "closureHash": "95486c58355690c8",
       "files": {
@@ -222,25 +251,25 @@
       }
     },
     "sidebar": {
-      "closureHash": "f1db4051eec4eac1",
+      "closureHash": "52304223cc7e17c5",
       "files": {
         "src/components/dooping/button.tsx": "a9d5979132efdbf2",
-        "src/components/dooping/sidebar.tsx": "abe93194d0ed77ec",
-        "src/components/dooping/tooltip.tsx": "65615ae220cd3823",
+        "src/components/dooping/sidebar.tsx": "89ae1660a747005f",
+        "src/components/dooping/tooltip.tsx": "cf077bd029612af1",
         "src/lib/dooping/utils.ts": "4183e1ff9acda6ee"
       }
     },
     "sidebar-nav": {
-      "closureHash": "f12cdb04faa78af9",
+      "closureHash": "9afe1c96f5c9c933",
       "files": {
         "src/components/dooping/badge.tsx": "b3a68cb4ab43a47f",
         "src/components/dooping/button.tsx": "a9d5979132efdbf2",
         "src/components/dooping/collapsible.tsx": "d610c15a4541a713",
-        "src/components/dooping/dropdown-menu.tsx": "77e3f5c33753bd7a",
-        "src/components/dooping/sidebar-nav.tsx": "6dcb22e9e2d82882",
-        "src/components/dooping/sidebar.tsx": "abe93194d0ed77ec",
-        "src/components/dooping/tooltip.tsx": "65615ae220cd3823",
-        "src/lib/dooping/nav.ts": "9ce24315e6468c92",
+        "src/components/dooping/dropdown-menu.tsx": "fa04330ac405e0af",
+        "src/components/dooping/sidebar-nav.tsx": "675e0de608946b5e",
+        "src/components/dooping/sidebar.tsx": "89ae1660a747005f",
+        "src/components/dooping/tooltip.tsx": "cf077bd029612af1",
+        "src/lib/dooping/nav.ts": "1dad79b222e0ef27",
         "src/lib/dooping/utils.ts": "4183e1ff9acda6ee"
       }
     },

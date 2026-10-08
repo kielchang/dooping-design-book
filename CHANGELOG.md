@@ -31,6 +31,37 @@
 
 ---
 
+## 未發佈（`dev`）
+
+### 多應用外殼：側欄切應用、頂部選單切功能（minor → 0.14.0）
+
+1. **改了什麼**：
+   - 新元件 **`AppMenubar` 功能選單列**（`app-menubar`，Radix Menubar）：吃同一份 `NavGroup[]`，一組一個頂層選單，
+     行為像 macOS 的選單列（左右鍵在頂層間移動並循環、開著時滑過另一個標題就切換、Esc 歸還焦點）。
+     兩層群組渲染成「分區標題＋子項」，不做子選單；行動版或頂層標題擠不下時收成單一「選單」鈕，依原順序列出每一區。
+   - `nav` 導覽契約新增**動作項 `NavAction`**（`{ title, action, shortcut? }`：不導航，把代號交回 `onAction`，例如開對話框）
+     與 `findActiveNavLeaf()`（找出所在項與它的分組，父子都符合時取最長的）。
+     `SidebarNav`、`CommandPalette` 都接 `onAction`——側欄、頂部選單、⌘K 三個出口吃同一份資料。
+   - `Sidebar` 新增 `collapsible="offcanvas"`：收合時整塊移出畫面（`inert`），工作區拿回整個寬度；
+     滑鼠碰左緣**窺看**（浮在內容上、不推版面，滑鼠離開／Esc／選了目的地就收）；鍵盤與觸控走 SidebarTrigger 釘選展開。
+     圖示欄的提示泡泡改到圖示右側（`Tooltip` 新增 `side="right"`）；`Sidebar` 子元件看的是「眼前長怎樣」
+     （`collapsible="none"` 時不會再誤用收合態的右彈選單）。
+   - `AppShell` 頂列與側欄貼著視窗頂端（sticky），頂列 `h-14` → `h-12`；`DropdownMenu` 匯出共用的選單樣式
+     `menuItemClass`／`menuContentClass`。
+   - 模式章〈後台系統的資訊架構〉新增「多應用系統」一節：兩層導覽各放一處、工作節奏分區原封不動搬到頂部、
+     **頂列左右兩段留給系統**（左＝側欄開關＋目前應用，右＝搜尋・通知・使用者）、頂層選單最多六個、
+     待處理數改成通知鈴鐺的未讀徽章。內部試裝宿主改成多應用版型，`verify:host` 加驗切應用換選單、
+     選單鍵盤路、接真路由後選了就關選單；行動版抽屜的可及名稱改為「應用程式」。
+2. **我需要做什麼**：
+   - 單應用的宿主**不需要**動：`AppShell`／`Sidebar`／`SidebarNav` 的既有用法照舊（頂列矮了 8px）。
+   - 要換成多應用版型：`npx shadcn add …/r/app-menubar.json`，照〈AppShell／Sidebar〉的「多應用外殼的組法」接；
+     `renderLink` 要回傳先呼叫轉發來的 `onClick` 再導航的元件（react-router 的 `Link` 本來就是）。
+   - 自己 `switch` 過 `NavItem` 的程式要多處理一種 `NavAction`（`isNavAction()` 判斷）——TS 會在漏掉的地方報錯。
+3. **為什麼改**：使用者一天在好幾個應用之間切換，側欄放分區只服務得了單一應用；把應用放側欄、功能放頂部，
+   收合側欄時工作區最大、又隨時叫得出應用清單。三次法則未滿（目前零取用端），由守門人決定先在內部試裝宿主試行。
+
+---
+
 ## 2026-09-15（三段式發布，版號未動）
 
 ### 三段式發布：dev → staging（套用驗收）→ main（核准版）

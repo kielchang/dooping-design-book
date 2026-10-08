@@ -3,22 +3,22 @@ import { LayoutTemplate } from "lucide-react";
 import { PageHeader } from "@/components/dooping/page-header";
 import { EmptyState } from "@/components/dooping/empty-state";
 import { Button } from "@/components/dooping/button";
-import { demoNavGroups } from "@/demo/sample-data";
+import { findActiveNavLeaf } from "@/lib/dooping/nav";
+import { demoAppMenus } from "@/demo/sample-data";
 
-/** 從同一份導覽資料找標題——頁名與側欄名永遠一致（跨頁守則：同一個東西全站同一個名字）。 */
+/** 從同一份選單資料找標題——頁名與選單名永遠一致（跨頁守則：同一個東西全站同一個名字）。 */
 function titleOf(path: string): string | undefined {
-  for (const group of demoNavGroups) {
-    for (const item of group.items) {
-      if (item.url === path) return item.title;
-      for (const sub of item.items ?? []) if (sub.url === path) return sub.title;
-    }
+  for (const menus of Object.values(demoAppMenus)) {
+    const hit = findActiveNavLeaf(menus, path, (item, p) => item.url === p.split(/[?#]/)[0]);
+    if (hit) return hit.item.title;
   }
   return undefined;
 }
 
 /**
- * 導覽裡還沒有頁型示範的分區。內部試裝宿主只示範五種頁型——其餘分區留白，
- * 但仍是「一頁一個 h1、主內容在 main 裡」的完整頁面，導覽與指令面板照樣走得到。
+ * 選單裡還沒有頁型示範的功能，以及其他應用（/apps/*，真實部署時是別的系統）。
+ * 內部試裝宿主只示範五種頁型——其餘留白，但仍是「一頁一個 h1、主內容在 main 裡」的完整頁面，
+ * 功能選單與指令面板照樣走得到。
  */
 export function PlaceholderPage() {
   const { pathname } = useLocation();

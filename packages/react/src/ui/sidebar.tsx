@@ -10,8 +10,12 @@ import { Tooltip } from "./tooltip";
 //
 // 與 shadcn 上游的差異都是刻意決定：
 // - 砍 variant="floating|inset"、SidebarRail、cookie 持久化、Ctrl+B 快捷鍵——
-//   後台 IA 規範只有一種側欄形態；本庫無 SSR，持久化交宿主（defaultOpen＋受控 open）；
+//   本庫無 SSR，持久化交宿主（defaultOpen＋受控 open）；
 //   全域鍵位表是宿主的事（useSidebar().toggle() 自己掛）。
+// - 收合形態兩種：icon（圖示欄，預設）與 offcanvas（收到 0、工作區最大）。
+//   offcanvas 收合後滑鼠碰左緣會「窺看」——側欄浮在內容上、不推版面，離開就收；
+//   鍵盤與觸控走 SidebarTrigger 釘選展開（只靠 hover 揭露的功能等於對觸控不存在）。
+//   多應用外殼的側欄是應用清單，見模式章〈後台系統的資訊架構〉。
 // - 行動版抽屜用**既有的 Radix Dialog** 組左滑面板，不新收 Sheet——
 //   focus trap／Esc／焦點歸還免費取得，且「分區與順序完全不變」自動成立
 //   （同一份 children，模式章〈後台系統的資訊架構〉的行動版規範）。
@@ -31,6 +35,9 @@ interface SidebarContextValue {
   setOpenMobile: (open: boolean) => void;
   /** 內部使用：行動版抽屜的開啟者，關閉時把焦點還給它（我們不走 Radix Trigger，得自己記）。 */
   mobileOpenerRef: React.RefObject<HTMLElement | null>;
+  /** offcanvas 收合態的窺看（浮在內容上的暫時展開）；釘選展開時一律為 false。 */
+  peek: boolean;
+  setPeek: (peek: boolean) => void;
 }
 
 const SidebarContext = React.createContext<SidebarContextValue | null>(null);
@@ -81,13 +88,17 @@ export function SidebarProvider({
   const isMobile = useMediaQuery(mobileQuery);
   const [openState, setOpenState] = React.useState(defaultOpen);
   const [openMobile, setOpenMobileState] = React.useState(false);
+  const [peekState, setPeek] = React.useState(false);
   const mobileOpenerRef = React.useRef<HTMLElement | null>(null);
   const controlled = openProp !== undefined;
   const open = controlled ? openProp : openState;
+  // 釘選展開或換成行動版，窺看就沒有意義——衍生而不是另外同步，免得兩個狀態打架
+  const peek = peekState && !open && !isMobile;
 
   const setOpen = React.useCallback(
     (next: boolean) => {
       if (!controlled) setOpenState(next);
+      setPeek(false);
       onOpenChange?.(next);
     },
     [controlled, onOpenChange],
@@ -105,8 +116,11 @@ export function SidebarProvider({
   }, [isMobile, openMobile, setOpenMobile, open, setOpen]);
 
   const value = React.useMemo<SidebarContextValue>(
-    () => ({ state: open ? "expanded" : "collapsed", open, setOpen, toggle, isMobile, openMobile, setOpenMobile, mobileOpenerRef }),
-    [open, setOpen, toggle, isMobile, openMobile, setOpenMobile],
+    () => ({
+      state: open ? "expanded" : "collapsed", open, setOpen, toggle, isMobile, openMobile, setOpenMobile, mobileOpenerRef,
+      peek, setPeek,
+    }),
+    [open, setOpen, toggle, isMobile, openMobile, setOpenMobile, peek],
   );
   return <SidebarContext.Provider value={value}>{children}</SidebarContext.Provider>;
 }
@@ -114,14 +128,63 @@ export function SidebarProvider({
 // ── 容器 ──────────────────────────────────────────────────────
 
 export interface SidebarProps extends React.ComponentPropsWithoutRef<"aside"> {
-  /** "icon"＝桌面可收成圖示欄（預設）；"none"＝固定展開。 */
-  collapsible?: "icon" | "none";
+  /**
+   * 桌面的收合形態：
+   * "icon"＝收成圖示欄（預設）；"offcanvas"＝收到 0、滑鼠碰左緣窺看；"none"＝固定展開。
+   */
+  collapsible?: "icon" | "offcanvas" | "none";
   /** 導覽地標與行動版抽屜的可及名稱。 */
   label?: string;
 }
 
-export function Sidebar({ collapsible = "icon", label = "主導覽", className, children, ...props }: SidebarProps) {
-  const { state, isMobile, openMobile, setOpenMobile, mobileOpenerRef } = useSidebar();
+// 窺看的開關延遲：開要一點猶豫（滑鼠路過左緣不該彈出來），
+// 關要一點寬容（手抖出界一下不該立刻收掉）。
+const PEEK_OPEN_DELAY = 120;
+const PEEK_CLOSE_DELAY = 250;
+
+export function Sidebar({
+  collapsible = "icon",
+  label = "主導覽",
+  className,
+  children,
+  onPointerEnter,
+  onPointerLeave,
+  onBlur,
+  ...props
+}: SidebarProps) {
+  const ctx = useSidebar();
+  const { state, isMobile, openMobile, setOpenMobile, mobileOpenerRef, peek, setPeek } = ctx;
+  const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearTimer = React.useCallback(() => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = null;
+  }, []);
+  React.useEffect(() => clearTimer, [clearTimer]);
+  const schedulePeek = (next: boolean) => {
+    clearTimer();
+    timer.current = setTimeout(() => setPeek(next), next ? PEEK_OPEN_DELAY : PEEK_CLOSE_DELAY);
+  };
+
+  // 子元件（SidebarNav、選單鈕的提示）看的是「眼前長怎樣」，不是釘選狀態：
+  // offcanvas 沒有圖示欄這一態——看得到的時候一定是展開的樣子。
+  const dataState = collapsible === "icon" ? state : "expanded";
+  const childCtx = React.useMemo<SidebarContextValue>(() => ({ ...ctx, state: dataState }), [ctx, dataState]);
+
+  const offcanvasCollapsed = collapsible === "offcanvas" && state === "collapsed" && !isMobile;
+  const peeking = offcanvasCollapsed && peek;
+  const hidden = offcanvasCollapsed && !peek;
+
+  // Esc 收窺看要掛在 document：窺看是滑鼠叫出來的，焦點通常不在側欄裡
+  React.useEffect(() => {
+    if (!peeking) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      clearTimer();
+      setPeek(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [peeking, clearTimer, setPeek]);
 
   if (isMobile) {
     return (
@@ -151,22 +214,92 @@ export function Sidebar({ collapsible = "icon", label = "主導覽", className, 
     );
   }
 
-  const dataState = collapsible === "none" ? "expanded" : state;
+  const nav = (
+    <nav aria-label={label} className="flex h-full min-h-0 flex-col">
+      {children}
+    </nav>
+  );
+
+  if (collapsible === "offcanvas") {
+    // 側欄本體永遠是 fixed、靠位移滑進滑出；版面佔位另外一塊——
+    // 釘選展開時佔位推開內容，窺看時不佔位（浮在內容上）。
+    // 同一塊元素在 fixed 與流內之間換來換去，收窺看那一下寬度動畫會把內容推一下。
+    return (
+      <SidebarContext.Provider value={childCtx}>
+        <div
+          aria-hidden
+          className={cn(
+            "shrink-0 transition-[width] duration-normal ease-standard motion-reduce:transition-none",
+            state === "expanded" ? "w-64" : "w-0",
+          )}
+        />
+        {hidden ? (
+          <div
+            aria-hidden
+            data-sidebar-edge=""
+            className="fixed inset-y-0 left-0 z-[45] w-2"
+            onPointerEnter={(e) => {
+              if (e.pointerType === "mouse") schedulePeek(true);
+            }}
+            onPointerLeave={clearTimer}
+          />
+        ) : null}
+        <aside
+          data-state={dataState}
+          data-collapsible={collapsible}
+          data-peek={peeking ? "" : undefined}
+          // 收到 0 的側欄用 inert 整塊移出 Tab 順序與無障礙樹——移出畫面不等於鍵盤走不進去
+          inert={hidden || undefined}
+          className={cn(
+            "group/sidebar fixed inset-y-0 left-0 z-[45] flex w-64 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground",
+            "transition-transform duration-normal ease-standard motion-reduce:transition-none",
+            hidden ? "-translate-x-full" : "translate-x-0",
+            peeking && "shadow-lg",
+            className,
+          )}
+          onPointerEnter={(e) => {
+            onPointerEnter?.(e);
+            if (peeking) clearTimer();
+          }}
+          onPointerLeave={(e) => {
+            onPointerLeave?.(e);
+            // 焦點還在裡面（鍵盤使用者正在裡面走）就不收——收了焦點會掉到 body
+            if (peeking && e.pointerType === "mouse" && !e.currentTarget.contains(document.activeElement)) {
+              schedulePeek(false);
+            }
+          }}
+          onBlur={(e) => {
+            onBlur?.(e);
+            if (peeking && !e.currentTarget.contains(e.relatedTarget as Node | null)) setPeek(false);
+          }}
+          {...props}
+        >
+          {nav}
+        </aside>
+      </SidebarContext.Provider>
+    );
+  }
+
   return (
-    <aside
-      data-state={dataState}
-      className={cn(
-        "group/sidebar flex h-svh shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground",
-        "transition-[width] duration-normal ease-standard motion-reduce:transition-none",
-        dataState === "collapsed" ? "w-14" : "w-64",
-        className,
-      )}
-      {...props}
-    >
-      <nav aria-label={label} className="flex h-full min-h-0 flex-col">
-        {children}
-      </nav>
-    </aside>
+    <SidebarContext.Provider value={childCtx}>
+      <aside
+        data-state={dataState}
+        data-collapsible={collapsible}
+        className={cn(
+          // 貼著視窗頂端：長頁面捲動時應用清單不跟著捲走
+          "group/sidebar sticky top-0 flex h-svh shrink-0 flex-col self-start border-r border-sidebar-border bg-sidebar text-sidebar-foreground",
+          "transition-[width] duration-normal ease-standard motion-reduce:transition-none",
+          dataState === "collapsed" ? "w-14" : "w-64",
+          className,
+        )}
+        onPointerEnter={onPointerEnter}
+        onPointerLeave={onPointerLeave}
+        onBlur={onBlur}
+        {...props}
+      >
+        {nav}
+      </aside>
+    </SidebarContext.Provider>
   );
 }
 
@@ -267,7 +400,7 @@ export const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenu
     );
     if (!tooltip || isMobile || state !== "collapsed") return inner;
     return (
-      <Tooltip content={tooltip} className="w-full">
+      <Tooltip content={tooltip} side="right" className="w-full">
         {inner}
       </Tooltip>
     );

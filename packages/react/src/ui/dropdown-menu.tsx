@@ -8,6 +8,10 @@ import { cn } from "../lib/utils";
 // 只有一層，投機性收錄是設計系統腐爛的第一步（收錄三原則）。
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
+
+/** 選單浮層與選單項的樣式——AppMenubar 共用同一份，兩種選單長得一樣、改一處就一起改。 */
+const menuContentClass =
+  "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md";
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
 const DropdownMenuGroup = DropdownMenuPrimitive.Group;
 
@@ -19,10 +23,7 @@ const DropdownMenuContent = React.forwardRef<
     <DropdownMenuPrimitive.Content
       ref={ref}
       sideOffset={sideOffset}
-      className={cn(
-        "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md",
-        className,
-      )}
+      className={cn(menuContentClass, className)}
       {...props}
     />
   </DropdownMenuPrimitive.Portal>
@@ -88,6 +89,8 @@ const DropdownMenuSeparator = React.forwardRef<
 DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName;
 
 export {
+  menuContentClass,
+  menuItemClass,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,

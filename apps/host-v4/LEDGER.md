@@ -1,6 +1,6 @@
 # 符合性台帳（內部試裝宿主）
 
-上游版本：v0.13.0（tokens 0.7.0）　最後對照日：2026-09-10
+上游版本：v0.14.0（tokens 0.7.0）　最後對照日：2026-10-07
 
 這個宿主是範本：**元件全部「遵循」、不允許刻意偏離**——`npm run host:check` 在 CI 擋任何差異。
 取用端自己的台帳會有「自製」與「刻意偏離」，格式照 AGENTS.md 的骨架。
@@ -10,6 +10,7 @@
 | 五種頁型與外殼用到的全部元件 | 遵循 | `dooping.install.json` 的 item 與其遞移相依 | — |
 | 網址狀態 adapter（`src/url-adapter.ts`） | 自製 | `use-table-url-state` 的 `UrlStateAdapter` 注入點 | 元件庫刻意不綁路由，adapter 本來就由宿主提供 |
 | 主題切換（`src/theme.tsx`） | 自製 | 契約：主題掛 `documentElement` | 宿主的責任，元件庫不提供 |
+| 「目前在哪個應用」的判定（`src/app.tsx` 的 `isAppActive`） | 自製 | `SidebarNav`／`findActiveNavLeaf` 的 `isActive` 接縫 | 取決於部署方式（同站路徑或各應用各自網域），只有宿主知道 |
 
 ## 不需要對齊
 

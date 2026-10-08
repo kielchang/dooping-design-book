@@ -122,6 +122,12 @@ async function main() {
   const context = await browser.newContext({ viewport: { width: 1000, height: 800 } });
   const page = await context.newPage();
   await page.addInitScript(CHANNEL_TAP);
+  // 把真的游標停在不會碰到東西的位置（右緣中段）。CI 的 Linux 無頭 Chromium 會讓游標落在頁面左側，
+  // 版面一變就對游標底下的元素發「真的」（isTrusted）pointerover／enter——offcanvas 側欄的左緣熱區
+  // 與浮出的側欄被它叫出來、留住，play 合成的離開事件跟著失效。Windows 本機不發這些事件，所以只有 CI 紅。
+  // 證據：2026-10-08 preview 連紅三次；PR #27 的事件時間線在 play 動作之前就記到側欄收到 trusted 指標事件，
+  // 加上這一行、play 不做任何繞道就全綠。
+  await page.mouse.move(998, 400);
   const pageErrors = [];
   page.on("pageerror", (e) => pageErrors.push(String(e.message).slice(0, 300)));
 

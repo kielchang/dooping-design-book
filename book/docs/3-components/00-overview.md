@@ -17,7 +17,7 @@ title: 元件總覽
 | 表單 | Input、NumberInput、Label、Checkbox、Select、SegGroup、Chips |
 | 浮層 | Tooltip、Dialog、Popover、DropdownMenu、ConfirmDialog、Command |
 | 結構 | Collapsible |
-| 外殼 | AppShell、Sidebar、SidebarNav（v0.13.0 收錄）、PageHeader／BackLink／Breadcrumb |
+| 外殼 | AppShell、Sidebar、SidebarNav（v0.13.0 收錄）、AppMenubar（v0.14.0，多應用版型）、PageHeader／BackLink／Breadcrumb |
 | 資料 | Table、DataTable、TabPills、Delta、EmptyState、Stepper |
 | 進階表單 | EditableField、ChangeSummary |
 | 引導 | Coachmark |

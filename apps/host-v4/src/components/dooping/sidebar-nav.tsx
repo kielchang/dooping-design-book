@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ChevronRight } from "lucide-react";
-import { isNavActive, type NavGroup, type NavLeaf } from "@/lib/dooping/nav";
+import { isNavAction, isNavActive, type NavAction, type NavGroup, type NavLeaf } from "@/lib/dooping/nav";
 import { Badge } from "@/components/dooping/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/dooping/collapsible";
 import {
@@ -39,6 +39,8 @@ export interface SidebarNavProps {
   isActive?: (item: NavLeaf, currentPath: string) => boolean;
   /** 〔例行〕〔試算〕標籤文字。 */
   labels?: { routine?: string; sandbox?: string };
+  /** 動作項（NavAction）被選取時呼叫——開對話框之類的事由宿主決定。 */
+  onAction?: (action: string, item: NavAction) => void;
 }
 
 const defaultRenderLink = (props: SidebarNavLinkProps) => <a {...props} />;
@@ -62,8 +64,9 @@ export function SidebarNav({
   renderLink = defaultRenderLink,
   isActive,
   labels: labelsProp,
+  onAction,
 }: SidebarNavProps) {
-  const { state, isMobile, setOpenMobile } = useSidebar();
+  const { state, isMobile, setOpenMobile, peek, setPeek } = useSidebar();
   const labels = { routine: "例行", sandbox: "試算", ...labelsProp };
   const active = isActive ?? ((item: NavLeaf, path: string) => isNavActive(item.url, path));
   const collapsed = state === "collapsed" && !isMobile;
@@ -82,8 +85,8 @@ export function SidebarNav({
             <NavBadgeTag badge={item.badge} labels={labels} />
           </>
         ),
-        // 行動版點選後關抽屜——使用者選完目的地，留著抽屜只是擋住他要去的地方
-        onClick: isMobile ? () => setOpenMobile(false) : undefined,
+        // 行動版點選後關抽屜、窺看中點選後收窺看——使用者選完目的地，留著只是擋住他要去的地方
+        onClick: isMobile ? () => setOpenMobile(false) : peek ? () => setPeek(false) : undefined,
         ...(item.external ? { target: "_blank", rel: "noreferrer" } : {}),
       },
       item,
@@ -102,6 +105,23 @@ export function SidebarNav({
           <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
           <SidebarMenu>
             {group.items.map((item) => {
+              if (isNavAction(item)) {
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      tooltip={item.title}
+                      onClick={() => {
+                        if (isMobile) setOpenMobile(false);
+                        else if (peek) setPeek(false);
+                        onAction?.(item.action, item);
+                      }}
+                    >
+                      {item.icon ? <item.icon /> : null}
+                      <span className="truncate group-data-[state=collapsed]/sidebar:sr-only">{item.title}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              }
               if (!item.items) {
                 return <SidebarMenuItem key={item.title}>{leafLink(item)}</SidebarMenuItem>;
               }

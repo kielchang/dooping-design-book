@@ -5,8 +5,12 @@ title: AppShell／Sidebar 應用外殼
 # AppShell／Sidebar 應用外殼
 
 後台的殼：側邊欄＋頂列＋主內容。**規範的正本在
-[後台系統的資訊架構](/patterns/back-office-ia)**——分區怎麼切、狀態列放什麼、
+[後台系統的資訊架構](/patterns/back-office-ia)**——分區怎麼切、頂列放什麼、
 單一出口與深連結，全以那一頁為準；這裡是那份規範的**元件載體**。
+
+同一副殼有兩種版型：**多應用**（側欄是應用清單、應用內的功能在頂部
+[功能選單列](/components/app-menubar)）與**單應用**（側欄直接是分區導覽）。
+怎麼選見〈後台系統的資訊架構〉的「多應用系統」一節。
 
 :::note 收錄狀態
 外殼元件 v0.13.0 起在正式版（頁面章原本刻意不收外殼，後來以純呈現元件收進元件章）。
@@ -23,13 +27,47 @@ title: AppShell／Sidebar 應用外殼
 | --- | --- |
 | `Sidebar` 家族 | 側欄容器與結構件：Provider、Trigger、Header/Content/Footer、Group、Menu 系 |
 | `SidebarNav` | 吃 `NavGroup[]` 的三態渲染：連結／展開群組／收合態右彈選單，含〔例行〕〔試算〕標籤 |
-| `AppShell` | 佈局容器：側欄＋頂列＋主內容，轉發 Provider props |
+| `AppShell` | 佈局容器：側欄＋頂列＋主內容，轉發 Provider props；頂列與側欄貼著視窗頂端（sticky） |
+| [`AppMenubar`](/components/app-menubar) | 多應用版型的頂部功能選單——同一份 `NavGroup[]`，一組一個頂層選單 |
 
 **純呈現，三不綁**：不綁路由（連結用 `renderLink` 注入，預設真 `<a>`）、
 不綁資料抓取、不碰儲存（收合狀態的持久化用受控 `open`/`onOpenChange` 交宿主）。
 這是 ADR-0011 的退場前提——砍掉時宿主一小時內能用同一份 token 重寫自己的殼。
 
-<StoryFrame id="元件-外殼-應用外殼・側邊欄--典型組成" title="典型組成：分區導覽＋收合＋狀態列落點" height={520} />
+<StoryFrame id="元件-外殼-應用外殼・側邊欄--典型組成" title="單應用版型：分區導覽＋收合" height={520} />
+
+## 多應用外殼的組法
+
+側欄放應用清單（一個應用＝一個 `NavLeaf`），頂列分三段：
+**左**＝系統（SidebarTrigger＋目前應用）、**中**＝目前應用的 `AppMenubar`、
+**右**＝系統（搜尋、通知、使用者選單）。換應用時中段整組換掉，
+側欄、功能選單、⌘K 三個出口吃同一份資料。
+
+<StoryFrame id="頁面-多應用外殼--切換應用" title="多應用外殼：側欄切應用、頂部切功能" height={560} />
+
+「目前在哪個應用」用 `SidebarNav` 的 `isActive` 接：路徑落在應用自己的 url 底下，
+或落在它任一個功能項上（`findActiveNavLeaf` 找得到）。應用各自部署在不同網域時，
+同一個接縫改成比對網域。
+
+```tsx
+const isAppActive = (app: NavLeaf, path: string) =>
+  isNavActive(app.url, path) || Boolean(findActiveNavLeaf(menusOf[app.url] ?? [], path));
+const app = findActiveNavLeaf(apps, pathname, isAppActive)?.item;
+
+<AppShell
+  sidebar={<Sidebar label="應用程式"><SidebarContent>
+    <SidebarNav groups={apps} currentPath={pathname} isActive={isAppActive} renderLink={renderLink} />
+  </SidebarContent></Sidebar>}
+  header={<>
+    <SidebarTrigger />{/* 左：系統 */}
+    <AppMenubar groups={menusOf[app.url]} currentPath={pathname} renderLink={renderLink} onAction={run} />
+    <div className="flex shrink-0 items-center gap-1">{/* 右：搜尋、通知、使用者 */}</div>
+  </>}
+>…</AppShell>
+```
+
+完整組法（含通知 Popover、使用者 DropdownMenu、動作項開對話框）是 story
+「頁面/多應用外殼」，內部試裝宿主 `apps/host-v4` 照同一個組法接 react-router。
 
 ## 何時不要用
 
@@ -48,9 +86,14 @@ title: AppShell／Sidebar 應用外殼
 
 ## 狀態
 
-- **桌面收合**：`collapsible="icon"`（預設）收成圖示欄；文字轉 sr-only
+- **桌面收合（圖示欄）**：`collapsible="icon"`（預設）收成圖示欄；文字轉 sr-only
   （可及名稱不消失）、群組標題隱藏、兩層群組改成往右彈出的
-  [DropdownMenu](/components/popover-dropdown)、hover 出提示泡泡。
+  [DropdownMenu](/components/popover-dropdown)、hover 出提示泡泡（在圖示**右側**——
+  在上方會蓋住上一項）。
+- **桌面收合（收到 0）**：`collapsible="offcanvas"` 收合時側欄整塊移出畫面，
+  工作區拿回整個寬度。滑鼠碰左緣會**窺看**：側欄浮在內容上（不推版面），
+  滑鼠離開、按 Esc 或選了目的地就收。鍵盤與觸控走 SidebarTrigger 釘選展開——
+  只靠 hover 揭露的功能對觸控等於不存在。
 - **行動版**：自動轉左滑抽屜（既有 Radix Dialog 組成——焦點鎖定、Esc、焦點歸還
   全部繼承），**分區與順序完全不變**；點選目的地即關閉。
 - **選中態**：`bg-sidebar-accent`（＝該主題的 `brand-subtle`，識別層）＋
@@ -76,6 +119,8 @@ title: AppShell／Sidebar 應用外殼
 - 側欄是 `nav` 地標，`label` 預設「主導覽」；行動版抽屜以同名可及名稱呈現。
 - 收合態的連結名稱走 sr-only 保留——`display:none` 會把可及名稱一起藏掉，
   這是 stories 的 play 直接驗的契約。
+- `offcanvas` 收到 0 時側欄是 `inert`：移出畫面不等於鍵盤走不進去，
+  不加 inert 的話 Tab 會停在看不見的連結上。
 - SidebarTrigger 自帶 `aria-label` 與 `aria-expanded`。
 - 聚焦環走中性 `--ring`（`--sidebar-ring ≡ ring`，ADR-0007 的延伸）。
 
@@ -91,6 +136,12 @@ title: AppShell／Sidebar 應用外殼
 ```bash
 npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/app-shell.json
 npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/sidebar-nav.json
+```
+
+多應用版型再加：
+
+```bash
+npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/app-menubar.json
 ```
 
 `sidebar-nav` 會自動帶入 `sidebar`、`collapsible`、`dropdown-menu`、`badge`、

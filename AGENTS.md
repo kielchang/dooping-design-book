@@ -10,6 +10,7 @@
 
 給 AI agent：接手一個要遵照本設計語言的專案時，先讀完這頁，再讀文件站對應章節。
 **不要憑印象重寫元件**——元件已經存在，用下面的指令裝進來。
+用的過程中遇到不符規範、想改設計、上游缺件——照本頁「回饋到上游」送一則回饋，不必等。
 
 ## 三層，相依強度刻意遞減
 
@@ -237,7 +238,7 @@ npm ls @dooping/tokens; curl -s https://kielchang.github.io/dooping-design-book/
 | 本地實作 | 狀態 | 上游對應 | 原因（偏離必填） |
 | --- | --- | --- | --- |
 | 資料表 | 遵循 | data-table | — |
-| <元件或模式> | 自製 | （缺件表已認領） | 上游尚無，等三次法則 |
+| <元件或模式> | 自製 | （已回饋：DESIGN task #<id>） | 上游尚無，已回饋待分流 |
 | <元件或模式> | 刻意偏離 | <對應項> | <寫成可被推翻的形式> |
 
 ## 不需要對齊
@@ -258,6 +259,65 @@ npm ls @dooping/tokens; curl -s https://kielchang.github.io/dooping-design-book/
 
 變更一律記在 [CHANGELOG](https://github.com/kielchang/dooping-design-book/blob/main/CHANGELOG.md)。
 每則都回答「改了什麼／你要做什麼／為什麼改」，不需要調整時會明說。
+
+## 回饋到上游
+
+元件、token、頁型用起來有問題——**不符規範、用起來卡、想改設計、上游缺件**——就送一則回饋。
+回饋收在維護方的 PMIS（系統代號 `DESIGN`）：有 PMIS MCP（`mcp__pmis__*` 工具）的 agent 直接開一個 task。
+沒有 PMIS 工具、或你的專案在 PMIS 還沒有系統代號，改走下方「去哪裡提」的 GitHub 表單——不要為了送回饋自己 `create_system`。
+
+- **跟台帳同一刻送**：台帳記一列「自製」或「刻意偏離」、或發現行為與規範不符的當下就送，**不必等自己用到第三次**。
+  單一專案只看得到自己的用例，三次法則由上游守門人跨系統數。
+- **一則＝一個場景＝一次證據**：同樣的事在另一處又遇到，就再送一則，不要改舊的；
+  知道有同對象的舊回饋，在「問題」第一行寫「同 #N」。
+- **送出後交給守門人**：不改狀態、不掛 feature、不設到期日——分流規則見文件站「治理 → 回饋與 RFC 流程」。
+  把 task 編號記進台帳那一列的「上游對應」（`（已回饋：DESIGN task #<id>）`）。
+
+```json title="回饋：create_task 參數"
+{
+  "systemCode": "DESIGN",
+  "title": "[回饋] <對象>：<一句話講問題>",
+  "priority": "medium",
+  "author": "agent:<你的系統代號小寫>",
+  "description": "<照下方骨架填好的 markdown>"
+}
+```
+
+`priority` 平常填 `medium`；**無障礙或安全問題填 `high`**，不必等三次，也不要開公開 issue。
+無障礙指「有人因此用不了或看不出來」：對比不足、只靠顏色傳達、鍵盤或螢幕閱讀器操作不了、聚焦看不見；拿不準就填 `high`，守門人會改判。
+`status`、`featureId`、`dueDate` 不要帶——那是守門人分流用的欄位。
+
+```markdown title="回饋：description 骨架"
+## 來源
+- 系統代號：<你的 systemCode>
+- 上游版本：v<台帳記的上游版本，即抄走當下 /r/index.json 的 version>（tokens <npm ls @dooping/tokens 的版本>）
+
+## 對象
+<registry item（如 data-table）／token（如 --danger）／文件頁網址，可列多個>
+
+## 類型
+<不符規範｜使用摩擦・設計變更建議｜缺件>
+
+## 目前處置
+<遵循｜自製｜刻意偏離>——自製與刻意偏離照抄台帳那一列的原因
+
+## 問題
+<遇到什麼；不符規範附最小重現：步驟、畫面位置或程式片段>
+
+## 建議
+<希望上游怎麼改；沒有想法就寫「無」>
+
+## 影響範圍
+<在你的專案裡幾處、哪些頁型用到>
+
+## 如果不改會怎樣
+<你目前的替代做法，以及它的代價>
+```
+
+八段都要有，不知道就寫「不確定」。「類型」分不清是不符規範還是設計變更（不知道上游有沒有規定），填「使用摩擦・設計變更建議」，守門人分流時會改判。
+tokens 寫實際裝的版本（`npm ls`）；與台帳記的配對版本不同時兩個都寫。後四段就是台帳四題（問題、建議、影響範圍、如果不改會怎樣）——台帳寫一次、回饋照抄。
+「建議」裡的程式或文案示範用中性詞（項目／單位／類別／批次／紀錄）：被收錄時會原樣進公開的元件與文件，
+領域詞會被上游的 `tests/de-domain.test.ts` 擋下。
 
 ## 想把東西加回這個 repo
 
@@ -283,13 +343,14 @@ npm run build:registry # 元件改了就要重新產生 registry JSON 並一起�
 
 | 要提的是 | 門口 |
 | --- | --- |
+| **用的過程中**遇到的任何問題或建議（有 PMIS MCP 的 agent） | 本頁「回饋到上游」→ PMIS `DESIGN` 的 task |
 | Bug（行為與規範不符） | <https://github.com/kielchang/dooping-design-book/issues/new?template=bug.yml> |
 | 小調整（文案、對比、一個 prop） | 直接開 PR，模板自帶自查清單 |
 | 新元件／新 token／改語意 | <https://github.com/kielchang/dooping-design-book/issues/new?template=rfc.yml>（五題逐欄） |
 | 頁面章缺件表的項目 | <https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml>（一則＝三次法則的一次證據） |
 
-守門人與狀態機見文件站「治理 → 回饋與 RFC 流程」；
-**先在宿主做、台帳記自製，三次法則過了再提回上游**（符合性台帳的順序）。
+第一列以外的 GitHub 門口給人，以及沒有 PMIS 的外部讀者。守門人與分流見文件站「治理 → 回饋與 RFC 流程」；
+**先在宿主做、台帳記自製，同時回饋——三次法則由上游數**（符合性台帳的順序）。
 
 ## 入口
 
@@ -298,4 +359,4 @@ npm run build:registry # 元件改了就要重新產生 registry JSON 並一起�
 - 📦 Registry 索引 <https://kielchang.github.io/dooping-design-book/r/index.json>
 - 🤖 機器地圖 <https://kielchang.github.io/dooping-design-book/llms.txt>
 - 🏗 系統架構（想貢獻先讀）[ARCHITECTURE.md](https://github.com/kielchang/dooping-design-book/blob/main/ARCHITECTURE.md)
-- 💬 提出建議 <https://github.com/kielchang/dooping-design-book/issues/new/choose>
+- 💬 提出建議：agent 照本頁「回饋到上游」送 PMIS；人走 <https://github.com/kielchang/dooping-design-book/issues/new/choose>

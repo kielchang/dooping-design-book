@@ -1,6 +1,6 @@
 {
   "name": "dooping-design-book",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "private": true,
   "type": "module",
   "description": "Dooping Design Book — 跨專案設計語言、模式手冊與 React 參考實作",
@@ -62,6 +62,7 @@
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-dropdown-menu": "^2.1.24",
     "@radix-ui/react-label": "^2.1.2",
+    "@radix-ui/react-menubar": "^1.1.24",
     "@radix-ui/react-popover": "^1.1.23",
     "@radix-ui/react-radio-group": "^1.4.7",
     "@radix-ui/react-select": "^2.1.6",

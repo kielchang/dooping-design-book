@@ -185,6 +185,10 @@ export const 收合成完全隱藏: Story = {
       // 再叫出來，滑鼠離開就收
       await userEvent.hover(canvasElement.querySelector("[data-sidebar-edge]") as HTMLElement);
       await waitFor(() => expect(aside).toHaveAttribute("data-peek"));
+      // 指標先移進浮出來的側欄、再離開——真實使用者也是這樣走。不能從熱區直接 unhover：
+      // 熱區在窺看時已卸載，user-event 的 pointerleave 沿「上一個指標目標」的祖先鏈派送，
+      // 從已卸載的熱區離開不會經過側欄（CI 實測窺看因此收不掉；本機是被瀏覽器自己的指標事件掩蓋）。
+      await userEvent.hover(aside);
       await userEvent.unhover(aside);
       await waitFor(() => expect(aside).not.toHaveAttribute("data-peek"));
       await expect(aside).toHaveAttribute("inert");

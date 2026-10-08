@@ -10,7 +10,8 @@
 //
 // 因此這裡不是「盡量避免」，是「一個字都不留」，而且用測試盯著。
 import { describe, it, expect } from "vitest";
-import { readdirSync, readFileSync, statSync, existsSync } from "node:fs";
+import { readdirSync, statSync, existsSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { join, relative, extname } from "node:path";
 
@@ -124,6 +125,12 @@ const FORBIDDEN = [
 // 這支守衛跑到 4.9 秒、貼著 5 秒的預設 timeout，變成會隨機紅的守衛。
 // 會隨機紅比慢更糟：沒人相信的紅燈最後會被加 timeout 蓋掉，守衛就此空轉。
 // 所以改的是重算（行為逐字相同），不是把 timeout 調大。
+//
+// 2026-10-08 又貼回來了：掃描量長到 416 檔／2MB，完整 `npm test` 平行跑時這支逾時（單跑 2.6 秒）。
+// 同一條原則再做兩件事（結果與順序逐字相同）：
+//   ① 逐行比對之前先「整份小寫一次、逐詞 includes」——絕大多數檔案一個詞都沒有，到這裡就結束；
+//      詞不含換行，所以整份找不到的詞逐行也不可能找到，這一步不會漏。比對 430ms → 150ms。
+//   ② 讀檔改平行（fs/promises）。Windows 上逐檔同步讀的每檔開銷是大頭：400ms → 120ms。
 const FORBIDDEN_LOWER = FORBIDDEN.map((t) => t.toLowerCase());
 
 export interface Hit {
@@ -139,10 +146,18 @@ export interface Hit {
  * `FORBIDDEN` 被清空、`walk()` 壞掉，兩種情況都是綠的。
  */
 export function scanLines(text: string): Hit[] {
+  // 整份先篩：只留這份檔案裡真的出現過的詞（照詞表順序，逐行輸出的順序因此不變）
+  const whole = text.toLowerCase();
+  const present: number[] = [];
+  for (let t = 0; t < FORBIDDEN.length; t++) {
+    if (whole.includes(FORBIDDEN_LOWER[t])) present.push(t);
+  }
+  if (present.length === 0) return [];
+
   const hits: Hit[] = [];
   text.split("\n").forEach((line, i) => {
     const lower = line.toLowerCase();
-    for (let t = 0; t < FORBIDDEN.length; t++) {
+    for (const t of present) {
       if (lower.includes(FORBIDDEN_LOWER[t])) {
         hits.push({ line: i + 1, term: FORBIDDEN[t], text: line.trim().slice(0, 80) });
       }
@@ -173,16 +188,17 @@ describe("去領域化", () => {
     expect(targets.length).toBeGreaterThan(20);
   });
 
-  it("全部檔案不含任何產業的領域詞彙", () => {
+  it("全部檔案不含任何產業的領域詞彙", async () => {
+    // 這支測試檔自己就是詞表，跳過
+    const files = targets.filter((abs) => !relative(ROOT, abs).includes("de-domain.test"));
+    const texts = await Promise.all(files.map((abs) => readFile(abs, "utf8")));
     const hits: string[] = [];
-    for (const abs of targets) {
+    files.forEach((abs, i) => {
       const rel = relative(ROOT, abs);
-      // 這支測試檔自己就是詞表，跳過
-      if (rel.includes("de-domain.test")) continue;
-      for (const h of scanLines(readFileSync(abs, "utf8"))) {
+      for (const h of scanLines(texts[i])) {
         hits.push(`${rel}:${h.line} 出現「${h.term}」 → ${h.text}`);
       }
-    }
+    });
     expect(
       hits,
       `發現領域詞彙殘留（共 ${hits.length} 處）：\n${hits.join("\n")}\n\n` +

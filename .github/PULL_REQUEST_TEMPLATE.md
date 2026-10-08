@@ -1,9 +1,10 @@
 <!--
   三種 PR，只留你這一種，其他整段刪掉。流程正本：book/docs/7-governance/01-versioning.mdx「三段式發布」。
     一般 PR（開到 dev）             → 留「改了什麼／自查」
-    候選版 PR（dev → staging）      → 只貼 CHANGELOG 最上面那一節
+    候選版 PR（dev → staging）      → 只貼 CHANGELOG 最上面那一節；開之前守門人先分流 PMIS 裡新進的 [回饋] task
     核准 PR（staging → main）       → 貼 CHANGELOG 該節，並逐項勾完「核准清單」（pr-gate 會檢查）
-  新元件／新 token／改語意：先在宿主做並記台帳，三次法則過了再開 RFC issue（issues/new?template=rfc.yml）提回上游。
+  取用端遇到問題、想改設計、缺件：先在宿主做並記台帳，同時回饋上游——agent 照 AGENTS.md「回饋到上游」送 PMIS，
+  人走 issues/new/choose。三次法則由守門人在上游數，過了才開 RFC 或 PR。
 -->
 
 ## 改了什麼／為什麼

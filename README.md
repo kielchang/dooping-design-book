@@ -86,12 +86,10 @@ npm workspaces 已經滿足，而且**不需要在每個 CI／每台機器多裝
 
 ## 回饋與貢獻
 
-三種回饋，三個門口（詳見 [CONTRIBUTING.md](CONTRIBUTING.md)）：
+兩個入口，同一套判準（正本：文件站[〈回饋與 RFC 流程〉](https://kielchang.github.io/dooping-design-book/governance/rfc/)）：
 
-- **Bug** → [Bug 回報表單](https://github.com/kielchang/dooping-design-book/issues/new?template=bug.yml)
-- **小調整** → 直接開 PR（模板自帶自查清單）
-- **新元件／新 token／改語意** → [RFC 提案表單](https://github.com/kielchang/dooping-design-book/issues/new?template=rfc.yml)；
-  頁面章缺件表的項目走[缺件認領](https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml)
+- **取用端的 AI agent** → 照 [AGENTS.md「回饋到上游」](AGENTS.md)在維護方的 PMIS 開 task，用的當下就送
+- **人** → GitHub 表單或 PR，門口列在 [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## 授權
 

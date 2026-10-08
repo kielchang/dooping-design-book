@@ -95,6 +95,9 @@ token 配對與下一步。取用端只看 main（Releases／`/r/index.json`／n
 | 規則 | 守衛測試＋文件頁那一句。理由寫在守衛檔頭，失敗訊息用 `tests/lib/guard.ts` 的 `because()` 帶理由與規則正本 | 同一件事第二次需要人記得時。反向驗證過才算規則；沒有守衛的標「人工：由誰、何時」或「建議」 |
 | 決定 | PMIS ADR（context／options／decision／consequences），標題沿用 `ADR-NNNN：…` | 做決定的當下。只有難回頭、會被質疑的決定才記；採納後要改走修訂 |
 
+取用端的回饋不是第四軌：它們是 PMIS `DESIGN` 裡標題以 `[回饋]` 開頭的 task（格式正本 `AGENTS.md`「回饋到上游」，
+分流規則在 `book/docs/7-governance/02-rfc.mdx`「取用端回饋：PMIS 的分流」）；接受後才開 feature 進計畫軌。
+
 **agent 不得在 repo 開任何 ADR 或提案檔**（`docs/adr/`、`docs/rfc/`、`proposals/` 之類）。
 repo 留三樣東西：規則（守衛＋文件頁那一條）、架構描述（`ARCHITECTURE.md`、`AGENTS.md`、文件站各章）、使用說明。
 元件註解裡既有的 `ADR-00xx` 指向 PMIS 同號，不要改——改註解會動 registry 指紋。

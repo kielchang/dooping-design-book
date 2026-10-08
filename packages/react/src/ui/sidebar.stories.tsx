@@ -151,55 +151,41 @@ export const 收合成完全隱藏: Story = {
     const mainLeft = () => main.getBoundingClientRect().left;
     const pinnedLeft = mainLeft();
 
-    // 契約是「終點在哪」，不是滑動動畫：幾何斷言期間關掉轉場。
-    // CI 的無頭 Chromium（Linux）實測轉場完全不前進——收合後右緣停在 256 超過 1 秒，
-    // 本機 Windows 卻是 200ms 就到位；賭影格排程的斷言會隨環境紅綠。
-    const noTransition = doc.createElement("style");
-    noTransition.textContent = "*, *::before, *::after { transition: none !important; }";
-    doc.head.append(noTransition);
-    try {
-      await userEvent.click(trigger);
-      await waitFor(() => expect(aside).toHaveAttribute("inert"));
-      await waitFor(() => expect(aside.getBoundingClientRect().right).toBeLessThanOrEqual(0));
-      // 工作區拿回整個寬度
-      await waitFor(() => expect(mainLeft()).toBeLessThan(pinnedLeft));
-      const collapsedLeft = mainLeft();
-      // 移出畫面不等於鍵盤走不進去——inert 要真的擋住焦點
-      const link = within(aside).getByRole("link", { name: /工作台/, hidden: true });
-      link.focus();
-      await expect(doc.activeElement).not.toBe(link);
+    await userEvent.click(trigger);
+    await waitFor(() => expect(aside).toHaveAttribute("inert"));
+    await waitFor(() => expect(aside.getBoundingClientRect().right).toBeLessThanOrEqual(0));
+    // 工作區拿回整個寬度
+    await waitFor(() => expect(mainLeft()).toBeLessThan(pinnedLeft));
+    const collapsedLeft = mainLeft();
+    // 移出畫面不等於鍵盤走不進去——inert 要真的擋住焦點
+    const link = within(aside).getByRole("link", { name: /工作台/, hidden: true });
+    link.focus();
+    await expect(doc.activeElement).not.toBe(link);
 
-      // 碰左緣窺看：浮層、不推版面
-      const edge = canvasElement.querySelector("[data-sidebar-edge]") as HTMLElement;
-      await userEvent.hover(edge);
-      await waitFor(() => expect(aside).toHaveAttribute("data-peek"));
-      await expect(aside).not.toHaveAttribute("inert");
-      await waitFor(() => expect(aside.getBoundingClientRect().left).toBe(0));
-      expect(mainLeft()).toBe(collapsedLeft);
-      await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    // 碰左緣窺看：浮層、不推版面
+    const edge = canvasElement.querySelector("[data-sidebar-edge]") as HTMLElement;
+    await userEvent.hover(edge);
+    await waitFor(() => expect(aside).toHaveAttribute("data-peek"));
+    await expect(aside).not.toHaveAttribute("inert");
+    await waitFor(() => expect(aside.getBoundingClientRect().left).toBe(0));
+    expect(mainLeft()).toBe(collapsedLeft);
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
 
-      // Esc 收（焦點不在側欄裡也要收得掉）
-      await userEvent.keyboard("{Escape}");
-      await waitFor(() => expect(aside).toHaveAttribute("inert"));
+    // Esc 收（焦點不在側欄裡也要收得掉）
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(aside).toHaveAttribute("inert"));
 
-      // 再叫出來，滑鼠離開就收
-      await userEvent.hover(canvasElement.querySelector("[data-sidebar-edge]") as HTMLElement);
-      await waitFor(() => expect(aside).toHaveAttribute("data-peek"));
-      // 指標先移進浮出來的側欄、再離開——真實使用者也是這樣走。不能從熱區直接 unhover：
-      // 熱區在窺看時已卸載，user-event 的 pointerleave 沿「上一個指標目標」的祖先鏈派送，
-      // 從已卸載的熱區離開不會經過側欄（CI 實測窺看因此收不掉；本機是被瀏覽器自己的指標事件掩蓋）。
-      await userEvent.hover(aside);
-      await userEvent.unhover(aside);
-      await waitFor(() => expect(aside).not.toHaveAttribute("data-peek"));
-      await expect(aside).toHaveAttribute("inert");
+    // 再叫出來，滑鼠離開就收
+    await userEvent.hover(canvasElement.querySelector("[data-sidebar-edge]") as HTMLElement);
+    await waitFor(() => expect(aside).toHaveAttribute("data-peek"));
+    await userEvent.unhover(aside);
+    await waitFor(() => expect(aside).not.toHaveAttribute("data-peek"));
+    await expect(aside).toHaveAttribute("inert");
 
-      // 收尾：釘選展開回來（推開內容），別讓視覺掃描拿到收合畫面
-      await userEvent.click(trigger);
-      await waitFor(() => expect(aside).not.toHaveAttribute("inert"));
-      await waitFor(() => expect(mainLeft()).toBe(pinnedLeft));
-    } finally {
-      noTransition.remove();
-    }
+    // 收尾：釘選展開回來（推開內容），別讓視覺掃描拿到收合畫面
+    await userEvent.click(trigger);
+    await waitFor(() => expect(aside).not.toHaveAttribute("inert"));
+    await waitFor(() => expect(mainLeft()).toBe(pinnedLeft));
   },
 };
 

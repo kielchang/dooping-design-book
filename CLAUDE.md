@@ -115,8 +115,10 @@ Claude 記憶在 `~/.claude/projects/<專案路徑 slug>/memory/`，clone 到不
 - 正式 remote：`https://github.com/kielchang/dooping-design-book.git`
   （**兩個 o**。repo 曾叫 `doping-design-book`，舊名靠 GitHub 轉址還能推，
   但會噴 `This repository moved`；看到就把 origin 換成上面那個。）
-- **三段式發布**：功能分支做完才併進 `dev` → PR `dev → staging`（候選版，跑套用驗收）→ PR `staging → main`（勾核准清單＝核准）。
+- **三段式發布**：功能分支 → PR 到 `dev`（`pr-verify` 綠了才合併）→ PR `dev → staging`（候選版，跑套用驗收）→ PR `staging → main`（勾核准清單＝核准）。
   流程正本：`book/docs/7-governance/01-versioning.mdx`「三段式發布」。`main` 與 `staging` 受 ruleset 保護，不要直接 push。
+- **進 dev 也走 PR，不要本機合併後直接推 dev**：本機（Windows）綠不代表 CI（Linux）綠，直接推的話差異只能在 dev 上爆
+  （2026-10-08 預覽站連紅四次）。人工規則——dev 的 ruleset 目前不強制 PR。
 - `dev` push 部署預覽站 `/preview/`；`staging` push 部署候選版 `/staging/`；`main` push 部署正式站根目錄並蓋 tag。
   每段各自一個 concurrency group；三段共用 gh-pages 分支，由 `scripts/deploy-gh-pages.sh` 的 `STAGE_DIRS` 劃界。
 - 預覽站：<https://kielchang.github.io/dooping-design-book/preview/>；候選版：<https://kielchang.github.io/dooping-design-book/staging/>

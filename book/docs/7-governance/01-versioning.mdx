@@ -23,7 +23,7 @@ dev（工作中）──PR──▶ staging（候選版：套用驗收）──P
 
 | 分支 | 代表什麼 | 部署到 | 能不能參照 | 能不能安裝 | 誰讓它前進 |
 | --- | --- | --- | --- | --- | --- |
-| `dev` | 最新功能開發 | `/preview/` | 不能 | 不供安裝 | 功能分支做完才併進來；外部 PR 開到這裡 |
+| `dev` | 最新功能開發 | `/preview/` | 不能 | 不供安裝 | 功能分支開 PR 進來，PR 檢查綠了才合併；外部 PR 也開到這裡 |
 | `staging` | 候選版，正在做套用驗收 | `/staging/` | 不能 | 可以在自己的分支試裝回報，不可正式導入 | 只收 dev 的 PR |
 | `main` | **最新核准版** | 正式站根目錄 | **其他系統只參照這裡** | `/r/`、npm | 只收 staging 的 PR，守門人核准後合併 |
 
@@ -44,7 +44,7 @@ dev（工作中）──PR──▶ staging（候選版：套用驗收）──P
 ### 流程
 
 ```
-① dev 上開發：功能分支做完才併進 dev；改到元件或 token 就依判準表 bump 版號（CI 擋漏 bump）
+① dev 上開發：功能分支開 PR 到 dev，PR 檢查（pr-verify）綠了才合併；改到元件或 token 就依判準表 bump 版號（CI 擋漏 bump）
 ② 切候選版：守門人先分流 PMIS 裡新進的取用端回饋（見〈回饋與 RFC 流程〉）；
    在 dev 把 CHANGELOG「## 未發佈」改名——有 bump 寫「## vX.Y.Z · 日期」，
    版號沒動寫「## 日期（說明）」——然後開 dev → staging 的 PR
@@ -62,6 +62,10 @@ dev（工作中）──PR──▶ staging（候選版：套用驗收）──P
 - **驗收沒過**：修在 dev、推上去，再開一次 dev → staging 的 PR，staging 會重跑全部驗收。不在 staging 上直接改；
   版號不必再 bump，除非那個 tag 已經被佔。
 - **dev 永遠是可發布的狀態**——這是「修在 dev 再送一次」成立的前提。做到一半的東西留在功能分支。
+- **進 dev 也走 PR，不在本機合併後直接推。** PR 檢查（`pr-verify`）跑的是與預覽站同一套守衛、在同一種 Linux 環境，只是不部署；
+  本機（尤其 Windows）綠不代表 CI 綠——真游標、焦點歸還時機、逾時都實際只在 CI 出現過。
+  直接推 dev 的代價是這些差異只能在 dev 上爆：2026-10-08 預覽站因此連紅四次，dev 那段時間不是可發布狀態。
+  （人工：由合併的人遵守；dev 的 ruleset 目前不強制 PR。）
 - **部署失敗的窗口**：合併進 main 但部署紅了＝main 已含內容、正式站還沒動。修好原因後重跑 deploy（手動觸發只能對 main），不是 revert。
 - **強制**：main 與 staging 由 GitHub ruleset 保護（必須 PR、只允許 merge commit、必過檢查、禁止強推與刪除），來源分支由 pr-gate 擋。
   設定正本在 `.github/rulesets/`，`tests/workflow-contract.test.ts` 核對它與 workflow 對得上。

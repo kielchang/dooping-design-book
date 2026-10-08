@@ -150,78 +150,56 @@ export const 收合成完全隱藏: Story = {
     const main = canvasElement.querySelector("main") as HTMLElement;
     const mainLeft = () => main.getBoundingClientRect().left;
     const pinnedLeft = mainLeft();
-
-    // 契約是「終點在哪」，不是滑動動畫：幾何斷言期間關掉轉場。
-    // CI 的無頭 Chromium（Linux）實測轉場完全不前進——收合後右緣停在 256 超過 1 秒，
-    // 本機 Windows 卻是 200ms 就到位；賭影格排程的斷言會隨環境紅綠。
-    const noTransition = doc.createElement("style");
-    noTransition.textContent = "*, *::before, *::after { transition: none !important; }";
-    doc.head.append(noTransition);
-    // DIAG（暫時，不併）：CI 才紅的窺看收不掉——記下指標／焦點事件與 data-peek 的時間線
+    // DIAG（暫時，不併）：只記瀏覽器自己發的（trusted）指標事件與 data-peek 變化，訊息會被截在 300 字
     const trace: string[] = [];
     const t0 = performance.now();
-    const log = (s: string) => trace.push(`${Math.round(performance.now() - t0)}ms ${s}`);
-    const tag = (n: EventTarget | null) =>
-      n instanceof Element ? `${n.tagName}${n.hasAttribute("data-sidebar-edge") ? "[edge]" : ""}${n.getAttribute("aria-label") ? `(${n.getAttribute("aria-label")})` : ""}` : String(n);
-    for (const type of ["pointerover", "pointerout", "pointerenter", "pointerleave", "pointermove", "focusin", "focusout", "keydown"]) {
+    for (const type of ["pointerover", "pointerenter"]) {
       doc.addEventListener(type, (e) => {
-        const el = e.target as Element;
-        if (type === "keydown" || el?.closest?.("aside,[data-sidebar-edge]"))
-          log(`${type} ${tag(el)} trusted=${e.isTrusted} pt=${(e as PointerEvent).pointerType ?? "-"} rel=${tag((e as PointerEvent).relatedTarget)}`);
+        if (e.isTrusted && (e.target as Element)?.closest?.("aside,[data-sidebar-edge]"))
+          trace.push(`${Math.round(performance.now() - t0)}T${type === "pointerover" ? "o" : "e"}`);
       }, true);
     }
-    new MutationObserver(() => log(`data-peek=${aside.hasAttribute("data-peek")} inert=${aside.hasAttribute("inert")}`))
-      .observe(aside, { attributes: true, attributeFilter: ["data-peek", "inert"] });
-    try {
-      await userEvent.click(trigger);
-      await waitFor(() => expect(aside).toHaveAttribute("inert"));
-      await waitFor(() => expect(aside.getBoundingClientRect().right).toBeLessThanOrEqual(0));
-      // 工作區拿回整個寬度
-      await waitFor(() => expect(mainLeft()).toBeLessThan(pinnedLeft));
-      const collapsedLeft = mainLeft();
-      // 移出畫面不等於鍵盤走不進去——inert 要真的擋住焦點
-      const link = within(aside).getByRole("link", { name: /工作台/, hidden: true });
-      link.focus();
-      await expect(doc.activeElement).not.toBe(link);
+    new MutationObserver(() => trace.push(`${Math.round(performance.now() - t0)}P${aside.hasAttribute("data-peek") ? 1 : 0}`))
+      .observe(aside, { attributes: true, attributeFilter: ["data-peek"] });
+    const diag = async (step: string, fn: () => Promise<unknown>) => {
+      try { await fn(); } catch { throw new Error(`DIAG ${step} trace=${trace.join(",")}`); }
+    };
 
-      // 碰左緣窺看：浮層、不推版面
-      const edge = canvasElement.querySelector("[data-sidebar-edge]") as HTMLElement;
-      await userEvent.hover(edge);
-      await waitFor(() => expect(aside).toHaveAttribute("data-peek"));
-      await expect(aside).not.toHaveAttribute("inert");
-      await waitFor(() => expect(aside.getBoundingClientRect().left).toBe(0));
-      expect(mainLeft()).toBe(collapsedLeft);
-      await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await userEvent.click(trigger);
+    await waitFor(() => expect(aside).toHaveAttribute("inert"));
+    await diag("right<=0", () => waitFor(() => expect(aside.getBoundingClientRect().right).toBeLessThanOrEqual(0)));
+    // 工作區拿回整個寬度
+    await waitFor(() => expect(mainLeft()).toBeLessThan(pinnedLeft));
+    const collapsedLeft = mainLeft();
+    // 移出畫面不等於鍵盤走不進去——inert 要真的擋住焦點
+    const link = within(aside).getByRole("link", { name: /工作台/, hidden: true });
+    link.focus();
+    await expect(doc.activeElement).not.toBe(link);
 
-      // Esc 收（焦點不在側欄裡也要收得掉）
-      await userEvent.keyboard("{Escape}");
-      await waitFor(() => expect(aside).toHaveAttribute("inert"));
+    // 碰左緣窺看：浮層、不推版面
+    const edge = canvasElement.querySelector("[data-sidebar-edge]") as HTMLElement;
+    await userEvent.hover(edge);
+    await waitFor(() => expect(aside).toHaveAttribute("data-peek"));
+    await expect(aside).not.toHaveAttribute("inert");
+    await waitFor(() => expect(aside.getBoundingClientRect().left).toBe(0));
+    expect(mainLeft()).toBe(collapsedLeft);
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
 
-      // 再叫出來，滑鼠離開就收
-      await userEvent.hover(canvasElement.querySelector("[data-sidebar-edge]") as HTMLElement);
-      await waitFor(() => expect(aside).toHaveAttribute("data-peek"));
-      // 指標先移進浮出來的側欄、再離開——真實使用者也是這樣走。不能從熱區直接 unhover：
-      // 熱區在窺看時已卸載，user-event 的 pointerleave 沿「上一個指標目標」的祖先鏈派送，
-      // 從已卸載的熱區離開不會經過側欄（CI 實測窺看因此收不掉；本機是被瀏覽器自己的指標事件掩蓋）。
-      await userEvent.hover(aside);
-      await userEvent.unhover(aside);
-      try {
-        await waitFor(() => expect(aside).not.toHaveAttribute("data-peek"));
-      } catch {
-        throw new Error(
-          `DIAG 窺看沒收：active=${tag(doc.activeElement)} insideAside=${aside.contains(doc.activeElement)} ` +
-            `| ${trace.slice(-40).join(" | ")}`,
-        );
-      }
-      await expect(aside).toHaveAttribute("inert");
+    // Esc 收（焦點不在側欄裡也要收得掉）
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(aside).toHaveAttribute("inert"));
 
-      // 收尾：釘選展開回來（推開內容），別讓視覺掃描拿到收合畫面
-      await userEvent.click(trigger);
-      await waitFor(() => expect(aside).not.toHaveAttribute("inert"));
-      await waitFor(() => expect(mainLeft()).toBe(pinnedLeft));
-    } finally {
-      noTransition.remove();
-    }
+    // 再叫出來，滑鼠離開就收
+    await userEvent.hover(canvasElement.querySelector("[data-sidebar-edge]") as HTMLElement);
+    await waitFor(() => expect(aside).toHaveAttribute("data-peek"));
+    await userEvent.unhover(aside);
+    await diag("unhover", () => waitFor(() => expect(aside).not.toHaveAttribute("data-peek")));
+    await expect(aside).toHaveAttribute("inert");
+
+    // 收尾：釘選展開回來（推開內容），別讓視覺掃描拿到收合畫面
+    await userEvent.click(trigger);
+    await waitFor(() => expect(aside).not.toHaveAttribute("inert"));
+    await waitFor(() => expect(mainLeft()).toBe(pinnedLeft));
   },
 };
 

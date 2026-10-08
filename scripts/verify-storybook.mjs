@@ -122,6 +122,11 @@ async function main() {
   const context = await browser.newContext({ viewport: { width: 1000, height: 800 } });
   const page = await context.newPage();
   await page.addInitScript(CHANNEL_TAP);
+  // 把真的游標停在不會碰到任何東西的位置（右緣中段）。不停的話 Linux 的無頭 Chromium 把游標當作在
+  // 左上角，版面一變就對游標底下的元素發「真的」pointerover／enter——左緣的側欄熱區、浮出的側欄
+  // 會被它叫出來或留住，play 合成的離開事件因此失效。Windows 上游標位置未定、不發這些事件，
+  // 於是只有 CI 紅（2026-10-08 preview 連紅三次，PR #27 的事件時間線取證）。
+  await page.mouse.move(998, 400);
   const pageErrors = [];
   page.on("pageerror", (e) => pageErrors.push(String(e.message).slice(0, 300)));
 

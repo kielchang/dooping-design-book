@@ -6,38 +6,34 @@ title: 元件總覽
 
 每個元件一頁，格式固定：**用途 → 何時不要用 → 狀態 → 無障礙 → 活範例 → 取用**。
 
-「何時不要用」是刻意放在第二段的。設計系統失敗最常見的原因不是元件不夠多，
-是元件被用在不對的地方——然後大家開始 fork，然後就沒有系統了。
-
 ## 收錄範圍
 
 | 類 | 元件 |
 | --- | --- |
 | 基礎 | Button、Badge、Card、Callout、Separator |
-| 表單 | Input、NumberInput、Label、Checkbox、Select、SegGroup、Chips |
-| 浮層 | Tooltip、Dialog、Popover、DropdownMenu、ConfirmDialog、Command |
+| 表單 | Input、Textarea、NumberInput、Label、Checkbox、RadioGroup、Switch、Select、SegGroup、Chips、DateRange、FormField／FieldError |
+| 浮層 | Tooltip、Dialog、Popover、DropdownMenu、ConfirmDialog、Command、Toast |
 | 結構 | Collapsible |
-| 外殼 | AppShell、Sidebar、SidebarNav（v0.13.0 收錄）、AppMenubar（v0.14.0，多應用版型）、PageHeader／BackLink／Breadcrumb |
-| 資料 | Table、DataTable、TabPills、Delta、EmptyState、Stepper |
+| 外殼 | AppShell、Sidebar、SidebarNav、AppMenubar（多應用版型）、CommandPalette、PageHeader／BackLink／Breadcrumb |
+| 資料 | Table、DataTable、TabPills、Delta、EmptyState、Skeleton、Stepper |
 | 進階表單 | EditableField、ChangeSummary |
 | 引導 | Coachmark |
 | 圖表 | BarChart、Pareto、StackedBar、TrendChart、Bullet、Scatter、Heatmap、LineChart、Legend |
+| 特殊介面 | Gantt（時間軸）、GraphCanvas（節點畫布） |
 | 文件用 | Placeholder / Spotlight / MockScreenFrame |
 
 ## 不收什麼
 
 - **完整的圖表庫**——[圖表](/components/charts)只收「後台閱讀型」的八種零相依圖，
-  刻意不做縮放、刷選、圖內鑽取，資料點也只撐到百位數。
+  不做縮放、刷選、圖內鑽取，資料點只撐到百位數。
   需要分析型互動請直接用成熟圖表庫，不要改造這一組。
 - **ErrorBoundary、路由、資料抓取**——外殼元件（AppShell／Sidebar）收的是
-  **純呈現**的殼；路由、權限、資料抓取仍是宿主的職責，
-  一律以 `renderLink`／props 注入。導覽層的**規範**正本仍在
-  [後台系統的資訊架構](/patterns/back-office-ia)——元件是規範的載體，不是第二份規範。
-- **任何綁定特定業務流程的複合畫面**——它們在原專案裡是對的，抄到別的產業就是錯的。
-  去領域化之後仍然成立的**頁型組成規範**（清單頁、明細頁、表單頁…）收在[頁面章](/pages)，
-  以文件與組合 story 的形式存在，不發元件。**頁首是唯一的例外**：它被八處重複手排、
-  觸發了頁面章自己寫下的解鎖條件（被重複手排就進元件章），因此以
-  [PageHeader](/components/page-header) 進元件章；其餘骨架仍只有組合 story。
+  **純呈現**的殼；路由、權限、資料抓取是宿主的職責，
+  一律以 `renderLink`／props 注入。導覽層的**規範**正本在
+  [後台系統的資訊架構](/patterns/back-office-ia)。
+- **任何綁定特定業務流程的複合畫面**——去領域化後仍成立的**頁型組成規範**（清單頁、明細頁、表單頁…）收在[頁面章](/pages)，
+  以文件與組合 story 的形式存在，不發元件。**頁首是唯一的例外**：依頁面章的解鎖條件
+  （被重複手排就進元件章），以 [PageHeader](/components/page-header) 進元件章；其餘骨架只有組合 story。
 
 ## 共同約定
 

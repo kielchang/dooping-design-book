@@ -8,11 +8,9 @@
 
 **不要開公開 issue 描述可被利用的細節。** 走私密通道：
 
-1. 首選：[GitHub 私密安全回報](https://github.com/kielchang/dooping-design-book/security/advisories/new)
-   （需維護者先在 Settings → Security 啟用 Private vulnerability reporting；見 `CONTRIBUTING.md` 的一次性設定）。
-2. 上述頁面 404（功能尚未啟用）時的過渡做法：開
-   [Bug 回報表單](https://github.com/kielchang/dooping-design-book/issues/new?template=bug.yml)，
-   只寫「安全相關，請聯繫」與影響範圍，**不要貼利用細節**，等維護者聯繫後再提供。
+走 [GitHub 私密安全回報](https://github.com/kielchang/dooping-design-book/security/advisories/new)
+（repo 的 Security 分頁 → Report a vulnerability）。內容只有維護者與回報者看得到。
+取用端的 AI agent 發現安全問題時，同樣走這條，送出前給使用者看過。
 
 ## 處理原則
 

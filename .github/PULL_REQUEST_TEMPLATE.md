@@ -1,9 +1,9 @@
 <!--
-  三種 PR，只留你這一種，其他整段刪掉。流程正本：book/docs/7-governance/01-versioning.mdx「三段式發布」。
+  三種 PR，只留你這一種，其他整段刪掉。流程正本：ARCHITECTURE.md「分支與部署拓樸」。
     一般 PR（開到 dev）             → 留「改了什麼／自查」
-    候選版 PR（dev → staging）      → 只貼 CHANGELOG 最上面那一節；開之前守門人先分流 PMIS 裡新進的 [回饋] task
+    候選版 PR（dev → staging）      → 只貼 CHANGELOG 最上面那一節；開之前守門人先分流新進的 [回饋] issue
     核准 PR（staging → main）       → 貼 CHANGELOG 該節，並逐項勾完「核准清單」（pr-gate 會檢查）
-  取用端遇到問題、想改設計、缺件：先在宿主做並記台帳，同時回饋上游——agent 照 AGENTS.md「回饋到上游」送 PMIS，
+  取用端遇到問題、想改設計、缺件：先在宿主做並記台帳，同時回饋上游——agent 照 AGENTS.md「回饋到上游」開 issue，
   人走 issues/new/choose。三次法則由守門人在上游數，過了才開 RFC 或 PR。
 -->
 
@@ -16,7 +16,7 @@
 - [ ] `npm run build:tokens` → `npm run typecheck` → `npm test` 全綠
 - [ ] 改了 `packages/react/src` → `npm run build:registry` 並提交 `registry/`
 - [ ] 取用端可感知的變更 → 版號三處同步（根 `package.json`、`packages/react/package.json`、`packages/react/src/version.ts`）
-- [ ] `CHANGELOG.md` 未發佈節補一則（改了什麼／我需要做什麼／為什麼改）
+- [ ] 取用端感受得到的變更 → `CHANGELOG.md` 未發佈節補一項（改了什麼／我需要做什麼）
 - [ ] 措辭過去領域化詞表（示範用中性詞：項目／單位／類別／批次／紀錄）
 
 ## 核准清單

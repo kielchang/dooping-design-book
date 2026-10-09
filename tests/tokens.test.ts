@@ -69,7 +69,7 @@ describe("設計 token", () => {
     const declared = read("packages/react/package.json").dependencies["@dooping/tokens"];
     const expected = `@dooping/tokens@^${declared.replace(/^[\^~>=<\s]+/, "")}`;
 
-    // registry:file（取用端工具，例如 dooping-check）不是元件、不吃 token，放行（ADR-0013 第二層）
+    // registry:file（取用端工具，例如 dooping-check）不是元件、不吃 token，放行
     const stale = read("registry/index.json")
       .items.filter((i: { type: string }) => i.type !== "registry:file")
       .map((i: { name: string }) => i.name)

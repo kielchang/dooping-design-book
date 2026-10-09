@@ -4,14 +4,14 @@ name: staging
 #   全部守衛＋內部試裝宿主＋發版閘＋套用驗收（乾淨的取用端專案）→ 部署 /staging/（registry 以 staging 網址建置，可安裝）→ 部署後冒煙。
 # 綠了才能開 staging → main 的 PR；main 的 ruleset 要求的就是這一支產生的「staging / build｜consumer｜smoke」。
 # 驗收紅了修在 dev、再開一次 dev → staging 的 PR，不在 staging 上直接改。
-# 流程正本：book/docs/7-governance/01-versioning.mdx「三段式發布」。
+# 流程正本：ARCHITECTURE.md「分支與部署拓樸」。
 on:
   push:
     branches: [staging]
   workflow_dispatch:
 
 permissions:
-  contents: write # 推 gh-pages 分支的 staging/
+  contents: read
 
 concurrency:
   group: pages-staging
@@ -31,6 +31,9 @@ jobs:
 
   staging:
     needs: staging-ref-guard
+    # 寫入權只給這個呼叫，_pipeline.yml 裡只有 deploy job 留著用（推 gh-pages 的 staging/），其餘 job 自己收回唯讀
+    permissions:
+      contents: write
     uses: ./.github/workflows/_pipeline.yml
     with:
       stage: staging

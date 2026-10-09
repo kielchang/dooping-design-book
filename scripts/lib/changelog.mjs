@@ -1,7 +1,7 @@
 // CHANGELOG 的分節規則——deploy 抽 Release notes、發版閘、守衛測試共用這一份。
 // （以前 deploy.yml 是 awk、tests/changelog.test.ts 是逐行移植：同一份規則兩處，只能靠測試盯著不分岔。）
 //
-// 標題三種（正本：CHANGELOG.md 開頭與 book/docs/7-governance/01-versioning.mdx）：
+// 標題三種（正本：CHANGELOG.md 開頭與 ARCHITECTURE.md「分支與部署拓樸」）：
 //   ## vX.Y.Z · YYYY-MM-DD      有 bump 的進版；Release notes 從這行之後讀到第一條恰為 --- 的行
 //   ## YYYY-MM-DD（說明）        版號沒動的進版（純文件／純 CI）：不打 tag、不發 Release
 //   ## 未發佈（`dev`）            還在累積；開 dev → staging 的 PR 之前要改成上面兩種之一

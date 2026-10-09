@@ -1,6 +1,6 @@
 // 壓力測試／超大數值：13 位數金額、超長小數。千分位還在嗎？會不會自動縮小字級（不該）？
 // 容器是捲動還是撐破？
-// 規範出處：book/docs/7-governance/09-stress-stories.mdx
+// 規範出處：packages/react/README.md「壓力測試 story」
 import type { Meta, StoryObj } from "@storybook/react";
 import { DataTable, type Column } from "../ui/data-table";
 import { EditableField } from "../form/editable-field";

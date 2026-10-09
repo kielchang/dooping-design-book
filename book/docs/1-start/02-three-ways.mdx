@@ -4,11 +4,11 @@ title: 三種取用方式
 
 # 三種取用方式
 
-三種都是「正確用法」，可以混用。**不必全有全無**——這正是這本書拆成三層的原因。
+三種可以混用，**不必全有全無**。
 
 <FlowThreeWays />
 
-（圖只是導覽；三種方式的內容與判準見下文，混用完全合法。）
+（圖只是導覽；三種方式的內容與判準見下文。）
 
 ## 方式一：只讀規範（零相依）
 
@@ -19,18 +19,17 @@ title: 三種取用方式
 - 不是 React（Vue / Svelte / Blazor / 原生）
 - 只想解決一個具體問題（例如「送出前的變更摘要該長怎樣」）
 
-模式章每一則都寫成「問題 → 做法 → 取捨 → 反例」，可以直接當規格書用。
+模式章每一則都可以直接當規格書用。
 
 ## 方式二：registry 複製元件（推薦）
 
-把元件**原始碼**複製進你的專案。之後它就是你的程式碼，改壞了不會影響別人，
-升級也不會半夜被 breaking change 叫醒。
+把元件**原始碼**複製進你的專案。之後它就是你的程式碼。
 
 ```bash
 # 一次裝一個
 npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/data-table.json
 
-# 相依會自動一起裝（DataTable 會帶上 table / input / button / select / tooltip / utils…）
+# 相依會自動一起裝（DataTable 會帶上 table / input / button / select / tooltip / utils…；完整清單見 /r/data-table.json）
 ```
 
 安裝後的落點：
@@ -38,7 +37,7 @@ npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/data-tab
 ```
 src/
 ├── components/dooping/    ← 元件
-└── lib/dooping/           ← 工具（cn、useSort、csv、download、forms-diff）
+└── lib/dooping/           ← 工具（cn、useSort、useDialogState、useTableUrlState、nav、csv、download、forms-diff）
 ```
 
 :::note 前置條件
@@ -60,7 +59,7 @@ src/
 npm install @dooping/tokens
 ```
 
-**Tailwind v4（建議）**——全域 CSS 四行，順序是承重結構：
+**Tailwind v4（建議）**——全域 CSS 四行，**順序不能改**：
 
 ```css title="你的全域 CSS"
 @import "tailwindcss";
@@ -70,7 +69,7 @@ npm install @dooping/tokens
 ```
 
 從 `npx shadcn init` 起手的話，**刪掉**它產生的 `:root`／`.dark` 色值區塊、
-`@theme inline` 裡的 `--color-*` 對映與 `@custom-variant dark`——留著就是兩份真相。
+`@theme inline` 裡的 `--color-*` 對映與 `@custom-variant dark`。
 
 **Tailwind v3**：
 
@@ -85,16 +84,17 @@ module.exports = {
 @import "@dooping/tokens/tokens.css";
 ```
 
-兩個版本產出的 class 名稱逐字相同（`bg-danger/10`、`h-control`、`duration-fast`…），
+兩個版本產出的 class 名稱逐字相同（`bg-danger-subtle`、`h-control`、`duration-fast`…），
 元件原始碼不必分版。
 
 沒有用 Tailwind 也可以——`tokens.css` 是純 CSS 變數，任何宿主都吃得下：
 
 ```css
 .my-alert {
-  background: hsl(var(--danger) / 0.1);
-  border: 1px solid hsl(var(--danger) / 0.35);
-  color: hsl(var(--danger));
+  background-color: hsl(var(--danger-subtle));
+  border: 1px solid hsl(var(--danger) / 0.3);
+  border-left: 4px solid currentColor;
+  color: hsl(var(--danger-subtle-foreground));
 }
 ```
 
@@ -103,7 +103,7 @@ module.exports = {
 ```ts
 import { semanticColors, chartColors } from "@dooping/tokens";
 
-const palette = chartColors("dark");   // ["#2a5ae5", "#0e9488", …]
+const palette = chartColors("dark");   // ["#66a3f4", "#7e6f00", …]
 const colors = semanticColors();        // { primary: "222.2 47.4% 11.2%", … }
 ```
 
@@ -111,10 +111,10 @@ const colors = semanticColors();        // { primary: "222.2 47.4% 11.2%", … }
 
 <Rules>
   <Do>
-    <p>新專案、React、要快 → <strong>方式二 ＋ 方式三</strong>。token 保證換皮一致，元件直接抄。</p>
+    <p>新專案、React、要快 → <strong>方式二 ＋ 方式三</strong>。</p>
   </Do>
   <Dont>
-    <p>不要為了「統一」而把已經上線的舊系統整包換掉。先只導入 token，讓兩套介面顏色一致，其餘慢慢來。</p>
+    <p>不要把已經上線的舊系統整包換掉。先只導入 token，其餘慢慢來。</p>
   </Dont>
 </Rules>
 

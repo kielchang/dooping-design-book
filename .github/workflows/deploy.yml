@@ -6,14 +6,14 @@ name: Deploy Design Book
 #   /r/*.json    → shadcn registry（npx shadcn add <URL> 可安裝）
 # gh-pages 上還有 /preview/（dev，preview.yml）與 /staging/（候選版，staging.yml），這支只動根目錄、絕不碰它們——
 # 邊界寫在 scripts/deploy-gh-pages.sh 的 STAGE_DIRS。
-# 流程正本：book/docs/7-governance/01-versioning.mdx「三段式發布」。
+# 流程正本：ARCHITECTURE.md「分支與部署拓樸」。
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: write # 推 gh-pages 分支、蓋 v* tag
+  contents: read
 
 concurrency:
   group: pages-production
@@ -33,6 +33,9 @@ jobs:
 
   production:
     needs: production-ref-guard
+    # 寫入權只給這個呼叫，_pipeline.yml 裡只有 deploy job 留著用（推 gh-pages 根目錄），其餘 job 自己收回唯讀
+    permissions:
+      contents: write
     uses: ./.github/workflows/_pipeline.yml
     with:
       stage: production
@@ -41,6 +44,8 @@ jobs:
   release:
     needs: production
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # 蓋 v* tag、建立 Release
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,6 +66,12 @@ jobs:
           git fetch --tags -q origin
           TAG="v$(node -p "require('./package.json').version")"
           if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            # 版號沒動時 tag 指向較早的 main commit 是正常的；不在 main 歷史上的就不是核准流程打的
+            TAG_SHA=$(git rev-list -n 1 "$TAG")
+            if ! git merge-base --is-ancestor "$TAG_SHA" "$GITHUB_SHA"; then
+              echo "::error::$TAG 已存在但指向 $TAG_SHA，不在 main 的歷史上——不是核准流程打的 tag。請先查清楚來源再處理。"
+              exit 1
+            fi
             echo "tag $TAG 已存在——版號未變的進版（純文件／純 CI）或重跑，都不另打 tag"
             exit 0
           fi
@@ -88,6 +99,11 @@ jobs:
           if ! git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
             echo "沒有 $TAG 這個 tag（上一步要嘛打了 tag、要嘛 tag 已存在）"
             exit 0
+          fi
+          # Release 只發給 main 歷史上的 tag（與上一步同一道檢查；補發歷史 tag 的 Release 也適用）
+          if ! git merge-base --is-ancestor "$(git rev-list -n 1 "$TAG")" "$GITHUB_SHA"; then
+            echo "::error::$TAG 不在 main 的歷史上，不發 Release"
+            exit 1
           fi
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG 已存在——純文件進版或重跑，不另發"

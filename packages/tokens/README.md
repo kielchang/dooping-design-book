@@ -24,7 +24,7 @@ npm install @dooping/tokens
 `tailwind.css` 只做名稱對映，本身不含任何色值：
 
 1. `@theme` 把語意色、圓角、陰影、字級、字體、動態、互動尺寸對映成 utility
-   （`bg-danger/10`、`rounded-md`、`shadow-sm`、`text-tiny`、`duration-fast`、`h-control`），
+   （`bg-danger-subtle`、`rounded-md`、`shadow-sm`、`text-tiny`、`duration-fast`、`h-control`），
    值一律 `var()` 回 `tokens.css`。
 2. `--color-*: initial` 清空 Tailwind 預設色盤——`bg-red-500` 產不出樣式（漂移防線①）。
 3. `@custom-variant dark` 同時認 `.dark` 與 `[data-theme="dark"]`；
@@ -56,7 +56,7 @@ module.exports = {
 兩個版本產出的 class 名稱逐字相同，元件原始碼不必分版：
 
 ```tsx
-<div className="bg-danger/10 border-danger/30 text-danger" />
+<div className="bg-danger-subtle border-danger/30 text-danger-subtle-foreground" />
 ```
 
 ### 純 CSS（任何宿主）
@@ -65,9 +65,10 @@ module.exports = {
 @import "@dooping/tokens/tokens.css";
 
 .my-alert {
-  background: hsl(var(--danger) / 0.1);
-  border: 1px solid hsl(var(--danger) / 0.35);
-  color: hsl(var(--danger));
+  background-color: hsl(var(--danger-subtle));
+  border: 1px solid hsl(var(--danger) / 0.3);
+  border-left: 4px solid currentColor;
+  color: hsl(var(--danger-subtle-foreground));
 }
 ```
 

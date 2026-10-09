@@ -1,4 +1,4 @@
-// Tailwind v4 preflight ＋ tokens 基座 → book/src/css/demo-base.css（文件站 demo 宿主基座，ADR-0010）
+// Tailwind v4 preflight ＋ tokens 基座 → book/src/css/demo-base.css（文件站 demo 宿主基座）
 //
 //   node book/scripts/port-preflight.mjs
 //
@@ -125,7 +125,7 @@ const tokensBase = (() => {
 })();
 
 const HEADER = `/* demo 宿主基座 — Tailwind v4 preflight ＋ @dooping/tokens 基座，移植到兩個 scope，
- * 讓文件站的活範例拿到與 Storybook（v4）完全相同的樣式前提（ADR-0010）。
+ * 讓文件站的活範例拿到與 Storybook（v4）完全相同的樣式前提。
  *
  * ⚠️ 本檔由 book/scripts/port-preflight.mjs 產生，請勿手改。
  * tests/host-baseline.test.ts 會拿 node_modules/tailwindcss/preflight.css 與 tokens 的 tailwind.css

@@ -5,7 +5,7 @@ title: AppShell／Sidebar 應用外殼
 # AppShell／Sidebar 應用外殼
 
 後台的殼：側邊欄＋頂列＋主內容。**規範的正本在
-[後台系統的資訊架構](/patterns/back-office-ia)**——分區怎麼切、頂列放什麼、
+[後台系統的資訊架構](/patterns/back-office-ia)**：分區怎麼切、頂列放什麼、
 單一出口與深連結，全以那一頁為準；這裡是那份規範的**元件載體**。
 
 同一副殼有兩種版型：**多應用**（側欄是應用清單、應用內的功能在頂部
@@ -13,8 +13,7 @@ title: AppShell／Sidebar 應用外殼
 怎麼選見〈後台系統的資訊架構〉的「多應用系統」一節。
 
 :::note 收錄狀態
-外殼元件 v0.13.0 起在正式版（頁面章原本刻意不收外殼，後來以純呈現元件收進元件章）。
-重新檢視條件＝第一個真實宿主依文件自行導入的回報；屆時若決定退場，走〈版本策略〉的棄用流程（標記棄用、保留至少一個 minor、下個 major 移除），不會無預警消失。
+外殼元件在正式版。若要退場，走〈版本策略〉的棄用流程（標記棄用、保留至少一個 minor、下個 major 移除），不會無預警消失。
 :::
 
 <StoryLink id="元件-外殼-應用外殼・側邊欄--典型組成" />
@@ -32,7 +31,6 @@ title: AppShell／Sidebar 應用外殼
 
 **純呈現，三不綁**：不綁路由（連結用 `renderLink` 注入，預設真 `<a>`）、
 不綁資料抓取、不碰儲存（收合狀態的持久化用受控 `open`/`onOpenChange` 交宿主）。
-這是 ADR-0011 的退場前提——砍掉時宿主一小時內能用同一份 token 重寫自己的殼。
 
 <StoryFrame id="元件-外殼-應用外殼・側邊欄--典型組成" title="單應用版型：分區導覽＋收合" height={520} />
 
@@ -73,33 +71,29 @@ const app = findActiveNavLeaf(apps, pathname, isAppActive)?.item;
 
 <Rules>
   <Do><p>後台系統的站台外殼——與〈後台系統的資訊架構〉的分區規範成套使用。</p></Do>
-  <Dont><p>對外的行銷站、文件站、登入頁不要套這個殼——它們的導覽是內容結構，
-  不是工作節奏。登入頁在外殼<strong>之外</strong>（頁面章明文不收）。</p></Dont>
+  <Dont><p>對外的行銷站、文件站、登入頁不要套這個殼。登入頁在外殼<strong>之外</strong>。</p></Dont>
 </Rules>
 
 <Rules>
   <Do><p>側欄項目用 <code>NavGroup[]</code> 描述，同一份資料餵
   <a href="/components/command">CommandPalette</a>。</p></Do>
-  <Dont><p>不要在側欄與指令面板各維護一份清單——改名只改一邊，
-  使用者會以為是兩個功能。</p></Dont>
+  <Dont><p>不要在側欄與指令面板各維護一份清單。</p></Dont>
 </Rules>
 
 ## 狀態
 
 - **桌面收合（圖示欄）**：`collapsible="icon"`（預設）收成圖示欄；文字轉 sr-only
   （可及名稱不消失）、群組標題隱藏、兩層群組改成往右彈出的
-  [DropdownMenu](/components/popover-dropdown)、hover 出提示泡泡（在圖示**右側**——
-  在上方會蓋住上一項）。
+  [DropdownMenu](/components/popover-dropdown)、hover 出提示泡泡（在圖示**右側**）。
 - **桌面收合（收到 0）**：`collapsible="offcanvas"` 收合時側欄整塊移出畫面，
   工作區拿回整個寬度。滑鼠碰左緣會**窺看**：側欄浮在內容上（不推版面），
-  滑鼠離開、按 Esc 或選了目的地就收。鍵盤與觸控走 SidebarTrigger 釘選展開——
-  只靠 hover 揭露的功能對觸控等於不存在。
-- **行動版**：自動轉左滑抽屜（既有 Radix Dialog 組成——焦點鎖定、Esc、焦點歸還
+  滑鼠離開、按 Esc 或選了目的地就收。鍵盤與觸控走 SidebarTrigger 釘選展開。
+- **行動版**：自動轉左滑抽屜（Radix Dialog 組成：焦點鎖定、Esc、焦點歸還
   全部繼承），**分區與順序完全不變**；點選目的地即關閉。
 - **選中態**：`bg-sidebar-accent`（＝該主題的 `brand-subtle`，識別層）＋
   `aria-current="page"`；hover 走狀態層。active 判定用 `isNavActive()` 的多層
   fallback（完整相符 → 去 query → 路徑邊界的父路徑），可用 `isActive` 覆寫。
-- **開闔狀態**：`useSidebar()` 拿 `toggle()`／`state`——宿主要掛快捷鍵、
+- **開闔狀態**：`useSidebar()` 拿 `toggle()`／`state`；宿主要掛快捷鍵、
   要存 localStorage 都從這裡接。
 
 ### SPA 宿主的接法
@@ -117,19 +111,17 @@ const app = findActiveNavLeaf(apps, pathname, isAppActive)?.item;
 ## 無障礙
 
 - 側欄是 `nav` 地標，`label` 預設「主導覽」；行動版抽屜以同名可及名稱呈現。
-- 收合態的連結名稱走 sr-only 保留——`display:none` 會把可及名稱一起藏掉，
-  這是 stories 的 play 直接驗的契約。
-- `offcanvas` 收到 0 時側欄是 `inert`：移出畫面不等於鍵盤走不進去，
-  不加 inert 的話 Tab 會停在看不見的連結上。
+- 收合態的連結名稱走 sr-only 保留，不用 `display:none`（守衛：stories 的 play 直接驗）。
+- `offcanvas` 收到 0 時側欄是 `inert`；Tab 不能停在看不見的連結上。
 - SidebarTrigger 自帶 `aria-label` 與 `aria-expanded`。
-- 聚焦環走中性 `--ring`（`--sidebar-ring ≡ ring`，ADR-0007 的延伸）。
+- 聚焦環走中性 `--ring`（`--sidebar-ring ≡ ring`，不隨主題轉色）。
 
 ## Token
 
 側欄有自己的表面語意（[主題](/foundations/theming)頁有完整清單）：
-`--sidebar` 是「比頁面底沉一階的安靜區」（唯一新顏色，反解生成）；
+`--sidebar` 是「比頁面底沉一階的安靜區」（唯一新顏色）；
 `--sidebar-accent` ≡ `brand-subtle`、`--sidebar-primary` ≡ `brand`、
-`--sidebar-ring` ≡ `ring`——七個別名由 `verify:color` 的恆等守衛盯住。
+`--sidebar-ring` ≡ `ring`。（守衛：`verify:color` 的恆等守衛盯住七個別名）
 
 ## 取用
 
@@ -146,4 +138,4 @@ npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/app-menu
 
 `sidebar-nav` 會自動帶入 `sidebar`、`collapsible`、`dropdown-menu`、`badge`、
 `tooltip` 與 `nav`（NavGroup 型別）。token 需要 `@dooping/tokens@^0.7.0`
-（`--sidebar-*` 自 0.7.0 起提供）。
+（提供 `--sidebar-*`）。

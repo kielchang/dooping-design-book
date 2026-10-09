@@ -17,8 +17,7 @@ title: ConfirmDialog 確認對話框
 
 <Rules>
   <Do><p>後果不可逆或影響範圍大的動作：作廢、送出鎖定、批次刪除。</p></Do>
-  <Dont><p>可復原的低後果動作<strong>不要跳確認</strong>——直接執行＋就地提供「復原」。
-  每個刪除都跳確認，三天後使用者就會閉著眼睛按確定，確認框變成儀式就不再保護任何東西。
+  <Dont><p>可復原的低後果動作<strong>不要跳確認</strong>，直接執行＋就地提供「復原」。
   分級判準見 <a href="/components/dialog">Dialog</a>。</p></Dont>
 </Rules>
 
@@ -26,13 +25,11 @@ title: ConfirmDialog 確認對話框
 
 三個行為契約，每一條都有 play function 驗收：
 
-1. **確認後不自動關閉**——成功才關、失敗留在原地顯示錯誤，時機由宿主在
-   `onConfirm` 的後續決定。元件刻意不吃 Promise：async 編排與錯誤呈現是應用層的事。
-2. **`loading` 鎖住所有出口**——確認、取消、Esc、點遮罩、右上關閉一律無效。
-   操作進行中關掉對話框，使用者會以為取消了，實際上沒有。
-3. **`typeToConfirm` 硬確認**——輸入指定字串才解鎖確認鈕。
-   [硬鎖定](/patterns/hard-lock)那條「把危險操作變成刻意的決定」在對話框層的落地，
-   保留給影響半徑最大、完全無法還原的操作。
+1. **確認後不自動關閉**：成功才關、失敗留在原地顯示錯誤，時機由宿主在
+   `onConfirm` 的後續決定。元件不吃 Promise；async 編排與錯誤呈現由應用層負責。
+2. **`loading` 鎖住所有出口**：確認、取消、Esc、點遮罩、右上關閉一律無效。
+3. **`typeToConfirm` 硬確認**：輸入指定字串才解鎖確認鈕。
+   只用於影響半徑最大、完全無法還原的操作（[硬鎖定](/patterns/hard-lock)在對話框層的做法）。
 
 <Demo title="破壞性＋硬確認（輸入編號才解鎖）">
   <ConfirmDialogDemo />
@@ -41,9 +38,8 @@ title: ConfirmDialog 確認對話框
 ## 無障礙
 
 - 繼承 Dialog 的全部保證：焦點鎖定、`aria-modal`、標題與描述的 aria 連動。
-- `loading` 時確認鈕帶 `aria-busy`，螢幕報讀器聽得到「處理中」。
-- 硬確認的輸入框走 Label 連動，錯字時按鈕維持 disabled——不用紅字罵人，
-  解鎖與否本身就是回饋。
+- `loading` 時確認鈕帶 `aria-busy`，讀屏要唸得到「處理中」。
+- 硬確認的輸入框走 Label 連動，錯字時按鈕維持 disabled，不另顯示紅字錯誤。
 
 ## 取用
 

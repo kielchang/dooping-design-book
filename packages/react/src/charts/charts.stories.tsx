@@ -227,7 +227,7 @@ export const 子彈圖: Story = {
   },
 };
 
-// 互動 playground：中文 arg 三層映射（規範見治理章〈Story 撰寫慣例〉）。
+// 互動 playground：中文 arg 三層映射（規範見 packages/react/README.md「Story 撰寫規則」）。
 // 圖表全是純 props，不需要 remount；資料出自 demo/generate 的確定性生成器。
 // 驗收動線：資料點數拉到 0 看「無資料」；長條把點數拉超過類別上限看「其他（N 項）」封頂。
 type 互動Args = {

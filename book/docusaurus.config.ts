@@ -15,7 +15,7 @@ const PROD_URL = "https://kielchang.github.io/dooping-design-book/";
 
 // 三段式發布：preview＝dev 的工作狀態、staging＝候選版（驗收中）、production＝核准版（main）。
 // 文件寫了「只參照正式站」，但誤入的人不會先讀文件——站台自己要說它是哪一段，而且不給搜尋引擎收錄。
-// BOOK_STAGE 由 workflow 明確設定；本機沒設時由 baseUrl 推斷。規則正本：治理章〈版本策略〉「三段式發布」。
+// BOOK_STAGE 由 workflow 明確設定；本機沒設時由 baseUrl 推斷。規則正本：ARCHITECTURE.md「分支與部署拓樸」。
 const STAGES = ["preview", "staging", "production"] as const;
 type Stage = (typeof STAGES)[number];
 const STAGE = (process.env.BOOK_STAGE ??
@@ -108,13 +108,10 @@ const config: Config = {
         docs: {
           routeBasePath: "/",
           sidebarPath: "./sidebars.ts",
-          // 每頁的「編輯此頁」。治理章的架構頁是 sync script 的建置產物
-          // （gitignored），對它的編輯要導向正本，否則連到一個不存在的檔案。
+          // 每頁的「編輯此頁」。
           // 指向 dev：日常修訂都在 dev 累積；staging 只收 dev、main 只收 staging 的核准合併。
           editUrl: ({ docPath }) =>
-            docPath === "7-governance/10-architecture.md"
-              ? "https://github.com/kielchang/dooping-design-book/edit/dev/ARCHITECTURE.md"
-              : `https://github.com/kielchang/dooping-design-book/edit/dev/book/docs/${docPath}`,
+            `https://github.com/kielchang/dooping-design-book/edit/dev/book/docs/${docPath}`,
         },
         blog: false,
         pages: false,

@@ -1,4 +1,4 @@
-// 兩版之間動到哪些 registry item（ADR-0013 第三層）。
+// 兩版之間動到哪些 registry item（更新訊號：Release 異動清單）。
 //
 //   node scripts/registry-changes.mjs --from v0.11.1                 # 對照工作目錄的 registry/
 //   node scripts/registry-changes.mjs --before v0.13.0 --markdown    # 自動找 v0.13.0 之前最近的 v* tag（deploy.yml／_pipeline.yml 用）

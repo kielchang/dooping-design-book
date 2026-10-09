@@ -6,7 +6,7 @@
 # `book/src/css/kit.css` 都 import 它。所以 clone 完不先產生 token 產物，
 # `npm test`、Storybook、文件站**三者都會失敗**。CI 有做這一步，人與 agent 沒有提示。
 #
-# 三個步驟都是幂等的，而且在「已經做過」時幾乎零成本，所以刻意**不**用
+# 四個步驟都是幂等的，而且在「已經做過」時幾乎零成本，所以刻意**不**用
 # $CLAUDE_CODE_REMOTE 只跑遠端：本機的第一次 checkout 會踩到同一個坑。
 set -euo pipefail
 

@@ -3,7 +3,7 @@
 //   main（核准版）← staging（候選版，套用驗收）← dev（工作中）
 //
 // 取用端不需要這支——他們只看 main（Releases／/r/index.json／npm），正本在文件站「治理 → 跟上新版」。
-// 流程正本：book/docs/7-governance/01-versioning.mdx「三段式發布」。只讀不寫：它是儀表板，不是工具箱。
+// 流程正本：ARCHITECTURE.md「分支與部署拓樸」。只讀不寫：它是儀表板，不是工具箱。
 import { readFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { join, dirname } from "node:path";

@@ -4,9 +4,8 @@ title: 表單頁
 
 # 表單頁
 
-**一次把一件事填完。** 表單頁服務「建立一筆新的」；
-修改既有資料是[明細頁](/pages/detail-page)逐欄編輯的事——這條分工先記住，
-後面的規則都是從它長出來的。
+**一次把一件事填完。** 表單頁用於「建立一筆新的」；
+修改既有資料用[明細頁](/pages/detail-page)的逐欄編輯。
 
 ## 何時用
 
@@ -19,8 +18,7 @@ title: 表單頁
 
 <Rules>
   <Do><p>一頁一件事：標題直接說出那件事（「建立項目」），填完送出就離開。</p></Do>
-  <Dont><p>不要做「一頁改十件事」的萬用表單。什麼都能改的畫面，
-  使用者每次都要重新掃一遍才找得到要改的那格。</p></Dont>
+  <Dont><p>不要做「一頁改十件事」的萬用表單。</p></Dont>
 </Rules>
 
 ## 組成
@@ -38,56 +36,52 @@ title: 表單頁
 <Rules>
   <Do><p>依<strong>使用者回答問題的順序</strong>分組——「這是什麼」一組、「數量與管道」一組，
   一組一張卡。組織原則與長表單拆法見<a href="/patterns/scenario-request-form">情境化申請單</a>。</p></Do>
-  <Dont><p>不要照資料表欄位順序從上排到下。資料模型的順序是給程式看的，
-  40 個欄位平鋪的表單是給人受苦的。</p></Dont>
+  <Dont><p>不要照資料表欄位順序從上排到下。</p></Dont>
 </Rules>
 
 <Rules>
   <Do><p>一欄式優先：視線直直往下走。欄位窄且相關（如數量＋金額）才併排。</p></Do>
-  <Dont><p>不要為了「看起來緊湊」排三欄。Z 字形的視線路徑讓漏填率變高，
-  而且 Tab 順序與視覺順序容易對不上。</p></Dont>
+  <Dont><p>不要為了「看起來緊湊」排三欄。</p></Dont>
 </Rules>
 
-必填標示全站一種寫法（標在 Label 上），可選欄位不標——反過來標「（選填）」
-的前提是必填佔多數。兩種都標等於都沒標。
+必填標示全站一種寫法（標在 Label 上），可選欄位不標；必填佔多數時才改標「（選填）」。
+不要兩種都標。
 
 ## 錯誤的位置
 
-跨頁一致性守則第 4 條在表單頁的展開：
+跨頁一致性守則第 4 條在表單頁的做法：
 
-- **行內錯誤緊貼欄位**：用 `FormField`——它把 `aria-invalid`＋`aria-describedby`＋
-  錯誤小字的固定寫法接好（見[錯誤態](/components/input#錯誤態formfield-把固定寫法接好)），
-  不再需要手寫這三條。
+- **行內錯誤緊貼欄位**：用 `FormField`，它接好 `aria-invalid`＋`aria-describedby`＋
+  錯誤小字的固定寫法（見[錯誤態](/components/input#錯誤態formfield-把固定寫法接好)），
+  不要手寫這三條。
 - **頂部只做彙總**：用 [Callout](/components/callout)（warning）列「有幾個欄位待補」，
   不重複每一條錯誤內容。
-- **時機**：blur 或送出後才標紅。使用者還沒碰過的欄位就標紅，
-  是在懲罰還沒發生的錯（[輸入控制項](/components/input)的既有規則）。
+- **時機**：blur 或送出後才標紅，使用者還沒碰過的欄位不標紅
+  （[輸入控制項](/components/input)的既有規則）。
 
 ## 動作區
 
 <Rules>
   <Do><p>主要動作在右、取消在左；送出中把按鈕停用＋換「處理中…」文案。
   取消要有離開防呆：表單有內容時按取消，先用 Dialog 確認「要放棄這份表單？」。</p></Do>
-  <Dont><p>不要做「重設」按鈕。誤觸的代價（整張白填）遠大於它的用處，
-  而且它長得跟「取消」太像。</p></Dont>
+  <Dont><p>不要做「重設」按鈕。</p></Dont>
 </Rules>
 
-送出成功的回饋去向全站固定一種：跳轉到新紀錄的明細頁、或就地
-`Callout live`（success）——選一種，寫進團隊的驗收清單（Toast 尚未收錄，
-見[缺件表](/pages/overview)）。
+送出成功的回饋照 [Toast](/components/toast) 的分工：「已建立」這類動作結果用 Toast；
+要留在頁上對照的結果才就地用 `Callout live`（success）。
+要帶使用者去看新紀錄時，直接跳轉到它的[明細頁](/pages/detail-page)，不在 Toast 裡放連結。
 
 ## 多步驟變體
 
 <StoryFrame id="頁面-表單頁--多步驟" title="多步驟：Stepper＋分步內容＋末步總覽" height={640} />
 
 **拆步的門檻**：欄位有順序依賴（先選單位才知道有哪些選項）、或單頁超過三組。
-純粹欄位多但彼此獨立，用分組卡就好——翻頁本身也是成本。
+欄位多但彼此獨立時用分組卡，不拆步。
 
 <Rules>
   <Do><p>步驟 ≤5、每步標題是名詞短語、可回上一步且<strong>已填內容不丟</strong>；
   末步永遠是總覽確認，送出前看得到全部要送的東西。</p></Do>
-  <Dont><p>不要在中間步驟就寫入資料。「填到第三步就已經建立了草稿」會留下
-  一堆半成品紀錄，而使用者以為自己按了取消就什麼都沒發生。</p></Dont>
+  <Dont><p>不要在中間步驟就寫入資料。</p></Dont>
 </Rules>
 
 Stepper 的可點回跳、目前步驟標示見 [Stepper](/components/stepper)；
@@ -96,7 +90,7 @@ Stepper 的可點回跳、目前步驟標示見 [Stepper](/components/stepper)�
 ## 無障礙
 
 - 每個輸入都有 `Label`（`htmlFor` 綁定）；錯誤用 `aria-invalid`＋`aria-describedby`。
-- 頂部彙總 Callout 加 `live`，錯誤數量變化時螢幕閱讀器唸得到。
+- 頂部彙總 Callout 加 `live`，錯誤數量變化時螢幕閱讀器要唸得到。
 - Tab 順序＝視覺順序；動作區永遠是最後兩個停留點。
 - 多步驟的目前步驟要以文字呈現（「第 2 步，共 3 步」），不能只靠顏色。
 
@@ -106,6 +100,7 @@ Stepper 的可點回跳、目前步驟標示見 [Stepper](/components/stepper)�
 npx shadcn@latest add \
   https://kielchang.github.io/dooping-design-book/r/input.json \
   https://kielchang.github.io/dooping-design-book/r/label.json \
+  https://kielchang.github.io/dooping-design-book/r/form-field.json \
   https://kielchang.github.io/dooping-design-book/r/number-input.json \
   https://kielchang.github.io/dooping-design-book/r/select.json \
   https://kielchang.github.io/dooping-design-book/r/checkbox.json \
@@ -113,12 +108,14 @@ npx shadcn@latest add \
   https://kielchang.github.io/dooping-design-book/r/chips.json \
   https://kielchang.github.io/dooping-design-book/r/card.json \
   https://kielchang.github.io/dooping-design-book/r/callout.json \
+  https://kielchang.github.io/dooping-design-book/r/toast.json \
   https://kielchang.github.io/dooping-design-book/r/dialog.json \
   https://kielchang.github.io/dooping-design-book/r/stepper.json
 ```
 
 ## 缺件與替代
 
-Form 包裝與欄位錯誤元件、Textarea、RadioGroup、DatePicker、Toast 尚未收錄——
-替代寫法見[頁面總覽的缺件表](/pages/overview)。在那之前，錯誤標示照本頁
-「錯誤的位置」一節的固定寫法手排，不要各畫面自創。
+表單用的件大多已收錄：欄位錯誤用 `FormField`（見 [Input 的錯誤態](/components/input#錯誤態formfield-把固定寫法接好)）、
+多行文字與單選用 [Textarea、RadioGroup](/components/form-controls)、送出回饋用 [Toast](/components/toast)。
+用日曆格選日期的元件未收錄：期間用 [DateRange](/components/date-range)（「自訂」是原生 `date` 輸入），
+要日曆格先到缺件認領回報使用場景。其餘缺件見[頁面總覽的缺件表](/pages/overview)。

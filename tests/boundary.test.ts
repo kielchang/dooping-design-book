@@ -42,7 +42,7 @@ const ALLOWED_EXTERNAL = [
  */
 const QUARANTINED: Record<string, string[]> = {
   "@xyflow/react": ["packages/react/src/ui/graph-canvas.tsx"],
-  // cmdk 是指令面板的過濾引擎（ADR-0011）。它本身很小，但同一個理由成立：
+  // cmdk 是指令面板的過濾引擎。它本身很小，但同一個理由成立：
   // 其他元件與取用端依賴 <Command> 的 API，不依賴 cmdk 本身，
   // 升級或抽換的成本永遠只在一個檔案裡。
   cmdk: ["packages/react/src/ui/command.tsx"],

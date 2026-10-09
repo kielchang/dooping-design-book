@@ -6,8 +6,7 @@ title: 間距與圓角
 
 ## 間距：4px 基準
 
-所有間距都是 4px 的倍數。理由不是美學，是**可預測**——
-當所有人都用同一組數字，版面自然對齊，不必逐處微調。
+所有間距都是 4px 的倍數。
 
 | Token | 值 | 典型用途 |
 | --- | --- | --- |
@@ -37,8 +36,7 @@ title: 間距與圓角
 --radius-lg: var(--radius);
 ```
 
-改 `--radius` 一個值，整站從方到圓。這是最常被要求的品牌調整，
-所以刻意做成單一開關。
+改 `--radius` 一個值，整站從方到圓。
 
 <Demo title="圓角階">
   <div className="flex flex-wrap items-end gap-3">
@@ -65,8 +63,7 @@ title: 間距與圓角
 | `control-lg` | 40px | 主要按鈕 |
 | `tap-target` | **44px** | 粗指標裝置的最小觸控目標 |
 
-Input、Select、EditableField 全部是 36px。這不是巧合——
-把三種控制項排在同一列時，任何 1–2px 的差異都會被看見。
+Input、Select、EditableField 全部是 36px，排在同一列時高度一致。
 
 觸控目標 44px 只在 `@media (pointer: coarse)` 生效：手機平板放大，桌機維持精簡。
 詳見[無障礙](/accessibility/principles)。

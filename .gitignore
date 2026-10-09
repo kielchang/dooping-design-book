@@ -7,11 +7,14 @@ storybook-static/
 *.tsbuildinfo
 .DS_Store
 
-# 取用契約與架構文件副本由 book/scripts/sync-root-docs.mjs 於 build 前產生（正本在 repo 根）
+# 取用契約副本由 book/scripts/sync-root-docs.mjs 於 build 前產生（正本在 repo 根）
 book/static/AGENTS.md
-book/docs/7-governance/10-architecture.md
 
 # 內部試裝宿主：scripts/host-add.mjs 產生的本機 registry（base 指向本機伺服器，不進版控）
 registry-local/
 # 套用驗收：scripts/verify-consumer.mjs 產生的本機 registry（同上）
 registry-consumer/
+
+# 維護者私有檔（不進公開 repo）
+CLAUDE.local.md
+.private-terms

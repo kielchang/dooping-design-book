@@ -128,7 +128,7 @@ export const 密集模式與變異欄: Story = {
   },
 };
 
-// 互動 playground：中文 arg 三層映射（規範見治理章〈Story 撰寫慣例〉）。
+// 互動 playground：中文 arg 三層映射（規範見 packages/react/README.md「Story 撰寫規則」）。
 // 資料出自 demo/generate 的確定性生成器——「把資料筆數拉到 0 看空狀態」
 // 這類驗收動線，對方能在 Controls 面板自己做。
 type 互動Args = {

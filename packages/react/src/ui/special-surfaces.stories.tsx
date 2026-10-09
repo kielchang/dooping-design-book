@@ -55,7 +55,7 @@ export const 節點畫布: Story = {
         <code>@xyflow/react</code> 的薄封裝——相依被隔離守衛關在一個檔案裡，
         其他元件與取用端只依賴 <code>&lt;GraphCanvas&gt;</code> 的領域 API。
         畫布底與節點吃帶色調中性（跟主題），連線與 handle 中性，
-        已選＝狀態層 20%、鍵盤聚焦＝<code>--ring</code> 外環——兩者可疊加（ADR-0007）。
+        已選＝狀態層 20%、鍵盤聚焦＝<code>--ring</code> 外環——兩者可疊加。
         左側色條沿用 <code>--chart-N</code>：與時間軸同一批資料實體、同一組顏色。
       </p>
     </div>
@@ -79,7 +79,7 @@ export const 節點畫布唯讀: Story = {
   ),
 };
 
-// ── 互動 playground：中文 arg 三層映射（規範見治理章〈Story 撰寫慣例〉）──
+// ── 互動 playground：中文 arg 三層映射（規範見 packages/react/README.md「Story 撰寫規則」）──
 // 一個 meta 裝多個元件，所以命名用「⟨元件⟩_互動」形式。
 
 /** 把生成的日期整批平移到今天附近——生成器保持確定性，平移邏輯留在 story。 */

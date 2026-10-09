@@ -10,8 +10,7 @@
 1. **Tailwind v4 取用路徑的端到端驗證**——AGENTS.md「取 token」的四行 `@import` 在這裡真的跑，
    `src/globals.css` 一行都沒多。
 2. **新子系統的起手範本**——整個目錄複製走就能開工（見下方）。
-3. **ADR-0011（外殼元件）的內部補充證據**——回饋記在 [LEDGER.md](LEDGER.md)。
-   它**不計入**「真實宿主回饋」，那一條要等第一個子系統依文件自行導入。
+3. **外殼元件的內部試裝**——觀察記在 [LEDGER.md](LEDGER.md)，不計入真實宿主的回饋。
 
 ## 跑起來
 
@@ -37,7 +36,7 @@ npm run host:build    # 產出 apps/host-v4/dist
 兩條路的產物必須逐位元組相同。要多裝一個元件：把名字加進 `dooping.install.json`，再跑 `host:sync`。
 遞移相依（例如 data-table 帶進來的 table、input）會自動補齊，不必列。
 
-`dooping.lock.json` 是更新檢查的紀錄（ADR-0013 第二層）：`host:sync` 用 `scripts/dooping-check.mjs init` 重建它，
+`dooping.lock.json` 是更新檢查的紀錄：`host:sync` 用 `scripts/dooping-check.mjs init` 重建它，
 `host:check` 用同一支工具加 `--strict` 做例行檢查。取用端怎麼用這支工具，見文件站〈跟上新版〉。
 
 ## 當範本開新系統

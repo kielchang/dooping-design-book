@@ -16,9 +16,9 @@
 
 - 路由（react-router）、部署 base、示範資料的頁面組合方式——與上游無關的宿主本地決定。
 
-## 回饋（ADR-0011 的內部補充證據）
+## 回饋（內部試裝的觀察）
 
-> 以下是**內部試裝**的觀察，證據強度低於真實宿主；ADR-0011 判準②仍等真實子系統的導入回報。
+> 以下是**內部試裝**的觀察，不計入真實宿主的回饋。
 
 1. **BackLink 只渲染真 `<a>`，不吃路由元件。** SPA 宿主點下去是整頁重載，
    而且 `href` 要自己帶上部署 base（預覽站在子路徑下）。範本不改元件，只能照做。
@@ -64,4 +64,4 @@
 | 工具 | 版本 | 最後執行 | 結果 |
 | --- | --- | --- | --- |
 | shadcn CLI（`scripts/host-add.mjs`） | 4.21.0 | 2026-09-10 | 56 個檔逐位元組相同（第一次跑 50／56：開頭註解被 CLI 刪掉的 6 個已修，見回饋 5）。更新 data-table 時 `--dry-run` 列出 3 個要覆寫的相依檔（見回饋 6） |
-| dooping-check（`scripts/dooping-check.mjs`） | 隨 registry | 2026-09-10 | lock 記 35 個 item，全部已是最新。`npm run host:sync` 重建 lock，`npm run host:check` 以 `--strict` 跑例行檢查（ADR-0013 第二層） |
+| dooping-check（`scripts/dooping-check.mjs`） | 隨 registry | 2026-10-08 | lock 記 38 個 item，全部已是最新。`npm run host:sync` 重建 lock，`npm run host:check` 以 `--strict` 跑例行檢查 |

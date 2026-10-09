@@ -1,6 +1,6 @@
 // 壓力測試／超長標籤：欄位、分頁、徽章的**標籤**過長時，標籤換行 vs 元件變形。
 // 判準：標籤可以換行，控制項不該變形。
-// 規範出處：book/docs/7-governance/09-stress-stories.mdx
+// 規範出處：packages/react/README.md「壓力測試 story」
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { EditableField } from "../form/editable-field";

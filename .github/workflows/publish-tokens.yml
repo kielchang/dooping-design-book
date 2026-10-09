@@ -2,7 +2,7 @@ name: Publish tokens
 
 # 只發佈 @dooping/tokens —— 三層裡唯一該進 npm 的一層。
 #
-# 元件不發套件（ADR-0004：元件一定會被改，走 registry 複製原始碼），
+# 元件不發套件（走 registry 複製原始碼），
 # 所以這條流水線刻意只認 packages/tokens 一個 workspace。
 #
 # 認證走 npm Trusted Publishing（OIDC）：npm 信任「這個 repo 的這支 workflow」，
@@ -27,6 +27,16 @@ name: Publish tokens
 #   tag tokens-v*      → 真的發佈（例：git tag tokens-v0.1.0 && git push --tags）
 #
 # 發佈前一定重跑守衛：token 是契約，發壞了每個宿主都會痛。
+#
+# 兩個 job，發佈身分只在後一個：
+#   build    唯讀、沒有 id-token：配對檢查、npm ci、建置、型別、守衛，打出 tarball 交給 publish。
+#            專案程式與相依套件的安裝腳本只在這裡跑——這裡拿不到發佈身分。
+#   publish  只有 tag 觸發或手動非試跑才跑；有 id-token，但不簽出、不跑 npm ci 與任何專案腳本，
+#            只把 build 打好的 tarball 送上 npm（發 tarball 不跑 prepublishOnly）。
+#   試跑整個不碰 publish job，發佈身分完全不出現。
+#   publish 掛 environment: npm-publish——在 GitHub Settings → Environments 把它的部署規則限定在
+#   tokens-v* tag，並在 npm 的 trusted publisher 填上這個 environment，發佈身分就綁死在核准流程。
+#   守衛：tests/workflow-contract.test.ts。
 on:
   workflow_dispatch:
     inputs:
@@ -39,29 +49,23 @@ on:
 
 permissions:
   contents: read
-  id-token: write # OIDC：trusted publishing 與 provenance 都靠這個
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
         with:
           # 配對檢查要驗「tag 指向的 commit 在不在 main 上」——
           # 預設的淺層簽出（depth 1）會讓 merge-base 誤判，這個 repo 很小，抓全歷史。
           fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-          registry-url: https://registry.npmjs.org
-
-      # Node 22 內建的 npm 是 10.x，不支援 OIDC。
-      # Trusted publishing 需要 npm >= 11.5.1，所以這一步不能省。
-      - name: 升級 npm（trusted publishing 需要 >= 11.5.1）
-        run: |
-          npm install -g npm@latest
-          echo "npm $(npm -v) / node $(node -v)"
 
       # 配對硬閘：tag 觸發、以及手動觸發但不是試跑的時候都要過（試跑不發佈，不適用）。
       #
@@ -107,6 +111,54 @@ jobs:
       - name: 守衛測試
         run: npm test
 
+      # 打包在這裡做完：publish job 只送出這個檔，不再建置。build:tokens 已經產出 dist，
+      # npm pack 不跑 prepublishOnly，所以打進去的就是上面守衛驗過的那一份。
+      - name: 打包 tarball
+        run: |
+          mkdir -p pack
+          npm pack --workspace @dooping/tokens --pack-destination pack
+          ls pack/*.tgz
+          tar -tzf pack/*.tgz
+      - name: 試跑：列出會送出的內容（不發佈）
+        if: github.event_name != 'push' && inputs.dry_run
+        run: |
+          echo "::notice::試跑模式 —— 不會真的發佈，publish job 不會執行"
+          npm publish pack/*.tgz --dry-run
+      - name: 交出 tarball
+        uses: actions/upload-artifact@v4
+        with:
+          name: tokens-tarball
+          path: pack/*.tgz
+          retention-days: 1
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    if: github.event_name == 'push' || !inputs.dry_run
+    runs-on: ubuntu-latest
+    environment: npm-publish
+    permissions:
+      contents: read
+      id-token: write # OIDC：trusted publishing 與 provenance 都靠這個
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      # Node 22 內建的 npm 是 10.x，不支援 OIDC。
+      # Trusted publishing 需要 npm >= 11.5.1，所以這一步不能省；釘死版號，不裝 latest。
+      - name: 升級 npm（trusted publishing 需要 >= 11.5.1）
+        run: |
+          npm install -g npm@11.19.0
+          echo "npm $(npm -v)"
+
+      - name: 取回 build 的 tarball
+        uses: actions/download-artifact@v4
+        with:
+          name: tokens-tarball
+          path: pack
+
       # 認證優先序由 npm CLI 決定：偵測得到 OIDC 就用 OIDC，
       # 偵測不到才回頭吃 NODE_AUTH_TOKEN。所以 NPM_TOKEN secret 是選用的——
       # 沒設就是純 trusted publishing，設了則作為第一次發佈的後備。
@@ -115,16 +167,10 @@ jobs:
       - name: 發佈
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          DRY_RUN: ${{ inputs.dry_run }}
         run: |
           if [ -n "$NODE_AUTH_TOKEN" ]; then
             echo "::warning::偵測到 NPM_TOKEN。OIDC 可用時會優先使用；若這次是靠 token 發佈成功，請在 npm 設好 trusted publisher 後撤銷此 token。"
           else
             echo "::notice::未設 NPM_TOKEN —— 走 trusted publishing（OIDC）。"
           fi
-          if [ "$DRY_RUN" = "true" ]; then
-            echo "::notice::試跑模式 —— 不會真的發佈"
-            npm publish --workspace @dooping/tokens --dry-run
-          else
-            npm publish --workspace @dooping/tokens
-          fi
+          npm publish pack/*.tgz --access public

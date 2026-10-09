@@ -3,8 +3,9 @@
 // 為什麼要有這支：GitHub 的必過檢查只認名字。job 改名，PR 就永遠卡在「Expected — waiting」；
 // 更糟的是被 if: 跳過的 job 會回報「成功」——staging.yml 少傳一個 consumer: true，套用驗收就不跑、main 照樣放行。
 // 另外兩個曾經存在的破口也在這裡盯著：deploy／staging 手動觸發不限分支、publish-tokens 手動非試跑跳過配對閘。
+// 權限也在這裡：寫入權只在部署 job，npm 發佈身分只在不跑專案程式的 publish job。
 // 這支看不到 GitHub 上的 ruleset 是否真的套用了——那要用 `gh api repos/<repo>/rules/branches/main` 看。
-// 規則正本：book/docs/7-governance/01-versioning.mdx「三段式發布」。
+// 規則正本：ARCHITECTURE.md「分支與部署拓樸」。
 import { describe, it, expect } from "vitest";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -13,13 +14,14 @@ import { because } from "./lib/guard";
 
 const ROOT = join(__dirname, "..");
 const WF_DIR = join(ROOT, ".github/workflows");
-const RULE = "book/docs/7-governance/01-versioning.mdx「三段式發布」";
+const RULE = "ARCHITECTURE.md「分支與部署拓樸」";
 const PIPELINE = "_pipeline.yml";
 const ACTIONS_APP_ID = 15368;
 
-type Step = { name?: string; run?: string; if?: string };
-type Job = { uses?: string; with?: Record<string, unknown>; if?: string; needs?: string | string[]; steps?: Step[]; concurrency?: unknown };
-type Workflow = { on: Record<string, { branches?: string[]; paths?: string[]; "paths-ignore"?: string[] } | null>; jobs: Record<string, Job>; concurrency?: { group: string } };
+type Step = { name?: string; run?: string; if?: string; uses?: string; with?: Record<string, unknown>; env?: Record<string, string> };
+type Permissions = Record<string, string>;
+type Job = { uses?: string; with?: Record<string, unknown>; if?: string; needs?: string | string[]; steps?: Step[]; concurrency?: unknown; permissions?: Permissions; environment?: unknown };
+type Workflow = { on: Record<string, { branches?: string[]; paths?: string[]; "paths-ignore"?: string[] } | null>; jobs: Record<string, Job>; concurrency?: { group: string }; permissions?: Permissions };
 
 const workflows: Record<string, Workflow> = Object.fromEntries(
   readdirSync(WF_DIR)
@@ -158,6 +160,79 @@ describe("workflow 與 ruleset 的契約", () => {
     expect(gate!.if).not.toContain("== false");
     expect(gate!.run).toContain("refs/heads/main");
     expect(gate!.run).toContain("merge-base --is-ancestor");
+  });
+
+  it("寫入權只在部署 job：其餘 job 唯讀、簽出不留憑證", () => {
+    const problems: string[] = [];
+    const isCheckout = (s: Step) => s.uses?.startsWith("actions/checkout@") ?? false;
+    // 呼叫端：整份唯讀，只有呼叫 _pipeline.yml 的 job（與 deploy.yml 的 release）拿 contents: write
+    for (const file of ["preview.yml", "staging.yml", "deploy.yml"]) {
+      const wf = workflows[file];
+      if (JSON.stringify(wf.permissions) !== JSON.stringify({ contents: "read" })) problems.push(`${file}：頂層 permissions 必須只有 contents: read`);
+      for (const [id, job] of Object.entries(wf.jobs)) {
+        const write = job.permissions?.contents === "write";
+        const allowed = usesPipeline(job) || (file === "deploy.yml" && id === "release");
+        if (write && !allowed) problems.push(`${file} 的 ${id}：不該有 contents: write`);
+        if (usesPipeline(job) && !write) problems.push(`${file} 的 ${id}：呼叫部署流程要給 contents: write（_pipeline.yml 的 deploy job 才推得了 gh-pages）`);
+      }
+    }
+    // pr-verify 跑 PR（含 fork）的程式、不部署：整份唯讀，呼叫 job 也不給寫入
+    const prVerify = workflows["pr-verify.yml"];
+    if (JSON.stringify(prVerify.permissions) !== JSON.stringify({ contents: "read" })) problems.push("pr-verify.yml：頂層 permissions 必須只有 contents: read");
+    for (const [id, job] of Object.entries(prVerify.jobs)) {
+      if (job.permissions && Object.values(job.permissions).includes("write")) problems.push(`pr-verify.yml 的 ${id}：不該有寫入權`);
+    }
+    // _pipeline.yml：deploy 繼承呼叫端的 contents: write（被呼叫的流程不能要求比呼叫端更多的權限，寫死 write 會讓唯讀的 pr-verify 起不來）；
+    // 其餘 job 自己寫 permissions 收回唯讀，簽出都不留憑證
+    for (const [id, job] of Object.entries(pipeline.jobs)) {
+      if (id === "deploy") {
+        if (job.permissions) problems.push("_pipeline.yml 的 deploy：不寫 permissions，繼承呼叫端那個 job 給的 contents: write");
+        const runs = (job.steps ?? []).map((s) => s.run ?? "").join("\n");
+        if (/\bnpm\b|\bnpx\b|\bnode\b/.test(runs)) problems.push("_pipeline.yml 的 deploy：持有寫入權的 job 不跑 npm／npx／node——只下載產物、執行部署腳本");
+        if (!(job.steps ?? []).some((s) => s.uses?.startsWith("actions/download-artifact@"))) problems.push("_pipeline.yml 的 deploy：要從 build 取回產物，不在這裡建置");
+      } else {
+        if (!job.permissions) {
+          problems.push(`_pipeline.yml 的 ${id}：沒寫 permissions——會整份繼承呼叫端的寫入權`);
+          continue;
+        }
+        const write = Object.entries(job.permissions).filter(([, v]) => v === "write").map(([k]) => k);
+        if (write.length) problems.push(`_pipeline.yml 的 ${id}：不該有寫入權（${write.join("、")}）`);
+        for (const s of (job.steps ?? []).filter(isCheckout)) {
+          if (s.with?.["persist-credentials"] !== false) problems.push(`_pipeline.yml 的 ${id}：actions/checkout 要設 persist-credentials: false`);
+        }
+      }
+    }
+    // release 只承認 main 歷史上的 tag：已存在的 tag 若不是核准流程打的，不跳過、不發 Release
+    const releaseRuns = (workflows["deploy.yml"].jobs.release?.steps ?? []).map((s) => s.run ?? "");
+    for (const keyword of ["git tag -a", "gh release create"]) {
+      const step = releaseRuns.find((r) => r.includes(keyword));
+      if (!step?.includes("merge-base --is-ancestor")) problems.push(`deploy.yml 的 release：「${keyword}」那一步要先確認既有 tag 在 main 的歷史上（merge-base --is-ancestor）`);
+    }
+    // deploy 不是必過檢查：冒煙要在 deploy 沒成功時明確紅，不能被 if: 跳過而回報成功
+    const smoke = pipeline.jobs.smoke;
+    if (![smoke?.needs].flat().includes("deploy")) problems.push("_pipeline.yml 的 smoke：needs 要包含 deploy");
+    if (!(smoke?.steps ?? []).some((s) => Object.values(s.env ?? {}).some((v) => v.includes("needs.deploy.result")) && s.run?.includes("exit 1"))) {
+      problems.push("_pipeline.yml 的 smoke：要有一步在 needs.deploy.result 不是 success 時 exit 1");
+    }
+    expect(problems, because(problems.join("\n"), "dev 合進來的程式與現抓的第三方套件都在 build／consumer 裡執行；手上有寫入權杖，就能在核准前改正式站根目錄、/r/ 與 tag", RULE)).toEqual([]);
+  });
+
+  it("publish-tokens：發佈身分只在不跑專案程式的 publish job，試跑不碰它", () => {
+    const wf = workflows["publish-tokens.yml"];
+    const problems: string[] = [];
+    if (wf.permissions?.["id-token"]) problems.push("頂層 permissions 不能有 id-token");
+    const withId = Object.entries(wf.jobs).filter(([, j]) => j.permissions?.["id-token"] === "write");
+    if (withId.length !== 1) problems.push(`id-token: write 必須只在一個 job（現在 ${withId.length} 個）`);
+    for (const [id, job] of withId) {
+      const steps = job.steps ?? [];
+      if (steps.some((s) => s.uses?.startsWith("actions/checkout@"))) problems.push(`${id}：持有發佈身分的 job 不簽出程式碼`);
+      const runs = steps.map((s) => s.run ?? "").join("\n");
+      if (/npm (ci|test|run|install(?! -g npm@\d))|\bnpx\b|\bnode\b/.test(runs)) problems.push(`${id}：持有發佈身分的 job 不跑專案腳本與相依安裝（只送出 build 打好的 tarball）`);
+      if (/npm@latest/.test(runs)) problems.push(`${id}：npm 要釘版號，不裝 latest`);
+      if (!job.if?.includes("!inputs.dry_run") || !job.if?.includes("github.event_name == 'push'")) problems.push(`${id}：只在 tag 觸發或手動非試跑時執行`);
+      if (!job.environment) problems.push(`${id}：要掛 environment，讓部署規則與 npm trusted publisher 綁得到核准流程`);
+    }
+    expect(problems, because(problems.join("\n"), "整個 job 都拿得到發佈身分時，專案程式、測試與相依套件的安裝腳本都能用它發佈；試跑還會跳過配對閘", RULE)).toEqual([]);
   });
 
   it("_pipeline.yml 的部署目錄＝部署腳本的 STAGE_DIRS", () => {

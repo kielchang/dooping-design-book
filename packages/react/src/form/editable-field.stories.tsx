@@ -91,7 +91,7 @@ export const 新增模式: Story = {
   },
 };
 
-// 互動 playground：中文 arg 三層映射（規範見治理章〈Story 撰寫慣例〉）。
+// 互動 playground：中文 arg 三層映射（規範見 packages/react/README.md「Story 撰寫規則」）。
 // 改 args 時 value state 必須 remount 重置——否則多選的 value 會停在
 // 已不存在的選項上，所以用「內部 Demo 元件＋key」的寫法。
 const KIND_BY_LABEL = {

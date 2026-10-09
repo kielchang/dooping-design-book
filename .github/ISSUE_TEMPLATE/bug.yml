@@ -33,15 +33,15 @@ body:
     id: spec-version
     attributes:
       label: 規範版號
-      description: 線上 `/r/index.json` 的 `version`，或你抄走元件時檔頭的版號戳記。
-      placeholder: "0.10.0"
+      description: 你抄走元件那天的 `/r/index.json` 的 `version`（記在你的符合性台帳）；不確定就填線上目前的版號並註明。
+      placeholder: "x.y.z"
     validations:
       required: true
   - type: input
     id: host-env
     attributes:
       label: 宿主環境
-      placeholder: React 18 + Tailwind 3 ／ Chrome ／ dark
+      placeholder: React 19 + Tailwind 4 ／ Chrome ／ dark
   - type: input
     id: page
     attributes:

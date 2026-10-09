@@ -1,6 +1,6 @@
 // 壓力測試／超多欄位：表格 10 欄以上。凍結首欄還有效嗎？
 // 水平捲動時黏性表頭有沒有透出後面的內容？
-// 規範出處：book/docs/7-governance/09-stress-stories.mdx
+// 規範出處：packages/react/README.md「壓力測試 story」
 import type { Meta, StoryObj } from "@storybook/react";
 import { DataTable, type Column } from "../ui/data-table";
 import { Badge } from "../ui/badge";

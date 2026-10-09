@@ -66,7 +66,7 @@ const preview: Preview = {
         ],
       },
     },
-    // order 必須涵蓋**所有**頂層分類（見文件〈Storybook 設定〉）；
+    // order 必須涵蓋**所有**頂層分類（見 packages/react/README.md「Storybook 設定」）；
     // tests/story-sort.test.ts 會拿實際 story 標題來對，漏列或打錯字都會紅。
     options: {
       storySort: {

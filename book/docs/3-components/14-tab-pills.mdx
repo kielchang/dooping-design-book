@@ -8,11 +8,6 @@ title: TabPills 分頁膠囊
 
 <StoryLink id="元件-狀態-變異・空狀態・分頁・步驟--分頁膠囊" />
 
-## 存在的唯一理由是收斂
-
-分頁列是最容易被各畫面各自手刻 `<button>` 的元件。一旦散開：改一次樣式要全站找一遍，
-而且 `role="tablist"` 語意一定會漏掉。
-
 <Rules>
   <Do><p>所有分頁切換一律用 TabPills。</p></Do>
   <Dont><p>不要手刻 <code>&lt;div&gt;&lt;button&gt;…&lt;/button&gt;&lt;/div&gt;</code> 分頁列。</p></Dont>
@@ -36,14 +31,13 @@ title: TabPills 分頁膠囊
 
 <Rules>
   <Do><p>分頁數 <strong>2–6</strong>、內容互斥、切換不改變網址主要語意。</p></Do>
-  <Dont><p>分頁超過 6 個 → 那是導覽，該進側邊欄。
-  分頁內容需要深連結分享 → 該用路由，或至少同步到 query string。</p></Dont>
+  <Dont><p>分頁超過 6 個 → 改進側邊欄。
+  分頁內容需要深連結分享 → 改用路由，或至少同步到 query string。</p></Dont>
 </Rules>
 
 ## 建議同步到網址
 
-`?tab=confirmed`。使用者會想把「目前這個視角」貼給同事——
-分頁狀態只存在記憶體裡，等於這個連結永遠打不開他看到的畫面。
+分頁狀態同步到網址：`?tab=confirmed`。
 
 ## 無障礙
 

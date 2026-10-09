@@ -47,7 +47,7 @@ const isAppActive = (app: NavLeaf, path: string) =>
 const USER = { name: "使用者甲", account: "user-a" };
 
 /**
- * 連結注入宿主自己的路由元件——ADR-0011「元件不綁路由」的接縫就在這裡。
+ * 連結注入宿主自己的路由元件——「元件不綁路由」的接縫就在這裡。
  * 站外連結維持真 <a>；站內改走 react-router 的 Link（它先呼叫轉發來的 onClick 再導航，
  * 功能選單的「選了就關」靠這個順序）。
  */

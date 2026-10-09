@@ -11,7 +11,7 @@
 // 3. 站台：非正式站 index.html 有 noindex 與該段橫幅；正式站兩者都沒有；Storybook（staging 另加宿主）200
 // 4. dooping-check：用取用端工具的 HTTP 路徑讀這一段的 registry 建 lock，closureHash 要等於 repo
 //
-// 規則正本：book/docs/7-governance/01-versioning.mdx「三段式發布」。
+// 規則正本：ARCHITECTURE.md「分支與部署拓樸」。
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { createLockEntries, readRegistry } from "../templates/dooping-check.mjs";

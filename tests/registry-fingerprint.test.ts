@@ -1,4 +1,4 @@
-// registry 逐 item 指紋（ADR-0013 第一層）。
+// registry 逐 item 指紋（更新訊號：指紋）。
 //
 // 指紋是對外契約：取用端的 lock 記的就是它，Release 的異動清單也靠它分類。
 // 這支用**獨立寫的第二份實作**逐 item 重算 /r/index.json 的 meta——產生器與規則任何一邊寫錯都會紅；
@@ -36,7 +36,7 @@ const items: RegistryItem[] = readdirSync(REGISTRY)
   .map((f) => JSON.parse(readFileSync(join(REGISTRY, f), "utf8")));
 const index: { items: IndexItem[] } = JSON.parse(readFileSync(join(REGISTRY, "index.json"), "utf8"));
 
-// ── 第二份實作：照 ADR-0013 的文字規則重寫，不 import 產生器的任何東西 ────────────
+// ── 第二份實作：照〈跟上新版〉「指紋怎麼算」的文字規則重寫，不 import 產生器的任何東西 ────────────
 const hex16 = (s: string) => createHash("sha256").update(s).digest("hex").substring(0, 16);
 const lastSegment = (ref: string) => ref.substring(ref.lastIndexOf("/") + 1).replace(".json", "");
 
@@ -76,7 +76,7 @@ describe("/r/index.json 的逐 item 指紋", () => {
       if (entry.meta?.hash !== own.get(entry.name)) mismatches.push(`${entry.name} hash`);
       if (entry.meta?.closureHash !== closureHash) mismatches.push(`${entry.name} closureHash`);
     }
-    expect(mismatches, "index 的指紋與規則對不上——重跑 npm run build:registry，或產生器與 ADR-0013 的規則分岔了").toEqual([]);
+    expect(mismatches, "index 的指紋與規則對不上——重跑 npm run build:registry，或產生器與〈跟上新版〉「指紋怎麼算」的規則分岔了").toEqual([]);
   });
 });
 

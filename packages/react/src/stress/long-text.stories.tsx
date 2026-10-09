@@ -1,6 +1,6 @@
 // 壓力測試／超長文字值：內容超出欄寬時，截斷還是換行？截斷有沒有 Tooltip？
 // 換行的那幾列，同列其他欄位有沒有跟著變高？
-// 規範出處：book/docs/7-governance/09-stress-stories.mdx
+// 規範出處：packages/react/README.md「壓力測試 story」
 import type { Meta, StoryObj } from "@storybook/react";
 import { DataTable, type Column } from "../ui/data-table";
 import { ChangeSummary } from "../form/change-summary";

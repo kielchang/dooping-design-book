@@ -110,7 +110,7 @@ console.log(
 );
 if (expected.size <= 1) problems.push("幾乎沒有檔案可同步——安裝集或 registry 讀取壞了，守衛不能空轉");
 
-// 宿主的 dooping.lock.json（ADR-0013 第二層）。宿主是取用端範本：host:sync＝「重抄＋重建 lock」，
+// 宿主的 dooping.lock.json（更新訊號：lock 檢查）。宿主是取用端範本：host:sync＝「重抄＋重建 lock」，
 // host:check＝「例行檢查 --strict」——用剛同步進宿主的那一份工具跑，走取用端會走的同一條路。
 // lock 指向本 repo 的 registry/（相對於宿主根目錄），CI 零網路、結果決定性。
 const TOOL = join(HOST, "scripts/dooping-check.mjs");

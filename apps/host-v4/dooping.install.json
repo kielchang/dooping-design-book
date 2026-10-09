@@ -36,6 +36,7 @@
     "separator",
     "button",
     "switch",
+    "date-range",
     "form-field",
     "empty-state",
     "dooping-check"

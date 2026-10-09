@@ -16,7 +16,7 @@
 //      零 pageerror／console error、axe（color-contrast 歸 verify:color）
 //
 // 不涵蓋：Next.js App Router、Tailwind v3、Base UI 共存——各自另案評估。
-// 規則正本：book/docs/7-governance/01-versioning.mdx「三段式發布」；範本說明見 fixtures/consumer-vite-v4/README.md。
+// 規則正本：ARCHITECTURE.md「分支與部署拓樸」；範本說明見 fixtures/consumer-vite-v4/README.md。
 import { execFileSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
@@ -323,7 +323,7 @@ async function main() {
   if (!keep) rmSync(dir, { recursive: true, force: true });
   if (failures.length) {
     console.error(`\n✗ 套用驗收不通過（${failures.length} 項，${seconds} 秒）：\n${failures.map((f) => `  ${f}`).join("\n")}`);
-    console.error("\n規則正本：book/docs/7-governance/01-versioning.mdx「三段式發布」；範本：fixtures/consumer-vite-v4/README.md");
+    console.error("\n規則正本：ARCHITECTURE.md「分支與部署拓樸」；範本：fixtures/consumer-vite-v4/README.md");
     if (keep) console.error(`暫存專案保留在：${dir}`);
     process.exitCode = 1;
     return;

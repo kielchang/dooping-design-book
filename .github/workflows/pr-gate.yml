@@ -4,7 +4,7 @@ name: pr-gate
 #   - 來源分支只能是 staging ← dev、main ← staging，而且同一個 repo
 #   - 合併後的內容＝來源分支（驗過的就是合併後拿到的）
 #   - 版號嚴格遞增、tag 未被佔、CHANGELOG 已改名且標題對得上
-#   - 開到 main 的 PR：內文的「核准清單」勾完（edited 觸發：勾完就自動重跑）
+#   - 開到 main 的 PR：內文的「核准清單」勾完、「核准版本」＝PR 目前的 head（edited 觸發：改完就自動重跑；synchronize：再推 commit 就重驗）
 # 內容本身的驗證不在這裡重跑：PR 的 head 就是 dev／staging 的 tip，那個 SHA 在 push 時已經跑過
 # preview／staging 的全部守衛與套用驗收，ruleset 要求的就是那些檢查。
 # 規則正本：ARCHITECTURE.md「分支與部署拓樸」；實作與測試：scripts/release-gate.mjs、tests/release-gate.test.ts。
@@ -24,10 +24,10 @@ jobs:
   pr-gate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with: { node-version: 22 }
       # PR 內文走環境變數，不直接內插進 shell——內文是使用者輸入
       - name: 發版閘（來源分支、樹相等、版號、CHANGELOG、核准清單）

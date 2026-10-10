@@ -24,7 +24,7 @@ title: AppShell／Sidebar 應用外殼
 
 | 元件 | 定位 |
 | --- | --- |
-| `Sidebar` 家族 | 側欄容器與結構件：Provider、Trigger、Header/Content/Footer、Group、Menu 系 |
+| `Sidebar` 家族 | 側欄容器與結構件：Provider、Header/Content/Footer、Group、Menu 系；桌面版的收合拉環由 `Sidebar` 自己畫，`SidebarTrigger` 是行動版的抽屜開關 |
 | `SidebarNav` | 吃 `NavGroup[]` 的三態渲染：連結／展開群組／收合態右彈選單，含〔例行〕〔試算〕標籤 |
 | `AppShell` | 佈局容器：側欄＋頂列＋主內容，轉發 Provider props；頂列與側欄貼著視窗頂端（sticky） |
 | [`AppMenubar`](/components/app-menubar) | 多應用版型的頂部功能選單——同一份 `NavGroup[]`，一組一個頂層選單 |
@@ -37,7 +37,7 @@ title: AppShell／Sidebar 應用外殼
 ## 多應用外殼的組法
 
 側欄放應用清單（一個應用＝一個 `NavLeaf`），頂列分三段：
-**左**＝系統（SidebarTrigger＋目前應用）、**中**＝目前應用的 `AppMenubar`、
+**左**＝系統（目前應用；行動版多一個開抽屜的 SidebarTrigger）、**中**＝目前應用的 `AppMenubar`、
 **右**＝系統（搜尋、通知、使用者選單）。換應用時中段整組換掉，
 側欄、功能選單、⌘K 三個出口吃同一份資料。
 
@@ -57,7 +57,7 @@ const app = findActiveNavLeaf(apps, pathname, isAppActive)?.item;
     <SidebarNav groups={apps} currentPath={pathname} isActive={isAppActive} renderLink={renderLink} />
   </SidebarContent></Sidebar>}
   header={<>
-    <SidebarTrigger />{/* 左：系統 */}
+    <SidebarTrigger />{/* 左：系統。行動版才出現，桌面版收合走側欄右緣的拉環 */}
     <AppMenubar groups={menusOf[app.url]} currentPath={pathname} renderLink={renderLink} onAction={run} />
     <div className="flex shrink-0 items-center gap-1">{/* 右：搜尋、通知、使用者 */}</div>
   </>}
@@ -82,14 +82,17 @@ const app = findActiveNavLeaf(apps, pathname, isAppActive)?.item;
 
 ## 狀態
 
+- **收合入口：右緣拉環**：桌面版的收合控制是側欄右緣、固定在底部的小標籤（`Sidebar` 自己畫，宿主不用接）。
+  點一下或左右拖拉切換：往左拖收合、往右拖展開；鍵盤 Enter／空白鍵也能切換，滑鼠移上去有「收合側邊欄」／「展開側邊欄」提示。
+  頂列不放切換鈕：`SidebarTrigger` 在桌面版不渲染，只在行動版出現。`collapsible="none"` 沒有拉環。
 - **桌面收合（圖示欄）**：`collapsible="icon"`（預設）收成圖示欄；文字轉 sr-only
   （可及名稱不消失）、群組標題隱藏、兩層群組改成往右彈出的
   [DropdownMenu](/components/popover-dropdown)、hover 出提示泡泡（在圖示**右側**）。
 - **桌面收合（收到 0）**：`collapsible="offcanvas"` 收合時側欄整塊移出畫面，
   工作區拿回整個寬度。滑鼠碰左緣會**窺看**：側欄浮在內容上（不推版面），
-  滑鼠離開、按 Esc 或選了目的地就收。鍵盤與觸控走 SidebarTrigger 釘選展開。
+  滑鼠離開、按 Esc 或選了目的地就收。拉環留在視窗左緣底部，點擊、往右拖或鍵盤都能釘選展開。
 - **行動版**：自動轉左滑抽屜（Radix Dialog 組成：焦點鎖定、Esc、焦點歸還
-  全部繼承），**分區與順序完全不變**；點選目的地即關閉。
+  全部繼承），**分區與順序完全不變**；點選目的地即關閉。抽屜由頂列的 `SidebarTrigger` 打開，沒有拉環。
 - **選中態**：`bg-sidebar-accent`（＝該主題的 `brand-subtle`，識別層）＋
   `aria-current="page"`；hover 走狀態層。active 判定用 `isNavActive()` 的多層
   fallback（完整相符 → 去 query → 路徑邊界的父路徑），可用 `isActive` 覆寫。
@@ -102,17 +105,21 @@ const app = findActiveNavLeaf(apps, pathname, isAppActive)?.item;
 <SidebarNav
   groups={navGroups}
   currentPath={location.pathname}
-  renderLink={(props, item) => <Link to={item.url} {...props} />}
+  renderLink={({ href, ...props }) => <Link to={href} {...props} />}
 />
 ```
 
 `renderLink` 收到的 props（含 `aria-current` 與行動版關抽屜的 `onClick`）要**原樣轉發**。
+網址用收到的 `href`，不要用 `item.url`：`href` 已經過網址白名單（`safeNavUrl`）——
+相對路徑、http、https、mailto、tel 原樣放行，`javascript:` 這類點下去會執行內容的網址換成 `#`。
+導覽資料常從後台設定來，這一層不能省。`AppMenubar` 與 `CommandPalette` 的 `onNavigate` 收到的也是過濾後的網址。
 
 ## 無障礙
 
 - 側欄是 `nav` 地標，`label` 預設「主導覽」；行動版抽屜以同名可及名稱呈現。
 - 收合態的連結名稱走 sr-only 保留，不用 `display:none`（守衛：stories 的 play 直接驗）。
 - `offcanvas` 收到 0 時側欄是 `inert`；Tab 不能停在看不見的連結上。
+- 拉環是真的按鈕：可及名稱跟著狀態變（「收合側邊欄」／「展開側邊欄」），帶 `aria-expanded`；`offcanvas` 收合時它不在 `inert` 的側欄裡，Tab 得到。
 - SidebarTrigger 自帶 `aria-label` 與 `aria-expanded`。
 - 聚焦環走中性 `--ring`（`--sidebar-ring ≡ ring`，不隨主題轉色）。
 

@@ -26,6 +26,8 @@ export interface ItemStatus {
 }
 
 export declare function contentHash(content: string): string;
+export declare function insideProject(cwd: string, path: string): string | null;
+export declare function ghEscape(text: string): string;
 export declare function readRegistry(registry: string, name: string, cwd: string): Promise<unknown>;
 export declare function resolveTargets(cwd: string): (target: string) => string;
 export declare function createLockEntries(

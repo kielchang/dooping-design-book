@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ChevronRight } from "lucide-react";
-import { isNavAction, isNavActive, type NavAction, type NavGroup, type NavLeaf } from "@/lib/dooping/nav";
+import { isNavAction, isNavActive, safeNavUrl, type NavAction, type NavGroup, type NavLeaf } from "@/lib/dooping/nav";
 import { Badge } from "@/components/dooping/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/dooping/collapsible";
 import {
@@ -75,7 +75,7 @@ export function SidebarNav({
     const isCurrent = !item.external && active(item, currentPath);
     const link = renderLink(
       {
-        href: item.url,
+        href: safeNavUrl(item.url),
         "aria-current": isCurrent ? "page" : undefined,
         children: (
           <>
@@ -144,9 +144,11 @@ export function SidebarNav({
                           <DropdownMenuItem key={sub.title} asChild>
                             {renderLink(
                               {
-                                href: sub.url,
-                                "aria-current": active(sub, currentPath) ? "page" : undefined,
+                                href: safeNavUrl(sub.url),
+                                "aria-current": !sub.external && active(sub, currentPath) ? "page" : undefined,
                                 children: sub.title,
+                                // 與展開態的 leafLink 一致：外部連結開新分頁，且不讓新分頁拿到 window.opener
+                                ...(sub.external ? { target: "_blank", rel: "noreferrer" } : {}),
                               },
                               sub,
                             )}

@@ -56,6 +56,9 @@ npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/data-tab
 **前置條件**：專案要有 `components.json` 與 `@/*` 路徑別名。沒有的話先 `npx shadcn@latest init`。
 Tailwind 的 `content` 掃描範圍要涵蓋落點（`./src/**/*.{ts,tsx}` 已含 `components/dooping/`）。
 
+**測過的 CLI 版本**：上游的套用驗收用 `shadcn@4.21.0`。`@latest` 裝起來不對（落點、相依、檔案內容跟 registry 不同）時，
+先把指令裡的 `shadcn@latest` 換成 `shadcn@4.21.0` 重試，並回饋上游。
+
 **落點是固定的**，不要改：
 
 ```
@@ -279,7 +282,8 @@ npm ls @dooping/tokens; curl -s https://kielchang.github.io/dooping-design-book/
 gh issue create --repo kielchang/dooping-design-book --title "[回饋] <對象>：<一句話講問題>" --body-file feedback.md
 ```
 
-`feedback.md` 照下方骨架填。沒有 `gh` 或沒有權杖時，把填好的內容交給使用者，請他從
+`feedback.md` 照下方骨架填。想讓使用者在送出前親眼看過，指令後面加 `--web`：會開瀏覽器帶入標題與內容，由使用者自己按送出
+（內容太長、網址放不下時就用原本的指令）。沒有 `gh` 或沒有權杖時，把填好的內容交給使用者，請他從
 <https://github.com/kielchang/dooping-design-book/issues/new/choose> 挑最接近的表單（不符規範→Bug、缺件→缺件認領、設計變更→RFC），
 標題加 `[回饋]` 前綴，內容貼進第一個說明欄。
 

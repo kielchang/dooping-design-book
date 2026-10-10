@@ -1,0 +1,15 @@
+# 外掛（GitHub Actions）的更新提醒。workflow 裡的外掛一律釘 commit SHA（tests/workflow-contract.test.ts 擋），
+# 釘死之後不會自己更新——由 Dependabot 每月把新版整理成一個 PR 開到 dev，照一般 PR 流程審過再合併。
+# 程式套件不走 Dependabot：漏洞由 .github/workflows/audit.yml 每週檢查。
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: dev
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: ci

@@ -355,8 +355,8 @@ export const 欄位顯示: Story = {
 };
 
 /** 網址同步示範：畫面上直接顯示序列化字串，play 對它斷言（不碰真的 location）。 */
-function UrlSyncDemo() {
-  const [search, setSearch] = React.useState("");
+function UrlSyncDemo({ initialSearch = "" }: { initialSearch?: string }) {
+  const [search, setSearch] = React.useState(initialSearch);
   const listeners = React.useRef(new Set<() => void>());
   const adapter = React.useMemo<UrlStateAdapter>(() => ({
     get: () => search,
@@ -388,6 +388,62 @@ export const 網址同步: Story = {
     await waitFor(() => expect(url()).toContain("q="));
     await waitFor(() => expect(url()).not.toContain("page="));
     setInputValue(input, "");
+  },
+};
+
+export const 網址被改壞: Story = {
+  render: () => <UrlSyncDemo initialSearch="size=99999&page=500&sort=valueOf.asc&f.__proto__=x" />,
+  // 契約：網址是任何人都能改的輸入。每頁筆數不在選項裡就退回 pageSize、頁碼超出回第 1 頁、
+  // 排序鍵不是欄位（valueOf 這類原型上的名稱）就不排序——表格照常顯示，不丟例外。
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() => expect(canvasElement.querySelectorAll("tbody tr")).toHaveLength(5));
+    await expect(canvasElement.querySelector("tbody tr")).toHaveTextContent(demoRecords[0].id);
+    await expect(canvas.getByRole("combobox", { name: "每頁筆數" })).toHaveTextContent(/^每頁 5$/);
+  },
+};
+
+function PlatformExportDemo() {
+  const [result, setResult] = React.useState("");
+  return (
+    <div className="space-y-2">
+      <DataTable
+        rows={demoRecords}
+        columns={columns}
+        getRowKey={(r) => r.id}
+        initialSort={{ key: "amount", dir: "desc" }}
+        pageSize={5}
+        toolbar={({ rows }) => (
+          <Button variant="outline" size="sm" onClick={() => setResult(`${rows.length} 筆，第一筆 ${rows[0]?.id ?? "—"}`)}>
+            平台匯出（{rows.length} 筆）
+          </Button>
+        )}
+      />
+      <p className="text-xs text-muted-foreground" data-testid="export-result">{result || "（還沒按匯出）"}</p>
+    </div>
+  );
+}
+
+export const 平台自訂匯出: Story = {
+  render: () => <PlatformExportDemo />,
+  // 契約：toolbar 給函式時拿到的 rows＝目前篩選排序後的全部列（不分頁）。
+  // 平台自己的匯出鈕（例如保留數字格式的 Excel）用它取資料，內容才跟畫面一致。
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const total = demoRecords.length;
+    const topByAmount = [...demoRecords].sort((a, b) => b.amount - a.amount)[0].id;
+    // 不分頁：每頁 5 筆，拿到的仍是全部
+    await userEvent.click(canvas.getByRole("button", { name: `平台匯出（${total} 筆）` }));
+    // 跟著排序：第一筆＝金額最大的那筆，也是表格第一列
+    await expect(canvas.getByTestId("export-result")).toHaveTextContent(`${total} 筆，第一筆 ${topByAmount}`);
+    await expect(canvasElement.querySelector("tbody tr")).toHaveTextContent(topByAmount);
+    // 跟著篩選：搜尋後只剩符合的列
+    const input = canvas.getByRole("textbox", { name: "搜尋關鍵字…" });
+    setInputValue(input, "R-2401");
+    await userEvent.click(await canvas.findByRole("button", { name: "平台匯出（1 筆）" }));
+    await expect(canvas.getByTestId("export-result")).toHaveTextContent("1 筆，第一筆 R-2401");
+    setInputValue(input, "");
+    await canvas.findByRole("button", { name: `平台匯出（${total} 筆）` });
   },
 };
 

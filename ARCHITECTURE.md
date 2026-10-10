@@ -95,27 +95,30 @@ AGENTS.md ──(book/scripts/sync-root-docs.mjs)──► book/static/AGENTS.md
 | `tests/tokens-v4.test.ts` | 用 Tailwind v4 真的編 `dist/tailwind.css`：色鍵、透明度修飾、預設色盤清空、深色 variant、基座 | 同上 |
 | `tests/color.test.ts` | 把 `verify:color` 接進 `npm test`：無不合格項、六主題都在、brand 對比、聚焦環中性 | 門檻本身（在 `scripts/verify-color.mjs`） |
 | `tests/cn.test.ts` | `cn()` 的 tailwind-merge 分群：字級與文字色、漸層與底色互不吃 | 元件 class 的內容 |
+| `tests/csv.test.ts` | `csvEscape` 公式開頭的文字補 `'`、數字與純數字文字不補；序列化與解析往返 | 試算表軟體實際怎麼開檔、下載觸發（`saveBlob`） |
 | `tests/tailwind-compat.test.ts` | 元件只用 v3／v4 語意相同的 utility：禁兩版值不同的裸 utility、v4 限定語法、只靠 hover 揭露 | 兩版共有且同值的 class |
 | `tests/de-domain.test.ts` | 全庫文字 ↔ 176 詞領域黑名單，零容忍 | 英文變體以外的拼法（詞表列什麼擋什麼） |
 | `tests/demo-data.test.ts` | 示範資料只能來自 `demo/sample-data.ts`（含 `demo/generate.ts`） | 資料值本身 |
 | `tests/doc-hooks.test.ts` | 文件的 `<StoryFrame／StoryLink id>` 都對到真的 story | story 內容是否正確 |
 | `tests/story-sort.test.ts` | `.storybook/preview.tsx` 的 storySort 涵蓋每個分類且字串逐字吻合 | story 的順序是否合理 |
 | `tests/play-conventions.test.ts` | stories 不用 `userEvent.type／clear／paste`（改 `setInputValue`） | play 的斷言內容 |
-| `tests/nav.test.ts` | `isNavActive` 的多層 fallback | 側欄的渲染 |
-| `tests/table-url-state.test.ts` | 表格狀態 ↔ 網址的 codec、prefix 隔離讀與寫、與 DataTableState 的型別相容 | adapter 的路由整合（宿主） |
+| `tests/nav.test.ts` | `isNavActive` 的多層 fallback；`safeNavUrl` 網址白名單（`javascript:` 等換成 `#`，含變形寫法） | 側欄的渲染（story「連結網址白名單」） |
+| `tests/table-url-state.test.ts` | 表格狀態 ↔ 網址的 codec、prefix 隔離讀與寫、與 DataTableState 的型別相容；改壞的網址（特殊欄名、壞掉的 `%`）不改原型、不丟例外 | adapter 的路由整合（宿主）；每頁筆數與排序鍵的防護在 DataTable（story「網址被改壞」） |
 | `tests/host-baseline.test.ts` | Tailwind v4 preflight＋tokens 基座 ↔ `book/src/css/demo-base.css`；kit.css 的 import 順序與 layer | 渲染結果（`verify:book`） |
 | `tests/host-install-set.test.ts` | 頁面章的 `shadcn add` 指令 ⊆ 宿主安裝集；檔案真的在宿主裡；宿主的 tokens 配對與 workspace 連結 | 宿主頁面的行為（`verify:host`） |
-| `tests/registry-content.test.ts` | registry 檔案內容不以註解開頭（shadcn CLI 會刪） | 內容正確性 |
+| `tests/registry-content.test.ts` | registry 檔案內容不以註解開頭（shadcn CLI 會刪）；AGENTS.md「測過的 CLI 版本」＝套用驗收用的 `SHADCN` | 內容正確性 |
 | `tests/registry-fingerprint.test.ts` | `/r/index.json` 的逐 item 指紋＝第二份獨立實作；base 與說明不進指紋；相依變了 closureHash 跟著變 | 指紋的用途（`registry-changes`） |
 | `tests/registry-changes.test.ts` | 兩版 registry 的四類異動分類、Markdown 輸出、上一個 tag 照數字大小挑 | 真實歷史（CI 在 dev 預演） |
-| `tests/dooping-check.test.ts` | 取用端工具的內容指紋與產生器一致；路徑對應；已是最新／上游有更新／本地改過三態 | lock 的到期 |
+| `tests/dooping-check.test.ts` | 取用端工具的內容指紋與產生器一致；路徑對應；已是最新／上游有更新／本地改過三態；不信任 lock：專案外路徑不讀、非官方來源提醒、本機資料夾不印 shadcn 指令、特殊字元不印指令、Actions 輸出跳脫 | lock 的到期 |
 | `tests/feedback-intake.test.ts` | 取用端回饋的格式正本只在 AGENTS.md「回饋到上游」一份：送出指令是單行 `gh issue create`（`--repo` 本 repo、`[回饋]` 前綴、`--body-file`）、骨架八段依序；台帳四題各處同一說法；流程頁指向正本；別處沒有第二份 | issue 實際寫了什麼；守門人的分流節奏（人工） |
 | `tests/self-contained-refs.test.ts` | 公開檔（追蹤中＋未追蹤未忽略的文字檔）不得出現 `ADR-NNNN` 決策編號；尚未清的元件／token／template 檔列在 PENDING，清單只准縮短；維護者本機若有 gitignored 的 `.private-terms`，一併掃內部詞 | git 歷史、已發佈的套件與 Release 內文、建置產物 |
 | `tests/rule-pointers.test.ts` | 寫著「規則正本：」「流程正本：」的 `<路徑>「<標題>」` 都指到存在的檔與標題（標題相同，或以它開頭後接「：」「（」） | 沒有「」的指向、`because()` 的第三個參數；指向的內容是否還寫著那條規則 |
 | `tests/changelog.test.ts` | CHANGELOG 每節前是「空行、---、空行」；目前版號的 Release notes 只含自己這一節（測的是 deploy 實際呼叫的 `scripts/lib/changelog.mjs`） | 內容是否寫明對你的意義與兩問 |
 | `tests/deploy-gh-pages.test.ts` | 部署腳本對臨時 bare repo 實跑：根目錄部署保留 `preview/`、`staging/`；段部署只動自己的目錄；目標不在清單上就拒絕；push 被拒時重抓重套再推 | Pages 有沒有真的建置出來（部署後冒煙） |
-| `tests/workflow-contract.test.ts` | `.github/rulesets/` 要求的必過檢查都對得到真的 job 與觸發事件；檢查名不重複；必過 job 不會被 `if:` 跳過（staging 一定傳 `consumer`／`deploy`）；沒有 paths 過濾；concurrency 每段一組；手動觸發有分支守門；publish-tokens 手動發佈過配對閘；部署目錄＝`STAGE_DIRS`；寫入權只在 `deploy` job（其餘唯讀、簽出不留憑證、冒煙要求部署成功、release 只認 main 上的 tag）；npm 發佈身分只在不跑專案程式的 `publish` job | GitHub 上的 ruleset 有沒有真的套用（`gh api …/rules/branches/main`） |
-| `tests/release-gate.test.ts` | 發版閘每條規則各轉紅一次：版號遞增、tag 未被佔、CHANGELOG 已改名且標題對得上版號、分支只准 staging←dev／main←staging、合併後樹＝來源、核准清單勾完；抓不到 main 時 release 失敗 | git 那一層（CI 實跑）；CHANGELOG 內容是否寫明對你的意義與兩問 |
+| `tests/workflow-contract.test.ts` | `.github/rulesets/` 要求的必過檢查都對得到真的 job 與觸發事件；檢查名不重複；必過 job 不會被 `if:` 跳過（staging 一定傳 `consumer`／`deploy`）；沒有 paths 過濾；concurrency 每段一組；第三方外掛釘 commit SHA、Dependabot 的 PR 開到 dev、每週漏洞檢查只對執行期套件亮紅燈；手動觸發有分支守門；publish-tokens 手動發佈過配對閘；部署目錄＝`STAGE_DIRS`；寫入權只在 `deploy` job（其餘唯讀、簽出不留憑證、冒煙要求部署成功、release 只認 main 上的 tag）；npm 發佈身分只在不跑專案程式的 `publish` job | GitHub 上的 ruleset 有沒有真的套用（`gh api …/rules/branches/main`） |
+| `tests/release-gate.test.ts` | 發版閘每條規則各轉紅一次：版號遞增、tag 未被佔、CHANGELOG 已改名且標題對得上版號、分支只准 staging←dev／main←staging、合併後樹＝來源、核准清單勾完、核准版本＝PR 目前的 head；抓不到 main 時 release 失敗 | git 那一層（CI 實跑）；CHANGELOG 內容是否寫明對你的意義與兩問 |
+| `tests/paths.test.ts` | 本機腳本共用的路徑與參數防護：前綴相同的兄弟資料夾不算在內、解碼後的分隔符與上一層擋掉、壞掉的 `%` 不丟例外、會被整個刪掉的輸出目錄（`REGISTRY_OUT`）擋空字串與 `..`、Windows 經 cmd 的參數加引號 | 每支腳本有沒有真的用它（看程式） |
+| `tests/browser-storage.test.ts` | 會送到瀏覽器的程式碼不註冊 service worker；瀏覽器儲存只出現在允許清單的檔（宿主主題設定），清單只准縮短 | 存的內容是不是只有介面偏好、讀取有沒有驗證（人工） |
 | `tests/guard-ledger.test.ts` | 這張表列出每一支 `tests/*.test.ts` 與 `scripts/verify-*.mjs`、`host-sync.mjs` | 表格描述是否準確 |
 
 build 之後（CI 跑，本機可單獨跑）：
@@ -208,6 +211,28 @@ GitHub 一組只留一個等待中的 run，dev 連推會取消等待中的 main
   npm 的 trusted publisher 填上這個 environment。
 - 守衛：`tests/workflow-contract.test.ts`。
 
+### 外掛釘版與套件漏洞
+
+- workflow 用到的第三方外掛一律釘 commit SHA，後面註解版號（`actions/checkout@<40 碼> # v4.4.0`）。
+  外掛的標籤可以被改指到別的 commit，釘 SHA 才不會在不知情時換掉要執行的程式。
+- 釘死之後不會自己更新：`.github/dependabot.yml` 每月把外掛新版整理成一個 PR 開到 `dev`，照一般 PR 審過再合併。
+- 程式套件的漏洞由 `.github/workflows/audit.yml` 每週檢查。紅燈只管主程式執行時用到的套件（`npm audit --omit=dev`）；
+  開發工具與文件站的套件只在開發與建置時執行，漏洞列在 run 摘要裡、不擋——混在紅燈裡，新問題會被舊的蓋掉。
+- 必過檢查目前以檢查名＋GitHub Actions 的 app id 綁定。「必過檢查綁定 workflow 路徑」（ruleset 的 workflows 規則）只有組織帳號的 repo 能用，
+  本 repo 在個人帳號下，用不到。
+- 守衛：`tests/workflow-contract.test.ts`（外掛釘 SHA、Dependabot 目標 dev、漏洞檢查的紅燈範圍）。
+
+### 同一個網域：瀏覽器儲存只放介面偏好
+
+- 正式站、`/staging/`、`/preview/` 都在 `kielchang.github.io/dooping-design-book/` 底下，只以路徑區分；同一個網域還有帳號下其他 GitHub Pages 網站。
+  瀏覽器以網域為界：任何一站的程式都讀寫得到其他站存在瀏覽器裡的東西。
+- 瀏覽器儲存（localStorage、sessionStorage、IndexedDB、cookie）只放介面偏好（主題、深淺模式這類），讀取時一律驗證、讀不懂就用預設；
+  不放帳號、權杖、個人或業務資料。（人工：改到允許清單上的檔時，由審 PR 的人看內容。）
+- 不註冊 service worker。
+- 要加登入或任何敏感功能之前，先把站搬到獨立網域。
+- 取用端用 CLI 直接抓 `/r/` 的檔，不經過瀏覽器儲存，不受這一節影響。
+- 守衛：`tests/browser-storage.test.ts`（不註冊 service worker；瀏覽器儲存只准出現在允許清單的檔，清單只准縮短）。
+
 ### 三段的意義
 
 | 分支 | 代表什麼 | 部署到 | 誰讓它前進 |
@@ -237,8 +262,8 @@ GitHub 一組只留一個等待中的 run，dev 連推會取消等待中的 main
    版號沒動寫「## 日期（說明）」——然後開 dev → staging 的 PR
      └ pr-gate：只准 staging ← dev、版號遞增、tag 未被佔、CHANGELOG 標題對得上
 ③ 合併 → staging 建置、發版閘、套用驗收、部署 /staging/、部署後冒煙
-④ 開 staging → main 的 PR，照 PR 模板的「核准清單」逐項驗收並打勾
-     └ pr-gate：只准 main ← staging、合併後內容＝staging、核准清單勾完
+④ 開 staging → main 的 PR，照 PR 模板的「核准清單」逐項驗收並打勾，填上「核准版本」（PR 目前 head 的前 7 碼以上）
+     └ pr-gate：只准 main ← staging、合併後內容＝staging、核准清單勾完、核准版本＝PR 目前的 head
 ⑤ 合併＝核准 → 部署正式站、冒煙、自動蓋 tag vX.Y.Z、發 GitHub Release（版號沒動就不打、不發）
 ```
 
@@ -246,6 +271,7 @@ GitHub 一組只留一個等待中的 run，dev 連推會取消等待中的 main
   元件用真的 shadcn CLI 從候選版的 registry 裝，型別檢查、建置，再到瀏覽器量顏色——證明別的系統照
   [AGENTS.md](https://kielchang.github.io/dooping-design-book/AGENTS.md) 做真的接得上。
   還**不涵蓋** Next.js App Router、Tailwind v3 宿主、Base UI 共存。
+- **核准對到一個版本**：核准之後 PR 又有新的 commit，核准版本就對不上、pr-gate 轉紅——驗收過的必須就是要合併的，重新驗收再改核准版本。
 - **驗收沒過**：修在 dev、推上去，再開一次 dev → staging 的 PR，staging 會重跑全部驗收。不在 staging 上直接改；
   版號不必再 bump，除非那個 tag 已經被佔。
 - **dev 永遠是可發布的狀態**——這是「修在 dev 再送一次」成立的前提。做到一半的東西留在功能分支。

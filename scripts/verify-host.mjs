@@ -26,6 +26,7 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { dirname, extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
+import { isInside, safeDecode } from "./lib/paths.mjs";
 import { chromium } from "playwright";
 import { forcedColorsFocusFailures } from "./lib/forced-colors.mjs";
 import { loadTokens, near as nearRgb, parseColor, resolveTokenRgb, rgbStr } from "./lib/token-expect.mjs";
@@ -64,11 +65,12 @@ const resolve = (theme, mode, name) => resolveTokenRgb(tokens, theme, mode, name
 
 function serve() {
   const server = createServer((req, res) => {
-    let path = decodeURIComponent(new URL(req.url, "http://x").pathname);
+    let path = safeDecode(new URL(req.url, "http://x").pathname);
+    if (path === null) { res.writeHead(400); res.end(); return; }
     if (!path.startsWith(BASE)) { res.writeHead(404); res.end(); return; }
     path = path.slice(BASE.length);
     let file = normalize(join(DIST, path || "index.html"));
-    if (!file.startsWith(DIST)) { res.writeHead(403); res.end(); return; }
+    if (!isInside(file, DIST)) { res.writeHead(403); res.end(); return; }
     // SPA 回退：沒有副檔名的路徑（/stock-check）交給 index.html，由 react-router 接手
     if (!existsSync(file) || statSync(file).isDirectory()) {
       if (extname(path)) { res.writeHead(404); res.end(); return; }

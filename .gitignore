@@ -18,3 +18,11 @@ registry-consumer/
 # 維護者私有檔（不進公開 repo）
 CLAUDE.local.md
 .private-terms
+
+# 本機設定與憑證（不進版控）：Claude 的個人設定、環境變數檔、金鑰、npm 登入檔
+.claude/settings.local.json
+.env
+.env.*
+*.pem
+*.key
+.npmrc

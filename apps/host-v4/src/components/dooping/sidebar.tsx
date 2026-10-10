@@ -1,12 +1,12 @@
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Slot } from "@radix-ui/react-slot";
-import { PanelLeft } from "lucide-react";
+import { ChevronsLeft, ChevronsRight, PanelLeft } from "lucide-react";
 import { cn } from "@/lib/dooping/utils";
 import { Button, type ButtonProps } from "@/components/dooping/button";
 import { Tooltip } from "@/components/dooping/tooltip";
 
-// 應用外殼的側邊欄家族（ADR-0011，蒸餾自 shadcn sidebar，刻意精簡）。
+// 應用外殼的側邊欄家族：純呈現、不綁路由與資料，蒸餾自 shadcn sidebar、刻意精簡。
 //
 // 與 shadcn 上游的差異都是刻意決定：
 // - 砍 variant="floating|inset"、SidebarRail、cookie 持久化、Ctrl+B 快捷鍵——
@@ -14,7 +14,10 @@ import { Tooltip } from "@/components/dooping/tooltip";
 //   全域鍵位表是宿主的事（useSidebar().toggle() 自己掛）。
 // - 收合形態兩種：icon（圖示欄，預設）與 offcanvas（收到 0、工作區最大）。
 //   offcanvas 收合後滑鼠碰左緣會「窺看」——側欄浮在內容上、不推版面，離開就收；
-//   鍵盤與觸控走 SidebarTrigger 釘選展開（只靠 hover 揭露的功能等於對觸控不存在）。
+//   釘選展開走拉環（點擊、拖拉、鍵盤都行；只靠 hover 揭露的功能等於對觸控與鍵盤不存在）。
+// - 桌面版的收合入口是側欄右緣、固定在底部的**拉環**（Sidebar 自己畫，宿主不用接）：
+//   點一下或左右拖拉切換。頂列的 SidebarTrigger 只在行動版出現，負責開抽屜——
+//   頂列放切換鈕會跟功能選單混在一起，看不出它是收合側欄的。
 //   多應用外殼的側欄是應用清單，見模式章〈後台系統的資訊架構〉。
 // - 行動版抽屜用**既有的 Radix Dialog** 組左滑面板，不新收 Sheet——
 //   focus trap／Esc／焦點歸還免費取得，且「分區與順序完全不變」自動成立
@@ -28,7 +31,7 @@ interface SidebarContextValue {
   state: "expanded" | "collapsed";
   open: boolean;
   setOpen: (open: boolean) => void;
-  /** 桌面切收合、行動切抽屜——自動分流，SidebarTrigger 與宿主快捷鍵都走這裡。 */
+  /** 桌面切收合、行動切抽屜——自動分流，拉環、SidebarTrigger 與宿主快捷鍵都走這裡。 */
   toggle: () => void;
   isMobile: boolean;
   openMobile: boolean;
@@ -141,6 +144,69 @@ export interface SidebarProps extends React.ComponentPropsWithoutRef<"aside"> {
 // 關要一點寬容（手抖出界一下不該立刻收掉）。
 const PEEK_OPEN_DELAY = 120;
 const PEEK_CLOSE_DELAY = 250;
+// 拉環拖過這段距離（px）才算拖拉；不到就當成點擊
+const PULL_DRAG_THRESHOLD = 24;
+
+/**
+ * 拉環：貼在側欄右緣、固定在底部的小標籤，像抽屜的拉環。點一下或左右拖拉切換展開／收合
+ * （往左拖收合、往右拖展開）。拖拉是加分不是必要——點擊與鍵盤（Enter／空白鍵）都能切換，
+ * 可及名稱與圖示跟著狀態變。展開狀態由 Sidebar 傳進來（讀釘選狀態，不是子元件看到的「眼前長怎樣」）。
+ */
+function SidebarPullTab({
+  open,
+  setOpen,
+  className,
+  onPointerEnter,
+}: {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  className?: string;
+  onPointerEnter?: () => void;
+}) {
+  const drag = React.useRef<{ x: number; moved: boolean } | null>(null);
+  const label = open ? "收合側邊欄" : "展開側邊欄";
+  const Icon = open ? ChevronsLeft : ChevronsRight;
+  return (
+    <div data-sidebar-pull="" className={cn("z-10", className)} onPointerEnter={onPointerEnter}>
+      <Tooltip content={label} side="right">
+        <button
+          type="button"
+          aria-label={label}
+          aria-expanded={open}
+          className={cn(
+            "state-layer flex h-10 w-5 touch-none items-center justify-center rounded-r-md border border-l-0 border-sidebar-border",
+            "bg-sidebar text-sidebar-foreground shadow-sm outline-none [&_svg]:size-3.5 [&_svg]:shrink-0",
+            "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          )}
+          onPointerDown={(e) => {
+            if (e.button !== 0) return;
+            drag.current = { x: e.clientX, moved: false };
+            e.currentTarget.setPointerCapture?.(e.pointerId);
+          }}
+          onPointerMove={(e) => {
+            const d = drag.current;
+            if (!d || d.moved) return;
+            const dx = e.clientX - d.x;
+            if (Math.abs(dx) < PULL_DRAG_THRESHOLD) return;
+            d.moved = true;
+            if (dx < 0 && open) setOpen(false);
+            else if (dx > 0 && !open) setOpen(true);
+          }}
+          onPointerCancel={() => {
+            drag.current = null;
+          }}
+          onClick={() => {
+            const moved = drag.current?.moved;
+            drag.current = null;
+            if (!moved) setOpen(!open);
+          }}
+        >
+          <Icon aria-hidden />
+        </button>
+      </Tooltip>
+    </div>
+  );
+}
 
 export function Sidebar({
   collapsible = "icon",
@@ -276,9 +342,27 @@ export function Sidebar({
         >
           {nav}
         </aside>
+        {/* 拉環放在 aside 外面：收合時 aside 是 inert，拉環要留在左緣、點得到也 Tab 得到 */}
+        <SidebarPullTab
+          open={state === "expanded"}
+          setOpen={ctx.setOpen}
+          className={cn(
+            "fixed bottom-6 z-[46] transition-[left] duration-normal ease-standard motion-reduce:transition-none",
+            hidden ? "left-0" : "left-64",
+          )}
+          onPointerEnter={() => {
+            // 窺看中滑到拉環上：別讓「離開側欄就收」先把它收掉
+            if (peeking) clearTimer();
+          }}
+        />
       </SidebarContext.Provider>
     );
   }
+
+  const pullTab =
+    collapsible === "icon" ? (
+      <SidebarPullTab open={state === "expanded"} setOpen={ctx.setOpen} className="absolute bottom-6 left-full -ml-px" />
+    ) : null;
 
   return (
     <SidebarContext.Provider value={childCtx}>
@@ -298,21 +382,27 @@ export function Sidebar({
         {...props}
       >
         {nav}
+        {pullTab}
       </aside>
     </SidebarContext.Provider>
   );
 }
 
+/**
+ * 行動版的抽屜開關，放在頂列。桌面版不渲染——收合入口是 Sidebar 右緣的拉環。
+ * 頂列照樣放 `<SidebarTrigger />`：寬螢幕時它自動消失，窄螢幕時出現。
+ */
 export const SidebarTrigger = React.forwardRef<HTMLButtonElement, ButtonProps & { label?: string }>(
   ({ className, onClick, label = "切換側邊欄", ...props }, ref) => {
-    const { toggle, isMobile, open, openMobile } = useSidebar();
+    const { toggle, isMobile, openMobile } = useSidebar();
+    if (!isMobile) return null;
     return (
       <Button
         ref={ref}
         variant="ghost"
         size="icon"
         aria-label={label}
-        aria-expanded={isMobile ? openMobile : open}
+        aria-expanded={openMobile}
         className={cn("size-8", className)}
         onClick={(e) => {
           onClick?.(e);

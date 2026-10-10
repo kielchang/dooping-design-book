@@ -21,10 +21,11 @@ import { execFileSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
-import { dirname, extname, isAbsolute, join, normalize, relative, resolve } from "node:path";
+import { dirname, extname, join, normalize, resolve } from "node:path";
 import { chromium } from "playwright";
 import { contentHash, resolveTargets } from "../templates/dooping-check.mjs";
 import { ROOT, SHADCN, buildRegistry, run, startRegistryServer } from "./lib/serve-registry.mjs";
+import { isInside, safeDecode, shellArgs } from "./lib/paths.mjs";
 import { loadTokens, near, parseColor, resolveTokenRgb, rgbStr, tokenValue } from "./lib/token-expect.mjs";
 
 const TEMPLATE = join(ROOT, "fixtures/consumer-vite-v4");
@@ -38,10 +39,6 @@ const fail = (msg) => failures.push(msg);
 const step = (msg) => console.log(`\n[verify-consumer] ${msg}`);
 const sleep = (ms) => new Promise((ok) => setTimeout(ok, ms));
 const readJson = (path) => JSON.parse(readFileSync(path, "utf8"));
-const isInside = (child, parent) => {
-  const rel = relative(parent, child);
-  return rel === "" || (!rel.startsWith("..") && !isAbsolute(rel));
-};
 
 const tokens = loadTokens(ROOT);
 const DEFAULT_THEME = tokens.meta.defaultTheme;
@@ -70,7 +67,8 @@ function prepareDir() {
 function packTokens(dir) {
   const vendor = join(dir, "vendor");
   mkdirSync(vendor, { recursive: true });
-  const out = execFileSync("npm", ["pack", "--workspace", "@dooping/tokens", "--pack-destination", vendor, "--json"], {
+  // Windows 經 shell 執行：暫存目錄（使用者資料夾）含空白時參數要加引號
+  const out = execFileSync("npm", shellArgs(["pack", "--workspace", "@dooping/tokens", "--pack-destination", vendor, "--json"]), {
     cwd: ROOT,
     encoding: "utf8",
     shell: process.platform === "win32",
@@ -166,9 +164,10 @@ const MIME = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "
 
 function serveDist(dist) {
   const server = createServer((req, res) => {
-    const path = decodeURIComponent(new URL(req.url, "http://x").pathname);
+    const path = safeDecode(new URL(req.url, "http://x").pathname);
+    if (path === null) return res.writeHead(400).end();
     let file = normalize(join(dist, path === "/" ? "index.html" : path));
-    if (!file.startsWith(dist)) return res.writeHead(403).end();
+    if (!isInside(file, dist)) return res.writeHead(403).end();
     if (!existsSync(file) || statSync(file).isDirectory()) file = join(dist, "index.html");
     res.writeHead(200, { "content-type": MIME[extname(file)] ?? "application/octet-stream" });
     res.end(readFileSync(file));

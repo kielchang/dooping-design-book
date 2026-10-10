@@ -163,6 +163,22 @@ export function approvalChecklist(body) {
   return items;
 }
 
+/**
+ * 核准清單裡的「核准版本：<commit>」（至少 7 碼）；沒寫或寫的不是 commit 回傳 null。
+ * 勾完清單時記下當下驗收的是哪個 commit——之後再推 commit，版本就對不上，要重新驗收。
+ */
+export function approvedVersion(body) {
+  const lines = toLines(body ?? "");
+  const start = lines.findIndex((l) => /^#{1,6}\s*核准清單/.test(l));
+  if (start < 0) return null;
+  for (const line of lines.slice(start + 1)) {
+    if (/^#{1,6}\s/.test(line)) break;
+    const m = /^\s*核准版本[:：]\s*`?([0-9a-fA-F]{7,40})`?\s*$/.exec(line);
+    if (m) return m[1].toLowerCase();
+  }
+  return null;
+}
+
 const ALLOWED_SOURCE = { staging: "dev", main: "staging" };
 
 /** PR 閘：release 的全部規則 ＋ 同 repo ＋ 分支配對 ＋ 樹相等 ＋（base＝main）核准清單。 */
@@ -190,6 +206,14 @@ export function evaluatePr(s) {
       const open = items.filter((i) => !i.checked);
       if (open.length)
         failures.push(because(`核准清單還有 ${open.length} 項沒勾：${open.map((i) => i.text).join("；")}`, "勾完才算守門人核准；勾完後 PR 會自動重跑這道閘"));
+      const approved = approvedVersion(s.prBody);
+      if (!approved)
+        failures.push(because("核准清單沒寫「核准版本：<commit>」（PR 目前 head 的前 7 碼以上）", "核准要對到一個確定的版本，之後再推 commit 才看得出驗收過的不是這一版"));
+      else if (!(s.headSha ?? "").toLowerCase().startsWith(approved))
+        failures.push(because(
+          `核准版本 ${approved} 不是這個 PR 目前的 head（${(s.headSha ?? "").slice(0, 7) || "未知"}）——核准之後又有新的 commit`,
+          "驗收過的必須就是要合併的；重新驗收後把核准版本改成目前的 head",
+        ));
     }
   }
   return failures;
@@ -297,6 +321,7 @@ function main(argv) {
           headRepo: process.env.HEAD_REPO ?? "",
           repository: process.env.GITHUB_REPOSITORY ?? "",
           prBody: process.env.PR_BODY ?? "",
+          headSha: process.env.HEAD_SHA ?? "",
           treeEqual: treeEqual(process.env.HEAD_SHA),
         });
   report(mode, failures);

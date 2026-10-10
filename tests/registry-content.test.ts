@@ -6,6 +6,7 @@
 import { describe, it, expect } from "vitest";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { because } from "./lib/guard";
 
 const REGISTRY = join(__dirname, "..", "registry");
 
@@ -23,6 +24,20 @@ const items: RegistryItem[] = readdirSync(REGISTRY)
   .map((f) => JSON.parse(readFileSync(join(REGISTRY, f), "utf8")));
 
 const files = items.flatMap((item) => (item.files ?? []).map((file) => ({ item: item.name, ...file })));
+
+describe("取用端文件寫的 shadcn 版本＝套用驗收實際用的版本", () => {
+  it("AGENTS.md 的「測過的 CLI 版本」與 scripts/lib/serve-registry.mjs 的 SHADCN 相同", () => {
+    const tested = /export const SHADCN = "(shadcn@[\d.]+)"/.exec(readFileSync(join(__dirname, "..", "scripts/lib/serve-registry.mjs"), "utf8"))?.[1];
+    const agents = readFileSync(join(__dirname, "..", "AGENTS.md"), "utf8");
+    const documented = /測過的 CLI 版本\*\*：上游的套用驗收用 `(shadcn@[\d.]+)`/.exec(agents)?.[1];
+    expect(tested, "serve-registry.mjs 找不到 SHADCN").toBeTruthy();
+    expect(documented, because(
+      `AGENTS.md 寫的是 ${documented ?? "（沒寫）"}，套用驗收用的是 ${tested}`,
+      "取用端照 AGENTS.md 釘版本重試；兩處不同，釘到的就不是驗收過的那一版",
+      "AGENTS.md「測過的 CLI 版本」",
+    )).toBe(tested);
+  });
+});
 
 describe("registry 檔案內容：取用端經 shadcn CLI 拿到的樣子", () => {
   it("掃描對象不是空的", () => {

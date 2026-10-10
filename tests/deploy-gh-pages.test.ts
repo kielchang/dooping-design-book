@@ -4,39 +4,18 @@
 // 規則正本：scripts/deploy-gh-pages.sh 檔頭；段目錄清單 STAGE_DIRS。
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { execFileSync } from "node:child_process";
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { delimiter, join } from "node:path";
+import { join } from "node:path";
 import { because } from "./lib/guard";
+import { findSh, shEnv as shEnvWith } from "./lib/sh";
 
 const ROOT = join(__dirname, "..");
 const SCRIPT = join(ROOT, "scripts/deploy-gh-pages.sh").replace(/\\/g, "/");
 const RULE = "scripts/deploy-gh-pages.sh 檔頭";
 
-/**
- * Windows 上用 Git for Windows 附的 sh（不是 WSL 的 bash.exe）；CI 用系統 sh。
- * 腳本用到的 mktemp 等指令在 Git 的 usr/bin，從 PowerShell／cmd 跑時 PATH 通常沒有它——
- * 所以一併回傳那個目錄，子行程前置到 PATH，不靠呼叫端的 shell。
- */
-function findSh(): { sh: string; toolsDir?: string } {
-  if (process.platform !== "win32") return { sh: "sh" };
-  const exec = execFileSync("git", ["--exec-path"], { encoding: "utf8" }).trim();
-  const gitRoot = exec.replace(/[\\/](mingw64|mingw32|clangarm64)[\\/]libexec[\\/]git-core$/i, "");
-  const toolsDir = join(gitRoot, "usr/bin");
-  for (const candidate of [join(toolsDir, "sh.exe"), join(gitRoot, "bin/sh.exe")]) if (existsSync(candidate)) return { sh: candidate, toolsDir };
-  throw new Error(`找不到 Git for Windows 的 sh（git --exec-path＝${exec}）`);
-}
 const { sh: SH, toolsDir: SH_TOOLS } = findSh();
-
-/** 子行程環境：有 SH_TOOLS 就前置到 PATH。Windows 的鍵名大小寫不定（Path／PATH），沿用原本那個，避免兩個並存。 */
-function shEnv(extra: Record<string, string>): NodeJS.ProcessEnv {
-  const env: NodeJS.ProcessEnv = { ...process.env, DEPLOY_RETRY_DELAY: "0", ...extra };
-  if (SH_TOOLS) {
-    const key = Object.keys(env).find((k) => k.toUpperCase() === "PATH") ?? "PATH";
-    env[key] = [SH_TOOLS, env[key]].filter(Boolean).join(delimiter);
-  }
-  return env;
-}
+const shEnv = (extra: Record<string, string>) => shEnvWith(SH_TOOLS, { DEPLOY_RETRY_DELAY: "0", ...extra });
 
 const git = (cwd: string, ...args: string[]) => execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
 const write = (path: string, content: string) => {

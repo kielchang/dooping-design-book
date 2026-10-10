@@ -6,7 +6,7 @@ export interface AppShellProps extends Omit<SidebarProviderProps, "children"> {
   /** `<Sidebar>…</Sidebar>`（通常內含 SidebarNav）。 */
   sidebar: React.ReactNode;
   /**
-   * 頂列內容。多應用外殼的三段：左＝系統（SidebarTrigger＋目前應用）、
+   * 頂列內容。多應用外殼的三段：左＝系統（目前應用；SidebarTrigger 只在行動版出現）、
    * 中＝目前應用的功能選單（AppMenubar）、右＝系統（搜尋、通知、使用者選單）。
    * 頁面標題不放這裡——那是 PageHeader 的 h1。
    */
@@ -18,7 +18,7 @@ export interface AppShellProps extends Omit<SidebarProviderProps, "children"> {
 /**
  * 後台外殼的佈局容器：側欄＋（頂列）＋主內容。
  *
- * 刻意小到宿主可以在一小時內自己重寫（ADR-0011 的退場前提）：
+ * 刻意小到宿主可以在一小時內自己重寫——要退場時取用端不被卡住：
  * 它只做 flex 佈局與 SidebarProvider 的轉發，不綁路由、不碰資料、不管狀態持久化。
  * 站台層的規範（分區、頂列三段、單一出口、深連結）見模式章〈後台系統的資訊架構〉。
  *

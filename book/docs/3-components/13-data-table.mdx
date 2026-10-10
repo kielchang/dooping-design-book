@@ -76,6 +76,20 @@ const columns: Column<Order>[] = [
 - **門檻式分頁**：資料筆數沒超過一頁就**不顯示分頁器**。
 - **合計算「篩選後全部」**，不是當頁。
 - **匯出跟著畫面**：匯出的是使用者**現在看到的**（篩選＋排序後），不是原始全量。
+- **平台自己做的匯出也跟著畫面**：要保留數字、日期格式的 Excel 匯出由平台自己實作。`toolbar` 給函式，
+  拿到的 `rows` 就是目前篩選排序後的全部列（不分頁），用它取資料，不要自己重算篩選與排序。
+  欄位格式怎麼對應，照[列印與匯出](/patterns/print-and-export)「平台自己做的匯出：照畫面的呈現方式」。
+
+```tsx
+<DataTable
+  {...props}
+  toolbar={({ rows }) => (
+    <Button variant="outline" size="sm" onClick={() => exportExcel(rows)}>匯出 Excel</Button>
+  )}
+/>
+```
+
+<StoryLink id="元件-資料-資料表-datatable--平台自訂匯出" />
 
 ## 每頁筆數：5／15／30／50
 

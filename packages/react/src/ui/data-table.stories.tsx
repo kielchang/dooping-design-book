@@ -391,6 +391,50 @@ export const 網址同步: Story = {
   },
 };
 
+function PlatformExportDemo() {
+  const [result, setResult] = React.useState("");
+  return (
+    <div className="space-y-2">
+      <DataTable
+        rows={demoRecords}
+        columns={columns}
+        getRowKey={(r) => r.id}
+        initialSort={{ key: "amount", dir: "desc" }}
+        pageSize={5}
+        toolbar={({ rows }) => (
+          <Button variant="outline" size="sm" onClick={() => setResult(`${rows.length} 筆，第一筆 ${rows[0]?.id ?? "—"}`)}>
+            平台匯出（{rows.length} 筆）
+          </Button>
+        )}
+      />
+      <p className="text-xs text-muted-foreground" data-testid="export-result">{result || "（還沒按匯出）"}</p>
+    </div>
+  );
+}
+
+export const 平台自訂匯出: Story = {
+  render: () => <PlatformExportDemo />,
+  // 契約：toolbar 給函式時拿到的 rows＝目前篩選排序後的全部列（不分頁）。
+  // 平台自己的匯出鈕（例如保留數字格式的 Excel）用它取資料，內容才跟畫面一致。
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const total = demoRecords.length;
+    const topByAmount = [...demoRecords].sort((a, b) => b.amount - a.amount)[0].id;
+    // 不分頁：每頁 5 筆，拿到的仍是全部
+    await userEvent.click(canvas.getByRole("button", { name: `平台匯出（${total} 筆）` }));
+    // 跟著排序：第一筆＝金額最大的那筆，也是表格第一列
+    await expect(canvas.getByTestId("export-result")).toHaveTextContent(`${total} 筆，第一筆 ${topByAmount}`);
+    await expect(canvasElement.querySelector("tbody tr")).toHaveTextContent(topByAmount);
+    // 跟著篩選：搜尋後只剩符合的列
+    const input = canvas.getByRole("textbox", { name: "搜尋關鍵字…" });
+    setInputValue(input, "R-2401");
+    await userEvent.click(await canvas.findByRole("button", { name: "平台匯出（1 筆）" }));
+    await expect(canvas.getByTestId("export-result")).toHaveTextContent("1 筆，第一筆 R-2401");
+    setInputValue(input, "");
+    await canvas.findByRole("button", { name: `平台匯出（${total} 筆）` });
+  },
+};
+
 const REQUERY_INITIAL: DataTableState = {
   page: 0, pageSize: 5, query: "", sort: null, filters: {}, hiddenColumns: [], selection: [],
 };

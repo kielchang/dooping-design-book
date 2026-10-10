@@ -14,15 +14,16 @@ import { createServer } from "node:http";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
+import { isInside, safeDecode, shellArgs } from "./paths.mjs";
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), "../..");
 // 釘版：升版走 PR，PR 必附「host-add 後 host-sync 零差異」與 verify:consumer 通過的證據
 export const SHADCN = "shadcn@4.21.0";
 
-/** 非同步 spawn；結束碼非 0 就 reject。Windows 上 npm／npx 是 .cmd，要走 shell。 */
+/** 非同步 spawn；結束碼非 0 就 reject。Windows 上 npm／npx 是 .cmd，要走 shell——參數經 shellArgs 加引號。 */
 export function run(cmd, args, { cwd = ROOT, env = {}, timeoutMs = 0, stdio = "inherit" } = {}) {
   return new Promise((ok, fail) => {
-    const child = spawn(cmd, args, {
+    const child = spawn(cmd, shellArgs(args), {
       cwd,
       stdio,
       shell: process.platform === "win32",
@@ -69,7 +70,7 @@ export async function startRegistryServer({ registryDir, npmPackage }) {
   const requests = [];
   let base = "";
   const server = createServer((req, res) => {
-    const path = decodeURIComponent(new URL(req.url, "http://x").pathname);
+    const path = safeDecode(new URL(req.url, "http://x").pathname) ?? "";
     requests.push(path);
     const send = (status, body, type = "application/json") => {
       res.writeHead(status, { "content-type": type, "cache-control": "no-store" });
@@ -77,7 +78,7 @@ export async function startRegistryServer({ registryDir, npmPackage }) {
     };
     if (path.startsWith("/r/")) {
       const file = normalize(join(staticDir, path.slice(3)));
-      if (!file.startsWith(staticDir) || !existsSync(file) || statSync(file).isDirectory()) return send(404, "");
+      if (!path || !isInside(file, staticDir) || !existsSync(file) || statSync(file).isDirectory()) return send(404, "");
       return send(200, readFileSync(file));
     }
     if (npmPackage && path.startsWith("/npm/")) {

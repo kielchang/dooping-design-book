@@ -241,4 +241,39 @@ describe("workflow 與 ruleset 的契約", () => {
     const dests = [...setup.matchAll(/DEST=([^;\s]*);/g)].map((m) => m[1]).filter((d) => d && d !== ".").sort();
     expect(dests, because(`部署目錄 ${dests.join(" ")} ≠ STAGE_DIRS ${stageDirs.join(" ")}`, "根目錄部署只保留 STAGE_DIRS 列的目錄；多一段沒列進去，每次 main 部署都會把它刪掉", "scripts/deploy-gh-pages.sh 檔頭")).toEqual(stageDirs);
   });
+
+  const PIN_RULE = "ARCHITECTURE.md「外掛釘版與套件漏洞」";
+
+  it("第三方外掛一律釘 commit SHA（本 repo 的可重用流程除外）", () => {
+    const loose = Object.entries(workflows).flatMap(([file, wf]) =>
+      Object.entries(wf.jobs).flatMap(([id, job]) =>
+        (job.steps ?? [])
+          .map((s) => s.uses)
+          .filter((u): u is string => Boolean(u) && !u!.startsWith("./") && !/@[0-9a-f]{40}$/.test(u!))
+          .map((u) => `${file} 的 ${id}：${u}`),
+      ),
+    );
+    expect(loose, because(`沒釘 SHA：\n${loose.join("\n")}`, "外掛的標籤可以被改指到別的 commit；釘 SHA 才不會在不知情時換掉要執行的程式", PIN_RULE)).toEqual([]);
+  });
+
+  it("Dependabot 管外掛更新，PR 開到 dev", () => {
+    const config = parse(readFileSync(join(ROOT, ".github/dependabot.yml"), "utf8")) as { updates?: { "package-ecosystem": string; "target-branch"?: string }[] };
+    const actions = config.updates?.find((u) => u["package-ecosystem"] === "github-actions");
+    expect(actions, because("dependabot.yml 沒有 github-actions", "外掛釘死之後不會自己更新，要有人定期提醒", PIN_RULE)).toBeTruthy();
+    expect(actions!["target-branch"], because("Dependabot 的 PR 要開到 dev", "三段式發布：所有改動都從 dev 進來；開到預設分支 main 會被 ruleset 擋下", PIN_RULE)).toBe("dev");
+  });
+
+  it("每週漏洞檢查：紅燈只管執行期套件，開發工具與文件站只列摘要", () => {
+    const wf = workflows["audit.yml"];
+    expect(wf, "缺 .github/workflows/audit.yml").toBeTruthy();
+    expect(wf.permissions).toEqual({ contents: "read" });
+    const steps = Object.values(wf.jobs).flatMap((j) => j.steps ?? []);
+    const audits = steps.filter((s) => s.run?.includes("npm audit"));
+    const gate = audits.filter((s) => /npm audit --omit=dev --audit-level=high\s*$/.test(s.run!.trim()));
+    expect(gate.length, because("要有一步只跑 `npm audit --omit=dev --audit-level=high`、失敗就紅", "執行期套件跟著產物走，有高風險漏洞要通知", PIN_RULE)).toBe(1);
+    const report = audits.filter((s) => !gate.includes(s));
+    expect(report.every((s) => s.run!.split("\n").filter((l) => l.includes("npm audit")).every((l) => l.includes("|| true"))),
+      because("開發工具與文件站的 npm audit 要加 `|| true`、只寫進摘要", "它們只在開發與建置時執行；混在紅燈裡，新問題會被舊的蓋掉", PIN_RULE)).toBe(true);
+    for (const s of steps.filter((x) => x.uses?.startsWith("actions/checkout@"))) expect(s.with?.["persist-credentials"]).toBe(false);
+  });
 });

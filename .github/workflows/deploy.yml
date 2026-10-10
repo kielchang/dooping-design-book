@@ -47,11 +47,11 @@ jobs:
     permissions:
       contents: write # 蓋 v* tag、建立 Release
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           # 要讀上一個 v* tag 的 registry/ 來列 registry 異動
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with: { node-version: 22 }
 
       # 規範版號 tag（vX.Y.Z）——給取用端的訊號，不是部署紀錄。

@@ -21,10 +21,13 @@
 
 ## 核准清單
 
-<!-- 只有 staging → main 的 PR 需要。勾完才算核准；勾完後 pr-gate 會自動重跑。 -->
+<!-- 只有 staging → main 的 PR 需要。勾完、填好核准版本才算核准；改完 pr-gate 會自動重跑。 -->
 
 - [ ] `/staging/` 文件站：本版 CHANGELOG 提到的頁看過，候選版橫幅在
 - [ ] `/staging/host/` 手機看過：五種頁型、深色模式、390px 寬
 - [ ] `/staging/storybook/`：本版動到的元件 story 看過
 - [ ] staging run 摘要的 registry 異動清單與 CHANGELOG「我需要做什麼」對得上
 - [ ] token 有變的話：合併後推 `tokens-v<版號>`（token 沒變就勾並註明）
+
+核准版本：<!-- 驗收的是這個 PR 目前的 head commit，填前 7 碼以上。之後再推 commit 就對不上，要重新驗收再改 -->
+

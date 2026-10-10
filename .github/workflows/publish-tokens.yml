@@ -56,13 +56,13 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           # 配對檢查要驗「tag 指向的 commit 在不在 main 上」——
           # 預設的淺層簽出（depth 1）會讓 merge-base 誤判，這個 repo 很小，抓全歷史。
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           cache: npm
@@ -125,7 +125,7 @@ jobs:
           echo "::notice::試跑模式 —— 不會真的發佈，publish job 不會執行"
           npm publish pack/*.tgz --dry-run
       - name: 交出 tarball
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: tokens-tarball
           path: pack/*.tgz
@@ -141,7 +141,7 @@ jobs:
       contents: read
       id-token: write # OIDC：trusted publishing 與 provenance 都靠這個
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
@@ -154,7 +154,7 @@ jobs:
           echo "npm $(npm -v)"
 
       - name: 取回 build 的 tarball
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: tokens-tarball
           path: pack

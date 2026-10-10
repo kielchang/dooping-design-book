@@ -15,6 +15,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, wri
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { rewrite } from "./lib/rewrite.mjs";
+import { isInside } from "./lib/paths.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const REGISTRY = join(ROOT, "registry");
@@ -27,6 +28,8 @@ const rel = (p) => relative(ROOT, p).replace(/\\/g, "/");
 const INSTALL_SET = JSON.parse(readFileSync(join(HOST, "dooping.install.json"), "utf8")).items;
 
 function readItem(name) {
+  // 名稱來自安裝集與 registryDependencies：只收 registry 的 item 命名（小寫英數與 -），不拿它去拼專案外的路徑
+  if (!/^[a-z0-9][a-z0-9-]*$/.test(name)) throw new Error(`item 名稱不合法：「${name}」`);
   const p = join(REGISTRY, `${name}.json`);
   if (!existsSync(p)) throw new Error(`registry 沒有「${name}」——安裝集寫錯，或忘了 npm run build:registry`);
   return JSON.parse(readFileSync(p, "utf8"));
@@ -39,6 +42,8 @@ function walk(dir) {
     return statSync(abs).isDirectory() ? walk(abs) : [abs];
   });
 }
+
+const problems = [];
 
 // 安裝集＋沿 registryDependencies 的遞移閉包（與 `npx shadcn add` 的相依解析同一個語意）
 const resolved = new Map();
@@ -55,14 +60,19 @@ while (queue.length) {
 const expected = new Map();
 // target 以 ~/ 開頭＝專案根目錄（shadcn CLI 的規則；registry:file 用，例如 dooping-check），其餘落在 src/
 const targetPath = (target) => (target.startsWith("~/") ? join(HOST, target.slice(2)) : join(SRC, target));
-for (const item of resolved.values()) for (const f of item.files) expected.set(targetPath(f.target), f.content);
+for (const item of resolved.values()) {
+  for (const f of item.files) {
+    const file = targetPath(f.target);
+    // registry 是提交進來的檔：target 解析後跑出宿主目錄（`../`、絕對路徑）就不寫、也不讀
+    if (!isInside(file, HOST)) problems.push(`${item.name} 的 target 落在宿主目錄外：${f.target}`);
+    else expected.set(file, f.content);
+  }
+}
 
 const DEMO_SRC = join(ROOT, "packages/react/src/demo/sample-data.ts");
 const DEMO_HEADER =
   "// 由 scripts/host-sync.mjs 從 packages/react/src/demo/sample-data.ts 同步——示範資料只有一個來源，請勿手改。\n";
 expected.set(join(SRC, "demo/sample-data.ts"), DEMO_HEADER + rewrite(lf(readFileSync(DEMO_SRC, "utf8"))));
-
-const problems = [];
 
 // 宿主必須宣告每個 item 的 npm 相依。CLI 路徑會自動 npm install，這條路不會——
 // 漏宣告的症狀是建置或執行期才炸，所以在同步時就擋。

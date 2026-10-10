@@ -28,7 +28,7 @@
 npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/data-table.json
 ```
 
-相依會自動一起裝——`data-table` 會帶上 `table` / `input` / `button` / `select` / `tooltip` / `utils`。
+相依會自動一起裝——`data-table` 會帶上 `table`、`input`、`button`、`select`、`tooltip`、`utils` 等；完整清單看該項的 JSON（`/r/data-table.json` 的 `registryDependencies`）。
 全部可用項目列在 <https://kielchang.github.io/dooping-design-book/r/index.json>，
 單品 URL 一律是 `/r/<name>.json`。
 
@@ -61,7 +61,7 @@ Tailwind 的 `content` 掃描範圍要涵蓋落點（`./src/**/*.{ts,tsx}` 已�
 ```
 src/
 ├── components/dooping/    ← 元件（.tsx）
-└── lib/dooping/           ← 工具（utils、use-sort、csv、download、forms-diff）
+└── lib/dooping/           ← 工具（utils、use-sort、use-dialog-state、use-table-url-state、nav、csv、download、forms-diff）
 ```
 
 放在 `dooping/` 子目錄是為了讓「哪些是設計中心來的」一眼可辨，
@@ -92,7 +92,7 @@ src/
   [`book/src/css/demo-base.css`](https://github.com/kielchang/dooping-design-book/blob/main/book/src/css/demo-base.css)。
   注意 **portal 內容**（Dialog／Select／Tooltip／資料表篩選面板）掛在 `body` 直下，
   逃出容器子樹，scope 必須一併涵蓋。驗收方式：`npm run verify:host`
-  對內部試裝宿主跑的那一套（主題配色、頁面級 axe、強制色彩、行動版外殼），取捨見下方「宿主前置條件」。
+  對內部試裝宿主跑的那一套（主題配色、頁面級 axe、強制色彩、行動版外殼）。
 
 ## 取 token
 
@@ -124,9 +124,10 @@ v4 與 v3 的兩個語意差要知道：
 @import "@dooping/tokens/tokens.css";
 
 .my-alert {
-  background: hsl(var(--danger) / 0.1);
-  border: 1px solid hsl(var(--danger) / 0.35);
-  color: hsl(var(--danger));
+  background-color: hsl(var(--danger-subtle));
+  border: 1px solid hsl(var(--danger) / 0.3);
+  border-left: 4px solid currentColor;
+  color: hsl(var(--danger-subtle-foreground));
 }
 ```
 
@@ -141,10 +142,10 @@ module.exports = {
 import { semanticColors, chartColors, TOKENS_VERSION } from "@dooping/tokens";
 
 chartColors("dark");   // 8 色色盲友善色票
-semanticColors();      // 35 個語意色（HSL 三元組）
+semanticColors();      // 47 個語意色（HSL 三元組）
 ```
 
-第四個是 `@dooping/tokens/tokens.json`（來源正本，給非 JS 工具鏈讀）。
+第五個是 `@dooping/tokens/tokens.json`（來源正本，給非 JS 工具鏈讀）。
 
 `tokens.css` 是純 CSS 變數、不含任何 Tailwind 指令，所以不用 Tailwind 也能用。
 深色模式 `.dark` class 與 `[data-theme="dark"]` 屬性兩種鉤子都內建，切換就一行：
@@ -177,7 +178,7 @@ document.documentElement.classList.toggle("dark");
 
 | 層 | 怎麼鎖 | 怎麼知道自己落後了 |
 | --- | --- | --- |
-| token | 鎖到 `/r/index.json` 的 `tokensVersion`（例：`"@dooping/tokens": "^0.6.0"`，以線上為準） | `npm outdated @dooping/tokens` |
+| token | 鎖到 `/r/index.json` 的 `tokensVersion`（例：`"@dooping/tokens": "^0.7.0"`，以線上為準） | `npm outdated @dooping/tokens` |
 | 元件 | **套件層面鎖不了，也不需要**——複製走就是你的程式碼；要記「抄的時候長什麼樣」用 `dooping.lock.json` | `node scripts/dooping-check.mjs`（見下方「怎麼知道有新版」） |
 
 元件複製進來時會帶著**規範版號**戳記（與 GitHub 上的 `vX.Y.Z` tag 同一個號碼）。
@@ -204,7 +205,7 @@ npm ls @dooping/tokens; curl -s https://kielchang.github.io/dooping-design-book/
 ### 怎麼知道有新版
 
 - **推播（建議）**：repo 頁 Watch → Custom → **Releases**。每次進版自動發 Release，
-  **notes 就是 CHANGELOG 那一則全文**——通知本身回答三問，不用點連結；
+  **notes 就是 CHANGELOG 那一則全文**——通知本身就寫明對你的意義、改了什麼、你要做什麼，不用點連結；
   末尾附「這一版動到的 registry item」（內容有變／只因相依受影響／新增／移除），對照自己抄過的就知道要不要重抄。
   RSS：`https://github.com/kielchang/dooping-design-book/releases.atom`
 - **例行檢查（建議放進 CI）**：裝 `dooping-check` 這個 registry item，`init` 列出你主動裝過的 item，
@@ -238,7 +239,7 @@ npm ls @dooping/tokens; curl -s https://kielchang.github.io/dooping-design-book/
 | 本地實作 | 狀態 | 上游對應 | 原因（偏離必填） |
 | --- | --- | --- | --- |
 | 資料表 | 遵循 | data-table | — |
-| <元件或模式> | 自製 | （已回饋：DESIGN task #<id>） | 上游尚無，已回饋待分流 |
+| <元件或模式> | 自製 | （已回饋：#<issue>） | 上游尚無，已回饋待分流 |
 | <元件或模式> | 刻意偏離 | <對應項> | <寫成可被推翻的形式> |
 
 ## 不需要對齊
@@ -258,38 +259,33 @@ npm ls @dooping/tokens; curl -s https://kielchang.github.io/dooping-design-book/
 - 等第一個專案完整導入過一輪、暴露出命名與缺漏問題並修正後，才會切 1.0.0
 
 變更一律記在 [CHANGELOG](https://github.com/kielchang/dooping-design-book/blob/main/CHANGELOG.md)。
-每則都回答「改了什麼／你要做什麼／為什麼改」，不需要調整時會明說。
+每則開頭一句對你的意義，每項回答「改了什麼／你要做什麼」，不需要調整時會明說。
 
 ## 回饋到上游
 
 元件、token、頁型用起來有問題——**不符規範、用起來卡、想改設計、上游缺件**——就送一則回饋。
-回饋收在維護方的 PMIS（系統代號 `DESIGN`）：有 PMIS MCP（`mcp__pmis__*` 工具）的 agent 直接開一個 task。
-沒有 PMIS 工具、或你的專案在 PMIS 還沒有系統代號，改走下方「去哪裡提」的 GitHub 表單——不要為了送回饋自己 `create_system`。
+**你的專案設定（例如專案的 `CLAUDE.md`）另有指定回饋管道的，照它；否則開一則 GitHub issue。**
 
-- **跟台帳同一刻送**：台帳記一列「自製」或「刻意偏離」、或發現行為與規範不符的當下就送，**不必等自己用到第三次**。
-  單一專案只看得到自己的用例，三次法則由上游守門人跨系統數。
+- **跟台帳同一刻送**：台帳記一列「自製」或「刻意偏離」、或發現行為與規範不符的當下就送，**不必等自己用到第三次**——三次法則由上游守門人數。
 - **一則＝一個場景＝一次證據**：同樣的事在另一處又遇到，就再送一則，不要改舊的；
   知道有同對象的舊回饋，在「問題」第一行寫「同 #N」。
-- **送出後交給守門人**：不改狀態、不掛 feature、不設到期日——分流規則見文件站「治理 → 回饋與 RFC 流程」。
-  把 task 編號記進台帳那一列的「上游對應」（`（已回饋：DESIGN task #<id>）`）。
+- **issue 是公開的**：送出前把內容給你的使用者看過、取得同意。不寫內部系統名稱、業務資料、內部網址、帳密或連線資訊——
+  「專案」寫泛稱即可（例如「內部後台 A」）。
+- **安全問題不開 issue**：照 [SECURITY.md](https://github.com/kielchang/dooping-design-book/blob/main/SECURITY.md) 走私密回報。
+- **送出後交給守門人**：不自己改標題、加 label 或關閉——分流規則見文件站「治理 → 回饋與 RFC 流程」。
+  把 issue 編號記進台帳那一列的「上游對應」（`（已回饋：#<issue>）`）。
 
-```json title="回饋：create_task 參數"
-{
-  "systemCode": "DESIGN",
-  "title": "[回饋] <對象>：<一句話講問題>",
-  "priority": "medium",
-  "author": "agent:<你的系統代號小寫>",
-  "description": "<照下方骨架填好的 markdown>"
-}
+```bash title="回饋：送出指令"
+gh issue create --repo kielchang/dooping-design-book --title "[回饋] <對象>：<一句話講問題>" --body-file feedback.md
 ```
 
-`priority` 平常填 `medium`；**無障礙或安全問題填 `high`**，不必等三次，也不要開公開 issue。
-無障礙指「有人因此用不了或看不出來」：對比不足、只靠顏色傳達、鍵盤或螢幕閱讀器操作不了、聚焦看不見；拿不準就填 `high`，守門人會改判。
-`status`、`featureId`、`dueDate` 不要帶——那是守門人分流用的欄位。
+`feedback.md` 照下方骨架填。沒有 `gh` 或沒有權杖時，把填好的內容交給使用者，請他從
+<https://github.com/kielchang/dooping-design-book/issues/new/choose> 挑最接近的表單（不符規範→Bug、缺件→缺件認領、設計變更→RFC），
+標題加 `[回饋]` 前綴，內容貼進第一個說明欄。
 
-```markdown title="回饋：description 骨架"
+```markdown title="回饋：issue 內容骨架"
 ## 來源
-- 系統代號：<你的 systemCode>
+- 專案：<專案名稱或泛稱>
 - 上游版本：v<台帳記的上游版本，即抄走當下 /r/index.json 的 version>（tokens <npm ls @dooping/tokens 的版本>）
 
 ## 對象
@@ -314,10 +310,10 @@ npm ls @dooping/tokens; curl -s https://kielchang.github.io/dooping-design-book/
 <你目前的替代做法，以及它的代價>
 ```
 
-八段都要有，不知道就寫「不確定」。「類型」分不清是不符規範還是設計變更（不知道上游有沒有規定），填「使用摩擦・設計變更建議」，守門人分流時會改判。
+八段都要有，不知道就寫「不確定」。「類型」分不清是不符規範還是設計變更（不知道上游有沒有規定），填「使用摩擦・設計變更建議」。
+無障礙問題（有人因此用不了或看不出來：對比不足、只靠顏色傳達、鍵盤或螢幕閱讀器操作不了、聚焦看不見）在「類型」後加註「無障礙」，不必等三次。
 tokens 寫實際裝的版本（`npm ls`）；與台帳記的配對版本不同時兩個都寫。後四段就是台帳四題（問題、建議、影響範圍、如果不改會怎樣）——台帳寫一次、回饋照抄。
-「建議」裡的程式或文案示範用中性詞（項目／單位／類別／批次／紀錄）：被收錄時會原樣進公開的元件與文件，
-領域詞會被上游的 `tests/de-domain.test.ts` 擋下。
+「建議」裡的程式或文案示範用中性詞（項目／單位／類別／批次／紀錄），領域詞會被上游的 `tests/de-domain.test.ts` 擋下。
 
 ## 想把東西加回這個 repo
 
@@ -343,13 +339,13 @@ npm run build:registry # 元件改了就要重新產生 registry JSON 並一起�
 
 | 要提的是 | 門口 |
 | --- | --- |
-| **用的過程中**遇到的任何問題或建議（有 PMIS MCP 的 agent） | 本頁「回饋到上游」→ PMIS `DESIGN` 的 task |
+| **用的過程中**遇到的任何問題或建議（取用端 agent） | 本頁「回饋到上游」→ 標題 `[回饋]` 的 GitHub issue |
 | Bug（行為與規範不符） | <https://github.com/kielchang/dooping-design-book/issues/new?template=bug.yml> |
 | 小調整（文案、對比、一個 prop） | 直接開 PR，模板自帶自查清單 |
 | 新元件／新 token／改語意 | <https://github.com/kielchang/dooping-design-book/issues/new?template=rfc.yml>（五題逐欄） |
 | 頁面章缺件表的項目 | <https://github.com/kielchang/dooping-design-book/issues/new?template=missing-piece.yml>（一則＝三次法則的一次證據） |
 
-第一列以外的 GitHub 門口給人，以及沒有 PMIS 的外部讀者。守門人與分流見文件站「治理 → 回饋與 RFC 流程」；
+安全問題不走上面任何一條，照 SECURITY.md 私密回報。守門人與分流見文件站「治理 → 回饋與 RFC 流程」；
 **先在宿主做、台帳記自製，同時回饋——三次法則由上游數**（符合性台帳的順序）。
 
 ## 入口
@@ -359,4 +355,4 @@ npm run build:registry # 元件改了就要重新產生 registry JSON 並一起�
 - 📦 Registry 索引 <https://kielchang.github.io/dooping-design-book/r/index.json>
 - 🤖 機器地圖 <https://kielchang.github.io/dooping-design-book/llms.txt>
 - 🏗 系統架構（想貢獻先讀）[ARCHITECTURE.md](https://github.com/kielchang/dooping-design-book/blob/main/ARCHITECTURE.md)
-- 💬 提出建議：agent 照本頁「回饋到上游」送 PMIS；人走 <https://github.com/kielchang/dooping-design-book/issues/new/choose>
+- 💬 提出建議：agent 照本頁「回饋到上游」開 issue；人走 <https://github.com/kielchang/dooping-design-book/issues/new/choose>

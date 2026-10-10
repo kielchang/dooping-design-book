@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "app-menubar",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "type": "registry:ui",
   "title": "AppMenubar 功能選單列",
   "description": "多應用外殼的頂部功能選單：NavGroup[] 一組一個頂層選單（Radix Menubar），窄版收成單一選單。",

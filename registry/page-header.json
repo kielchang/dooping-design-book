@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "page-header",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "type": "registry:ui",
   "title": "PageHeader 頁首",
   "description": "頁首骨架三件：PageHeader（一頁一個 h1）、BackLink（真連結返回）、Breadcrumb（三層以上）。",

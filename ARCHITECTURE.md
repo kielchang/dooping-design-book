@@ -95,6 +95,7 @@ AGENTS.md ──(book/scripts/sync-root-docs.mjs)──► book/static/AGENTS.md
 | `tests/tokens-v4.test.ts` | 用 Tailwind v4 真的編 `dist/tailwind.css`：色鍵、透明度修飾、預設色盤清空、深色 variant、基座 | 同上 |
 | `tests/color.test.ts` | 把 `verify:color` 接進 `npm test`：無不合格項、六主題都在、brand 對比、聚焦環中性 | 門檻本身（在 `scripts/verify-color.mjs`） |
 | `tests/cn.test.ts` | `cn()` 的 tailwind-merge 分群：字級與文字色、漸層與底色互不吃 | 元件 class 的內容 |
+| `tests/csv.test.ts` | `csvEscape` 公式開頭的文字補 `'`、數字與純數字文字不補；序列化與解析往返 | 試算表軟體實際怎麼開檔、下載觸發（`saveBlob`） |
 | `tests/tailwind-compat.test.ts` | 元件只用 v3／v4 語意相同的 utility：禁兩版值不同的裸 utility、v4 限定語法、只靠 hover 揭露 | 兩版共有且同值的 class |
 | `tests/de-domain.test.ts` | 全庫文字 ↔ 176 詞領域黑名單，零容忍 | 英文變體以外的拼法（詞表列什麼擋什麼） |
 | `tests/demo-data.test.ts` | 示範資料只能來自 `demo/sample-data.ts`（含 `demo/generate.ts`） | 資料值本身 |

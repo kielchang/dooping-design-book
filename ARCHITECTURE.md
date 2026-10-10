@@ -115,6 +115,7 @@ AGENTS.md ──(book/scripts/sync-root-docs.mjs)──► book/static/AGENTS.md
 | `tests/changelog.test.ts` | CHANGELOG 每節前是「空行、---、空行」；目前版號的 Release notes 只含自己這一節（測的是 deploy 實際呼叫的 `scripts/lib/changelog.mjs`） | 內容是否寫明對你的意義與兩問 |
 | `tests/deploy-gh-pages.test.ts` | 部署腳本對臨時 bare repo 實跑：根目錄部署保留 `preview/`、`staging/`；段部署只動自己的目錄；目標不在清單上就拒絕；push 被拒時重抓重套再推 | Pages 有沒有真的建置出來（部署後冒煙） |
 | `tests/workflow-contract.test.ts` | `.github/rulesets/` 要求的必過檢查都對得到真的 job 與觸發事件；檢查名不重複；必過 job 不會被 `if:` 跳過（staging 一定傳 `consumer`／`deploy`）；沒有 paths 過濾；concurrency 每段一組；手動觸發有分支守門；publish-tokens 手動發佈過配對閘；部署目錄＝`STAGE_DIRS`；寫入權只在 `deploy` job（其餘唯讀、簽出不留憑證、冒煙要求部署成功、release 只認 main 上的 tag）；npm 發佈身分只在不跑專案程式的 `publish` job | GitHub 上的 ruleset 有沒有真的套用（`gh api …/rules/branches/main`） |
+| `tests/session-hook.test.ts` | 本機 SessionStart 掛勾只在 session 啟動時跑（`matcher: "startup"`）；origin 只把舊名 `kielchang/doping-design-book` 校正成正式位址，fork、鏡像、其他名字的 remote 不動（取出腳本那一段在臨時 repo 實跑） | 掛勾的安裝與建置步驟本身；Claude Code 怎麼解讀 matcher |
 | `tests/release-gate.test.ts` | 發版閘每條規則各轉紅一次：版號遞增、tag 未被佔、CHANGELOG 已改名且標題對得上版號、分支只准 staging←dev／main←staging、合併後樹＝來源、核准清單勾完；抓不到 main 時 release 失敗 | git 那一層（CI 實跑）；CHANGELOG 內容是否寫明對你的意義與兩問 |
 | `tests/guard-ledger.test.ts` | 這張表列出每一支 `tests/*.test.ts` 與 `scripts/verify-*.mjs`、`host-sync.mjs` | 表格描述是否準確 |
 

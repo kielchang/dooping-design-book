@@ -20,7 +20,8 @@ npm run build:tokens
 | `book/src/css/kit.css` | `@import` 兩個產物（v4 管線；demo-base 由 `book/scripts/port-preflight.mjs` 產生） |
 
 乾淨 clone 之後不先跑 `build:tokens`，`npm test`、Storybook、文件站**三者都會失敗**。
-`.claude/hooks/session-start.sh` 會自動處理（含 `book/` 的安裝），手動操作時要自己記得。
+`.claude/hooks/session-start.sh` 會在 Claude Code session 啟動時自動處理（含 `book/` 的安裝）；
+清空對話、壓縮、恢復時不跑，中途切換分支後要自己重跑上面兩行。手動操作時也要自己記得。
 
 ## 驗證指令（PR 前四道全過）
 

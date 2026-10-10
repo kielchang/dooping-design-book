@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "dooping-check",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "type": "registry:file",
   "title": "dooping-check 更新檢查",
   "description": "取用端的 lock 與例行檢查：已是最新／上游有更新／本地改過。",

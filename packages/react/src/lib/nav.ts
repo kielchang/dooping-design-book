@@ -19,6 +19,11 @@ export interface NavLeaf {
   badge?: NavBadge;
   /** 外部連結（操作手冊這類）：target=_blank、不參與 active 判定。 */
   external?: boolean;
+  /**
+   * 這一項代表的應用用哪一組環境色主題（`data-color-theme` 的值）。應用切換清單用它畫一塊
+   * 「那個系統的外殼色」縮影，一眼認出每個應用；名稱照舊顯示，不靠顏色單獨辨識。
+   */
+  colorTheme?: string;
   items?: never;
   action?: never;
 }
@@ -116,4 +121,21 @@ export function isNavActive(url: string, currentPath: string, opts: { exact?: bo
   if (target === current) return true;
   if (opts.exact) return false;
   return target !== "/" && current.startsWith(`${target}/`);
+}
+
+const SAFE_NAV_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:"]);
+
+/**
+ * 導覽連結的網址白名單：相對路徑、http、https、mailto、tel 原樣放行，其他一律換成 `"#"`。
+ *
+ * 導覽資料常從後台設定或資料庫來；`javascript:`、`data:` 這類網址點下去會執行內容，
+ * React 18 不會擋。判斷交給瀏覽器同一套網址解析（會先剝掉開頭空白與夾在中間的 Tab、換行），
+ * 所以 ` javascript:` 或拆開的寫法也擋得住。SidebarNav、AppMenubar、CommandPalette 都經過它。
+ */
+export function safeNavUrl(url: string): string {
+  try {
+    return SAFE_NAV_PROTOCOLS.has(new URL(url, "http://relative.invalid").protocol) ? url : "#";
+  } catch {
+    return "#";
+  }
 }

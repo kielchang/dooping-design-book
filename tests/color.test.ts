@@ -1,4 +1,4 @@
-// 色彩守衛：六組色相主題 × 淺深兩模式的對比與色覺障礙門檻。
+// 色彩守衛：全部環境色主題 × 淺深兩模式的對比與色覺障礙門檻。
 //
 // 檢查邏輯放在 scripts/verify-color.mjs（也可以單獨跑來看完整報告），
 // 這裡只把它接進 `npm test`，讓它跟其他守衛一起擋 PR。
@@ -18,7 +18,10 @@ const { fail, warn, stats } = runChecks() as {
   fail: string[];
   warn: string[];
   stats: {
-    themes: Record<string, { brandText: number; subtleText: number; ring: number; nearestStatusD: number }>;
+    themes: Record<string, {
+      shellText: number; shellSecondary: number; accentDelta: number; accentText: number; ring: number;
+    }>;
+    palette: { within: number; cross: number; count: number };
     chart: Record<string, { worst: number; lightnessRange: number; minContrast: number }>;
   };
 };
@@ -28,30 +31,31 @@ describe("色彩", () => {
     expect(fail, `\n${fail.join("\n")}\n`).toEqual([]);
   });
 
-  it("六組色相主題都在", () => {
-    expect(Object.keys(stats.themes)).toHaveLength(12); // 6 主題 × 2 模式
+  it("十八組環境色主題都在", () => {
+    expect(Object.keys(stats.themes)).toHaveLength(36); // 18 主題 × 2 模式
   });
 
-  it("每組主題的 brand 與 brand-subtle 文字都過 4.5:1", () => {
+  // 主題只換外殼（側欄＋表頭）。外殼上的字、群組標題（sidebar-foreground/70）、
+  // 選中項上的字都是正文，一律 4.5:1。
+  it("每組主題的外殼文字、次要文字、選中項文字都過 4.5:1", () => {
     for (const [tag, s] of Object.entries(stats.themes)) {
-      expect(s.brandText, `${tag} brand 文字`).toBeGreaterThanOrEqual(4.5);
-      expect(s.subtleText, `${tag} subtle 文字`).toBeGreaterThanOrEqual(4.5);
+      expect(s.shellText, `${tag} 外殼文字`).toBeGreaterThanOrEqual(4.5);
+      expect(s.shellSecondary, `${tag} 外殼次要文字`).toBeGreaterThanOrEqual(4.5);
+      expect(s.accentText, `${tag} 選中項文字`).toBeGreaterThanOrEqual(4.5);
     }
   });
 
-  it("每組主題的 ring 對該模式最亮表面都過 3:1（WCAG 1.4.11 非文字）", () => {
+  it("每組主題的外殼聚焦環都過 3:1（WCAG 1.4.11 非文字）", () => {
     for (const [tag, s] of Object.entries(stats.themes)) {
-      expect(s.ring, `${tag} ring`).toBeGreaterThanOrEqual(3);
+      expect(s.ring, `${tag} 外殼聚焦環`).toBeGreaterThanOrEqual(3);
     }
   });
 
-  // 主題色如果看起來像某個狀態色，使用者會停止把那個顏色讀成狀態。
-  // 這條擋掉過一組候選：松綠 178° 距 success 162° 只有 16°，量出來 ΔE00 17.4，
-  // 數字過得了但確實最像狀態色，因此沒有收進預設清單。
-  it("每組主題的 brand 與最近的狀態色至少差 ΔE00 12", () => {
-    for (const [tag, s] of Object.entries(stats.themes)) {
-      expect(s.nearestStatusD, `${tag} brand 與最近狀態色`).toBeGreaterThanOrEqual(12);
-    }
+  // 色票要「同族看得出是一家、跨族一眼分得開」，靠大區塊的顏色認出所在環境才成立。
+  it("環境色票：同族 ≥ ΔE00 8、跨族 ≥ ΔE00 10", () => {
+    expect(stats.palette.count).toBe(17); // 預設的淺色外殼不參與
+    expect(stats.palette.within).toBeGreaterThanOrEqual(8);
+    expect(stats.palette.cross).toBeGreaterThanOrEqual(10);
   });
 
   // 這是上一版的實際缺陷：8 色裡 6 色淺深共用值，把 L 鎖進 [0.49,0.67] 的窄帶，

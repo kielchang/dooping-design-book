@@ -12,13 +12,14 @@ import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, rmSync }
 import { dirname, join, basename, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { rewrite } from "./lib/rewrite.mjs";
+import { outputDirUnder } from "./lib/paths.mjs";
 import { fingerprints } from "./lib/fingerprint.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = join(ROOT, "packages/react/src");
 // REGISTRY_OUT：內部試裝宿主要一份「base 指向本機伺服器」的 registry（scripts/host-add.mjs），
-// 那份不能覆寫進版控的 registry/。預設值不變。
-const OUT = join(ROOT, process.env.REGISTRY_OUT ?? "registry");
+// 那份不能覆寫進版控的 registry/。預設值不變。輸出目錄會整個刪掉重建，只接受 repo 底下的相對路徑（空字串、..、絕對路徑都擋）。
+const OUT = outputDirUnder(ROOT, process.env.REGISTRY_OUT ?? "registry", "REGISTRY_OUT");
 const BASE = (process.env.REGISTRY_BASE ?? "https://kielchang.github.io/dooping-design-book").replace(/\/$/, "");
 
 /** 目標專案的落點：元件一律 components/dooping/、工具一律 lib/dooping/。 */

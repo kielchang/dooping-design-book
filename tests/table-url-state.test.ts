@@ -11,6 +11,7 @@ import {
   type TableUrlState, type UrlStateAdapter,
 } from "../packages/react/src/lib/use-table-url-state";
 import type { DataTableState } from "../packages/react/src/ui/data-table";
+import { because } from "./lib/guard";
 
 // ── 型別相容斷言（編譯期）────────────────────────────────────
 // TableUrlState 必須恰好是 DataTableState 去掉兩個暫時狀態鍵的子集，雙向可指派。
@@ -78,6 +79,34 @@ describe("round-trip", () => {
     const s = deserializeTableState("q=%E7%94%B2&utm_source=x&page=abc", DEFAULTS);
     expect(s.query).toBe("甲");
     expect(s.page).toBe(0); // page=abc 不是合法頁碼
+  });
+});
+
+// 網址是任何人都能改的輸入：特殊欄名不能改到物件原型、壞掉的 % 跳脫不能讓整張表丟例外。
+describe("deserializeTableState：故意改壞的網址", () => {
+  const RULE = "packages/react/src/lib/use-table-url-state.ts 的 UNSAFE_KEYS 與 dec 說明";
+  const WHY = "表格狀態寫在網址裡，任何人都能改；讀網址不能改到物件原型，也不能因為一個壞參數讓整張表當掉";
+
+  it("__proto__、constructor、prototype 當欄名一律略過，不改到原型", () => {
+    const s = deserializeTableState("f.__proto__=x&ft.constructor=y&fr.prototype=1..2&f.unit=%E7%94%B2", DEFAULTS);
+    expect(Object.getPrototypeOf(s.filters), because("filters 的原型被網址改掉了", WHY, RULE)).toBe(Object.prototype);
+    expect(Object.keys(s.filters), because("特殊欄名要略過，只留正常欄", WHY, RULE)).toEqual(["unit"]);
+    expect(s.filters.unit.values).toEqual(["甲"]);
+    expect(({} as Record<string, unknown>).values, because("全域 Object.prototype 不能被污染", WHY, RULE)).toBeUndefined();
+  });
+
+  it("壞掉的 % 跳脫不丟例外，解不開就保留原字", () => {
+    // URLSearchParams 先解一層：%25E0%25A4 → 「%E0%A4」，再解第二層會丟 URIError
+    expect(() => deserializeTableState("f.unit=%25E0%25A4&ft.name=%25&fr.qty=%25E0..5", DEFAULTS),
+      because("壞掉的 % 跳脫讓解析丟了例外", WHY, RULE)).not.toThrow();
+    const s = deserializeTableState("f.unit=%25E0%25A4&ft.name=%25&fr.qty=%25E0..5", DEFAULTS);
+    expect(s.filters.unit.values).toEqual(["%E0%A4"]);
+    expect(s.filters.name.texts).toEqual(["%"]);
+    expect(s.filters.qty).toMatchObject({ min: "%E0", max: "5" });
+  });
+
+  it("沒有欄名的篩選鍵（f.）略過", () => {
+    expect(Object.keys(deserializeTableState("f.=x&ft.=y", DEFAULTS).filters)).toEqual([]);
   });
 });
 

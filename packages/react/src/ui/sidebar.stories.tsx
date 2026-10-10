@@ -7,9 +7,9 @@ import {
 import { AppShell } from "./app-shell";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarTrigger } from "./sidebar";
 import { SidebarNav, type SidebarNavLinkProps } from "./sidebar-nav";
+import type { NavGroup } from "../lib/nav";
 import { Badge } from "./badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./card";
-import { Separator } from "./separator";
 import { demoNavGroups } from "../demo/sample-data";
 
 const meta: Meta = { title: "元件/外殼/應用外殼・側邊欄" };
@@ -47,11 +47,13 @@ function Shell({
   mobileQuery = FORCE_DESKTOP,
   defaultOpen,
   collapsible,
+  navGroups = groups,
 }: {
   currentPath: string;
   mobileQuery?: string;
   defaultOpen?: boolean;
   collapsible?: "icon" | "offcanvas";
+  navGroups?: NavGroup[];
 }) {
   return (
     <AppShell
@@ -61,19 +63,19 @@ function Shell({
         <Sidebar collapsible={collapsible}>
           <SidebarHeader>
             <div className="flex h-9 items-center gap-2 px-2 font-semibold">
-              <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-brand text-xs text-brand-foreground">帳</span>
+              <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-sidebar-primary text-xs text-sidebar-primary-foreground">帳</span>
               <span className="truncate group-data-[state=collapsed]/sidebar:sr-only">內部作業系統</span>
             </div>
           </SidebarHeader>
           <SidebarContent>
-            <SidebarNav groups={groups} currentPath={currentPath} renderLink={storyLink} />
+            <SidebarNav groups={navGroups} currentPath={currentPath} renderLink={storyLink} />
           </SidebarContent>
         </Sidebar>
       }
       header={
         <>
+          {/* 側欄開關：只在行動版出現（桌面版收合走側欄右緣的拉環） */}
           <SidebarTrigger />
-          <Separator orientation="vertical" className="h-5" />
           <span className="text-sm font-medium">工作台</span>
           {/* 全域健康度狀態列：可點的數字，見〈後台系統的資訊架構〉 */}
           <a href="#pending" onClick={(e) => e.preventDefault()} className="ml-auto">
@@ -115,11 +117,16 @@ export const 收合成圖示欄: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const doc = canvasElement.ownerDocument;
-    const trigger = canvas.getByRole("button", { name: "切換側邊欄" });
-    await userEvent.click(trigger);
+    // 桌面版頂列沒有切換鈕，收合走側欄右緣的拉環
+    await expect(canvas.queryByRole("button", { name: "切換側邊欄" })).toBeNull();
+    const pull = canvas.getByRole("button", { name: "收合側邊欄" });
+    await userEvent.click(pull);
+    // 滑鼠移開拉環，它的提示才會收——下面要驗的是連結自己的提示
+    await userEvent.unhover(pull);
     const aside = canvasElement.querySelector("aside");
     await waitFor(() => expect(aside).toHaveAttribute("data-state", "collapsed"));
-    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await expect(pull).toHaveAccessibleName("展開側邊欄");
+    await expect(pull).toHaveAttribute("aria-expanded", "false");
     // 收合後連結的可及名稱不能消失
     const link = canvas.getByRole("link", { name: /工作台/ });
     await userEvent.hover(link);
@@ -133,7 +140,89 @@ export const 收合成圖示欄: Story = {
     await userEvent.keyboard("{Escape}");
     await waitFor(() => expect(within(doc.body).queryByRole("menu")).toBeNull());
     // 收尾：展開回來，別讓視覺掃描拿到收合畫面
-    await userEvent.click(trigger);
+    await userEvent.click(pull);
+    await userEvent.unhover(pull);
+    await waitFor(() => expect(aside).toHaveAttribute("data-state", "expanded"));
+  },
+};
+
+// 導覽資料可能來自後台設定：一筆危險網址、一個收合後要往右彈出的外部子連結
+const guardedGroups: NavGroup[] = [
+  ...groups,
+  {
+    title: "外部資源",
+    items: [
+      { title: "未檢查的連結", url: "javascript:alert(1)", icon: CircleHelp },
+      { title: "參考資料", icon: BookOpen, items: [{ title: "外部文件", url: "https://example.com/docs", external: true }] },
+    ],
+  },
+];
+
+export const 連結網址白名單: Story = {
+  render: () => <Shell currentPath="/workbench" navGroups={guardedGroups} />,
+  // 契約：javascript: 這類網址渲染成 #（點了不會執行）；收合態往右彈出的外部子連結跟展開態一樣開新分頁、不給 opener。
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const doc = canvasElement.ownerDocument;
+    await expect(canvas.getByRole("link", { name: /未檢查的連結/ })).toHaveAttribute("href", "#");
+
+    const pull = canvas.getByRole("button", { name: "收合側邊欄" });
+    await userEvent.click(pull);
+    await userEvent.unhover(pull);
+    const aside = canvasElement.querySelector("aside");
+    await waitFor(() => expect(aside).toHaveAttribute("data-state", "collapsed"));
+    await userEvent.click(canvas.getByRole("button", { name: /參考資料/ }));
+    const item = await within(doc.body).findByRole("menuitem", { name: "外部文件" });
+    await expect(item).toHaveAttribute("target", "_blank");
+    await expect(item).toHaveAttribute("rel", "noreferrer");
+    await expect(item).not.toHaveAttribute("aria-current");
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(within(doc.body).queryByRole("menu")).toBeNull());
+    // 收尾：展開回來，別讓視覺掃描拿到收合畫面
+    await userEvent.click(pull);
+    await userEvent.unhover(pull);
+    await waitFor(() => expect(aside).toHaveAttribute("data-state", "expanded"));
+  },
+};
+
+export const 拉環拖拉與鍵盤: Story = {
+  render: () => <Shell currentPath="/workbench" />,
+  // 契約：拉環有文字提示；往左拖收合、往右拖展開（拖完不能又被當成點擊切回去）；鍵盤 Enter 切換、名稱跟著狀態變。
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const aside = canvasElement.querySelector("aside") as HTMLElement;
+    const pull = () => canvas.getByRole("button", { name: /^(收合|展開)側邊欄$/ });
+    const drag = async (dx: number) => {
+      const r = pull().getBoundingClientRect();
+      const x = r.left + r.width / 2;
+      const y = r.top + r.height / 2;
+      await userEvent.pointer([
+        { keys: "[MouseLeft>]", target: pull(), coords: { clientX: x, clientY: y } },
+        { target: pull(), coords: { clientX: x + dx, clientY: y } },
+        { keys: "[/MouseLeft]", target: pull(), coords: { clientX: x + dx, clientY: y } },
+      ]);
+    };
+
+    await userEvent.hover(pull());
+    const tip = await canvas.findByRole("tooltip");
+    await expect(tip).toHaveTextContent("收合側邊欄");
+    // 提示貼在拉環右側 8px：泡泡還沒定位時若佔版面，錨點會被撐寬、提示整個往右偏
+    await waitFor(() =>
+      expect(Math.abs(tip.getBoundingClientRect().left - (pull().getBoundingClientRect().right + 8))).toBeLessThanOrEqual(2));
+    await userEvent.unhover(pull());
+
+    await drag(-60);
+    await waitFor(() => expect(aside).toHaveAttribute("data-state", "collapsed"));
+    await expect(pull()).toHaveAccessibleName("展開側邊欄");
+    await drag(60);
+    await waitFor(() => expect(aside).toHaveAttribute("data-state", "expanded"));
+
+    pull().focus();
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(aside).toHaveAttribute("data-state", "collapsed"));
+    await expect(pull()).toHaveAttribute("aria-expanded", "false");
+    // 收尾：展開回來，別讓視覺掃描拿到收合畫面
+    await userEvent.keyboard("{Enter}");
     await waitFor(() => expect(aside).toHaveAttribute("data-state", "expanded"));
   },
 };
@@ -141,18 +230,24 @@ export const 收合成圖示欄: Story = {
 export const 收合成完全隱藏: Story = {
   render: () => <Shell currentPath="/workbench" collapsible="offcanvas" />,
   // 契約：offcanvas 收合後側欄整塊移出畫面與 Tab 順序（inert）；滑鼠碰左緣窺看——
-  // 浮在內容上、不推版面；Esc 或滑鼠離開就收；釘選展開走 SidebarTrigger（鍵盤與觸控的路）。
+  // 浮在內容上、不推版面；Esc 或滑鼠離開就收；釘選展開走留在左緣的拉環（點擊、拖拉、鍵盤都行）。
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const doc = canvasElement.ownerDocument;
-    const trigger = canvas.getByRole("button", { name: "切換側邊欄" });
     const aside = canvasElement.querySelector("aside") as HTMLElement;
     const main = canvasElement.querySelector("main") as HTMLElement;
     const mainLeft = () => main.getBoundingClientRect().left;
     const pinnedLeft = mainLeft();
 
-    await userEvent.click(trigger);
+    await userEvent.click(canvas.getByRole("button", { name: "收合側邊欄" }));
     await waitFor(() => expect(aside).toHaveAttribute("inert"));
+    // 拉環不在 inert 的側欄裡：收合後仍留在左緣、Tab 得到
+    const pull = canvas.getByRole("button", { name: "展開側邊欄" });
+    await expect(aside.contains(pull)).toBe(false);
+    pull.focus();
+    await expect(doc.activeElement).toBe(pull);
+    pull.blur();
+    await waitFor(() => expect(pull.getBoundingClientRect().left).toBeLessThan(8), { timeout: 3000 });
     await waitFor(() => expect(aside.getBoundingClientRect().right).toBeLessThanOrEqual(0));
     // 工作區拿回整個寬度
     await waitFor(() => expect(mainLeft()).toBeLessThan(pinnedLeft));
@@ -169,7 +264,7 @@ export const 收合成完全隱藏: Story = {
     await expect(aside).not.toHaveAttribute("inert");
     await waitFor(() => expect(aside.getBoundingClientRect().left).toBe(0));
     expect(mainLeft()).toBe(collapsedLeft);
-    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await expect(pull).toHaveAttribute("aria-expanded", "false");
 
     // Esc 收（焦點不在側欄裡也要收得掉）
     await userEvent.keyboard("{Escape}");
@@ -182,8 +277,8 @@ export const 收合成完全隱藏: Story = {
     await waitFor(() => expect(aside).not.toHaveAttribute("data-peek"));
     await expect(aside).toHaveAttribute("inert");
 
-    // 收尾：釘選展開回來（推開內容），別讓視覺掃描拿到收合畫面
-    await userEvent.click(trigger);
+    // 收尾：用拉環釘選展開回來（推開內容），別讓視覺掃描拿到收合畫面
+    await userEvent.click(canvas.getByRole("button", { name: "展開側邊欄" }));
     await waitFor(() => expect(aside).not.toHaveAttribute("inert"));
     await waitFor(() => expect(mainLeft()).toBe(pinnedLeft));
   },

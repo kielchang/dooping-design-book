@@ -7,7 +7,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
-  approvalChecklist,
+  approvalChecklist, approvedVersion,
   compareVersions,
   evaluateBumpGuard,
   evaluatePr,
@@ -40,7 +40,8 @@ const base = (over: Partial<GateState> = {}): GateState => ({
   ...over,
 });
 
-const CHECKED = ["## 核准清單", "", "- [x] 甲", "- [x] 乙", "- [X] 丙", "- [x] 丁", "- [x] 戊"].join(LF);
+const HEAD = "4f2c9e1a7b3d5f60817293a4b5c6d7e8f9012345";
+const CHECKED = ["## 核准清單", "", "- [x] 甲", "- [x] 乙", "- [X] 丙", "- [x] 丁", "- [x] 戊", "", "核准版本：`4f2c9e1`"].join(LF);
 const pr = (over: Partial<PrState> = {}): PrState => ({
   ...base(),
   baseRef: "staging",
@@ -48,6 +49,7 @@ const pr = (over: Partial<PrState> = {}): PrState => ({
   headRepo: "kielchang/dooping-design-book",
   repository: "kielchang/dooping-design-book",
   prBody: "",
+  headSha: HEAD,
   treeEqual: true,
   ...over,
 });
@@ -148,6 +150,18 @@ describe("pr（PR → staging／main）", () => {
     const body = ["## 自查", "- [ ] 別區的", "", "## 核准清單", "- [x] 甲", "- [ ] 乙", "", "## 備註", "- [ ] 也不算"].join(LF);
     expect(approvalChecklist(body)).toEqual([{ checked: true, text: "甲" }, { checked: false, text: "乙" }]);
     expect(approvalChecklist("")).toBeNull();
+  });
+
+  it("main 的 PR：核准版本沒寫、或不是目前的 head（核准後又推了 commit）→ 紅", () => {
+    const toMain = { baseRef: "main", headRef: "staging" };
+    const noVersion = CHECKED.replace("核准版本：`4f2c9e1`", "核准版本：<!-- 勾完後填 -->");
+    expect(hit(evaluatePr(pr({ ...toMain, prBody: noVersion })), "沒寫「核准版本")).toBe(true);
+    expect(hit(evaluatePr(pr({ ...toMain, prBody: CHECKED, headSha: "9a8b7c6d5e4f30211234567890abcdef12345678" })), "不是這個 PR 目前的 head")).toBe(true);
+    // 寫在別的區塊不算；大小寫、全形冒號、不加反引號都認
+    const elsewhere = noVersion + LF + LF + "## 備註" + LF + "核准版本：4f2c9e1";
+    expect(hit(evaluatePr(pr({ ...toMain, prBody: elsewhere })), "沒寫「核准版本")).toBe(true);
+    expect(approvedVersion(["## 核准清單", "核准版本: 4F2C9E1A"].join(LF))).toBe("4f2c9e1a");
+    expect(approvedVersion(["## 核准清單", "核准版本：4f2c9"].join(LF))).toBeNull(); // 不到 7 碼
   });
 });
 

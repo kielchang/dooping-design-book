@@ -25,6 +25,7 @@ import { readFileSync, readdirSync, statSync, existsSync, mkdirSync } from "node
 import { createServer } from "node:http";
 import { dirname, join, extname, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
+import { isInside, safeDecode } from "./lib/paths.mjs";
 import { chromium } from "playwright";
 import { hslToRgb8 } from "../packages/tokens/scripts/lib/color.mjs";
 
@@ -134,12 +135,13 @@ const MIME = {
 
 function serve(base) {
   const server = createServer((req, res) => {
-    let path = decodeURIComponent(new URL(req.url, "http://x").pathname);
+    let path = safeDecode(new URL(req.url, "http://x").pathname);
+    if (path === null) { res.writeHead(400); res.end(); return; }
     if (!path.startsWith(base)) { res.writeHead(404); res.end(); return; }
     path = path.slice(base.length).replace(/^\/+/, "");
     if (path === "" || path.endsWith("/")) path += "index.html";
     let file = normalize(join(BUILD, path));
-    if (!file.startsWith(BUILD)) { res.writeHead(403); res.end(); return; }
+    if (!isInside(file, BUILD)) { res.writeHead(403); res.end(); return; }
     if (existsSync(file) && statSync(file).isDirectory()) file = join(file, "index.html");
     if (!existsSync(file)) { res.writeHead(404); res.end(); return; }
     res.writeHead(200, { "content-type": MIME[extname(file)] ?? "application/octet-stream" });

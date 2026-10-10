@@ -58,88 +58,101 @@ chartColors("dark");  // 另外 8 色，L* 落在 49–86 —— 沒有任何一
 
 （守衛：`npm run verify:color`，淺深出現共用值就不合格；分類色票的規則見 [色彩語意](/foundations/color)）
 
-## 多色相主題
+## 環境色主題
 
-深／淺是**明度**的兩種模式，色相主題是另一個維度。兩者正交，可以任意組合。
+深／淺是**明度**的兩種模式，環境色主題是另一個維度。兩者正交，可以任意組合。
 
 ```html
-<html data-theme="dark" data-color-theme="indigo">
+<html data-theme="dark" data-color-theme="teal">
 ```
 
 - `data-theme` / `.dark` —— 明暗，既有機制不變
-- `data-color-theme` —— 色相，**不設就是預設主題（石墨）**
+- `data-color-theme` —— 環境色，**不設就是預設主題（石墨）**
+
+**主題只換外殼。** 側欄與頂列合起來是一個 L 形的大區塊，主題只換這一塊的底色，
+用顏色讓人一眼認出目前在哪個工作環境。內容區（畫布、卡片、浮層、欄位、表格）一律中性、所有主題同值。
+有哪些色、各自的色彩學語意，見[環境色票](/foundations/environment-palette)。
 
 ### 主題影響哪些 token
 
-每組主題每個模式共 22 個，分三類：
+環境主題只宣告**外殼的 9 個鍵**：
 
-| 類別 | Token | 怎麼變 |
+| Token | 意思 |
+| --- | --- |
+| `--sidebar` | 外殼底色（側欄與頂列） |
+| `--sidebar-foreground` | 外殼上的文字 |
+| `--sidebar-muted-foreground` | 外殼上的次要文字（群組標題等） |
+| `--sidebar-border` | 外殼內的分隔線 |
+| `--sidebar-accent` ／ `-foreground` | 選中的側欄項：同色相亮一階 |
+| `--sidebar-primary` ／ `-foreground` | 外殼上的標誌塊：與外殼反相 |
+| `--sidebar-ring` | 外殼上的聚焦環 |
+
+**與主題無關的**：內容面的中性色、`--primary`、`--brand` 家族（所有主題都鏡射 `--primary`）、
+`--ring`、全部狀態色與提醒淡底、全部圖表色票。
+（守衛：`npm run verify:color`。環境主題覆蓋外殼以外的鍵、或 brand 沒有鏡射 primary，就不合格。）
+
+### 色相預算：主題色只進外殼
+
+| 介面層 | 跟著主題變？ | 載體 |
 | --- | --- | --- |
-| **主題色**（4） | `--brand`、`--brand-foreground`、`--brand-subtle`、`--brand-subtle-foreground` | 完整重新生成（對比反解） |
-| **帶色調的中性色**（14） | `--background`、`--card`、`--popover`、`--muted`、`--secondary`、`--accent`、`--border`、`--input`、`--field-border`、`--field-editable`、`--field-readonly`、`--muted-foreground`、`--sidebar`、`--sidebar-border` | **只轉色相**，L 與 chroma 不動 |
-| **側欄別名**（4） | `--sidebar-primary`、`--sidebar-primary-foreground`、`--sidebar-accent`、`--sidebar-accent-foreground` | ＝brand 家族的**字面值複製**（生成器保證同值，verify:color 的別名守衛盯住） |
-
-**與主題無關的**：`--primary`（中性近黑，承擔多數控制項）、**`--ring`（聚焦環，
-中性；要在六個主題最亮的表面上都過 3:1）**、
-`--sidebar-ring`（≡ ring，同一條規則）、`--sidebar-foreground`（≡ foreground）、
-全部狀態色、全部圖表色票、提醒視窗的 `--{狀態}-subtle`。
-
-### 色相預算：主題色相只進識別層
-
-| 介面層 | 吃主題色相？ | 載體 |
-| --- | --- | --- |
-| Layout 大區塊背景風格色調 | ✅（只轉色相） | 14 個帶色調中性色（含 `--sidebar`、`--sidebar-border`） |
-| 選單／選中導覽項／品牌強調 | ✅ | `--brand` 家族（含 `Button` 的 `brand` variant——僅限一頁一顆的非提交型入口，這條沒有守衛，**人工：守門人，收新頁型或審 PR 時**；`--sidebar-primary`／`--sidebar-accent` 是它的別名） |
+| 外殼（側欄＋頂列）的大區塊底色 | ✅ | `--sidebar` 家族 |
+| 內容面（畫布、卡片、浮層、欄位） | ❌ | 中性色，所有主題同值 |
 | 動作（確認／送出／儲存） | ❌ | `--primary` 中性近黑 |
+| 品牌按鈕（`variant="brand"`，已淘汰） | ❌ | `--brand` ≡ `--primary` |
 | 互動（hover／pressed／已選） | ❌ | `currentColor` 疊加，機制無色相 |
-| 聚焦環 | ❌ | `--ring` 中性，全主題一致 |
+| 聚焦環 | 只在外殼換成淺色環 | 內容區 `--ring`；外殼 `--sidebar-ring` |
 | 狀態／提醒色 | ❌ | 語意固定，見[提醒色辭典](/foundations/alert-colors) |
 | 資料（圖表 8 色） | ❌ | 全主題共用 |
 
-欄位提醒色（琥珀＝已改動、紅＝有問題）與聚焦環會出現在**同一個輸入框**上：
-**彩色＝語意、中性＝焦點**，在所有主題下一致。
+按鈕、提醒、琥珀欄位都靠顏色傳達意思，它們全部坐在內容面上——主題色碰不到它們，
+外殼的顏色再強烈也不會被讀成「錯誤」或「已改動」。
 
-### 中性色帶主題色相
+### 外殼上的元件：`on-shell`
 
-14 個帶色調中性色（chroma 0.007–0.023）跟著主題轉色相：
+頂列與側欄的內容區塊套了 `on-shell`（`AppShell` 的頂列、`SidebarHeader`／`SidebarContent`／`SidebarFooter` 已內建）。
+這一層把 `--background`、`--foreground`、`--muted-foreground`、`--border`、`--input`、`--ring`
+換成外殼的值，放進來的一般元件（ghost／outline 按鈕、分隔線、輸入框、聚焦環）自動改用外殼上看得清楚的顏色。
+浮層（下拉、對話框）走 portal 掛到 body，維持內容面的中性色。
 
-```
-青玉  muted #f0f6f6   border #deeaea
-苔綠  muted #f3f6f1   border #e4e9e1
-紫晶  muted #f5f3f8   border #e9e5ee
-```
+<Rules>
+  <Do>
+    <p>頂列上的按鈕用 <code>ghost</code> 或 <code>outline</code>；標誌塊與頭像用 <code>bg-sidebar-primary text-sidebar-primary-foreground</code>。</p>
+  </Do>
+  <Dont>
+    <p>不要在外殼上用 <code>bg-primary</code>、<code>bg-brand</code> 做色塊——深色外殼上會變成黑底黑塊。</p>
+  </Dont>
+</Rules>
 
-**只轉色相、L 與 chroma 一律不動。**
-唯一的例外是 `--muted-foreground`：對「該主題的 `--muted`」反解到 4.5:1 產生，
-不是單純轉色相。
+**外殼上的狀態徽章要加外圈。** 通知數、紅點直接疊在深色外殼上，對比只有 2:1 上下，看不見。
+一律加 `ring-2 ring-sidebar-foreground`：外圈是外殼的字色，紅點對外圈 ≥ 3:1。
 
-### 六組預設主題
+### 主題島
 
-| 名稱 | `data-color-theme` | OKLCH 色相 |
-| --- | --- | --- |
-| 石墨（預設） | `graphite` | 265°（**無品牌色**，`--brand` 鏡射 `--primary`） |
-| 靛藍 | `indigo` | 272° |
-| 藍紫 | `violet` | 292° |
-| 紫晶 | `amethyst` | 305° |
-| 青玉 | `teal` | 195° |
-| 苔綠 | `moss` | 135° |
+`data-color-theme` 也可以放在任何元素上，只換那個元素底下的外殼鍵。
+應用切換清單用它畫「那個系統的外殼色」縮影（`NavLeaf` 的 `colorTheme`）：
 
-石墨沒有品牌色：`--brand` 鏡射 `--primary`，見
-[色彩語意 → brand 的邊界](/foundations/color)。
-
-### 新增主題：色相要避開狀態色
-
-主題色相不得落在狀態色附近：
-
-```
-danger 17.7°  destructive 25.3°  warning 70.6°
-edit 83.9°    success 162.4°     info 238.1°
+```tsx
+<span data-color-theme="teal" className="bg-sidebar text-sidebar-foreground ring-1 ring-sidebar-foreground/30">文</span>
 ```
 
-主色要用約 245° 的藍，必須先移開 `info`（238°）。
+每個主題（含預設）都有淺色與兩種後代深色選擇器，頁面的 `.dark` 在 `<html>` 上、主題屬性在元素上也成立。
+（守衛：`tests/environment-theme.test.ts`。）
 
-新增主題的步驟（改 `THEMES`、生成、驗收）見
-[色票配色策略 → 新增一組主題](/foundations/choosing-a-palette#新增一組主題)。
+整頁的主題仍然掛在 `<html>`：浮層走 portal 掛到 body，包在 wrapper 上的主題抓不到它們。
+主題島只用在色塊、色票這種局部預覽。
+
+### 固定一個系統的環境色
+
+主題切在 `<html>` 上，和明暗一樣。要讓一個系統固定用某一組，在首繪前的腳本裡寫死：
+
+```html
+<script>
+  document.documentElement.setAttribute("data-color-theme", "teal");
+</script>
+```
+
+色票清單、語意與挑選的判準見[環境色票](/foundations/environment-palette)；
+新增一組的步驟見[色票配色策略 → 新增一組主題](/foundations/choosing-a-palette#新增一組主題)。
 
 ## 列印是第三種主題
 

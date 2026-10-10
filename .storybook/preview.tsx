@@ -8,7 +8,7 @@ import "./styles.css";
  * Dialog / Select / Tooltip 走 portal 掛到 body，只切 wrapper 的屬性會讓浮層抓不到樣式。
  *
  * - `.dark` + `data-theme` —— 明暗。同時掛兩個，順便驗證 token 的兩種宿主鉤子都有效。
- * - `data-color-theme` —— 色相主題。與明暗**正交**，六組 × 兩模式共 12 種組合。
+ * - `data-color-theme` —— 環境色主題（只換側欄＋頂列的外殼）。與明暗**正交**，主題數 × 兩模式。
  */
 function ThemeSwitch({
   theme,
@@ -94,14 +94,14 @@ const preview: Preview = {
       },
     },
     colorTheme: {
-      description: "色相主題（宿主端設 data-color-theme 切換）",
+      description: "環境色主題：只換外殼（宿主端設 data-color-theme 切換）",
       defaultValue: DEFAULT_THEME,
       toolbar: {
-        title: "色相",
+        title: "環境色",
         icon: "paintbrush",
         items: COLOR_THEMES.map((t) => ({
           value: t.name,
-          title: `${t.label} ${t.hue}°`,
+          title: `${t.label}（${t.term}）`,
         })),
         dynamicTitle: true,
       },

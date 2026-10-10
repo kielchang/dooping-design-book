@@ -52,8 +52,9 @@ function Bubble({ id, children, side = "top", anchor }: { id?: string; children:
       ...(flipDown ? { top: "100%", bottom: "auto", marginTop: 4, marginBottom: 0 } : {}),
     });
   }, [side, anchor]);
+  // side="right" 一開始就是 fixed：還沒定位的泡泡若留在版面流裡，會把錨點撐寬，量到的位置跟著偏掉
   return (
-    <span ref={ref} role="tooltip" id={id} style={style} className={side === "right" ? bubbleBase : bubbleCls}>
+    <span ref={ref} role="tooltip" id={id} style={style} className={side === "right" ? cn(bubbleBase, "fixed left-0 top-0") : bubbleCls}>
       {children}
     </span>
   );

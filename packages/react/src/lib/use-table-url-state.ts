@@ -66,8 +66,19 @@ export const historyAdapter: UrlStateAdapter = {
 const DEFAULTS: TableUrlState = { page: 0, pageSize: 15, query: "", sort: null, filters: {} };
 
 const enc = encodeURIComponent;
+// 網址是任何人都能改的輸入：壞掉的 % 跳脫（例如貼上時被截斷）不能讓整張表丟例外，解不開就保留原字。
+const dec = (raw: string) => {
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    return raw;
+  }
+};
 const joinVals = (vals: string[]) => vals.map(enc).join(",");
-const splitVals = (raw: string) => raw.split(",").filter(Boolean).map(decodeURIComponent);
+const splitVals = (raw: string) => raw.split(",").filter(Boolean).map(dec);
+// 欄名來自網址：這幾個名稱指派到一般物件上會改到原型，一律略過。
+const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+const EMPTY_URL_FILTER: UrlColFilter = { texts: [], min: "", max: "", values: [] };
 
 /** state → search 字串。預設值省略；filters 逐欄三種通道：f.<欄>＝多選、ft.<欄>＝文字、fr.<欄>＝範圍。 */
 export function serializeTableState(state: TableUrlState, defaults: TableUrlState, prefix = ""): string {
@@ -92,6 +103,12 @@ export function deserializeTableState(search: string, defaults: TableUrlState, p
   const p = new URLSearchParams(search);
   const state: TableUrlState = { ...defaults, filters: { ...defaults.filters } };
   const strip = (name: string) => (prefix && name.startsWith(prefix) ? name.slice(prefix.length) : prefix ? null : name);
+  const filterOf = (col: string) =>
+    Object.prototype.hasOwnProperty.call(state.filters, col) ? state.filters[col] : EMPTY_URL_FILTER;
+  const filterCol = (name: string, head: string) => {
+    const col = name.slice(head.length);
+    return col === "" || UNSAFE_KEYS.has(col) ? null : col;
+  };
 
   for (const [rawName, value] of p.entries()) {
     const name = strip(rawName);
@@ -107,21 +124,15 @@ export function deserializeTableState(search: string, defaults: TableUrlState, p
       const m = value.match(/^(.+)\.(asc|desc)$/);
       if (m) state.sort = { key: m[1], dir: m[2] as "asc" | "desc" };
     } else if (name.startsWith("f.")) {
-      const col = name.slice(2);
-      state.filters[col] = { ...(state.filters[col] ?? { texts: [], min: "", max: "", values: [] }), values: splitVals(value) };
+      const col = filterCol(name, "f.");
+      if (col) state.filters[col] = { ...filterOf(col), values: splitVals(value) };
     } else if (name.startsWith("ft.")) {
-      const col = name.slice(3);
-      state.filters[col] = { ...(state.filters[col] ?? { texts: [], min: "", max: "", values: [] }), texts: splitVals(value) };
+      const col = filterCol(name, "ft.");
+      if (col) state.filters[col] = { ...filterOf(col), texts: splitVals(value) };
     } else if (name.startsWith("fr.")) {
-      const col = name.slice(3);
+      const col = filterCol(name, "fr.");
       const m = value.match(/^(.*)\.\.(.*)$/);
-      if (m) {
-        state.filters[col] = {
-          ...(state.filters[col] ?? { texts: [], min: "", max: "", values: [] }),
-          min: decodeURIComponent(m[1]),
-          max: decodeURIComponent(m[2]),
-        };
-      }
+      if (col && m) state.filters[col] = { ...filterOf(col), min: dec(m[1]), max: dec(m[2]) };
     }
   }
   return state;

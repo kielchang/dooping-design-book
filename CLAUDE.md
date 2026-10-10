@@ -104,7 +104,7 @@ token 配對與下一步。取用端只看 main（Releases／`/r/index.json`／n
 - 正式 remote：`https://github.com/kielchang/dooping-design-book.git`
   （**兩個 o**。repo 曾叫 `doping-design-book`，舊名靠 GitHub 轉址還能推，
   但會噴 `This repository moved`；看到就把 origin 換成上面那個。）
-- **三段式發布**：功能分支 → PR 到 `dev`（`pr-verify` 綠了才合併）→ PR `dev → staging`（候選版，跑套用驗收）→ PR `staging → main`（勾核准清單＝核准）。
+- **三段式發布**：功能分支 → PR 到 `dev`（`pr-verify` 綠了才合併）→ PR `dev → staging`（候選版，跑套用驗收）→ PR `staging → main`（勾完核准清單、填上核准版本＝核准；之後再推 commit 要重新驗收）。
   流程正本：`ARCHITECTURE.md`「分支與部署拓樸」。`main` 與 `staging` 受 ruleset 保護，不要直接 push。
 - **進 dev 也走 PR，不要本機合併後直接推 dev**：本機（Windows）綠不代表 CI（Linux）綠。
   人工規則——dev 的 ruleset 目前不強制 PR。

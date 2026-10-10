@@ -74,10 +74,16 @@ function Workspace({
   collapsible,
   mobileQuery = FORCE_DESKTOP,
   defaultOpen,
+  followAppTheme = false,
 }: {
   collapsible?: "icon" | "offcanvas";
   mobileQuery?: string;
   defaultOpen?: boolean;
+  /**
+   * 外殼跟著目前應用的環境色走。真實部署時每個應用是各自的系統、在自己的 <html> 鎖一組主題；
+   * 這裡用主題島（外層 data-color-theme）模擬「切到另一個系統」。
+   */
+  followAppTheme?: boolean;
 }) {
   const [path, setPath] = useState("/workbench");
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -91,7 +97,7 @@ function Workspace({
   const unread = demoNotifications.filter((n) => n.unread).length;
   const renderLink = (props: SidebarNavLinkProps) => <StoryLink {...props} onNavigate={setPath} />;
 
-  return (
+  const shell = (
     <AppShell
       mobileQuery={mobileQuery}
       defaultOpen={defaultOpen}
@@ -100,7 +106,7 @@ function Workspace({
         <Sidebar label="應用程式" collapsible={collapsible}>
           <SidebarHeader>
             <div className="flex h-9 items-center gap-2 px-2 font-semibold">
-              <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-brand text-xs text-brand-foreground">D</span>
+              <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-sidebar-primary text-xs text-sidebar-primary-foreground">D</span>
               <span className="truncate group-data-[state=collapsed]/sidebar:sr-only">工作平台</span>
             </div>
           </SidebarHeader>
@@ -139,7 +145,8 @@ function Workspace({
                   {unread > 0 ? (
                     <span
                       aria-hidden
-                      className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-medium leading-none text-destructive-foreground"
+                      data-shell-badge=""
+                      className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-medium leading-none text-destructive-foreground ring-2 ring-sidebar-foreground"
                     >
                       {unread}
                     </span>
@@ -180,7 +187,7 @@ function Workspace({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="size-8 rounded-full" aria-label={`使用者選單：${USER.name}`}>
-                  <span aria-hidden className="flex size-7 items-center justify-center rounded-full bg-brand text-xs font-medium text-brand-foreground">
+                  <span aria-hidden className="flex size-7 items-center justify-center rounded-full bg-sidebar-primary text-xs font-medium text-sidebar-primary-foreground">
                     {USER.name.slice(-1)}
                   </span>
                 </Button>
@@ -230,7 +237,19 @@ function Workspace({
       </Dialog>
     </AppShell>
   );
+  // display: contents——不佔版面，只讓底下的外殼鍵換成目前應用的那一組（CSS 變數照 DOM 繼承）
+  return followAppTheme ? <div className="contents" data-color-theme={app.colorTheme}>{shell}</div> : shell;
 }
+
+/** WCAG 相對亮度與對比——play 量外殼徽章外圈用。 */
+const luminance = (rgb: number[]) =>
+  rgb.map((v) => v / 255).map((c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
+    .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i], 0);
+const contrastOf = (a: number[], b: number[]) => {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+};
+const rgbOf = (css: string) => (css.match(/\d+(\.\d+)?/g) ?? []).slice(0, 3).map(Number);
 
 export const 切換應用: Story = {
   render: () => <Workspace />,
@@ -288,6 +307,38 @@ export const 切換應用: Story = {
     await userEvent.click(within(notice).getByRole("link", { name: /B-0217/ }));
     await waitFor(() => expect(body.queryByRole("dialog")).toBeNull());
     await expectPage("批次結算");
+  },
+};
+
+export const 環境色跟著應用: Story = {
+  render: () => <Workspace followAppTheme />,
+  // 契約：主題只換外殼（側欄＋頂列）。切到另一個應用，外殼換成那個應用的環境色——
+  // 頂列的底色等於應用清單裡那個應用色塊的底色（色塊是主題島，畫的就是那個系統的外殼色）；
+  // 內容區不跟著變。外殼上的通知數有一圈外殼字色的外圈，紅點才不會糊進深色外殼。
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const header = canvasElement.querySelector("header") as HTMLElement;
+    // 內容區的底色畫在 AppShell 的根（main 本身透明）
+    const content = (canvasElement.querySelector("main") as HTMLElement).closest(".min-h-svh") as HTMLElement;
+    const nav = canvas.getByRole("navigation", { name: "應用程式" });
+    const tileOf = (name: RegExp) =>
+      within(nav).getByRole("link", { name }).querySelector("[data-app-tile]") as HTMLElement;
+    const bg = (el: HTMLElement) => getComputedStyle(el).backgroundColor;
+
+    const contentBefore = bg(content);
+    await waitFor(() => expect(bg(header)).toBe(bg(tileOf(/作業中心/))));
+
+    await userEvent.click(within(nav).getByRole("link", { name: /文件庫/ }));
+    await waitFor(() => expect(bg(header)).toBe(bg(tileOf(/文件庫/))));
+    expect(bg(header)).not.toBe(bg(tileOf(/作業中心/)));
+    // 內容區維持中性：換環境不換內容面的底色
+    expect(bg(content)).toBe(contentBefore);
+
+    // 外殼上的通知數：外圈＝外殼字色，紅點對外圈 ≥ 3:1（WCAG 1.4.11）
+    const badge = canvasElement.querySelector("[data-shell-badge]") as HTMLElement;
+    const ink = getComputedStyle(header).color;
+    expect(getComputedStyle(badge).boxShadow).toContain(ink);
+    expect(contrastOf(rgbOf(getComputedStyle(badge).backgroundColor), rgbOf(ink))).toBeGreaterThanOrEqual(3);
   },
 };
 

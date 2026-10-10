@@ -77,6 +77,8 @@ const config: Config = {
                 "@dooping/react": path.resolve(pkgs, "react/src"),
                 "@dooping/tokens": path.resolve(pkgs, "tokens/src/index.ts"),
               },
+              // tokens 的 TS 原始碼照 ESM 寫 `import "./tokens.data.js"`（實際檔是 .ts）；webpack 預設不換副檔名
+              extensionAlias: { ".js": [".ts", ".js"] },
             },
             module: {
               rules: [

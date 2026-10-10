@@ -29,7 +29,8 @@ export function useSort<T>(
 
   const sorted = useMemo(() => {
     if (!sort) return rows;
-    const acc = accessors[sort.key];
+    // 排序鍵可能來自網址：只認 accessors 自己的鍵，`constructor` 這類原型上的名稱不算欄位
+    const acc = Object.prototype.hasOwnProperty.call(accessors, sort.key) ? accessors[sort.key] : undefined;
     if (!acc) return rows;
     return [...rows].sort((a, b) => {
       const va = acc(a);

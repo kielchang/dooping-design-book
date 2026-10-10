@@ -13,7 +13,6 @@ import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { DataTable, type Column } from "../ui/data-table";
-import { Separator } from "../ui/separator";
 import { SegGroup } from "../ui/seg-group";
 import { TabPills } from "../ui/tab-pills";
 import { formatMoney } from "../lib/utils";
@@ -165,7 +164,7 @@ function Composed() {
         <Sidebar>
           <SidebarHeader>
             <div className="flex h-9 items-center gap-2 px-2 font-semibold">
-              <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-brand text-xs text-brand-foreground">帳</span>
+              <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-sidebar-primary text-xs text-sidebar-primary-foreground">帳</span>
               <span className="truncate group-data-[state=collapsed]/sidebar:sr-only">內部作業系統</span>
             </div>
           </SidebarHeader>
@@ -176,8 +175,8 @@ function Composed() {
       }
       header={
         <>
+          {/* 側欄開關：只在行動版出現（桌面版收合走側欄右緣的拉環） */}
           <SidebarTrigger />
-          <Separator orientation="vertical" className="h-5" />
           {/* 頂列只放全域的東西——頁面標題是 PageHeader 的職責，不在這裡重複一份 */}
           <a href="#pending" onClick={(e) => e.preventDefault()} className="ml-auto">
             <Badge variant="warning">待處理 3 項</Badge>

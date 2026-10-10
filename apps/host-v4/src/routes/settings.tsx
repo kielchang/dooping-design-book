@@ -55,7 +55,7 @@ export function SettingsPage() {
             value={theme.mode}
             onPick={(v) => setTheme({ ...theme, mode: v as Mode })}
           />
-          <FormField label="色相主題" className="max-w-xs">
+          <FormField label="環境色主題" hint="只換側欄與頂列的外殼底色。正式系統由系統自己決定用哪一組；這裡讓試裝宿主逐一預覽。" className="max-w-xs">
             {(control) => (
               <Select value={theme.color} onValueChange={(v) => setTheme({ ...theme, color: v })}>
                 <SelectTrigger {...control}>
@@ -132,7 +132,7 @@ export function SettingsPage() {
           </p>
           <div className="flex flex-wrap items-center gap-2" aria-label="主題指紋色塊">
             <span className="size-8 rounded-sm bg-primary" title="primary" />
-            <span className="size-8 rounded-sm bg-brand" title="brand" />
+            <span className="size-8 rounded-sm bg-sidebar-accent" title="sidebar-accent" />
             <span className="size-8 rounded-sm border bg-sidebar" title="sidebar" />
             <span className="size-8 rounded-sm bg-danger-subtle" title="danger-subtle" />
             <span data-probe="color-mix" className="size-8 rounded-sm bg-primary/50" title="primary／50%" />

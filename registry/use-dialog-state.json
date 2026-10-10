@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "use-dialog-state",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "type": "registry:lib",
   "title": "useDialogState 對話框開關",
   "description": "多種對話框的集中開關：天然單開、同值再設即關。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0"
+    "@dooping/tokens@^0.8.0"
   ],
   "registryDependencies": [],
   "files": [

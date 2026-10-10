@@ -82,7 +82,7 @@ semanticColors();      // { primary: "222.2 47.4% 11.2%", … }（HSL 三元組�
 themeMeta();           // [{ name, label, hue }, …]（主題切換器用）
 ```
 
-## 深色模式與色相主題
+## 深色模式與環境色主題
 
 深色同時提供兩種宿主鉤子，兩者共用同一組規則：
 
@@ -91,9 +91,10 @@ themeMeta();           // [{ name, label, hue }, …]（主題切換器用）
 [data-theme="dark"] { /* … */ }
 ```
 
-色相主題與明暗**正交**：在 `<html>` 設 `data-color-theme="<name>"` 切換，不設就是預設主題。
+環境色主題與明暗**正交**：在 `<html>` 設 `data-color-theme="<name>"` 切換，不設就是預設主題。
 可用名稱以 `themeNames()`／`themeMeta()` 為準（這裡刻意不列舉，免得多一份會過期的清單）。
-主題只覆蓋 brand 家族、帶色調的中性色與側欄家族；狀態色、圖表色票、`--ring` 在所有主題之間完全相同。
+主題只換外殼（側欄＋頂列的 `--sidebar` 家族）；內容面的中性色、`--brand`（鏡射 `--primary`）、狀態色、圖表色票、`--ring` 在所有主題之間完全相同。
+`data-color-theme` 也可以放在單一元素上（主題島），只換那個元素底下的外殼鍵；外殼裡的一般元件用 `.on-shell` 換成外殼的配色。
 
 ```js
 document.documentElement.classList.toggle("dark");
@@ -108,7 +109,7 @@ document.documentElement.setAttribute("data-color-theme", "teal");
 | 群組 | 說明 |
 | --- | --- |
 | 語意色 | 表面／文字、動作、狀態（success/warning/info/danger 與 `-subtle` 低強度層）、欄位（可編輯 vs 唯讀）、保留色（已改動未送出）、側欄表面 |
-| 色相主題 | 每組主題的淺深兩套覆蓋值，由 `scripts/generate-theme.mjs` 以目標對比反解生成 |
+| 環境色主題 | 每組主題的淺深兩套外殼值（含色族、色名、色階的註記），由 `scripts/generate-theme.mjs` 以目標對比反解生成 |
 | 圖表色票 | 8 色分類色票（色盲友善）＋軸線／格線／文字 |
 | 圓角・間距・字級・字體 | 單一基準推導 |
 | 陰影 | 3 階（＝表面抬升層級） |

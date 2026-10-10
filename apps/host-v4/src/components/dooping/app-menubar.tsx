@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as MenubarPrimitive from "@radix-ui/react-menubar";
 import { ExternalLink, Menu } from "lucide-react";
-import { findActiveNavLeaf, isNavAction, isNavActive, type NavAction, type NavGroup, type NavLeaf } from "@/lib/dooping/nav";
+import { findActiveNavLeaf, isNavAction, isNavActive, safeNavUrl, type NavAction, type NavGroup, type NavLeaf } from "@/lib/dooping/nav";
 import { cn } from "@/lib/dooping/utils";
 import { menuContentClass, menuItemClass } from "@/components/dooping/dropdown-menu";
 import { useSidebar } from "@/components/dooping/sidebar";
@@ -45,9 +45,10 @@ const triggerClass = cn(
   "data-[state=open]:[--state-layer-alpha:var(--state-selected-alpha)] [&_svg]:size-4 [&_svg]:shrink-0",
 );
 
-// 所在分區：加粗＋底線兩種編碼——強制色彩模式下背景色會被系統換掉，字重留得下來
+// 所在分區：加粗＋底線兩種編碼——強制色彩模式下背景色會被系統換掉，字重留得下來。
+// 底線跟著文字色（currentColor）：選單列放在外殼（頂列）上，外殼的字色隨主題是近黑或近白。
 const currentTriggerClass =
-  "font-semibold after:absolute after:inset-x-2.5 after:bottom-0.5 after:h-0.5 after:rounded-full after:bg-primary";
+  "font-semibold after:absolute after:inset-x-2.5 after:bottom-0.5 after:h-0.5 after:rounded-full after:bg-current";
 
 const contentClass = cn(
   menuContentClass,
@@ -100,7 +101,7 @@ export function AppMenubar({
       <MenubarPrimitive.Item key={item.title} asChild className={menuItemClass}>
         {renderLink(
           {
-            href: item.url,
+            href: safeNavUrl(item.url),
             "aria-current": isCurrent ? "page" : undefined,
             children: (
               <>

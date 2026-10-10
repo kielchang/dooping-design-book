@@ -1,7 +1,7 @@
 import * as React from "react";
 import type { LucideIcon } from "lucide-react";
 import { ChevronRight } from "lucide-react";
-import { isNavAction, type NavAction, type NavGroup, type NavLeaf } from "../lib/nav";
+import { isNavAction, safeNavUrl, type NavAction, type NavGroup, type NavLeaf } from "../lib/nav";
 import {
   CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandShortcut,
 } from "./command";
@@ -27,7 +27,7 @@ export interface CommandPaletteProps {
   groups?: NavGroup[];
   /** 自訂指令群（主題切換這類）。元件不內建任何指令——那是應用層的決定。 */
   actions?: CommandActionGroup[];
-  /** 選中導覽項時呼叫。palette 內的項目是 option 不是連結——導航方式由宿主決定。 */
+  /** 選中導覽項時呼叫。palette 內的項目是 option 不是連結——導航方式由宿主決定。url 已過 `safeNavUrl` 白名單。 */
   onNavigate?: (url: string, item: NavLeaf) => void;
   /** 選中 groups 裡的動作項（NavAction）時呼叫——與頂部功能選單同一個出口。 */
   onAction?: (action: string, item: NavAction) => void;
@@ -121,7 +121,7 @@ export function CommandPalette({
                     <CommandItem
                       key={`${item.title}-${sub.title}`}
                       value={`${item.title} ${sub.title}`}
-                      onSelect={() => runCommand(() => onNavigate?.(sub.url, sub))}
+                      onSelect={() => runCommand(() => onNavigate?.(safeNavUrl(sub.url), sub))}
                     >
                       {item.icon ? <item.icon /> : null}
                       <span className="flex items-center gap-1">
@@ -135,7 +135,7 @@ export function CommandPalette({
                     <CommandItem
                       key={item.title}
                       value={item.title}
-                      onSelect={() => runCommand(() => onNavigate?.(item.url, item))}
+                      onSelect={() => runCommand(() => onNavigate?.(safeNavUrl(item.url), item))}
                     >
                       {item.icon ? <item.icon /> : null}
                       {item.title}

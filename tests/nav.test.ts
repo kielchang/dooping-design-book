@@ -2,8 +2,10 @@
 // isNavActive 的多層 fallback 是純函式——側欄與指令面板共用的 active 判定，
 // 在這裡直接驗，不用開瀏覽器。判定錯的症狀是「使用者在 A 頁、側欄亮著 B」，
 // 那會直接摧毀「我在哪」的信任。
+// safeNavUrl 是導覽連結的網址白名單：導覽資料可能來自後台設定，javascript:／data: 點下去會執行內容。
 import { describe, it, expect } from "vitest";
-import { findActiveNavLeaf, isNavActive, isNavAction, type NavGroup } from "../packages/react/src/lib/nav";
+import { findActiveNavLeaf, isNavActive, isNavAction, safeNavUrl, type NavGroup } from "../packages/react/src/lib/nav";
+import { because } from "./lib/guard";
 
 describe("isNavActive", () => {
   it("完整相符", () => {
@@ -103,5 +105,24 @@ describe("isNavAction", () => {
     expect(isNavAction({ title: "新增紀錄", action: "new-record" })).toBe(true);
     expect(isNavAction({ title: "工作台", url: "/workbench" })).toBe(false);
     expect(isNavAction({ title: "系統設定", items: [] })).toBe(false);
+  });
+});
+
+describe("safeNavUrl：導覽連結的網址白名單", () => {
+  const RULE = "packages/react/src/lib/nav.ts 的 safeNavUrl 說明";
+  const WHY = "導覽資料可能來自後台設定；javascript:、data: 這類網址點下去會執行內容，React 18 不擋";
+
+  it("相對路徑、http、https、mailto、tel 原樣放行", () => {
+    for (const url of ["/workbench", "reports?tab=1", "../up", "#section", "?q=1", "//cdn.example.test/x",
+      "https://example.test/a", "http://example.test", "mailto:team@example.test", "tel:+886212345678"]) {
+      expect(safeNavUrl(url), because(`「${url}」是安全的網址，要原樣放行`, WHY, RULE)).toBe(url);
+    }
+  });
+
+  it("會執行內容的網址換成 #，含大小寫、開頭空白、夾 Tab 換行的變形", () => {
+    for (const url of ["javascript:alert(1)", "JavaScript:alert(1)", " javascript:alert(1)", "java\tscript:alert(1)",
+      "java\nscript:alert(1)", "data:text/html,<b>x</b>", "vbscript:msgbox(1)", "file:///etc/passwd"]) {
+      expect(safeNavUrl(url), because(`「${JSON.stringify(url)}」要被擋成 #`, WHY, RULE)).toBe("#");
+    }
   });
 });

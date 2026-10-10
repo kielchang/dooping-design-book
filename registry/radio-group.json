@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "radio-group",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "type": "registry:ui",
   "title": "radio-group",
   "description": "",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "@radix-ui/react-radio-group",
     "lucide-react"
   ],

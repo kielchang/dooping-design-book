@@ -1,12 +1,12 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "separator",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "type": "registry:ui",
   "title": "Separator 分隔線",
   "description": "水平／垂直分隔（Radix Separator），預設裝飾性。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "@radix-ui/react-separator"
   ],
   "registryDependencies": [

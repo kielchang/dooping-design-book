@@ -7,7 +7,7 @@ import { StoryLink } from "@site/src/components/StoryLink";
 import {
   FlowThreeWays, FlowAdoptionStages, FlowStayingCurrent, FlowPageFirstSteps,
 } from "@site/src/components/flow-diagrams";
-import { ConfirmDialogDemo } from "@site/src/components/doc-demos";
+import { ConfirmDialogDemo, EnvironmentPalette } from "@site/src/components/doc-demos";
 import {
   Button, Badge, Callout, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter,
   Input, Label, Checkbox, NumberInput, Switch, Textarea, RadioGroup, RadioGroupItem,
@@ -31,7 +31,7 @@ export default {
   ...MDXComponents,
   Demo, Rules, Do, Dont, StoryFrame, StoryLink,
   FlowThreeWays, FlowAdoptionStages, FlowStayingCurrent, FlowPageFirstSteps,
-  ConfirmDialogDemo,
+  ConfirmDialogDemo, EnvironmentPalette,
   Button, Badge, Callout, Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter,
   Input, Label, Checkbox, NumberInput, Switch, Textarea, RadioGroup, RadioGroupItem,
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,

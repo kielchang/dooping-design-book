@@ -22,6 +22,8 @@ export interface PrState extends GateState {
   headRepo: string;
   repository: string;
   prBody: string;
+  /** PR 目前的 head commit；核准清單的「核准版本」要對得上它。 */
+  headSha?: string;
   treeEqual: boolean;
 }
 
@@ -42,4 +44,5 @@ export declare function evaluateChangelog(
 export declare function evaluateRelease(s: GateState): string[];
 export declare const MIN_APPROVAL_ITEMS: number;
 export declare function approvalChecklist(body: string): ChecklistItem[] | null;
+export declare function approvedVersion(body: string): string | null;
 export declare function evaluatePr(s: PrState): string[];

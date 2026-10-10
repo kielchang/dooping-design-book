@@ -66,10 +66,14 @@ npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/csv.json
 | 函式 | 說明 |
 | --- | --- |
 | `csvSerialize(headers, rows, bom = true)` | 產出 CSV 字串 |
-| `csvEscape(v)` | 單一值的跳脫（逗號、引號、換行） |
+| `csvEscape(v)` | 單一值的跳脫（逗號、引號、換行；公式開頭的文字補 `'`） |
 | `csvParse(text)` | 解析回二維陣列 |
 
 **`bom` 預設是 `true`，不要關掉。**
+
+**以 `=` `+` `-` `@`、Tab、CR 開頭的文字，前面一律補 `'`**——試算表才不會把它當公式執行。
+數字型別，以及只有正負號＋數字的文字（`-1,200`、`+5%`、`-3.5`），不補，匯出後仍能計算。
+`csvParse` 不會拿掉這個 `'`：它是通用解析器，讀的檔案不一定是這裡匯出的。
 
 ## `download` — 觸發瀏覽器下載
 

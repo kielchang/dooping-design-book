@@ -1,0 +1,41 @@
+# 每週套件漏洞檢查。規則正本：ARCHITECTURE.md「外掛釘版與套件漏洞」。
+#
+# 紅燈只管主程式執行時會用到的套件（npm audit --omit=dev）：它們跟著產物走，有高風險以上就紅、GitHub 寄信通知。
+# 開發工具與文件站的套件只在開發與建置時執行，漏洞列在這次 run 的摘要裡、不擋——混在紅燈裡會讓新問題被舊的蓋掉。
+# 只讀 lockfile，不安裝、不跑專案程式。
+name: audit
+
+on:
+  schedule:
+    - cron: "0 1 * * 1" # 每週一 09:00（台灣）
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audit
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: { node-version: 22 }
+      - name: 主程式執行期套件（高風險以上就紅）
+        run: npm audit --omit=dev --audit-level=high
+      - name: 開發工具與文件站（列在摘要，不擋）
+        if: always()
+        run: |
+          {
+            echo "## 開發工具與文件站的套件漏洞（只列出，不擋）"
+            echo '```'
+            npm audit --audit-level=high 2>&1 | tail -n 30 || true
+            echo
+            npm audit --audit-level=high --prefix book 2>&1 | tail -n 30 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

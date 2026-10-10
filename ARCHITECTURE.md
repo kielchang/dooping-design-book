@@ -93,7 +93,8 @@ AGENTS.md ──(book/scripts/sync-root-docs.mjs)──► book/static/AGENTS.md
 | `tests/tokens.test.ts` | tokens.json ↔ CSS 產物 ↔ v3 preset ↔ v4 入口 ↔ 版號四處；淺深成對；預設色盤不外洩；registry 的 tokens 配對 | 色值本身合不合格（`verify:color`） |
 | `tests/tokens-v3.test.ts` | 用 Tailwind v3＋preset 真的編一次，語意色與非色彩 token 都產得出來 | 元件有沒有用到 |
 | `tests/tokens-v4.test.ts` | 用 Tailwind v4 真的編 `dist/tailwind.css`：色鍵、透明度修飾、預設色盤清空、深色 variant、基座 | 同上 |
-| `tests/color.test.ts` | 把 `verify:color` 接進 `npm test`：無不合格項、六主題都在、brand 對比、聚焦環中性 | 門檻本身（在 `scripts/verify-color.mjs`） |
+| `tests/color.test.ts` | 把 `verify:color` 接進 `npm test`：無不合格項、十八組主題都在、外殼文字與聚焦環對比、環境色票的同族與跨族距離 | 門檻本身（在 `scripts/verify-color.mjs`） |
+| `tests/environment-theme.test.ts` | 每個主題（含預設）都能當主題島：tokens.css 有淺色區塊與兩種後代深色選擇器；〈環境色票〉的表列出每個主題，色名、色族、色階與 tokens 一致 | 色值本身（`verify:color`）；整合方挑哪一組 |
 | `tests/cn.test.ts` | `cn()` 的 tailwind-merge 分群：字級與文字色、漸層與底色互不吃 | 元件 class 的內容 |
 | `tests/csv.test.ts` | `csvEscape` 公式開頭的文字補 `'`、數字與純數字文字不補；序列化與解析往返 | 試算表軟體實際怎麼開檔、下載觸發（`saveBlob`） |
 | `tests/tailwind-compat.test.ts` | 元件只用 v3／v4 語意相同的 utility：禁兩版值不同的裸 utility、v4 限定語法、只靠 hover 揭露 | 兩版共有且同值的 class |
@@ -125,9 +126,9 @@ build 之後（CI 跑，本機可單獨跑）：
 
 | 指令 | 管什麼 | 不管什麼 |
 | --- | --- | --- |
-| `npm run verify:color`（`scripts/verify-color.mjs`） | 六主題×兩模式的 WCAG 對比、色覺 ΔE00、狀態層三階、圖表色距離；主題數與圖表色數下限 | 元件有沒有真的用上這些色（`verify:visual`） |
+| `npm run verify:color`（`scripts/verify-color.mjs`） | 全部主題×兩模式：外殼的文字、次要文字、選中項、聚焦環與外框；環境主題只能覆蓋外殼鍵、brand 鏡射 primary；環境色票同族 ≥8、跨族 ≥10、家族連續；狀態層三階（外殼逐主題）、提醒淡底、圖表色距離；主題數與圖表色數下限 | 元件有沒有真的用上這些色（`verify:visual`） |
 | `npm run verify:storybook`（`scripts/verify-storybook.mjs`） | 全部 story 的 axe＋play 全數執行；強制色彩下焦點看得見 | 顏色對比、頁面級規則 |
-| `npm run verify:visual`（`scripts/verify-visual.mjs`） | 六主題×兩模式的截圖掃 token 期望色，其他主題的 brand 不滲入 | 版面位移、像素基準 |
+| `npm run verify:visual`（`scripts/verify-visual.mjs`） | 全部主題×兩模式的截圖掃 token 期望色，其他主題的外殼色不滲入 | 版面位移、像素基準 |
 | `npm run verify:book`（`scripts/verify-book-host.mjs`） | 文件站每頁的 computed style 符合 token 有效值（邊框、底色、表格、步驟、portal） | Storybook |
 | `npm run verify:host`（`scripts/verify-host.mjs`） | 內部試裝宿主：主題套上、color-mix、頁面級 axe、強制色彩、行動版外殼、凍結欄、多應用外殼（切應用換選單、選單鍵盤路、接真路由後選了就關） | 元件單元行為（story） |
 | `npm run host:check`（`scripts/host-sync.mjs --check`） | registry ↔ 宿主檔案逐位元組相同；宿主宣告的 npm 相依；`dooping.lock.json` 與 registry 對得上 | 宿主自己的頁面程式 |

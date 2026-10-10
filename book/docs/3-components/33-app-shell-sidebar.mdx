@@ -93,7 +93,7 @@ const app = findActiveNavLeaf(apps, pathname, isAppActive)?.item;
   滑鼠離開、按 Esc 或選了目的地就收。拉環留在視窗左緣底部，點擊、往右拖或鍵盤都能釘選展開。
 - **行動版**：自動轉左滑抽屜（Radix Dialog 組成：焦點鎖定、Esc、焦點歸還
   全部繼承），**分區與順序完全不變**；點選目的地即關閉。抽屜由頂列的 `SidebarTrigger` 打開，沒有拉環。
-- **選中態**：`bg-sidebar-accent`（＝該主題的 `brand-subtle`，識別層）＋
+- **選中態**：`bg-sidebar-accent`（預設外殼是中性淡底；環境外殼是同色相亮一階）＋
   `aria-current="page"`；hover 走狀態層。active 判定用 `isNavActive()` 的多層
   fallback（完整相符 → 去 query → 路徑邊界的父路徑），可用 `isActive` 覆寫。
 - **開闔狀態**：`useSidebar()` 拿 `toggle()`／`state`；宿主要掛快捷鍵、
@@ -121,14 +121,16 @@ const app = findActiveNavLeaf(apps, pathname, isAppActive)?.item;
 - `offcanvas` 收到 0 時側欄是 `inert`；Tab 不能停在看不見的連結上。
 - 拉環是真的按鈕：可及名稱跟著狀態變（「收合側邊欄」／「展開側邊欄」），帶 `aria-expanded`；`offcanvas` 收合時它不在 `inert` 的側欄裡，Tab 得到。
 - SidebarTrigger 自帶 `aria-label` 與 `aria-expanded`。
-- 聚焦環走中性 `--ring`（`--sidebar-ring ≡ ring`，不隨主題轉色）。
+- 外殼裡的聚焦環走 `--sidebar-ring`：預設外殼等於中性的 `--ring`，深色的環境外殼換成近白，對外殼與選中項都 ≥ 3:1。
 
 ## Token
 
-側欄有自己的表面語意（[主題](/foundations/theming)頁有完整清單）：
-`--sidebar` 是「比頁面底沉一階的安靜區」（唯一新顏色）；
-`--sidebar-accent` ≡ `brand-subtle`、`--sidebar-primary` ≡ `brand`、
-`--sidebar-ring` ≡ `ring`。（守衛：`verify:color` 的恆等守衛盯住七個別名）
+側欄與頂列合起來是**外殼**，用 `--sidebar` 家族的 9 個鍵（[深淺主題 → 環境色主題](/foundations/theming#環境色主題)有完整清單）。
+環境色主題只換這一組：預設主題是「比頁面底沉一階」的淺色外殼；環境主題是深色外殼，
+用大區塊的顏色認出工作環境（色票見[環境色票](/foundations/environment-palette)）。
+`SidebarHeader`／`SidebarContent`／`SidebarFooter` 與 `AppShell` 的頂列內建 `on-shell`，放進來的一般元件自動改用外殼的配色。
+應用切換清單的項目帶 `colorTheme` 時，圖示放進主題島色塊，畫的是那個應用的外殼色。
+（守衛：`verify:color` 盯外殼的對比、別名與色票距離）
 
 ## 取用
 
@@ -144,5 +146,5 @@ npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/app-menu
 ```
 
 `sidebar-nav` 會自動帶入 `sidebar`、`collapsible`、`dropdown-menu`、`badge`、
-`tooltip` 與 `nav`（NavGroup 型別）。token 需要 `@dooping/tokens@^0.7.0`
+`tooltip` 與 `nav`（NavGroup 型別）。token 需要 `@dooping/tokens@^0.8.0`
 （提供 `--sidebar-*`）。

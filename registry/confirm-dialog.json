@@ -6,7 +6,7 @@
   "title": "ConfirmDialog 確認對話框",
   "description": "破壞性操作確認：載入中鎖出口、可選硬確認輸入。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0"
+    "@dooping/tokens@^0.8.0"
   ],
   "registryDependencies": [
     "https://kielchang.github.io/dooping-design-book/r/button.json",

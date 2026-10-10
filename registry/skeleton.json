@@ -6,7 +6,7 @@
   "title": "Skeleton 骨架屏",
   "description": "首載用的版面灰塊；三種載入手段的分工見文件〈載入中〉。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0"
+    "@dooping/tokens@^0.8.0"
   ],
   "registryDependencies": [
     "https://kielchang.github.io/dooping-design-book/r/utils.json"

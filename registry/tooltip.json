@@ -6,7 +6,7 @@
   "title": "Tooltip 提示泡泡",
   "description": "hover／鍵盤聚焦／長壓顯示，含邊緣防溢與截斷文字元件。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0"
+    "@dooping/tokens@^0.8.0"
   ],
   "registryDependencies": [
     "https://kielchang.github.io/dooping-design-book/r/utils.json"

@@ -6,7 +6,7 @@
   "title": "Separator 分隔線",
   "description": "水平／垂直分隔（Radix Separator），預設裝飾性。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "@radix-ui/react-separator"
   ],
   "registryDependencies": [

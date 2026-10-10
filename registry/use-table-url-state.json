@@ -6,7 +6,7 @@
   "title": "useTableUrlState 網址同步",
   "description": "表格狀態 ↔ 網址：預設值省略、條件變更回第 1 頁、adapter 可注入。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0"
+    "@dooping/tokens@^0.8.0"
   ],
   "registryDependencies": [],
   "files": [

@@ -214,19 +214,20 @@ export const demoNavGroups: NavGroup[] = [
 /**
  * 多應用外殼示範：側欄的應用清單——與導覽同一份 NavGroup[] 契約，一個應用＝一個葉節點。
  * 應用名稱一律用中性詞；icon 一樣在 stories／宿主端以標題對映。
+ * `colorTheme` 是那個應用鎖定的環境色主題：清單用它畫外殼色縮影，四個應用各取一個色族示範。
  */
 export const demoApps: NavGroup[] = [
   {
     title: "常用",
     items: [
-      { title: "作業中心", url: "/workbench" },
-      { title: "文件庫", url: "/apps/library" },
-      { title: "排程", url: "/apps/schedule" },
+      { title: "作業中心", url: "/workbench", colorTheme: "indigo" },
+      { title: "文件庫", url: "/apps/library", colorTheme: "teal" },
+      { title: "排程", url: "/apps/schedule", colorTheme: "rust" },
     ],
   },
   {
     title: "管理",
-    items: [{ title: "系統管理", url: "/apps/admin" }],
+    items: [{ title: "系統管理", url: "/apps/admin", colorTheme: "slate" }],
   },
 ];
 

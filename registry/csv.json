@@ -6,7 +6,7 @@
   "title": "csv 序列化",
   "description": "含 UTF-8 BOM 的 CSV 產出與解析。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0"
+    "@dooping/tokens@^0.8.0"
   ],
   "registryDependencies": [],
   "files": [

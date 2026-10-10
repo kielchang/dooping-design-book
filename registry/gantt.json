@@ -6,7 +6,7 @@
   "title": "Gantt 時間軸",
   "description": "檢視與選取用的精簡時間軸：分類色長條、進度、今天線、列選取。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0"
+    "@dooping/tokens@^0.8.0"
   ],
   "registryDependencies": [
     "https://kielchang.github.io/dooping-design-book/r/empty-state.json",

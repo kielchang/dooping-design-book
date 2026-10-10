@@ -6,7 +6,7 @@
   "title": "CommandPalette 指令面板",
   "description": "全域搜尋：⌘K 開啟，導覽資料與側邊欄、功能選單單一來源。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "lucide-react"
   ],
   "registryDependencies": [

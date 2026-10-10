@@ -58,6 +58,25 @@ function NavBadgeTag({ badge, labels }: { badge: NavLeaf["badge"]; labels: Requi
   );
 }
 
+/**
+ * 葉節點的圖示。帶 `colorTheme` 的項目（應用切換清單）把圖示放進一塊主題島色塊：
+ * 色塊上的 `data-color-theme` 只換這塊底下的外殼鍵，顯示的是「那個系統的外殼色」。
+ * 1px 淺框讓它在同樣是深色的外殼上仍分得出邊界。
+ */
+function LeafIcon({ item }: { item: NavLeaf }) {
+  if (!item.colorTheme) return item.icon ? <item.icon /> : null;
+  return (
+    <span
+      aria-hidden
+      data-color-theme={item.colorTheme}
+      data-app-tile=""
+      className="-ml-1 flex size-6 shrink-0 items-center justify-center rounded-sm bg-sidebar text-xs font-semibold text-sidebar-foreground ring-1 ring-sidebar-foreground/30"
+    >
+      {item.icon ? <item.icon /> : item.title.slice(0, 1)}
+    </span>
+  );
+}
+
 export function SidebarNav({
   groups,
   currentPath,
@@ -79,7 +98,7 @@ export function SidebarNav({
         "aria-current": isCurrent ? "page" : undefined,
         children: (
           <>
-            {item.icon ? <item.icon /> : null}
+            <LeafIcon item={item} />
             {/* 收合態用 sr-only 不用 hidden：display:none 會把連結的可及名稱一起藏掉 */}
             <span className="truncate group-data-[state=collapsed]/sidebar:sr-only">{item.title}</span>
             <NavBadgeTag badge={item.badge} labels={labels} />

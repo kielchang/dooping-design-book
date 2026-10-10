@@ -145,7 +145,7 @@ module.exports = {
 import { semanticColors, chartColors, TOKENS_VERSION } from "@dooping/tokens";
 
 chartColors("dark");   // 8 色色盲友善色票
-semanticColors();      // 47 個語意色（HSL 三元組）
+semanticColors();      // 48 個語意色（HSL 三元組）
 ```
 
 第五個是 `@dooping/tokens/tokens.json`（來源正本，給非 JS 工具鏈讀）。
@@ -157,6 +157,16 @@ semanticColors();      // 47 個語意色（HSL 三元組）
 document.documentElement.classList.toggle("dark");
 // 或走屬性：document.documentElement.setAttribute("data-theme", "dark")
 ```
+
+環境色主題是另一個維度：只換側欄＋頂列的外殼，內容區維持中性。同樣掛在 `<html>`：
+
+```js
+document.documentElement.setAttribute("data-color-theme", "teal");
+```
+
+有哪些色、各自的色彩學語意，見[環境色票](https://kielchang.github.io/dooping-design-book/foundations/environment-palette/)。
+外殼上的頂列按鈕用 `ghost`／`outline`；標誌塊與頭像用 `bg-sidebar-primary text-sidebar-primary-foreground`；
+外殼上的狀態徽章（通知數、紅點）加 `ring-2 ring-sidebar-foreground`。
 
 要改 token 值請改 `packages/tokens/src/tokens.json`，**不要手改 `dist/` 或 `src/tokens.data.ts`**——那是產物。
 
@@ -181,7 +191,7 @@ document.documentElement.classList.toggle("dark");
 
 | 層 | 怎麼鎖 | 怎麼知道自己落後了 |
 | --- | --- | --- |
-| token | 鎖到 `/r/index.json` 的 `tokensVersion`（例：`"@dooping/tokens": "^0.7.0"`，以線上為準） | `npm outdated @dooping/tokens` |
+| token | 鎖到 `/r/index.json` 的 `tokensVersion`（例：`"@dooping/tokens": "^0.8.0"`，以線上為準） | `npm outdated @dooping/tokens` |
 | 元件 | **套件層面鎖不了，也不需要**——複製走就是你的程式碼；要記「抄的時候長什麼樣」用 `dooping.lock.json` | `node scripts/dooping-check.mjs`（見下方「怎麼知道有新版」） |
 
 元件複製進來時會帶著**規範版號**戳記（與 GitHub 上的 `vX.Y.Z` tag 同一個號碼）。

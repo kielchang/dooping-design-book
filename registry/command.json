@@ -6,7 +6,7 @@
   "title": "Command 指令清單",
   "description": "可過濾的指令清單與對話框殼（cmdk 薄封裝，隔離相依）。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "cmdk",
     "lucide-react"
   ],

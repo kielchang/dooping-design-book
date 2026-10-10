@@ -22,18 +22,18 @@ title: GraphCanvas 節點畫布
 ## 色彩：token 橋接層
 
 React Flow 自帶一整套 `--xy-*` 視覺變數。封裝把它們對映到本書的語意 token，
-依[主題](/foundations/theming)的色相預算逐層對位：
+依[主題](/foundations/theming)的色相預算逐層對位（畫布在內容區，主題色不進來）：
 
-| 畫布元素 | 介面層 | 吃什麼 | 主題色相 |
+| 畫布元素 | 介面層 | 吃什麼 | 隨主題變 |
 | --- | --- | --- | --- |
-| 畫布底、格點 | Layout | `--background`／`--border` | ✅ 帶色調中性 |
-| 節點框、控制列、minimap | 表面 | `--card` 家族 | ✅ 帶色調中性 |
+| 畫布底、格點 | Layout | `--background`／`--border` | ❌ 中性 |
+| 節點框、控制列、minimap | 表面 | `--card` 家族 | ❌ 中性 |
 | 連線、handle | 結構 | `--muted-foreground`／`--border` | ❌ 中性 |
 | hover／已選 | 互動 | `state-layer` 6%／20% | ❌ 中性 |
 | 鍵盤聚焦 | 聚焦 | `--ring` 外環 | ❌ 中性 |
 | 節點分類色條 | 資料 | `--chart-N` | 與主題無關，跟資料實體走 |
 
-全部落在既有 token 上，**深淺模式與六組色相主題自動成立**。
+全部落在既有 token 上，**深淺模式自動成立，切環境色主題畫布不變**。
 不要另用 React Flow 自己的 `colorMode`。
 
 ### 已選與聚焦是兩個通道

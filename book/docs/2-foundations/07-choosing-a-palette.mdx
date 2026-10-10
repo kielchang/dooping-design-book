@@ -4,7 +4,7 @@ title: 色票配色策略
 
 # 色票配色策略
 
-**適用**：換品牌色、新增色相主題、新增或重生分類色票、調整任何生成出來的色值時。
+**適用**：新增環境色主題、新增或重生分類色票、調整任何生成出來的色值時。
 已定案的值見[色彩語意](/foundations/color)、[深淺主題](/foundations/theming)、[提醒色辭典](/foundations/alert-colors)；
 圖表上每個系列取哪一種顏色，見[圖表的配色策略](/components/charts#配色策略先問資料形態再問維度語意)。
 
@@ -17,15 +17,15 @@ title: 色票配色策略
 | 層 | 規則 | 詳見 |
 | --- | --- | --- |
 | **1. 語意** | Token 名稱說「代表什麼」；語意色是唯一的色彩 API，色階不外露。狀態色語意固定，切主題、切深淺都不變 | [色彩語意](/foundations/color#四組語意職責不重疊)、[提醒色辭典](/foundations/alert-colors) |
-| **2. 色相預算** | 主題色相只進識別層（帶色調中性色、`--brand` 家族）；動作、互動、聚焦環、狀態色、圖表色都不吃主題色相 | [深淺主題 → 色相預算](/foundations/theming#色相預算主題色相只進識別層) |
-| **3. 狀態色與主題色並存** | 色相：警報色域保留，有彩度的 brand 距所有狀態色 ≥ 25°。飽和度：`--danger` 是畫面上最飽和的色。面積：高飽和色（提醒關鍵色＋圖表重點色）共用 10% | [色彩語意 → 並存三層](/foundations/color#狀態色與主題色並存色相飽和度面積) |
+| **2. 色相預算** | 主題色只進外殼（側欄＋頂列的 `--sidebar` 家族）；內容面、動作、互動、狀態色、圖表色都不跟主題走 | [深淺主題 → 色相預算](/foundations/theming#色相預算主題色只進外殼) |
+| **3. 主題色與辨識色並存** | 分區：主題色只在外殼，按鈕、提醒、欄位只在內容面。飽和度：`--danger` 是畫面上最飽和的色，外殼的彩度低於它。面積：高飽和色（提醒關鍵色＋圖表重點色）共用 10% | [色彩語意 → 並存三層](/foundations/color#主題色與辨識色並存分區飽和度面積) |
 
 分類色票（`--chart-1` … `--chart-8`）不進這三層：與狀態語意脫鉤、不跟主題走、不得靠近任何狀態色，
 見[色彩語意 → 分類色票](/foundations/color#分類色票與狀態語意脫鉤)。
 
 ## 值是生成的，不是挑的
 
-主題色、帶色調中性色、提醒淡底、側欄表面、分類色票，以及未達標的狀態色前景，都由
+環境色（外殼）、內容面的中性色、提醒淡底、預設外殼、分類色票，以及未達標的狀態色前景，都由
 `packages/tokens/scripts/generate-theme.mjs` 生成：**給定目標（對比比值或感知距離），反解明度與彩度**。
 
 ```bash
@@ -36,12 +36,13 @@ npm run verify:color   # 閘門：有不合格項就 exit 1
 
 | 生成的值 | 做法 | 參數 |
 | --- | --- | --- |
-| `--brand`／`--brand-foreground` | 固定色相與彩度上限，反解明度使白字達 4.5:1，取最亮的解；無品牌色的主題鏡射 `--primary` | `THEMES` 的 `hue`、`cap`、`neutralBrand`；深色彩度 × `DARK_CHROMA_FACTOR` |
-| `--brand-subtle`／`-foreground` | 淺色從最淡往深探、深色從最深往亮探，取第一個與該主題 `--muted`、`--sidebar` 都拉開 ΔE00 8 的值；文字反解到 4.5:1 | `SUBTLE_MIN` |
-| 14 個帶色調中性色 | 只轉色相，明度與彩度不動；`--muted-foreground` 對該主題的 `--muted` 反解到 4.5:1 | `NEUTRAL_TINT` |
+| 環境主題的外殼（`--sidebar` 家族） | 依色階給定明度與彩度上限（深色模式彩度約打八折）；選中項同色相往亮探到與外殼 ΔE00 8、白字仍 ≥ 4.5:1；次要文字反解到 4.8:1；標誌塊與外殼反相 | `THEMES` 的 `hue`、`tier`；`SHELL`、`SHELL_ACCENT_MIN`、`SHELL_SECONDARY` |
+| `--brand`／`--brand-foreground` | 鏡射 `--primary`（所有主題同值，只有預設主題宣告） | — |
+| `--brand-subtle`／`-foreground` | 淺色從最淡往深探、深色從最深往亮探，取第一個與 `--muted`、預設外殼都拉開 ΔE00 8 的值；文字反解到 4.5:1 | `SUBTLE_MIN` |
+| 14 個內容面中性色 | 轉到石墨的色相（265°），明度與彩度不動；`--muted-foreground` 對 `--muted` 反解到 4.5:1。只放在預設主題，其他主題沿 cascade 共用 | `NEUTRAL_TINT`、`CONTENT_HUE` |
 | 狀態色前景 | 未達 4.5:1 才修：success／warning／info 改同色相深墨前景；danger／destructive 保留白字、壓深填色 | — |
 | `--{狀態}-subtle`／`-foreground` | 四種共用一個明度，各色相彩度反解到同一個染色量；文字反解到 4.5:1 | `SUBTLE_TINT`、`SUBTLE_L_BAND` |
-| `--sidebar` | 反解到與頁面底的目標 ΔE00 | `SIDEBAR_TINT` |
+| 預設外殼 `--sidebar` | 反解到與頁面底的目標 ΔE00 | `SIDEBAR_TINT` |
 | `--chart-1` … `--chart-8` | 從候選池以最遠點插入挑出（見〈排序：最遠點插入〉） | `CHART_BAND`、`CHART_CHROMA`、`HUE_SPACING`、`ANCHOR_HUE` |
 
 一律取整成 8-bit 之後再驗，對**實際的前景與表面 token** 驗（見[色彩語意 → 對比要求](/foundations/color#對比要求)）。
@@ -53,24 +54,31 @@ npm run verify:color   # 閘門：有不合格項就 exit 1
 
 ## 驗證門檻
 
-所有門檻都對六組主題 × 淺深兩模式驗；守衛欄寫由誰擋。
+所有門檻都對全部主題 × 淺深兩模式驗；守衛欄寫由誰擋。
 `verify:color` 的不合格項同時讓 `npm test` 紅（`tests/color.test.ts` 跑同一組檢查）；warn 不擋，總數超過 15 則 `npm test` 紅。
 
 | 檢查項 | 門檻 | 守衛 |
 | --- | --- | --- |
-| **主題色**（每主題 × 淺深） | | |
-| `--brand`、`--brand-subtle` 上的文字 | ≥ 4.5:1 | `verify:color` |
-| `--brand` 色塊對頁面底 | ≥ 3:1 | `verify:color` |
-| `--ring` 對最亮表面（淺色 `--background`、深色 `--muted`）與 `--sidebar` | ≥ 3:1 | `verify:color` |
-| `--brand` 與最近的狀態色 | ΔE00 ≥ 12 | `verify:color` |
-| `--brand` 與每個狀態色的色相差（brand 的 OKLCH chroma ≥ 0.04 才驗） | ≥ 25° | `verify:color` |
-| `--brand` 與停用外觀（`--primary` 以 50% 疊在頁面底） | ΔE00 ≥ 12 | `verify:color` |
-| `--brand` 的 OKLCH chroma | 低於 `--danger` 的 chroma | `verify:color` |
-| `--brand-subtle` 對 `--muted`；`--sidebar-accent` 對 `--sidebar` | ΔE00 ≥ 6 | `verify:color` |
-| `--sidebar` 上的文字 | ≥ 4.5:1 | `verify:color` |
-| `--sidebar` 對頁面底 | ΔE00 ≥ 2（超過 6 記 warn） | `verify:color` |
-| `--muted-foreground` 對 `--muted`、`--background`、`--sidebar` | ≥ 4.5:1（未達記 warn） | `verify:color` |
-| `--sidebar-*` 別名對 brand 家族與 `--border` | 值逐字相同 | `verify:color` |
+| **外殼**（每主題 × 淺深） | | |
+| `--sidebar-foreground`、`--sidebar-muted-foreground` 對外殼 | ≥ 4.5:1 | `verify:color` |
+| 選中項 `--sidebar-accent` 對外殼；選中項上的文字 | ΔE00 ≥ 8；≥ 4.5:1 | `verify:color` |
+| `--sidebar-ring` 對外殼、對選中項 | ≥ 3:1 | `verify:color` |
+| 標誌塊 `--sidebar-primary` 上的字；標誌塊對外殼 | ≥ 4.5:1；≥ 3:1 | `verify:color` |
+| 預設外殼對頁面底 | ΔE00 ≥ 2（超過 6 記 warn） | `verify:color` |
+| 環境外殼對頁面底 | ΔE00 ≥ 10 | `verify:color` |
+| 環境外殼的 OKLCH chroma | 低於 `--danger` 的 chroma | `verify:color` |
+| 外殼的別名（預設外殼對 brand 家族、`--border`、`--muted-foreground`；環境外殼對 `--sidebar-foreground`、`--sidebar`） | 值逐字相同 | `verify:color` |
+| **內容中性**（每主題） | | |
+| 環境主題宣告的鍵 | 只有外殼鍵 | `verify:color` |
+| `--brand`／`--brand-foreground` | 鏡射 `--primary`／`--primary-foreground` | `verify:color` |
+| `--brand-subtle` 上的文字；對 `--muted` | ≥ 4.5:1；ΔE00 ≥ 6 | `verify:color` |
+| `--ring` 對最亮表面（淺色 `--background`、深色 `--muted`） | ≥ 3:1 | `verify:color` |
+| `--muted-foreground` 對 `--muted`、`--background` | ≥ 4.5:1（未達記 warn） | `verify:color` |
+| **環境色票** | | |
+| 同族兩階外殼（淺深取最差） | ΔE00 ≥ 8 | `verify:color` |
+| 不同族外殼（淺深取最差） | ΔE00 ≥ 10 | `verify:color` |
+| 家族在色相上連續（族內色相範圍不夾別族） | — | `verify:color` |
+| 每個主題都能當主題島；〈環境色票〉的表與 tokens 同步 | — | `npm test` |
 | **實色填底**（淺深） | | |
 | success／warning／info／danger／destructive／primary 的前景對填色；`--edit-foreground` 對 `--edit-bg` | ≥ 4.5:1 | `verify:color` |
 | **提醒淡底**（淺深） | | |
@@ -84,7 +92,7 @@ npm run verify:color   # 閘門：有不合格項就 exit 1
 | 每色對六個狀態色 | 色相差 ≥ 20°（兩色 chroma 都 ≥ 0.04 才算），或 ΔE00 ≥ 18 | `verify:color` |
 | 淺深兩組 | 不共用任何一值 | `verify:color` |
 | 八色的 L\* 全距 | 超過 28 | `npm test` |
-| **互動狀態層**（淺深 × 頁面底、卡片、`--muted`、浮層、側欄） | | |
+| **互動狀態層**（淺深 × 頁面底、卡片、`--muted`、浮層；外殼逐主題） | | |
 | hover 對底色 | ΔE00 ≥ 2.5 | `verify:color` |
 | pressed 對 hover | ΔE00 ≥ 2.5 | `verify:color` |
 | 已選對 hover | ΔE00 ≥ 4 | `verify:color` |
@@ -189,14 +197,17 @@ npm run verify:color   # 閘門：有不合格項就 exit 1
 
 ## 新增一組主題
 
-1. **選色相**：OKLCH 色相落在可用區間（109°–137°、188°–213°、264°–352°），
-   且距六個狀態色都 ≥ 25°（見[深淺主題 → 新增主題](/foundations/theming#新增主題色相要避開狀態色)）。
+環境主題只產生外殼。現有的 8 個色族（每族深淺兩階）已經把色輪排滿：
+**加進既有色族**（例如某族只用了一階）優先；**新開色族**要先走[回饋與 RFC 流程](/governance/rfc)，
+因為它得和兩側的色族都拉開 ΔE00 10。
+
+1. **選色族與色階**：加進既有色族就沿用該族的 `hue`，換 `tier`；新色族選一個與相鄰色族都拉得開的色相。
 2. **加參數**：在 `packages/tokens/scripts/generate-theme.mjs` 的 `THEMES` 加一筆（欄位見下表）。
 3. **生成**：`npm run build:theme`，再 `npm run build:tokens`。
 4. **驗收**：`npm run verify:color`。沒過或生成器丟錯（無解、拉不開），回第 1、2 步改參數重跑（見下表）。
-5. **改測試**：`tests/color.test.ts` 的主題數斷言改成「主題數 × 2」，跑 `npm test`。
-6. **補文件**：[深淺主題](/foundations/theming)的主題清單加一列。
-   Storybook 工具列與宿主的主題選單讀 tokens，不必另外登記。
+5. **改測試**：`tests/color.test.ts` 的主題數與色票數斷言跟著改，跑 `npm test`。
+6. **補文件**：[環境色票](/foundations/environment-palette)的色票清單加一列（`tests/environment-theme.test.ts` 會核對），
+   色族是新的就在「色族的語意」補一列。Storybook 工具列與宿主的主題選單讀 tokens，不必另外登記。
 7. **定案**：見〈定案〉。
 
 `THEMES` 的欄位：
@@ -205,17 +216,20 @@ npm run verify:color   # 閘門：有不合格項就 exit 1
 | --- | --- |
 | `name` | `data-color-theme` 的值 |
 | `label` | 顯示名 |
-| `hue` | 第 1 步選定的 OKLCH 色相 |
-| `cap` | 淺色的彩度上限，深色自動 × 0.75；現有有彩主題是 0.130–0.150 |
-| `neutralBrand` | 只有無品牌色的主題設 `true`（`--brand` 鏡射 `--primary`） |
+| `family` | 色族鍵，用色名（`red`、`cyan`…），不用業務名稱 |
+| `term` | 華語基本色名（＋修飾詞），例如「青」「黃褐」 |
+| `tier` | `base`（淺階）、`deep`（深階）；`neutral` 是無色相的深色外殼，`default` 只給預設主題 |
+| `hue` | OKLCH 色相；同族兩階用同一個 |
 
 沒過時改哪個參數：
 
 | `verify:color` 報的 | 改什麼 |
 | --- | --- |
-| brand 色相距某狀態色不足 25°，或與最近狀態色 ΔE00 不足 12 | 換 `hue` |
-| brand 的 chroma 不低於 danger | 降 `cap` |
-| brand 與停用外觀 ΔE00 不足 12 | 加大 `cap`；沒有品牌色的主題改設 `neutralBrand: true` |
+| 跨族外殼 ΔE00 不足 10 | 換 `hue`，離相鄰色族遠一點 |
+| 同族兩階 ΔE00 不足 8 | 調 `SHELL` 兩階的明度差（會影響全部色族，改完要全部重驗） |
+| 家族不連續 | `hue` 落進了別族的範圍；換 `hue` 或改 `family` |
+| 環境外殼對頁面底不足 10（深色模式） | 提高該色階深色模式的明度；中性外殼沒有色相可拉開，只能靠明度 |
+| 外殼文字或次要文字不足 4.5:1 | 降低該色階的明度 |
 
 ## 新增或擴充分類色票
 

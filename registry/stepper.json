@@ -6,7 +6,7 @@
   "title": "Stepper 步驟指示",
   "description": "多步驟流程進度，完成態同時用勾選與顏色。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "lucide-react"
   ],
   "registryDependencies": [

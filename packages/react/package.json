@@ -19,7 +19,7 @@
     "react-dom": ">=18"
   },
   "dependencies": {
-    "@dooping/tokens": "0.7.0",
+    "@dooping/tokens": "0.8.0",
     "@xyflow/react": "^12.11.2"
   }
 }

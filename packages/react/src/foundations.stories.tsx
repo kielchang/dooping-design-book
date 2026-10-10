@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { tokens } from "@dooping/tokens";
+import { themeMeta, tokens } from "@dooping/tokens";
 
 const meta: Meta = { title: "基礎/設計 Token" };
 export default meta;
@@ -107,54 +107,45 @@ export const 圖表色票: Story = {
   },
 };
 
-export const 色相主題: Story = {
+export const 環境色主題: Story = {
   render: () => (
     <div className="space-y-5">
       <p className="max-w-2xl text-sm text-muted-foreground">
-        用工具列的<strong>色相</strong>切換六組主題，<strong>主題</strong>切換淺深——兩者正交。
-        主題只影響 16 個 token：4 個主題色（下方）與 12 個帶色調的中性色（背景、邊框、muted…，
-        只轉色相、明度與彩度不動）。
+        主題只換<strong>外殼</strong>（側欄＋頂列）的大區塊底色，用顏色認出目前在哪個工作環境；
+        內容區一律中性。下面每一格都是一個<strong>主題島</strong>：<code>data-color-theme</code>{" "}
+        放在元素上，只換那塊底下的外殼鍵。工具列的<strong>主題</strong>切淺深，每一格跟著換。
       </p>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="space-y-2 rounded-md border p-3">
-          <p className="text-xs font-semibold">主題色</p>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-md bg-brand px-3 py-1.5 text-sm font-medium text-brand-foreground">
-              關鍵動作
-            </span>
-            <span className="rounded-md bg-brand-subtle px-3 py-1.5 text-sm font-medium text-brand-subtle-foreground">
-              被選中的項目
+      <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
+        {themeMeta().map((t) => (
+          <div
+            key={t.name}
+            data-color-theme={t.name}
+            className="space-y-1.5 rounded-md border border-sidebar-border bg-sidebar p-2 text-sidebar-foreground"
+          >
+            <p className="text-xs font-semibold">{t.label}</p>
+            <p className="text-tiny text-sidebar-muted-foreground">
+              {t.term}・<code>{t.name}</code>
+            </p>
+            <span className="block rounded-sm bg-sidebar-accent px-1.5 py-0.5 text-tiny text-sidebar-accent-foreground">
+              選中的項目
             </span>
           </div>
-        </div>
-        <div className="space-y-2 rounded-md border p-3">
-          <p className="text-xs font-semibold">與主題無關</p>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground">
-              一般控制項
-            </span>
-            <span className="rounded-md bg-danger px-2.5 py-1 text-xs font-medium text-danger-foreground">異常</span>
-            <span className="rounded-md bg-warning px-2.5 py-1 text-xs font-medium text-warning-foreground">注意</span>
-          </div>
-          {/* 聚焦環是中性色、不隨主題轉相，不和欄位提醒色搶語意 */}
-          <div className="pt-1">
-            <input
-              aria-label="聚焦環示意"
-              className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm ring-2 ring-ring ring-offset-2 ring-offset-background"
-              defaultValue="聚焦環是中性色"
-              readOnly
-            />
-          </div>
-          <p className="text-tiny text-muted-foreground">
-            <code>--primary</code> 維持中性近黑、狀態色色相鎖死、聚焦環中性。切色相時這一欄應該<strong>幾乎不動</strong>。
-          </p>
-        </div>
+        ))}
       </div>
-      <p className="max-w-2xl text-tiny text-muted-foreground">
-        為什麼狀態色不跟著主題微調：往主題偏 15° 會讓淺色模式六組裡有四組的分類色守衛破掉；
-        只彎淡底層則讓藍紫系的 warning／danger 淡底收斂到 ΔE00 8.8——琥珀和紅都變粉橘。
-        整體感靠「四種提示共用同一條構成規則」加「坐在帶主題色相的中性表面上」，不靠彎色相。
-      </p>
+      <div className="max-w-2xl space-y-2 rounded-md border p-3">
+        <p className="text-xs font-semibold">與主題無關（內容區）</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground">
+            一般控制項
+          </span>
+          <span className="rounded-md bg-danger px-2.5 py-1 text-xs font-medium text-danger-foreground">異常</span>
+          <span className="rounded-md bg-warning px-2.5 py-1 text-xs font-medium text-warning-foreground">注意</span>
+          <span className="rounded-md bg-edit-bg px-2.5 py-1 text-xs font-medium text-edit-foreground">已改動</span>
+        </div>
+        <p className="text-tiny text-muted-foreground">
+          按鈕、提醒、琥珀欄位都靠顏色傳達意思，所以它們在任何主題下都一樣——工具列切主題時這一欄應該<strong>完全不動</strong>。
+        </p>
+      </div>
     </div>
   ),
 };

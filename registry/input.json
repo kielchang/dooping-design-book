@@ -6,7 +6,7 @@
   "title": "Input 輸入框",
   "description": "文字輸入，高度對齊控制項尺寸 token。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0"
+    "@dooping/tokens@^0.8.0"
   ],
   "registryDependencies": [
     "https://kielchang.github.io/dooping-design-book/r/utils.json"

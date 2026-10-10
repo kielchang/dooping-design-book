@@ -6,7 +6,7 @@
   "title": "forms/diff 欄位比對",
   "description": "FieldSpec 驅動的變更偵測與顯示格式化。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0"
+    "@dooping/tokens@^0.8.0"
   ],
   "registryDependencies": [],
   "files": [

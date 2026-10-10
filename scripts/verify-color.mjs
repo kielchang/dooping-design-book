@@ -1,4 +1,4 @@
-// 色彩驗收 —— 六組色相主題 × 淺深兩模式，所有門檻都在這裡擋。
+// 色彩驗收 —— 全部環境色主題 × 淺深兩模式，所有門檻都在這裡擋。
 //
 //   node scripts/verify-color.mjs        # 印報告，不合格時 exit 1
 //
@@ -30,13 +30,28 @@ const CHART_WARN = 15;     // 低於此算勉強，記為警告不擋
 const STATUS_HUE_GAP = 20;
 const STATUS_DE_MIN = 18;
 const SUBTLE_TINT_RATIO = 1.3; // 四種淡底的染色量比值上限：不等量會讓嚴重度階序失效
-const BRAND_STATUS_MIN = 12; // 主題色與狀態色的感知距離：主色像成功色會讓「綠色＝通過」失效
-const BRAND_HUE_GAP = 25;  // 主題色與狀態色的**色相**距離：警報色域（0–95°）是保留區
 const SUBTLE_MIN = 6;      // brand-subtle 與 muted 的距離：否則「被選中」看起來只是「有點灰」
-const BRAND_DISABLED_MIN = 12; // brand 與停用外觀的距離：近中性的主題色會被讀成 disabled
 const CHROMATIC_MIN = 0.04;    // 低於此視為無彩：色相角度在近中性色上沒有感知意義
-const SIDEBAR_ZONE_MIN = 2;    // sidebar 與頁面底的距離：低於此「另一個區」不成立
-const SIDEBAR_ZONE_MAX = 6;    // 上限（警告）：外殼是安靜區，不該比 muted 還響
+const SIDEBAR_ZONE_MIN = 2;    // 預設外殼與頁面底的距離：低於此「另一個區」不成立
+const SIDEBAR_ZONE_MAX = 6;    // 上限（警告）：預設外殼是安靜區，不該比 muted 還響
+
+// 環境色主題（主題只換外殼）的門檻。
+//
+// 以前的主題同時是品牌按鈕、選中淡底與中性色的色相來源，所以要守一整套「別像狀態色、
+// 別住進警報色域、別像停用、飽和度要低於 danger」的規則。現在主題碰不到內容面，
+// 那幾條改由「環境主題只能有外殼鍵」＋「brand 鏡射 primary」兩條結構性規則取代：
+// 主題色根本不會出現在提醒、按鈕、欄位旁邊。
+const SHELL_ACCENT_MIN = 8;   // 選中項與外殼：低於此「這一項被選中」在外殼上看不出來
+const SHELL_FAMILY_MIN = 8;   // 同族兩階外殼：看得出是兩個環境，又像一家人
+const SHELL_CROSS_MIN = 10;   // 不同族外殼：一眼分得開
+const SHELL_FRAME_MIN = 10;   // 環境外殼與頁面底（深色模式最吃緊）：外框要成立
+/** 環境主題可以宣告的鍵：只有外殼。 */
+const SHELL_KEYS = new Set([
+  "sidebar", "sidebar-foreground", "sidebar-muted-foreground", "sidebar-border",
+  "sidebar-accent", "sidebar-accent-foreground", "sidebar-primary", "sidebar-primary-foreground", "sidebar-ring",
+]);
+/** brand 家族在所有主題都鏡射 primary。brand-subtle 是中性淡底，不在鏡射之列。 */
+const BRAND_MIRROR = [["brand", "primary"], ["brand-foreground", "primary-foreground"]];
 
 const MODES = ["light", "dark"];
 const STATUS = ["success", "warning", "danger", "info", "destructive", "edit"];
@@ -47,174 +62,191 @@ export function runChecks() {
   const stats = { themes: {}, chart: {} };
 
   // 防空轉：主題或圖表色票讀不到時，下面的迴圈一次都不跑、fail 是空的、報告全綠。
-  // 單獨跑這支也要擋（tests/color.test.ts 的主題數斷言只在 npm test 裡）。現值 6 主題、8 圖表色。
+  // 單獨跑這支也要擋（tests/color.test.ts 的主題數斷言只在 npm test 裡）。現值 18 主題、8 圖表色。
   const themeCount = Object.keys(tokens.themes ?? {}).length;
   const chartCount = Object.keys(tokens.chart?.light ?? {}).filter((k) => k.startsWith("chart-")).length;
-  if (themeCount < 6) fail.push(`只讀到 ${themeCount} 組色相主題（下限 6）——tokens.json 讀錯或結構變了，守衛不能空轉`);
+  if (themeCount < 18) fail.push(`只讀到 ${themeCount} 組環境色主題（下限 18）——tokens.json 讀錯或結構變了，守衛不能空轉`);
   if (chartCount < 8) fail.push(`只讀到 ${chartCount} 個圖表色（下限 8）——tokens.json 讀錯或結構變了，守衛不能空轉`);
 
   const px = (mode, name) => hslToRgb8(tokens.color[mode][name].value);
 
+  const DEF = tokens.meta.defaultTheme;
+
   /**
-   * 解出「在主題 X 之下，這個 token 實際是什麼顏色」。
+   * 解出「在主題 X 之下，這個 token 實際是什麼顏色」，照 CSS 的 cascade 走：
+   * 主題自己的宣告 → 預設主題（`:root` 就是基準層＋預設主題）→ 基準層。
    *
-   * 中性色（背景、邊框、muted…）現在會被主題層覆蓋，所以拿 `tokens.color` 的基準值去驗
-   * 是驗到後備值、不是驗到畫面上的顏色。這正是這支腳本存在的理由，自己更不能犯：
-   * 生成器一度就是拿沒轉過色相的 muted 去報告 ring 的對比，數字才會看起來低於門檻。
+   * 拿 `tokens.color` 的基準值去驗是驗到後備值、不是驗到畫面上的顏色。這正是這支腳本
+   * 存在的理由，自己更不能犯：生成器一度就是拿沒轉過色相的 muted 去報告 ring 的對比。
    */
   const resolve = (themeName, mode, name) => {
-    const t = tokens.themes?.[themeName]?.[mode]?.[name];
-    return hslToRgb8((t ?? tokens.color[mode][name]).value);
+    const v = tokens.themes?.[themeName]?.[mode]?.[name]
+      ?? tokens.themes?.[DEF]?.[mode]?.[name]
+      ?? tokens.color[mode][name];
+    if (!v) throw new Error(`${themeName}/${mode} 解不出 ${name}`);
+    return hslToRgb8(v.value);
   };
+  const at = (group, name) => hslToRgb8(group[name].value);
   const hardestOf = (themeName, mode) =>
     mode === "light" ? resolve(themeName, "light", "background") : resolve(themeName, "dark", "muted");
   const pageBgOf = (themeName, mode) => resolve(themeName, mode, "background");
+  /** src-over：不透明的疊加色以 alpha 疊在不透明底色上 */
+  const mix = (paint, base, a) => paint.map((c, i) => Math.round(c * a + base[i] * (1 - a)));
 
   // 預設主題的表面——圖表與狀態色不隨主題變，用預設主題的表面驗即可
-  const DEF = tokens.meta.defaultTheme;
   const pageBg = { light: pageBgOf(DEF, "light"), dark: pageBgOf(DEF, "dark") };
 
-  // ── 1. 色相主題 ────────────────────────────────────────────
+  // ── 1. 環境色主題（只換外殼） ──────────────────────────────
+  //
+  // 主題只換側欄＋表頭的外殼底色，內容面一律中性。這一段擋四件事：
+  //   a. 外殼看得清楚：文字、次要文字、選中項、聚焦環、標誌塊
+  //   b. 主題碰不到內容面：環境主題只能有外殼鍵；brand 在所有主題都等於 primary
+  //   c. 色票分得開：同族 ≥ SHELL_FAMILY_MIN、跨族 ≥ SHELL_CROSS_MIN、家族在色相上連續
+  //   d. 外殼和內容面分得開：深色模式下外殼對頁面底 ≥ SHELL_FRAME_MIN
   for (const [name, theme] of Object.entries(tokens.themes ?? {})) {
+    const isDefault = name === DEF;
     for (const mode of MODES) {
       const t = theme[mode];
-      const at = (k) => hslToRgb8(t[k].value);
       const tag = `${name}/${mode}`;
-      const brand = at("brand");
       const push = (ok, msg) => (ok ? null : fail.push(msg));
+      const r = (k) => resolve(name, mode, k);
 
-      const cBrand = contrast(brand, at("brand-foreground"));
-      push(cBrand >= TEXT, `${tag} brand 上的文字只有 ${cBrand.toFixed(2)}:1（需 ${TEXT}）`);
-
-      const cSubtle = contrast(at("brand-subtle"), at("brand-subtle-foreground"));
-      push(cSubtle >= TEXT, `${tag} brand-subtle 上的文字只有 ${cSubtle.toFixed(2)}:1（需 ${TEXT}）`);
-
-      // ring 是全主題共用的中性基礎值（主題層不再覆蓋），
-      // 但表面是各主題帶色相的——所以這條**每個主題仍要各驗一次**：
-      // 同一個 ring、不同的對象。用 resolve() 拿有效值，主題有覆蓋就驗覆蓋、
-      // 沒有就驗基礎值，機制不因這次決定而特化。
-      const cRing = contrast(resolve(name, mode, "ring"), hardestOf(name, mode));
-      push(cRing >= NONTEXT, `${tag} ring 對最亮表面只有 ${cRing.toFixed(2)}:1（需 ${NONTEXT}）`);
-
-      // brand 色塊本身也要看得見，否則按鈕在頁面上「浮不出來」
-      const cFill = contrast(brand, pageBgOf(name, mode));
-      push(cFill >= NONTEXT, `${tag} brand 色塊對頁面底只有 ${cFill.toFixed(2)}:1（需 ${NONTEXT}）`);
-
-      // brand-subtle 必須與 muted 分得開
-      const dMuted = deltaE00(lab(at("brand-subtle")), lab(resolve(name, mode, "muted")));
-      push(dMuted >= SUBTLE_MIN, `${tag} brand-subtle 與 muted 只差 ΔE00 ${dMuted.toFixed(1)}（需 ${SUBTLE_MIN}）`);
-
-      // brand 與狀態色的感知距離。主色如果看起來像「成功」，使用者會停止把綠色讀成狀態。
-      // 這條擋掉過一組候選：松綠 178° 距 success 162° 只有 16°，量出來 ΔE00 17.4——
-      // 數字過得了門檻，但它確實是最像狀態色的一組，因此沒有收進預設清單。
-      let nearest = { d: Infinity, s: "" };
-      for (const s of STATUS) {
-        const d = deltaE00(lab(brand), lab(px(mode, s)));
-        if (d < nearest.d) nearest = { d, s };
+      // b. 內容中性：環境主題的鍵集只能是外殼鍵。內容面要是被主題覆蓋，
+      //    提醒淡底就不再坐在同一個中性面上，「主題色碰不到辨識色」不成立。
+      if (!isDefault) {
+        const extra = Object.keys(t).filter((k) => !SHELL_KEYS.has(k));
+        push(extra.length === 0,
+          `${tag} 覆蓋了外殼以外的鍵（${extra.join("、")}）——主題只能換外殼，內容面必須中性`);
       }
-      push(nearest.d >= BRAND_STATUS_MIN,
-        `${tag} brand 與 ${nearest.s} 只差 ΔE00 ${nearest.d.toFixed(1)}（需 ${BRAND_STATUS_MIN}）`);
+      const brandOk = BRAND_MIRROR.every(([b, p]) => r(b).join() === r(p).join());
+      push(brandOk, `${tag} brand 家族沒有鏡射 primary——品牌色不隨主題變，所有主題都等於 primary`);
 
-      // ── 讓紅黃保持「一眼就反應」的兩條結構性規則 ──────────
-      //
-      // 紅色能讓人瞬間停手，靠的不只是色相，還有「它在畫面上很稀有、而且最搶眼」。
-      // 主題色不需要閃避紅色的長相，需要閃避的是**它的位置與份量**。
+      // a. 外殼可讀性
+      const sb = r("sidebar");
+      const sbFg = r("sidebar-foreground");
+      const cSbText = contrast(sbFg, sb);
+      push(cSbText >= TEXT, `${tag} 外殼上的文字只有 ${cSbText.toFixed(2)}:1（需 ${TEXT}）`);
+      const cSbSecondary = contrast(r("sidebar-muted-foreground"), sb);
+      push(cSbSecondary >= TEXT,
+        `${tag} 外殼上的次要文字（sidebar-muted-foreground）只有 ${cSbSecondary.toFixed(2)}:1（需 ${TEXT}）`);
+      const accent = r("sidebar-accent");
+      const dAccent = deltaE00(lab(accent), lab(sb));
+      push(dAccent >= SHELL_ACCENT_MIN,
+        `${tag} 選中項（sidebar-accent）與外殼只差 ΔE00 ${dAccent.toFixed(1)}（需 ${SHELL_ACCENT_MIN}）——選中項浮不出來`);
+      const cAccentText = contrast(r("sidebar-accent-foreground"), accent);
+      push(cAccentText >= TEXT, `${tag} 選中項上的文字只有 ${cAccentText.toFixed(2)}:1（需 ${TEXT}）`);
+      const ring = r("sidebar-ring");
+      const cRingShell = contrast(ring, sb);
+      const cRingAccent = contrast(ring, accent);
+      push(cRingShell >= NONTEXT, `${tag} 外殼聚焦環對外殼只有 ${cRingShell.toFixed(2)}:1（需 ${NONTEXT}）`);
+      push(cRingAccent >= NONTEXT, `${tag} 外殼聚焦環對選中項只有 ${cRingAccent.toFixed(2)}:1（需 ${NONTEXT}）`);
+      const mark = r("sidebar-primary");
+      const cMarkText = contrast(r("sidebar-primary-foreground"), mark);
+      const cMarkShell = contrast(mark, sb);
+      push(cMarkText >= TEXT, `${tag} 標誌塊上的字只有 ${cMarkText.toFixed(2)}:1（需 ${TEXT}）`);
+      push(cMarkShell >= NONTEXT, `${tag} 標誌塊對外殼只有 ${cMarkShell.toFixed(2)}:1（需 ${NONTEXT}）`);
 
-      // 1. 色相層：警報色域是保留區。
-      //    danger 18°／destructive 25°／warning 71°／edit 83° 把 0–95° 整段吃滿。
-      //    主題落在那裡就算個別色票分得開（明度差會把 ΔE00 拉大），
-      //    也等於把「瞬間反應」這個通道花在品牌上——畫面上到處是暖色，紅色就不再突出。
-      //    **色相規則只在顏色真的有彩度時才成立。** 近中性色的色相角度數值上存在、
-      //    感知上不存在——一顆近白的按鈕不可能「佔用警報色域」。石墨的 brand 鏡射
-      //    primary 之後在深色是近白（chroma 0.0035），量出來距 info 只有 13°，
-      //    但那是把一個無意義的角度拿去比。低於這個彩度就跳過色相檢查。
-      const hueGap = (a, b) => { const d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; };
-      const [, brandChroma, bh] = rgb8ToOklch(brand);
-      if (brandChroma >= CHROMATIC_MIN) {
-        let nearH = { g: 360, s: "" };
-        for (const s of STATUS) {
-          const g = hueGap(bh, rgb8ToOklch(px(mode, s))[2]);
-          if (g < nearH.g) nearH = { g, s };
-        }
-        push(nearH.g >= BRAND_HUE_GAP,
-          `${tag} brand 色相距 ${nearH.s} 只有 ${nearH.g.toFixed(0)}°（需 ${BRAND_HUE_GAP}°）` +
-          `——主題不該住進警報色域`);
+      // d. 外殼與內容面。預設外殼是「比頁面底沉一階的安靜區」，環境外殼是一眼可辨的框。
+      const dFrame = deltaE00(lab(sb), lab(pageBgOf(name, mode)));
+      if (isDefault) {
+        push(dFrame >= SIDEBAR_ZONE_MIN,
+          `${tag} 外殼與頁面底只差 ΔE00 ${dFrame.toFixed(1)}（需 ${SIDEBAR_ZONE_MIN}）——「另一個區」不成立`);
+        if (dFrame > SIDEBAR_ZONE_MAX) warn.push(`${tag} 預設外殼與頁面底差到 ΔE00 ${dFrame.toFixed(1)}（上限 ${SIDEBAR_ZONE_MAX}）——外殼太響`);
+      } else {
+        push(dFrame >= SHELL_FRAME_MIN,
+          `${tag} 環境外殼與頁面底只差 ΔE00 ${dFrame.toFixed(1)}（需 ${SHELL_FRAME_MIN}）——外框不成立`);
+        // 飽和度階序：錯誤紅必須是畫面上最飽和的顏色。外殼是全畫面最大的色塊，
+        // 它的彩度一旦追上 danger，紅色就從「最搶眼」降級成「其中一個彩色」。
+        const cShell = rgb8ToOklch(sb)[1];
+        const cDanger = rgb8ToOklch(px(mode, "danger"))[1];
+        push(cShell < cDanger,
+          `${tag} 外殼的 chroma ${cShell.toFixed(3)} 不低於 danger 的 ${cDanger.toFixed(3)}——飽和度階序反過來，紅色會失去優先權`);
       }
 
-      // 1b. brand 當實色填底時，不得被讀成**停用**。
-      //
-      // `Button` 的停用態是 `disabled:opacity-50`，所以使用者看到的「停用外觀」
-      // 就是 primary 以 50% 疊在背景上。近中性的主題色做成填色按鈕會正好撞進那個位置——
-      // 石墨先前照公式生成的 chroma 0.030 灰藍，距停用外觀只有 ΔE00 8.5／7.9，
-      // 使用者實際看 Storybook 時第一眼就說它「像停用」。
-      // 修法是讓無彩主題的 brand 直接鏡射 primary（近黑／近白），而不是硬擠出一個灰。
-      const disabled = px(mode, "primary").map((v, i) =>
-        Math.round(v * 0.5 + pageBgOf(name, mode)[i] * 0.5));
-      const dDisabled = deltaE00(lab(brand), lab(disabled));
-      push(dDisabled >= BRAND_DISABLED_MIN,
-        `${tag} brand 與停用外觀只差 ΔE00 ${dDisabled.toFixed(1)}（需 ${BRAND_DISABLED_MIN}）` +
-        `——填色按鈕會被讀成停用`);
-
-      // 2. 飽和度層：警報必須是畫面上最飽和的東西。
-      //    danger 的 chroma 若被主題超過，紅色就從「最搶眼」降級成「其中一個彩色」。
-      const cBrandChroma = brandChroma;
-      const cDanger = rgb8ToOklch(px(mode, "danger"))[1];
-      push(cBrandChroma < cDanger,
-        `${tag} brand 的 chroma ${cBrandChroma.toFixed(3)} 不低於 danger 的 ${cDanger.toFixed(3)}` +
-        `——飽和度階序反過來，紅色會失去優先權`);
-
-      // 中性色跟著主題轉色相之後，這些配對要逐主題重驗——L 與 chroma 沒動，
-      // 但 WCAG 的相對亮度跟色相有關，轉一圈下來會有零點幾的位移。
-      for (const [fg, bg] of [["muted-foreground", "muted"], ["muted-foreground", "background"]]) {
-        const c = contrast(resolve(name, mode, fg), resolve(name, mode, bg));
-        if (c < TEXT) warn.push(`${tag} ${fg} 在 ${bg} 上 ${c.toFixed(2)}:1（需 ${TEXT}）`);
-      }
-
-      // ── 側邊欄表面 ──────────────────────────────
-      // sidebar 是全天候大面積表面，文字與聚焦環的門檻比照 background；
-      // 「另一個區」的可辨性（對頁面底的 ΔE00）與選中項的區分度（sidebar-accent）
-      // 是生成參數，這裡驗的是它們沒有被手改或漂移。
-      const sb = resolve(name, mode, "sidebar");
-      const cSbText = contrast(resolve(name, mode, "sidebar-foreground"), sb);
-      push(cSbText >= TEXT, `${tag} sidebar 上的文字只有 ${cSbText.toFixed(2)}:1（需 ${TEXT}）`);
-
-      const cSbSecondary = contrast(resolve(name, mode, "muted-foreground"), sb);
-      if (cSbSecondary < TEXT) warn.push(`${tag} muted-foreground 在 sidebar 上 ${cSbSecondary.toFixed(2)}:1（需 ${TEXT}）`);
-
-      const cSbRing = contrast(resolve(name, mode, "ring"), sb);
-      push(cSbRing >= NONTEXT, `${tag} ring 對 sidebar 只有 ${cSbRing.toFixed(2)}:1（需 ${NONTEXT}）`);
-
-      const dSbBg = deltaE00(lab(sb), lab(pageBgOf(name, mode)));
-      push(dSbBg >= SIDEBAR_ZONE_MIN,
-        `${tag} sidebar 與頁面底只差 ΔE00 ${dSbBg.toFixed(1)}（需 ${SIDEBAR_ZONE_MIN}）——「另一個區」不成立`);
-      if (dSbBg > SIDEBAR_ZONE_MAX) {
-        warn.push(`${tag} sidebar 與頁面底差到 ΔE00 ${dSbBg.toFixed(1)}（上限 ${SIDEBAR_ZONE_MAX}）——外殼太響`);
-      }
-
-      const dAccent = deltaE00(lab(at("sidebar-accent")), lab(sb));
-      push(dAccent >= SUBTLE_MIN,
-        `${tag} sidebar-accent 與 sidebar 只差 ΔE00 ${dAccent.toFixed(1)}（需 ${SUBTLE_MIN}）——選中項浮不出來`);
-
-      // 別名恆等：主題層的 sidebar-* 是 brand 家族的字面值複製（生成器唯一寫入者）。
-      // 手改 tokens.json 會讓兩個「應該永遠同色」的 token 安靜分家——這裡把它變成紅燈。
-      for (const [alias, base] of [
-        ["sidebar-primary", "brand"],
-        ["sidebar-primary-foreground", "brand-foreground"],
-        ["sidebar-accent", "brand-subtle"],
-        ["sidebar-accent-foreground", "brand-subtle-foreground"],
-        ["sidebar-border", "border"],
-      ]) {
+      // 別名恆等：生成器是唯一寫入者，手改會讓「應該永遠同色」的 token 安靜分家。
+      const aliases = isDefault
+        ? [["sidebar-primary", "brand"], ["sidebar-primary-foreground", "brand-foreground"],
+           ["sidebar-accent", "brand-subtle"], ["sidebar-accent-foreground", "brand-subtle-foreground"],
+           ["sidebar-border", "border"], ["sidebar-muted-foreground", "muted-foreground"]]
+        : [["sidebar-accent-foreground", "sidebar-foreground"], ["sidebar-ring", "sidebar-foreground"],
+           ["sidebar-primary", "sidebar-foreground"], ["sidebar-primary-foreground", "sidebar"]];
+      for (const [alias, base] of aliases) {
         push(t[alias]?.value === t[base]?.value,
-          `${tag} ${alias} 與 ${base} 的值分家了——sidebar-* 是別名，請重跑 generate-theme 而不是手改`);
+          `${tag} ${alias} 與 ${base} 的值分家了——這是別名，請重跑 generate-theme 而不是手改`);
       }
-      // 刻意不驗 border 對背景。分隔線是裝飾性的細線，WCAG 1.4.11 不涵蓋；
-      // 訂一個自己發明的門檻只會產生六組主題各一則的雜訊，而假警報會訓練人忽略真警報。
+
+      // 預設主題才有的內容面檢查：brand-subtle（中性淡底）與 ring 對最亮表面。
+      // 環境主題不覆蓋這些鍵，有效值與預設主題相同，驗一次就夠。
+      let cSubtle = null;
+      let cRing = null;
+      if (isDefault) {
+        cSubtle = contrast(at(t, "brand-subtle"), at(t, "brand-subtle-foreground"));
+        push(cSubtle >= TEXT, `${tag} brand-subtle 上的文字只有 ${cSubtle.toFixed(2)}:1（需 ${TEXT}）`);
+        const dMuted = deltaE00(lab(at(t, "brand-subtle")), lab(r("muted")));
+        push(dMuted >= SUBTLE_MIN, `${tag} brand-subtle 與 muted 只差 ΔE00 ${dMuted.toFixed(1)}（需 ${SUBTLE_MIN}）`);
+        cRing = contrast(r("ring"), hardestOf(name, mode));
+        push(cRing >= NONTEXT, `${tag} ring 對最亮表面只有 ${cRing.toFixed(2)}:1（需 ${NONTEXT}）`);
+        for (const [fg, bg] of [["muted-foreground", "muted"], ["muted-foreground", "background"]]) {
+          const c = contrast(r(fg), r(bg));
+          if (c < TEXT) warn.push(`${tag} ${fg} 在 ${bg} 上 ${c.toFixed(2)}:1（需 ${TEXT}）`);
+        }
+      }
 
       stats.themes[tag] = {
-        brandText: cBrand, subtleText: cSubtle, ring: cRing, fill: cFill,
-        nearestStatus: nearest.s, nearestStatusD: nearest.d,
+        shellText: cSbText, shellSecondary: cSbSecondary, accentDelta: dAccent, accentText: cAccentText,
+        ring: cRingShell, frame: dFrame, subtleText: cSubtle, contentRing: cRing,
       };
     }
+  }
+
+  // c. 色票結構：同族兩階看得出是一家、跨族一眼分得開、家族在色相上連續。
+  //    比的是外殼本身（淺深兩模式取最差），預設主題是淺色外殼、不參與。
+  {
+    const envs = Object.entries(tokens.themes ?? {}).filter(([n]) => n !== DEF);
+    const shellOf = (n, mode) => resolve(n, mode, "sidebar");
+    const dist = (a, b) => Math.min(...MODES.map((m) => deltaE00(lab(shellOf(a, m)), lab(shellOf(b, m)))));
+    let within = { d: Infinity, p: "" };
+    let cross = { d: Infinity, p: "" };
+    for (let i = 0; i < envs.length; i++) {
+      for (let j = i + 1; j < envs.length; j++) {
+        const [a, ta] = envs[i];
+        const [b, tb] = envs[j];
+        const d = dist(a, b);
+        const same = ta.$family === tb.$family;
+        const min = same ? SHELL_FAMILY_MIN : SHELL_CROSS_MIN;
+        if (d < min) {
+          fail.push(`${a}↔${b} 外殼只差 ΔE00 ${d.toFixed(1)}（${same ? "同族" : "跨族"}需 ${min}）`);
+        }
+        if (same && d < within.d) within = { d, p: `${a}↔${b}` };
+        if (!same && d < cross.d) cross = { d, p: `${a}↔${b}` };
+      }
+    }
+    // 家族在色相上連續：任一族的色相範圍內，不得夾著別族的主題（近中性的 slate 不參與色相比較）。
+    const hueOf = (n) => rgb8ToOklch(shellOf(n, "light"))[2];
+    const chromaOf = (n) => rgb8ToOklch(shellOf(n, "light"))[1];
+    const chromatic = envs.filter(([n]) => chromaOf(n) >= CHROMATIC_MIN);
+    const families = new Map();
+    for (const [n, t] of chromatic) families.set(t.$family, [...(families.get(t.$family) ?? []), hueOf(n)]);
+    for (const [fam, hues] of families) {
+      if (hues.length < 2) continue;
+      // 族內色相的最小覆蓋弧（族內最大缺口的對面）
+      const sorted = [...hues].sort((x, y) => x - y);
+      let gapAt = 0;
+      let gap = sorted[0] + 360 - sorted[sorted.length - 1];
+      for (let k = 1; k < sorted.length; k++) {
+        if (sorted[k] - sorted[k - 1] > gap) { gap = sorted[k] - sorted[k - 1]; gapAt = k; }
+      }
+      const start = sorted[gapAt];
+      const span = 360 - gap;
+      for (const [n, t] of chromatic) {
+        if (t.$family === fam) continue;
+        const off = (hueOf(n) - start + 360) % 360;
+        if (off > 0.5 && off < span - 0.5) {
+          fail.push(`${n}（${t.$family}）夾在 ${fam} 族的色相範圍裡——家族在色相上要連續`);
+        }
+      }
+    }
+    stats.palette = { within: within.d, withinPair: within.p, cross: cross.d, crossPair: cross.p, count: envs.length };
   }
 
   // ── 1a. 側邊欄基準層的別名恆等 ─────────────────────────────
@@ -223,6 +255,7 @@ export function runChecks() {
   for (const mode of MODES) {
     for (const [alias, base] of [
       ["sidebar-foreground", "foreground"],
+      ["sidebar-muted-foreground", "muted-foreground"],
       ["sidebar-border", "border"],
       ["sidebar-ring", "ring"],
     ]) {
@@ -383,8 +416,6 @@ export function runChecks() {
   // 深色模式下 `foreground` 與 `primary` 是同一個近白，拿它疊實色按鈕會得到 ΔE00 0.0。
   const alpha = (n) => parseFloat(tokens.state[n].value) / 100;
   const A = { hover: alpha("hover-alpha"), pressed: alpha("pressed-alpha"), selected: alpha("selected-alpha") };
-  /** src-over：不透明的疊加色以 alpha 疊在不透明底色上 */
-  const mix = (paint, base, a) => paint.map((c, i) => Math.round(c * a + base[i] * (1 - a)));
 
   const STATE_HOVER_MIN = 2.5;    // 低於此看不出「這個可以互動」
   const STATE_PRESSED_MIN = 2.5;  // 按下要能與 hover 分開
@@ -398,24 +429,32 @@ export function runChecks() {
   // 不驗 `field-editable`／`field-readonly`：那兩個是**輸入框**的底色（見 number-input、
   // coachmark 的 textarea），沒有任何帶狀態層的元件坐在上面。欄位的回饋走聚焦環與邊框，
   // 不走狀態層——驗一組不存在的組合只會製造假警報。
+  //
+  // 外殼（側欄、表頭）上的選單項、表頭按鈕也走狀態層，而外殼每個主題都不一樣——
+  // 所以外殼這一組**逐主題**驗，內容面四種表面在所有主題下同值，驗預設主題即可。
   const SURFACES = [
     ["background", "foreground"],
     ["card", "card-foreground"],
     ["muted", "foreground"],
     ["popover", "popover-foreground"],
-    ["sidebar", "sidebar-foreground"],   // 側欄選單項的 hover／selected 也走狀態層
+  ];
+  const surfaceRuns = [
+    ...SURFACES.map(([surface, onColor]) => ({ theme: DEF, surface, onColor, label: surface })),
+    ...Object.keys(tokens.themes ?? {}).map((theme) => ({
+      theme, surface: "sidebar", onColor: "sidebar-foreground", label: `sidebar（${theme}）`,
+    })),
   ];
   for (const mode of MODES) {
     const s = { hover: Infinity, pressed: Infinity, selected: Infinity, loudest: 0, text: Infinity, sec: Infinity };
-    for (const [surface, onColor] of SURFACES) {
-      const base = px(mode, surface);
-      const paint = px(mode, onColor);
+    for (const { theme, surface, onColor, label } of surfaceRuns) {
+      const base = resolve(theme, mode, surface);
+      const paint = resolve(theme, mode, onColor);
       const hov = mix(paint, base, A.hover);
       const prs = mix(paint, base, A.pressed);
       const sel = mix(paint, base, A.selected);
       const d = (a, b) => deltaE00(lab(a), lab(b));
       const [dh, dp, ds, dmax] = [d(base, hov), d(hov, prs), d(hov, sel), d(base, sel)];
-      const tag = `${surface}/${mode}`;
+      const tag = `${label}/${mode}`;
       if (dh < STATE_HOVER_MIN) fail.push(`hover 對 ${tag} 只差 ΔE00 ${dh.toFixed(1)}（需 ${STATE_HOVER_MIN}）`);
       if (dp < STATE_PRESSED_MIN) fail.push(`pressed 對 hover 在 ${tag} 只差 ΔE00 ${dp.toFixed(1)}（需 ${STATE_PRESSED_MIN}）`);
       if (ds < STATE_SELECTED_MIN) fail.push(`已選對 hover 在 ${tag} 只差 ΔE00 ${ds.toFixed(1)}（需 ${STATE_SELECTED_MIN}）`);
@@ -426,7 +465,9 @@ export function runChecks() {
       s.hover = Math.min(s.hover, dh); s.pressed = Math.min(s.pressed, dp);
       s.selected = Math.min(s.selected, ds); s.loudest = Math.max(s.loudest, dmax);
       s.text = Math.min(s.text, ct);
-      s.sec = Math.min(s.sec, contrast(px(mode, "muted-foreground"), sel));
+      // 弱化文字：內容面是 muted-foreground，外殼上是 sidebar-muted-foreground
+      const secondary = resolve(theme, mode, surface === "sidebar" ? "sidebar-muted-foreground" : "muted-foreground");
+      s.sec = Math.min(s.sec, contrast(secondary, sel));
     }
     stats.state ??= {};
     stats.state[mode] = s;
@@ -457,13 +498,18 @@ export function runChecks() {
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
   const { fail, warn, stats } = runChecks();
 
-  console.log("色相主題（brand 文字 4.5:1／ring 對最亮表面 3:1／brand 與最近狀態色 ΔE00 ≥12）");
+  console.log("環境色主題（外殼文字與次要文字 4.5:1／選中項 ΔE00 ≥8／聚焦環 3:1／外框 ΔE00 ≥10）");
   for (const [tag, s] of Object.entries(stats.themes)) {
     console.log(
-      `  ${tag.padEnd(16)} brand字 ${s.brandText.toFixed(2)}  subtle字 ${s.subtleText.toFixed(2)}  ` +
-      `ring ${s.ring.toFixed(2)}  色塊 ${s.fill.toFixed(2)}  最近狀態色 ${s.nearestStatus}=${s.nearestStatusD.toFixed(1)}`,
+      `  ${tag.padEnd(18)} 字 ${s.shellText.toFixed(1)}  次要 ${s.shellSecondary.toFixed(1)}  ` +
+      `選中Δ ${s.accentDelta.toFixed(1)}（字 ${s.accentText.toFixed(1)}）  環 ${s.ring.toFixed(1)}  外框Δ ${s.frame.toFixed(1)}`,
     );
   }
+  const p = stats.palette;
+  console.log(
+    `  色票 ${p.count} 組：同族最近 ${p.withinPair} ΔE00 ${p.within.toFixed(1)}（需 ${SHELL_FAMILY_MIN}）　` +
+    `跨族最近 ${p.crossPair} ΔE00 ${p.cross.toFixed(1)}（需 ${SHELL_CROSS_MIN}）`,
+  );
   console.log("\n圖表分類色票");
   for (const [mode, s] of Object.entries(stats.chart)) {
     console.log(

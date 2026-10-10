@@ -6,7 +6,7 @@
   "title": "Charts 圖表",
   "description": "後台閱讀型的八種零相依圖＋圖例＋色票工具，含文字與鍵盤等價。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0"
+    "@dooping/tokens@^0.8.0"
   ],
   "registryDependencies": [
     "https://kielchang.github.io/dooping-design-book/r/utils.json"

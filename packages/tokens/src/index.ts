@@ -34,13 +34,22 @@ export function chartColors(mode: ThemeMode = "light"): string[] {
     .map((k) => all[k]);
 }
 
-// 色相主題。`$label`／`$hue` 是註記欄（與 `$comment` 同類），`flatten()` 會自動略過，
-// 因此它們不會混進 token 對映裡。這裡經 `unknown` 轉一次型別：tokens.data.ts 是
-// `as const` 的字面量型別，與這個較寬的結構沒有足夠重疊，直接 cast 會被 TS 擋下。
-type ThemeGroup = { $label?: string; $hue?: number; light: TokenGroup; dark: TokenGroup };
+// 環境色主題（只換外殼）。`$label`／`$hue`／`$family`／`$term`／`$tier` 是註記欄
+// （與 `$comment` 同類），`flatten()` 會自動略過，因此它們不會混進 token 對映裡。
+// 這裡經 `unknown` 轉一次型別：tokens.data.ts 是 `as const` 的字面量型別，
+// 與這個較寬的結構沒有足夠重疊，直接 cast 會被 TS 擋下。
+type ThemeGroup = {
+  $label?: string;
+  $hue?: number;
+  $family?: string;
+  $term?: string;
+  $tier?: string;
+  light: TokenGroup;
+  dark: TokenGroup;
+};
 const allThemes = (raw as unknown as { themes?: Record<string, ThemeGroup> }).themes ?? {};
 
-/** 可用的色相主題名稱（`data-color-theme` 的合法值），依 tokens.json 宣告順序。 */
+/** 可用的環境色主題名稱（`data-color-theme` 的合法值），依 tokens.json 宣告順序。 */
 export function themeNames(): string[] {
   return Object.keys(allThemes);
 }
@@ -49,20 +58,37 @@ export function themeNames(): string[] {
 export const DEFAULT_THEME: string =
   (raw.meta as { defaultTheme?: string }).defaultTheme ?? "";
 
-/** 主題的顯示名稱與 OKLCH 色相角度，給文件站與主題切換器用。 */
-export function themeMeta(): { name: string; label: string; hue: number }[] {
+/** 主題的中繼資料，給文件站、色票頁與應用切換清單用。 */
+export interface ThemeMeta {
+  name: string;
+  /** 顯示名稱（例如「青玉」） */
+  label: string;
+  /** OKLCH 色相角度 */
+  hue: number;
+  /** 色族鍵（例如 `cyan`）：同族的主題彼此相近，不同族一眼分得開 */
+  family: string;
+  /** 華語基本色名（例如「青」） */
+  term: string;
+  /** 色階：`default`（預設淺色外殼）／`neutral`／`base`（淺階）／`deep`（深階） */
+  tier: string;
+}
+
+export function themeMeta(): ThemeMeta[] {
   return Object.entries(allThemes).map(([name, t]) => ({
     name,
     label: t.$label ?? name,
     hue: t.$hue ?? 0,
+    family: t.$family ?? "",
+    term: t.$term ?? "",
+    tier: t.$tier ?? "",
   }));
 }
 
 /**
- * 某個色相主題覆蓋的全部 token（HSL 三元組字串）。
+ * 某個主題**自己宣告**的 token（HSL 三元組字串），不含沿 cascade 繼承來的值。
  *
- * 內容分三類：brand 家族、帶色調的中性色（只轉色相）、sidebar-primary/accent
- * 家族（brand 的別名）。狀態色與圖表色票不隨主題變，要拿那些請用
+ * 預設主題宣告內容面的中性色、brand 家族與淺色外殼的選中項；環境主題只宣告外殼鍵
+ * （`--sidebar` 家族）。狀態色與圖表色票不隨主題變，要拿那些請用
  * `semanticColors()`／`chartColors()`。
  */
 export function themeColors(

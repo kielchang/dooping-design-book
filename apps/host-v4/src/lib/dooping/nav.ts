@@ -19,6 +19,11 @@ export interface NavLeaf {
   badge?: NavBadge;
   /** 外部連結（操作手冊這類）：target=_blank、不參與 active 判定。 */
   external?: boolean;
+  /**
+   * 這一項代表的應用用哪一組環境色主題（`data-color-theme` 的值）。應用切換清單用它畫一塊
+   * 「那個系統的外殼色」縮影，一眼認出每個應用；名稱照舊顯示，不靠顏色單獨辨識。
+   */
+  colorTheme?: string;
   items?: never;
   action?: never;
 }

@@ -6,7 +6,7 @@
   "title": "useDialogState 對話框開關",
   "description": "多種對話框的集中開關：天然單開、同值再設即關。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0"
+    "@dooping/tokens@^0.8.0"
   ],
   "registryDependencies": [],
   "files": [

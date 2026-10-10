@@ -6,7 +6,7 @@
   "title": "Checkbox 勾選框",
   "description": "單一勾選（Radix Checkbox）。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "@radix-ui/react-checkbox",
     "lucide-react"
   ],

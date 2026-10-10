@@ -6,7 +6,7 @@
   "title": "TabPills 分頁膠囊",
   "description": "分頁切換的統一元件，含 tablist 語意。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0"
+    "@dooping/tokens@^0.8.0"
   ],
   "registryDependencies": [
     "https://kielchang.github.io/dooping-design-book/r/utils.json"

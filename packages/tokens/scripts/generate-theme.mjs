@@ -23,61 +23,85 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = join(ROOT, "src/tokens.json");
 const tokens = JSON.parse(readFileSync(SRC, "utf8"));
 
-const WHITE = [255, 255, 255];
 const px = (t) => hslToRgb8(tokens.color[t.mode][t.name].value);
 
-// 每個模式裡「最亮的表面」——聚焦環要在最不利的表面上仍達 3:1，
-// 只驗頁面底色會漏掉卡片與浮層。
-const HARDEST_SURFACE = {
-  light: px({ mode: "light", name: "background" }),   // 純白
-  dark: px({ mode: "dark", name: "muted" }),          // 深色裡最亮的一層
-};
-const PAGE_BG = {
-  light: px({ mode: "light", name: "background" }),
-  dark: px({ mode: "dark", name: "background" }),
-};
+// 頁面底色在中性色轉色相之後才定案，所以用到時才讀，不在檔頭先算。
+const pageBg = (mode) => px({ mode, name: "background" });
 
-// ── 六組主題色 ─────────────────────────────────────────────
-// hue 是 OKLCH 角度。狀態色佔用 danger 17.7°／destructive 25.3°／warning 70.6°／
-// edit 83.9°／success 162.4°／info 238.1°，主題色相刻意與這些保持距離。
-// `neutralBrand` = 這一組**沒有品牌色**，`--brand` 直接鏡射 `--primary`。
+// ── 環境色：主題只染外殼 ───────────────────────────────────
 //
-// 石墨的定位是「不挑主題時等同現況」，而現況本來就沒有 `--brand`。先前讓它照公式生成
-// 一個 chroma 0.030 的灰藍，結果填色按鈕與**停用**按鈕幾乎同色——實測距停用外觀
-// 只有 ΔE00 8.5（淺）／7.9（深），低於 10 就是實務上分不開。
-// 那不是色相問題，是「用一個近中性色去做實色填底」本身就會撞到 disabled 的視覺位置。
+// 主題（宿主在 <html> 設 `data-color-theme`）只換**側欄＋表頭**這個 L 形外殼的底色，
+// 用大區塊的顏色讓人一眼知道自己在哪個工作環境。內容面（畫布、卡片、浮層、欄位、表格）
+// 一律中性、所有主題同值：提醒、按鈕、琥珀欄位這些靠顏色辨識的元件都坐在內容面上，
+// 主題色碰不到它們，色相預算只剩外殼本身要管。
+//
+// 外殼用**深色**：淺染的外殼和提醒淡底（*-subtle）落在同一個明亮、低彩度的區域，
+// 實測一眼分得開的只剩 2–4 色；深色外殼（L 0.27–0.40）離淡底與狀態實色都遠，全色輪都能用。
+//
+// 色票結構：8 個色族 × 深淺 2 階，加中性的 slate。同族兩階靠明度拉開（看得出是一家），
+// 不同族靠色相拉開（一眼分得開）；兩個門檻由 scripts/verify-color.mjs 擋。
+// graphite 是預設：維持原本的淺色外殼，代表「未指定環境」，沒設 data-color-theme 的宿主畫面不變。
+//
+// `--brand` 不再隨主題變：所有主題都鏡射 `--primary`。只有預設主題輸出它，其他主題沿 cascade
+// 繼承 `:root`。品牌色要是留在內容面，就會回到「主題色和提醒、按鈕搶色相」的老問題。
+
+/** 外殼的明度與 chroma 上限。深色模式 chroma 約打八折：高飽和色在暗背景會產生光暈，刺眼且難讀。 */
+const SHELL = {
+  base:    { light: { L: 0.40, C: 0.085 }, dark: { L: 0.38, C: 0.065 } },
+  deep:    { light: { L: 0.28, C: 0.070 }, dark: { L: 0.27, C: 0.055 } },
+  // 中性外殼在深色模式要比彩色的深階亮一些：沒有色相可以跟頁面底拉開，只能靠明度
+  neutral: { light: { L: 0.30, C: 0.015 }, dark: { L: 0.33, C: 0.012 } },
+};
+/** 外殼上的文字、標誌塊與聚焦環：近白。對最亮的外殼（淺階）仍有 8:1 以上。 */
+const SHELL_FG = "210 40% 98%";
+/** 選中的導覽項與外殼的最小感知距離——低於此，「這一項被選中」在深色外殼上看不出來。 */
+const SHELL_ACCENT_MIN = 8;
+/** 外殼內分隔線與外殼的感知距離：看得出分區，但只是細線。 */
+const SHELL_BORDER = 6;
+/** 外殼上次要文字的對比目標：比正文門檻多留一點，取整後不會掉線。 */
+const SHELL_SECONDARY = 4.8;
+
+// hue 是 OKLCH 角度，family／term 給文件與色票頁（term＝華語基本色名，叫得出名字）。
+// 鍵名保留既有的 indigo／violet／amethyst／teal／moss，意義從「強調色」改成「外殼色」。
 const THEMES = [
-  { name: "graphite", label: "石墨", hue: 265, cap: 0.030, neutralBrand: true },
-  { name: "indigo",   label: "靛藍", hue: 272, cap: 0.150 },
-  { name: "violet",   label: "藍紫", hue: 292, cap: 0.150 },
-  { name: "amethyst", label: "紫晶", hue: 305, cap: 0.150 },
-  { name: "teal",     label: "青玉", hue: 195, cap: 0.130 },
-  { name: "moss",     label: "苔綠", hue: 135, cap: 0.130 },
+  { name: "graphite",    label: "石墨",   family: "neutral", term: "灰",   tier: "default", hue: 265 },
+  { name: "slate",       label: "石板",   family: "neutral", term: "灰",   tier: "neutral", hue: 265 },
+  { name: "berry",       label: "莓紅",   family: "red",     term: "紅",   tier: "base",    hue: 5 },
+  { name: "berry-deep",  label: "深莓紅", family: "red",     term: "紅",   tier: "deep",    hue: 5 },
+  { name: "rust",        label: "赭",     family: "orange",  term: "橙",   tier: "base",    hue: 45 },
+  { name: "rust-deep",   label: "深赭",   family: "orange",  term: "橙",   tier: "deep",    hue: 45 },
+  { name: "olive",       label: "橄欖",   family: "yellow",  term: "黃褐", tier: "base",    hue: 95 },
+  { name: "olive-deep",  label: "深橄欖", family: "yellow",  term: "黃褐", tier: "deep",    hue: 95 },
+  { name: "moss",        label: "苔綠",   family: "green",   term: "綠",   tier: "base",    hue: 140 },
+  { name: "moss-deep",   label: "深苔綠", family: "green",   term: "綠",   tier: "deep",    hue: 140 },
+  { name: "teal",        label: "青玉",   family: "cyan",    term: "青",   tier: "base",    hue: 190 },
+  { name: "teal-deep",   label: "深青玉", family: "cyan",    term: "青",   tier: "deep",    hue: 190 },
+  { name: "lagoon",      label: "湖水",   family: "azure",   term: "青藍", tier: "base",    hue: 230 },
+  { name: "lagoon-deep", label: "深湖水", family: "azure",   term: "青藍", tier: "deep",    hue: 230 },
+  { name: "indigo",      label: "靛藍",   family: "blue",    term: "藍",   tier: "base",    hue: 265 },
+  { name: "indigo-deep", label: "深靛藍", family: "blue",    term: "藍",   tier: "deep",    hue: 265 },
+  { name: "violet",      label: "紫羅蘭", family: "purple",  term: "紫",   tier: "base",    hue: 310 },
+  { name: "amethyst",    label: "紫晶",   family: "purple",  term: "紫",   tier: "deep",    hue: 310 },
 ];
 const DEFAULT_THEME = "graphite";
 
-/** 深色模式的 chroma 折減：高飽和色在暗背景會產生光暈（halation），刺眼且降低可讀性。 */
-const DARK_CHROMA_FACTOR = 0.75;
-
-/** brand-subtle 與 muted 的最小感知距離——低於此，「被選中」看起來只是「有點灰」。 */
-const SUBTLE_MIN = 8;
-
-// 帶主題色相的中性色。
+// ── 內容面的中性色 ─────────────────────────────────────────
 //
-// 這些 token 的 chroma 只有 0.007–0.023——單看一格幾乎分不出來，但它們是畫面上
-// 面積最大的那 60%。中性色固定在冷藍（248–267°）而主色是青玉或苔綠時，
-// 介面會有一種說不上來的「兩套系統拼裝」感：主色是暖綠，它坐的表面卻是冷藍。
+// 中性色帶一點石墨的色相（265°）：chroma 只有 0.007–0.023，單看一格分不出來，
+// 但它們是畫面上面積最大的那 60%。**只轉色相，L 與 chroma 一律不動**，明暗層次、
+// 表面抬升階、對比關係因此原封不動。
 //
-// 做法是**只轉色相，L 與 chroma 一律不動**。因此明暗層次、表面抬升階、
-// 對比關係全部原封不動，只有色偏跟著主題走。這也是提醒視窗能自動繼承主題的前提：
-// tint 疊在這些表面上，一度色相都不用彎。
+// 這組值只放在預設主題裡：`:root` 就是「基準層＋預設主題」，環境主題只覆蓋外殼鍵，
+// 內容面因此沿 cascade 在每個主題下都同值，提醒淡底永遠坐在同一個中性面上。
+// 不把它寫回基準層：低彩度色反覆轉色相時，8-bit 取整會讓值每跑一次跳一格，生成就不再冪等。
+const CONTENT_HUE = 265;
 const NEUTRAL_TINT = [
   "background", "card", "popover",          // 表面（淺色下是純白，chroma 0，轉了也不變）
   "muted", "secondary", "accent",           // 弱化與次要表面
   "border", "input", "field-border",        // 線
   "muted-foreground",                       // 次要文字
   "field-editable", "field-readonly",       // 欄位底
-  "sidebar", "sidebar-border",              // 外殼表面與其邊線（由 buildSidebarBase 先生成）
+  "sidebar", "sidebar-border",              // 預設外殼（淺色）與其邊線（由 buildSidebarBase 先生成）
 ];
 
 function tintNeutral(mode, hue) {
@@ -91,8 +115,8 @@ function tintNeutral(mode, hue) {
   }
 
   // muted-foreground 是次要文字，會落在 muted 這種弱化表面上。
-  // 基準值對 muted 只有 4.34:1（本來就低於門檻），轉色相後最差掉到 4.25:1。
-  // 既然這一格是生成的，就解對而不是留一條警告：對「這個主題的 muted」反解到 4.5:1。
+  // 基準值對 muted 只有 4.34:1，轉色相後最差掉到 4.25:1。
+  // 既然這一格是生成的，就解對而不是留一條警告：對轉過色相的 muted 反解到 4.5:1。
   // 只往暗解，不動色相與 chroma——次要文字變太深會搶掉正文的層次。
   const mutedRgb = hslToRgb8(out.muted.value);
   const [, mfC] = rgb8ToOklch(hslToRgb8(tokens.color[mode]["muted-foreground"].value));
@@ -107,43 +131,28 @@ function tintNeutral(mode, hue) {
   return out;
 }
 
-function buildTheme({ hue, cap, neutralBrand = false }) {
+// ── 預設主題：brand 家族 ───────────────────────────────────
+//
+// brand 鏡射 primary，前景**必須跟著鏡射 primary-foreground**：深色模式的 primary 是近白，
+// 配寫死的白字會變成白底白字。
+//
+// brand-subtle（選中的導覽項、分頁底線區）不能用固定的 L/C——muted 本身是帶藍的淺灰，
+// 固定值產出的淡底會與 muted 幾乎同色（實測只差 ΔE00 3.2），「被選中」看起來只是「有點灰」。
+// 改成解出來：從最淡開始往下探，找第一個與 muted **且**與預設外殼（sidebar）都拉開
+// SUBTLE_MIN 的值——選中的導覽項實際坐在 sidebar 上。
+const SUBTLE_MIN = 8;
+const DEFAULT_SUBTLE_CAP = 0.030;
+const DARK_CHROMA_FACTOR = 0.75;
+
+function buildDefaultTheme() {
   const out = { light: {}, dark: {} };
-
   for (const mode of ["light", "dark"]) {
-    const c = mode === "dark" ? cap * DARK_CHROMA_FACTOR : cap;
-
-    // 中性色先算——brand-subtle 要與「這個主題的 muted」拉開距離，
-    // 得用轉過色相之後的值。
+    const hue = CONTENT_HUE;
+    const c = mode === "dark" ? DEFAULT_SUBTLE_CAP * DARK_CHROMA_FACTOR : DEFAULT_SUBTLE_CAP;
+    // 中性色先算——brand-subtle 要與「轉過色相的」muted 與外殼拉開距離
     const neutral = tintNeutral(mode, hue);
-    const nx = (name) => hslToRgb8((neutral[name] ?? tokens.color[mode][name]).value);
-
-    // brand：關鍵 CTA 的填色。解 L 使白字達 4.5:1，取最亮的合格解——
-    // 最亮＝色彩最鮮明而不過於沉重，且仍留在文字對比門檻內。
-    //
-    // 無彩主題例外：鏡射 primary。前景**必須跟著鏡射 primary-foreground**，
-    // 不能沿用下面寫死的白——深色模式的 primary 是近白（`210 40% 98%`），
-    // 配白字會變成白底白字。
-    const brand = neutralBrand
-      ? { rgb: px({ mode, name: "primary" }) }
-      : solveLightness(hue, c, WHITE, 4.5, { from: 0.30, to: 0.80, prefer: "max" });
-    if (!brand) throw new Error(`${mode} brand 無解（hue ${hue}）`);
-    const brandFg = neutralBrand
-      ? tokens.color[mode]["primary-foreground"].value
-      : "0 0% 100%";
-
-    // brand-subtle：選中的導覽項、分頁底線區的淡底。
-    //
-    // 這一格不能用固定的 L/C——muted 本身就是帶藍的淺灰（淺色 247.9°、深色 266.8°），
-    // 藍紫系主題用固定值產出的淡底會與 muted 幾乎同色（實測石墨只差 ΔE00 3.2），
-    // 於是「這一項被選中」看起來只是「這一項有點灰」。
-    // 改成解出來：從最淡開始往下探，找第一個與 muted 拉開 SUBTLE_MIN 的值。
-    //
-    // 自 0.7.0 起多一個對象：選中的導覽項（`--sidebar-accent` ≡ brand-subtle）實際
-    // 坐在 sidebar 表面上，不只坐在 muted 旁——「對比是生成參數」的原則落到新表面，
-    // 判準因此是「與 muted **且**與該主題的 sidebar 皆拉開 SUBTLE_MIN」。
-    const muted = nx("muted");
-    const sidebarSurf = nx("sidebar");
+    const muted = hslToRgb8(neutral.muted.value);
+    const sidebarSurf = hslToRgb8(neutral.sidebar.value);
     const subtle = (() => {
       const from = mode === "light" ? 0.970 : 0.230;
       const dir = mode === "light" ? -1 : 1;      // 淺色往下探、深色往上探
@@ -154,51 +163,76 @@ function buildTheme({ hue, cap, neutralBrand = false }) {
         if (deltaE00(lab(rgb), lab(muted)) >= SUBTLE_MIN &&
             deltaE00(lab(rgb), lab(sidebarSurf)) >= SUBTLE_MIN) return rgb;
       }
-      throw new Error(`${mode} brand-subtle 與 muted／sidebar 拉不開（hue ${hue}）`);
+      throw new Error(`${mode} brand-subtle 與 muted／sidebar 拉不開`);
     })();
-
-    // subtle 上的文字：對該淡底達 4.5:1。淺色往暗解、深色往亮解。
     const onSubtle = mode === "light"
       ? solveLightness(hue, c, subtle, 4.5, { from: 0.20, to: 0.62, prefer: "max" })
       : solveLightness(hue, c, subtle, 4.5, { from: 0.60, to: 0.97, prefer: "min" });
-    if (!onSubtle) throw new Error(`${mode} brand-subtle-foreground 無解（hue ${hue}）`);
+    if (!onSubtle) throw new Error(`${mode} brand-subtle-foreground 無解`);
 
-    // ring 刻意**不**進主題（ADR-0007）：聚焦環回落 :root 的中性基礎值。
-    // v0.4.0 曾把它做成吃主題色相，實際使用發現它會與欄位提醒色
-    // （edit 琥珀、danger）在同一個輸入框上撞成兩套強調——
-    // 提醒色管語意、ring 管焦點，色相分家之後切主題也不會誤讀 ring 的用意。
-    // 中性 ring 對各主題表面的 3:1（WCAG 1.4.11）改由 verify-color 驗有效值。
-
+    const brand = tokens.color[mode].primary.value;
+    const brandFg = tokens.color[mode]["primary-foreground"].value;
     out[mode] = {
       ...neutral,
-      brand: {
-        value: rgb8ToHsl(brand.rgb),
-        desc: neutralBrand
-          ? "主題色：本組無品牌色，鏡射 primary"
-          : "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）",
-      },
-      "brand-foreground": { value: brandFg, desc: "brand 上的文字" },
-      "brand-subtle": { value: rgb8ToHsl(subtle), desc: "主題色淡底：選中的導覽項、分頁底線區" },
+      brand: { value: brand, desc: "品牌色：鏡射 primary，所有主題同值（主題只換外殼）" },
+      "brand-foreground": { value: brandFg, desc: "brand 上的文字（鏡射 primary-foreground）" },
+      "brand-subtle": { value: rgb8ToHsl(subtle), desc: "中性淡底：選中的導覽項、分頁底線區" },
       "brand-subtle-foreground": { value: rgb8ToHsl(onSubtle.rgb), desc: "brand-subtle 上的文字" },
+      // 預設外殼是淺色，外殼的強調塊與選中項沿用 brand 家族（字面值複製，verify-color 盯恆等）
+      "sidebar-primary": { value: brand, desc: "外殼上的標誌塊＝brand 別名（預設外殼）" },
+      "sidebar-primary-foreground": { value: brandFg, desc: "sidebar-primary 上的文字＝brand-foreground 別名" },
+      "sidebar-accent": { value: rgb8ToHsl(subtle), desc: "選中的側欄項底色＝brand-subtle 別名（預設外殼）" },
+      "sidebar-accent-foreground": { value: rgb8ToHsl(onSubtle.rgb), desc: "sidebar-accent 上的文字＝brand-subtle-foreground 別名" },
+      "sidebar-muted-foreground": { value: neutral["muted-foreground"].value, desc: "外殼上的次要文字＝muted-foreground 別名（預設外殼）" },
     };
+  }
+  return out;
+}
 
-    // 側欄的主題層別名（ADR-0011）。名稱沿用 shadcn 慣例讓上游 sidebar 生態的
-    // class 逐字可用，值卻**不是**新顏色——sidebar-primary ≡ brand（側欄是識別層，
-    // 不是動作層，ADR-0007 的色相預算）、sidebar-accent ≡ brand-subtle（它的 desc
-    // 本來就是「選中的導覽項」）。用字面值複製而不是 CSS var() 別名：
-    // semanticColors()／verify-color／tokens.data.ts 三個消費端都要 HSL 三元組。
-    // 恆等關係由 verify-color 的別名守衛盯住，手改必紅。
-    out[mode]["sidebar-primary"] = {
-      value: out[mode].brand.value, desc: "側欄的品牌強調＝brand 別名（生成器保證同值）",
+// ── 環境主題：深色外殼 ─────────────────────────────────────
+//
+// 每個值都是反解出來的：
+//   外殼     給定 L、chroma 上限（色域內）
+//   選中項   同色相往亮探，第一個與外殼拉開 SHELL_ACCENT_MIN 的值；近白字仍須 ≥4.5:1
+//   分隔線   同色相往亮探，拉開 SHELL_BORDER
+//   次要文字 同色相、低彩度，對外殼反解到 SHELL_SECONDARY（取最暗的合格值，留出與正文的層次）
+//   標誌塊   與外殼反相：近白底、外殼色字
+//   聚焦環   近白（對外殼與選中項都遠超 3:1）
+function buildShellTheme({ hue, tier }) {
+  const out = { light: {}, dark: {} };
+  const fg = hslToRgb8(SHELL_FG);
+  for (const mode of ["light", "dark"]) {
+    const { L, C } = SHELL[tier][mode];
+    const at = (l) => oklchToRgb8(l, Math.min(C, maxChroma(l, hue)), hue);
+    const shell = at(L);
+    if (contrast(fg, shell) < 4.5) throw new Error(`${mode} 外殼 ${rgb8ToHex(shell)} 上的文字不到 4.5:1（hue ${hue}）`);
+
+    const lighter = (target) => {
+      for (let i = 1; i < 120; i++) {
+        const rgb = at(L + i * 0.002);
+        if (deltaE00(lab(rgb), lab(shell)) >= target) return rgb;
+      }
+      throw new Error(`${mode} 外殼 ${rgb8ToHex(shell)} 往亮探不到 ΔE00 ${target}（hue ${hue}）`);
     };
-    out[mode]["sidebar-primary-foreground"] = {
-      value: out[mode]["brand-foreground"].value, desc: "sidebar-primary 上的文字＝brand-foreground 別名",
-    };
-    out[mode]["sidebar-accent"] = {
-      value: out[mode]["brand-subtle"].value, desc: "選中的側欄項底色＝brand-subtle 別名",
-    };
-    out[mode]["sidebar-accent-foreground"] = {
-      value: out[mode]["brand-subtle-foreground"].value, desc: "sidebar-accent 上的文字＝brand-subtle-foreground 別名",
+    const accent = lighter(SHELL_ACCENT_MIN);
+    if (contrast(fg, accent) < 4.5) {
+      throw new Error(`${mode} 選中項 ${rgb8ToHex(accent)} 上的文字不到 4.5:1（hue ${hue}）`);
+    }
+    const border = lighter(SHELL_BORDER);
+    const secondary = solveLightness(hue, 0.02, shell, SHELL_SECONDARY, { from: L, to: 0.98, prefer: "min" });
+    if (!secondary) throw new Error(`${mode} 外殼 ${rgb8ToHex(shell)} 的次要文字無解（hue ${hue}）`);
+    const shellHsl = rgb8ToHsl(shell);
+
+    out[mode] = {
+      sidebar: { value: shellHsl, desc: "環境色：側欄與表頭的外殼底色（目標反解，非挑色）" },
+      "sidebar-foreground": { value: SHELL_FG, desc: "外殼上的文字（近白）" },
+      "sidebar-muted-foreground": { value: rgb8ToHsl(secondary.rgb), desc: "外殼上的次要文字（群組標題等）" },
+      "sidebar-border": { value: rgb8ToHsl(border), desc: "外殼內的分隔線" },
+      "sidebar-accent": { value: rgb8ToHsl(accent), desc: "選中的側欄項：同色相亮一階" },
+      "sidebar-accent-foreground": { value: SHELL_FG, desc: "sidebar-accent 上的文字＝sidebar-foreground" },
+      "sidebar-primary": { value: SHELL_FG, desc: "外殼上的標誌塊：與外殼反相的近白" },
+      "sidebar-primary-foreground": { value: shellHsl, desc: "標誌塊上的字＝外殼色" },
+      "sidebar-ring": { value: SHELL_FG, desc: "外殼上的聚焦環＝sidebar-foreground" },
     };
   }
   return out;
@@ -394,20 +428,20 @@ function buildAlertSubtle() {
   }
   return log;
 }
-const alertLog = buildAlertSubtle();
 
-// ── 側邊欄表面（ADR-0011） ─────────────────────────────────
+// ── 預設外殼（淺色）的側邊欄表面 ───────────────────────────
 //
-// 八個 `--sidebar-*` token 裡只有 `--sidebar` 是真正的新顏色，其餘全是別名：
-//   sidebar-foreground ≡ foreground、sidebar-border ≡ border、
-//   sidebar-ring ≡ ring（ADR-0007：聚焦環中性、不進主題），
-//   sidebar-primary/accent 家族 ≡ brand/brand-subtle 家族（在 buildTheme 內逐主題複製）。
+// 這是基準層、也就是預設主題 graphite 的外殼；環境主題的深色外殼由 buildShellTheme 產生。
+// 基準層九個 `--sidebar-*` token 裡只有 `--sidebar` 是真正的新顏色，其餘全是別名：
+//   sidebar-foreground ≡ foreground、sidebar-muted-foreground ≡ muted-foreground、sidebar-border ≡ border、
+//   sidebar-ring ≡ ring（淺色外殼上的聚焦環和內容區同一個中性環），
+//   sidebar-primary/accent 家族 ≡ brand/brand-subtle 家族（在 buildDefaultTheme 內複製）。
 //
 // `--sidebar` 的定位是「比頁面底沉一階的安靜區」——全天候大面積，要看得出
 // 「這是另一個區」但遠低於 muted 的響度。與本檔其他值一樣是目標反解不是挑色：
 // 解 ΔE00(sidebar, background) 命中目標，hue/chroma 取 muted 家族（同一家中性）。
 //
-// 目標值的由來（實測 8-bit 網格，見 PR 討論）：淺色的近白區有感知壓縮，
+// 目標值的由來（實測 8-bit 網格）：淺色的近白區有感知壓縮，
 // ΔE00 2.5 已是「可辨但安靜」的位置（#f7fbff）；深色 3.0 落在 bg 與 card 之間
 // （#131721），保住表面抬升階——sidebar 上的卡片與浮層仍然「浮得起來」。
 const SIDEBAR_TINT = { light: 2.5, dark: 3.0 };
@@ -454,7 +488,11 @@ function buildSidebarBase() {
       value: tokens.color[mode].border.value, desc: "側欄邊線＝border 別名（生成器保證同值）",
     };
     tokens.color[mode]["sidebar-ring"] = {
-      value: tokens.color[mode].ring.value, desc: "側欄聚焦環＝ring 別名（ADR-0007：中性、不進主題）",
+      value: tokens.color[mode].ring.value, desc: "側欄聚焦環＝ring 別名（預設外殼；環境主題換成近白）",
+    };
+    tokens.color[mode]["sidebar-muted-foreground"] = {
+      value: tokens.color[mode]["muted-foreground"].value,
+      desc: "外殼上的次要文字（群組標題等）＝muted-foreground 別名（預設外殼）",
     };
     log.push(
       `  sidebar/${mode}  ${rgb8ToHex(solved)}  距頁面底 Δ${deltaE00(lab(solved), lab(bg)).toFixed(1)}` +
@@ -463,7 +501,6 @@ function buildSidebarBase() {
   }
   return log;
 }
-const sidebarLog = buildSidebarBase();
 
 // ── 圖表分類色票 ───────────────────────────────────────────
 //
@@ -520,7 +557,7 @@ const CHROMATIC_MIN = 0.04;      // 低於此視為無彩，色相角度沒有�
 const hueGap = (a, b) => { const d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; };
 
 function buildChartPalette(mode, n = 8) {
-  const bg = PAGE_BG[mode];
+  const bg = pageBg(mode);
   const [lo, hi] = CHART_BAND[mode];
   const chroma = CHART_CHROMA[mode];
 
@@ -588,8 +625,16 @@ function buildChartPalette(mode, n = 8) {
 }
 
 // ── 產生並寫回 ─────────────────────────────────────────────
+//
+// 順序有相依：預設外殼要先解出來，預設主題才能連它一起轉色相。
+const alertLog = buildAlertSubtle();
+const sidebarLog = buildSidebarBase();
+
 const themes = {};
-for (const t of THEMES) themes[t.name] = { $label: t.label, $hue: t.hue, ...buildTheme(t) };
+for (const t of THEMES) {
+  const meta = { $label: t.label, $hue: t.hue, $family: t.family, $term: t.term, $tier: t.tier };
+  themes[t.name] = { ...meta, ...(t.tier === "default" ? buildDefaultTheme() : buildShellTheme(t)) };
+}
 
 const chart = { light: {}, dark: {} };
 for (const mode of ["light", "dark"]) {
@@ -626,29 +671,29 @@ if (statusLog.length) {
   for (const l of statusLog) console.log(l);
   console.log("");
 }
-console.log("側邊欄表面（唯一新顏色是 --sidebar，其餘七個是別名）");
+console.log("預設外殼（唯一新顏色是 --sidebar，其餘八個是別名）");
 for (const l of sidebarLog) console.log(l);
 console.log("");
-console.log("主題色（brand 對其前景 4.5:1／中性 ring 對各主題最亮表面 3:1）");
+// 一律拿**該主題自己的**前景與表面去量，不要拿理想白或未轉色相的基準值——
+// 報告算錯對象比不印還糟，它會讓人去修沒壞的東西。
+console.log("環境色（外殼文字 ≥4.5:1／選中項與外殼 ΔE00 ≥8／與別族最近的距離）");
+const shellOf = (name, m) => hslToRgb8((themes[name][m].sidebar ?? tokens.color[m].sidebar).value);
 for (const t of THEMES) {
+  if (t.tier === "default") continue;
   const th = themes[t.name];
-  // 一律拿**該主題自己的**前景與表面去量，不要拿理想白或未轉色相的基準值——
-  // 這支報告先前兩次都犯過：ring 拿沒轉色相的 muted 去比，brand 拿純白去比，
-  // 於是印出低於門檻的假數字。報告算錯對象比不印還糟，它會讓人去修沒壞的東西。
-  //
-  // ring 是全主題共用的中性基礎值（ADR-0007），但表面是各主題帶色相的——
-  // 所以每個主題仍要各驗一次：同一個 ring，對象不同。
-  const cB = (m) => contrast(hslToRgb8(th[m].brand.value), hslToRgb8(th[m]["brand-foreground"].value));
-  const cR = (m) => contrast(
-    hslToRgb8(tokens.color[m].ring.value),
-    hslToRgb8((th[m][m === "light" ? "background" : "muted"] ?? tokens.color[m][m === "light" ? "background" : "muted"]).value),
-  );
-  const b = { l: hslToRgb8(th.light.brand.value), d: hslToRgb8(th.dark.brand.value) };
-  console.log(
-    `  ${t.label} ${t.name.padEnd(9)} H=${String(t.hue).padStart(3)}  ` +
-    `brand ${rgb8ToHex(b.l)}/${rgb8ToHex(b.d)} 前景 ${cB("light").toFixed(2)}/${cB("dark").toFixed(2)}  ` +
-    `ring(基礎) ${cR("light").toFixed(2)}/${cR("dark").toFixed(2)}`,
-  );
+  const cells = ["light", "dark"].map((m) => {
+    const sb = shellOf(t.name, m);
+    const text = contrast(hslToRgb8(th[m]["sidebar-foreground"].value), sb);
+    const acc = deltaE00(lab(hslToRgb8(th[m]["sidebar-accent"].value)), lab(sb));
+    return `${rgb8ToHex(sb)} 字${text.toFixed(1)} 選中Δ${acc.toFixed(1)}`;
+  });
+  let near = { d: Infinity, n: "" };
+  for (const o of THEMES) {
+    if (o.tier === "default" || o.family === t.family) continue;
+    const d = Math.min(...["light", "dark"].map((m) => deltaE00(lab(shellOf(t.name, m)), lab(shellOf(o.name, m)))));
+    if (d < near.d) near = { d, n: o.name };
+  }
+  console.log(`  ${t.label.padEnd(4)} ${t.name.padEnd(12)} ${cells.join("  ")}  別族最近 ${near.n} Δ${near.d.toFixed(1)}`);
 }
 console.log("\n圖表色票");
 for (const mode of ["light", "dark"]) {

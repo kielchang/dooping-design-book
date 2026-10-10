@@ -6,7 +6,7 @@
   "title": "radio-group",
   "description": "",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "@radix-ui/react-radio-group",
     "lucide-react"
   ],

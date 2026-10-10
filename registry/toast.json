@@ -6,7 +6,7 @@
   "title": "toast",
   "description": "",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "lucide-react"
   ],
   "registryDependencies": [

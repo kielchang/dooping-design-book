@@ -6,7 +6,7 @@
   "title": "Popover 彈出面板",
   "description": "錨定在觸發元素旁的浮層容器（Radix Popover）。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "@radix-ui/react-popover"
   ],
   "registryDependencies": [

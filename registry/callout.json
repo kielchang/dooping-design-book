@@ -6,7 +6,7 @@
   "title": "Callout 提示框",
   "description": "良好／警示／提醒／危險四種語意提示。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "lucide-react"
   ],
   "registryDependencies": [

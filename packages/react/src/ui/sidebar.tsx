@@ -420,15 +420,15 @@ SidebarTrigger.displayName = "SidebarTrigger";
 // ── 結構件 ────────────────────────────────────────────────────
 
 export function SidebarHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("flex flex-col gap-2 p-2", className)} {...props} />;
+  return <div className={cn("on-shell flex flex-col gap-2 p-2", className)} {...props} />;
 }
 
 export function SidebarContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("flex min-h-0 flex-1 flex-col gap-1 overflow-auto", className)} {...props} />;
+  return <div className={cn("on-shell flex min-h-0 flex-1 flex-col gap-1 overflow-auto", className)} {...props} />;
 }
 
 export function SidebarFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("flex flex-col gap-2 p-2", className)} {...props} />;
+  return <div className={cn("on-shell flex flex-col gap-2 p-2", className)} {...props} />;
 }
 
 export function SidebarGroup({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
@@ -439,7 +439,7 @@ export function SidebarGroupLabel({ className, ...props }: React.HTMLAttributes<
   return (
     <div
       className={cn(
-        "flex h-7 items-center rounded-md px-2 text-xs text-muted-foreground",
+        "flex h-7 items-center rounded-md px-2 text-xs text-sidebar-muted-foreground",
         "group-data-[state=collapsed]/sidebar:sr-only",
         className,
       )}
@@ -461,7 +461,7 @@ export function SidebarMenuItem({ className, ...props }: React.HTMLAttributes<HT
 export interface SidebarMenuButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
   /**
-   * 選中態：`bg-sidebar-accent`（＝該主題的 brand-subtle，識別層）。
+   * 選中態：`bg-sidebar-accent`（預設外殼是中性淡底；環境外殼是同色相亮一階，白字）。
    * 刻意**不用** state-layer 的 data-state=selected 疊加——淡底上再疊 currentColor
    * 會把文字對比吃掉；hover 仍走 state-layer（疊在 accent 上只有 6%，無害）。
    */
@@ -475,7 +475,7 @@ export const SidebarMenuButton = React.forwardRef<HTMLButtonElement, SidebarMenu
     const { state, isMobile } = useSidebar();
     const cls = cn(
       "state-layer flex h-9 w-full items-center gap-2 overflow-hidden rounded-md px-2 text-left text-sm outline-none",
-      "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
+      "focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
       "disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0",
       "group-data-[state=collapsed]/sidebar:justify-center group-data-[state=collapsed]/sidebar:px-0",
       isActive && "bg-sidebar-accent text-sidebar-accent-foreground",
@@ -525,7 +525,7 @@ export const SidebarMenuSubButton = React.forwardRef<HTMLButtonElement, SidebarM
   ({ asChild = false, isActive = false, className, children, ...props }, ref) => {
     const cls = cn(
       "state-layer flex h-8 w-full items-center gap-2 overflow-hidden rounded-md px-2 text-left text-sm outline-none",
-      "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
+      "focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
       "disabled:pointer-events-none disabled:opacity-50",
       isActive && "bg-sidebar-accent text-sidebar-accent-foreground",
       className,

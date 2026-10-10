@@ -4,7 +4,7 @@
 // 因此可被 Tailwind、CSS Modules、原生 CSS、甚至非 React 的宿主直接吃。
 //
 // 深色一次宣告兩種鉤子：`.dark`（Tailwind / shadcn 慣例）與 `[data-theme="dark"]`
-// （Docusaurus、部分文件站與後台框架的慣例）。兩者共用同一組規則，見 ADR-0005 補充。
+// （Docusaurus、部分文件站與後台框架的慣例）。兩者共用同一組規則，宿主用哪一種都行。
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -28,15 +28,13 @@ lines.push(` * 版本 ${tokens.meta.version}`);
 lines.push(" */");
 lines.push("");
 
-// ── 多色相主題 ────────────────────────────────────────────────
-// 主題層覆蓋的 token 分三類（實際清單以 tokens.json 的 themes.* 為準，不在這裡寫死數字）：
-// brand 家族（完整反解生成）、帶色調的中性色（只轉色相，L/C 不動）、
-// sidebar-primary/accent 家族（＝brand 家族的字面值別名）。狀態色、圖表色票、
-// --ring（ADR-0007）與主題無關，在所有主題之間完全相同。
-//
-// 被主題覆蓋的 token 在 color.* 裡仍保有基準值當後備，主題層宣告在後面把它蓋掉。
-// 宿主若只引 tokens.css 而不設任何主題屬性，拿到的就是預設主題（石墨）——
-// 觀感與沒有主題功能時一致。
+// ── 環境色主題 ────────────────────────────────────────────────
+// 主題只換外殼（側欄＋表頭）。實際清單以 tokens.json 的 themes.* 為準，不在這裡寫死：
+//   預設主題  內容面的中性色、brand 家族（鏡射 primary）、淺色外殼的選中項與標誌塊
+//   環境主題  只有外殼鍵（--sidebar 家族）
+// `:root` 就是「基準層＋預設主題」，所以內容面、brand、狀態色、圖表色票、--ring
+// 在所有主題之間完全相同——環境主題的區塊裡根本沒有這些鍵。
+// 宿主若只引 tokens.css 而不設任何主題屬性，拿到的就是預設主題（石墨）。
 const THEMES = tokens.themes ?? {};
 const DEFAULT_THEME = tokens.meta.defaultTheme;
 const themeVars = (name, mode) => vars(THEMES[name]?.[mode] ?? {});
@@ -96,20 +94,46 @@ lines.push(...vars(tokens.chart.dark));
 lines.push("}");
 lines.push("");
 
-// ── 非預設主題 ────────────────────────────────────────────────
-// 順序即是 cascade：淺色區塊全部排在深色區塊之後，深色區塊靠
-// `[data-color-theme=X].dark`（0,2,0）的較高權重蓋回來。少了這層權重差，
-// 「深色 + 非預設主題」會拿到淺色的 brand。
+// ── 環境主題與主題島 ──────────────────────────────────────────
+// 順序即是 cascade：淺色區塊全部排在深色區塊之後，深色區塊靠 0,2,0 的較高權重蓋回來。
+// 少了這層權重差，「深色 + 環境主題」會拿到淺色的外殼。
+//
+// 主題島：`data-color-theme` 也可以放在任何元素上（例如應用切換清單裡「那個系統」的色塊），
+// 只換那個元素底下的外殼鍵。深色區塊因此多兩個後代選擇器——頁面的 .dark 在 <html> 上、
+// 主題屬性在色塊上，兩者不在同一個元素。
+//
+// 預設主題也要有一組島：在環境主題的頁面裡顯示「預設外殼」的色塊時，它得把外殼鍵蓋回來。
+// 島只蓋外殼鍵（所有環境主題鍵的聯集），值取預設主題的有效值（基準層＋預設主題）。
 const OTHERS = Object.keys(THEMES).filter((n) => n !== DEFAULT_THEME);
+const SHELL_KEYS = [...new Set(OTHERS.flatMap((n) => Object.keys(THEMES[n].light ?? {})))];
+const defaultShellVars = (mode) =>
+  SHELL_KEYS.map((k) => {
+    const v = THEMES[DEFAULT_THEME]?.[mode]?.[k] ?? tokens.color[mode][k];
+    if (!isToken(v)) throw new Error(`預設主題缺外殼鍵 ${k}（${mode}）`);
+    return `  --${k}: ${v.value};`;
+  });
+const darkSelectors = (name) =>
+  [
+    `[data-color-theme="${name}"].dark`,
+    `[data-color-theme="${name}"][data-theme="dark"]`,
+    `.dark [data-color-theme="${name}"]`,
+    `[data-theme="dark"] [data-color-theme="${name}"]`,
+  ].join(",\n");
 if (OTHERS.length) {
-  lines.push("/* 其餘色相主題：宿主在 <html> 上設 data-color-theme=\"<name>\" 切換。 */");
+  lines.push("/* 環境主題：宿主在 <html> 上設 data-color-theme=\"<name>\"；放在元素上就是主題島。 */");
+  lines.push(`[data-color-theme="${DEFAULT_THEME}"] { /* ${THEMES[DEFAULT_THEME]?.$label ?? DEFAULT_THEME}（島） */`);
+  lines.push(...defaultShellVars("light"));
+  lines.push("}");
   for (const name of OTHERS) {
     lines.push(`[data-color-theme="${name}"] { /* ${THEMES[name].$label} */`);
     lines.push(...themeVars(name, "light"));
     lines.push("}");
   }
+  lines.push(`${darkSelectors(DEFAULT_THEME)} {`);
+  lines.push(...defaultShellVars("dark"));
+  lines.push("}");
   for (const name of OTHERS) {
-    lines.push(`[data-color-theme="${name}"].dark,\n[data-color-theme="${name}"][data-theme="dark"] {`);
+    lines.push(`${darkSelectors(name)} {`);
     lines.push(...themeVars(name, "dark"));
     lines.push("}");
   }
@@ -118,7 +142,7 @@ if (OTHERS.length) {
 
 // ── 語意 utility：欄位「可編輯 vs 唯讀」 ──────────────────────
 lines.push(`/* 欄位語意（單一二分法）：可編輯＝淡冷底＋清楚邊框；唯讀／計算值＝muted。
-   刻意不做「輸入／假設／公式」三色——那是試算表儲存格慣例，對網頁表單語意不成立（ADR-0002）。 */
+   刻意不做「輸入／假設／公式」三色——那是試算表儲存格慣例，對網頁表單語意不成立。 */
 .field-editable {
   background-color: hsl(var(--field-editable));
   color: hsl(var(--field-editable-foreground));
@@ -127,6 +151,18 @@ lines.push(`/* 欄位語意（單一二分法）：可編輯＝淡冷底＋清�
 .field-readonly {
   background-color: hsl(var(--field-readonly));
   color: hsl(var(--field-readonly-foreground));
+}
+
+/* 外殼語境：放在側欄、表頭的內容區塊上。一般元件（按鈕、分隔線、輸入框、聚焦環、次要文字）
+   在這一層底下改用外殼的配色——主題只換外殼，內容面元件放進深色外殼時才看得清楚。
+   浮層（下拉、對話框）走 portal 掛到 body，不在這一層底下，維持內容面的中性色。 */
+.on-shell {
+  --background: var(--sidebar);
+  --foreground: var(--sidebar-foreground);
+  --muted-foreground: var(--sidebar-muted-foreground);
+  --border: var(--sidebar-border);
+  --input: var(--sidebar-border);
+  --ring: var(--sidebar-ring);
 }
 `);
 

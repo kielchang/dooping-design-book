@@ -6,7 +6,7 @@
   "title": "Collapsible 摺疊區",
   "description": "展開／收合容器（Radix Collapsible），無自帶視覺。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "@radix-ui/react-collapsible"
   ],
   "registryDependencies": [],

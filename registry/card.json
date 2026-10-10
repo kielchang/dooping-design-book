@@ -6,7 +6,7 @@
   "title": "Card 卡片",
   "description": "內容容器：標題／描述／內容／頁尾。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0"
+    "@dooping/tokens@^0.8.0"
   ],
   "registryDependencies": [
     "https://kielchang.github.io/dooping-design-book/r/utils.json"

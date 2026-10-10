@@ -6,7 +6,7 @@
   "title": "Dialog 對話框",
   "description": "模態對話框（Radix Dialog）。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "@radix-ui/react-dialog",
     "lucide-react"
   ],

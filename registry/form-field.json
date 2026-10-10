@@ -6,7 +6,7 @@
   "title": "FormField 欄位包裝",
   "description": "Label＋aria 連動＋錯誤態的固定寫法元件化，含 FieldError。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "lucide-react"
   ],
   "registryDependencies": [

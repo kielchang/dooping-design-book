@@ -179,7 +179,7 @@ export const 對話框: Story = {
 | 守衛 | 指令 | 管什麼 | 不管什麼 |
 | --- | --- | --- | --- |
 | 無障礙行為 | `npm run verify:storybook` | 全部 story 的 axe 掃描（role、名稱、巢狀互動…）＋ play function 全數執行成功 | 顏色對比（`verify:color` 是唯一顏色權威）；`region` 等頁面級規則（story 是片段） |
-| 視覺回歸 | `npm run verify:visual` | 六主題 × 兩模式 × 哨兵 story：截圖掃全圖，驗「期望色存在＋其他主題的 `--brand` 不存在」 | 版面位移（沒有基準圖比對） |
+| 視覺回歸 | `npm run verify:visual` | 全部主題 × 兩模式 × 哨兵 story：截圖掃全圖，驗「期望色存在＋其他主題的外殼色不存在」 | 版面位移（沒有基準圖比對） |
 
 - 兩支都吃建好的 Storybook 產物：本機 `npm run build-storybook` 後直接跑，CI 在建置步驟之後自動接。
 - **combobox 的可及名稱不能取自值文字**（值會變，名稱不會）：`SelectTrigger` 一定要用 `<Label htmlFor>` 接 `id`，或給 `aria-label`。

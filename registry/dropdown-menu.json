@@ -6,7 +6,7 @@
   "title": "DropdownMenu 下拉選單",
   "description": "動作選單與勾選項（Radix DropdownMenu），單層。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "@radix-ui/react-dropdown-menu",
     "lucide-react"
   ],

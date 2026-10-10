@@ -6,7 +6,7 @@
   "title": "EmptyState 空狀態",
   "description": "圖示＋標題＋說明＋行動呼籲。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "lucide-react"
   ],
   "registryDependencies": [

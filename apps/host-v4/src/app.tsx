@@ -76,7 +76,7 @@ export function App() {
             <div className="flex h-9 items-center gap-2 px-2 font-semibold">
               <span
                 aria-hidden
-                className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-brand text-xs text-brand-foreground"
+                className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-sidebar-primary text-xs text-sidebar-primary-foreground"
               >
                 D
               </span>
@@ -113,7 +113,8 @@ export function App() {
                   {unread > 0 ? (
                     <span
                       aria-hidden
-                      className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-medium leading-none text-destructive-foreground"
+                      data-shell-badge=""
+                      className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-medium leading-none text-destructive-foreground ring-2 ring-sidebar-foreground"
                     >
                       {unread}
                     </span>
@@ -152,7 +153,7 @@ export function App() {
                 <Button variant="ghost" size="icon" className="size-8 rounded-full" aria-label={`使用者選單：${USER.name}`}>
                   <span
                     aria-hidden
-                    className="flex size-7 items-center justify-center rounded-full bg-brand text-xs font-medium text-brand-foreground"
+                    className="flex size-7 items-center justify-center rounded-full bg-sidebar-primary text-xs font-medium text-sidebar-primary-foreground"
                   >
                     {USER.name.slice(-1)}
                   </span>

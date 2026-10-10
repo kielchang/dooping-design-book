@@ -6,7 +6,7 @@
   "title": "SegGroup 分段選擇",
   "description": "少量互斥選項，radiogroup ＋ roving tabindex。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "lucide-react"
   ],
   "registryDependencies": [

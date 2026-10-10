@@ -6,7 +6,7 @@
   "title": "PageHeader 頁首",
   "description": "頁首骨架三件：PageHeader（一頁一個 h1）、BackLink（真連結返回）、Breadcrumb（三層以上）。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "lucide-react"
   ],
   "registryDependencies": [

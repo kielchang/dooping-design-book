@@ -33,7 +33,27 @@
 
 ## 未發佈（`dev`）
 
-側欄收合改成右緣拉環（要重抄 `sidebar`）、CSV 匯出擋試算表公式（要重抄 `csv`）、平台自己做匯出時的取資料方式與畫面對照表、導覽連結與表格網址的防護（要重抄 `nav`、`tooltip` 等）、dooping-check 補防護；另有文件改版：回饋改走 GitHub、公開文件只留規則與做法。token 不動。
+主題改為環境色：只換側欄＋頂列的外殼、內容區中性，**行為改變**（tokens 0.7.0 → 0.8.0，要重抄外殼元件）；側欄收合改成右緣拉環（要重抄 `sidebar`）、CSV 匯出擋試算表公式（要重抄 `csv`）、平台自己做匯出時的取資料方式與畫面對照表、導覽連結與表格網址的防護（要重抄 `nav`、`tooltip` 等）、dooping-check 補防護；另有文件改版：回饋改走 GitHub、公開文件只留規則與做法。
+
+### 主題改為環境色：只換外殼，內容區中性（行為改變，tokens 0.7.0 → 0.8.0）
+
+1. **改了什麼**：
+   - 主題（`data-color-theme`）只換**外殼**——側欄與頂列這個 L 形大區塊——用顏色認出目前在哪個工作環境。
+     內容區（畫布、卡片、浮層、欄位、表格）的中性色在所有主題下同值，不再跟著主題轉色相。
+   - 主題從 6 組變 18 組：8 個色族（華語基本色名）× 深淺兩階，加中性的 `slate`；`graphite` 仍是預設、維持淺色外殼。
+     色票清單與每個色族的色彩學語意見文件站〈環境色票〉。`indigo`、`violet`、`amethyst`、`teal`、`moss` 沿用名稱，但意義改成外殼色。
+   - `--brand` 在所有主題都等於 `--primary`；`Button` 的 `brand` 變體標為淘汰，外觀等同 `default`。
+   - 新 token `--sidebar-muted-foreground`（外殼上的次要文字）；新 utility `.on-shell`（外殼裡的一般元件改用外殼配色）；
+     `data-color-theme` 可以放在單一元素上（主題島），只換那塊的外殼鍵。
+   - `AppShell` 的頂列改用外殼色（預設主題下只差一點點：`#ffffff` → `#f7fbff`）；`SidebarHeader`／`SidebarContent`／`SidebarFooter` 內建 `on-shell`；
+     群組標題改用 `--sidebar-muted-foreground`、側欄項的聚焦環改用 `--sidebar-ring`；`AppMenubar` 的所在分區底線跟著文字色。
+   - `NavLeaf` 新增選填的 `colorTheme`：應用切換清單用它畫「那個系統的外殼色」色塊。
+2. **我需要做什麼**：
+   - 升級 `@dooping/tokens` 到 `^0.8.0`，重抄 `app-shell`、`sidebar`、`sidebar-nav`、`app-menubar`、`button`、`nav`。
+   - 檢查頂列與側欄裡你自己放的元件：按鈕用 `ghost`／`outline`；標誌塊與頭像用 `bg-sidebar-primary text-sidebar-primary-foreground`（不要用 `bg-brand`、`bg-primary`）；
+     外殼上的狀態徽章（通知數、紅點）加 `ring-2 ring-sidebar-foreground`。
+   - 用了 `variant="brand"` 的改成 `default`（不改也行，外觀已經相同）。
+   - 用了舊主題名的，對照〈環境色票〉重新挑一組；沒設 `data-color-theme` 的不受影響（只有頂列底色那一點差異）。
 
 ### 側欄收合改成右緣拉環（minor → 0.15.0）
 

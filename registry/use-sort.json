@@ -6,7 +6,7 @@
   "title": "useSort 排序 hook",
   "description": "無→大到小→小到大 的三態排序。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0"
+    "@dooping/tokens@^0.8.0"
   ],
   "registryDependencies": [],
   "files": [

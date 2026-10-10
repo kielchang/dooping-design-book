@@ -6,7 +6,7 @@
   "title": "Mockup 文件示意積木",
   "description": "Placeholder／Spotlight／MockScreenFrame：零截圖文件示意。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0"
+    "@dooping/tokens@^0.8.0"
   ],
   "registryDependencies": [
     "https://kielchang.github.io/dooping-design-book/r/utils.json"

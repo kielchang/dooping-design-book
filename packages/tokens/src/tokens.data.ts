@@ -3,11 +3,11 @@ export default {
   "$comment": "Dooping 設計 token 唯一來源（框架中立）。CSS 變數與 Tailwind preset 皆由此檔產生，勿直接改 dist/。色彩值以 HSL 三元組字串表示（可被 hsl(var(--x) / <alpha>) 套用透明度）；chart.* 例外為 hex（SVG fill/stroke 直接吃 var()，不經 hsl() 包裝）。",
   "meta": {
     "name": "dooping",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "defaultTheme": "graphite"
   },
   "color": {
-    "$comment": "語意色：命名說的是「這個顏色代表什麼意思」，不是「這是什麼顏色」。換色票時只改這裡，全站語意不變。詳見 ADR-0001。",
+    "$comment": "語意色：命名說的是「這個顏色代表什麼意思」，不是「這是什麼顏色」。換色票時只改這裡，全站語意不變。",
     "light": {
       "background": {
         "value": "0 0% 100%",
@@ -83,7 +83,7 @@ export default {
       },
       "ring": {
         "value": "222.2 84% 4.9%",
-        "desc": "鍵盤聚焦環（中性，不吃主題色相——ADR-0007）"
+        "desc": "鍵盤聚焦環（中性，不吃主題色相：焦點與欄位提醒色分家，換主題也不會誤讀）"
       },
       "success": {
         "value": "160 84% 39%",
@@ -119,7 +119,7 @@ export default {
       },
       "edit": {
         "value": "43 96% 56%",
-        "desc": "保留色：已改動未送出（邊框）。此琥珀不得挪作他用，見 ADR-0002"
+        "desc": "保留色：已改動未送出（邊框）。此琥珀不得挪作他用"
       },
       "edit-foreground": {
         "value": "23 78% 26%",
@@ -195,7 +195,11 @@ export default {
       },
       "sidebar-ring": {
         "value": "222.2 84% 4.9%",
-        "desc": "側欄聚焦環＝ring 別名（ADR-0007：中性、不進主題）"
+        "desc": "側欄聚焦環＝ring 別名（預設外殼；環境主題換成近白）"
+      },
+      "sidebar-muted-foreground": {
+        "value": "215.4 16.3% 46.9%",
+        "desc": "外殼上的次要文字（群組標題等）＝muted-foreground 別名（預設外殼）"
       }
     },
     "dark": {
@@ -256,7 +260,7 @@ export default {
       },
       "ring": {
         "value": "210 30% 80%",
-        "desc": "鍵盤聚焦環（中性，不吃主題色相——ADR-0007）"
+        "desc": "鍵盤聚焦環（中性，不吃主題色相：焦點與欄位提醒色分家，換主題也不會誤讀）"
       },
       "success": {
         "value": "160 60% 45%"
@@ -352,7 +356,11 @@ export default {
       },
       "sidebar-ring": {
         "value": "210 30% 80%",
-        "desc": "側欄聚焦環＝ring 別名（ADR-0007：中性、不進主題）"
+        "desc": "側欄聚焦環＝ring 別名（預設外殼；環境主題換成近白）"
+      },
+      "sidebar-muted-foreground": {
+        "value": "215 20.2% 65.1%",
+        "desc": "外殼上的次要文字（群組標題等）＝muted-foreground 別名（預設外殼）"
       }
     }
   },
@@ -609,6 +617,9 @@ export default {
     "graphite": {
       "$label": "石墨",
       "$hue": 265,
+      "$family": "neutral",
+      "$term": "灰",
+      "$tier": "default",
       "light": {
         "background": {
           "value": "0 0% 100%",
@@ -668,15 +679,15 @@ export default {
         },
         "brand": {
           "value": "222.2 47.4% 11.2%",
-          "desc": "主題色：本組無品牌色，鏡射 primary"
+          "desc": "品牌色：鏡射 primary，所有主題同值（主題只換外殼）"
         },
         "brand-foreground": {
           "value": "210 40% 98%",
-          "desc": "brand 上的文字"
+          "desc": "brand 上的文字（鏡射 primary-foreground）"
         },
         "brand-subtle": {
           "value": "220.6 100% 93.3%",
-          "desc": "主題色淡底：選中的導覽項、分頁底線區"
+          "desc": "中性淡底：選中的導覽項、分頁底線區"
         },
         "brand-subtle-foreground": {
           "value": "221.5 11.9% 42.7%",
@@ -684,7 +695,7 @@ export default {
         },
         "sidebar-primary": {
           "value": "222.2 47.4% 11.2%",
-          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
+          "desc": "外殼上的標誌塊＝brand 別名（預設外殼）"
         },
         "sidebar-primary-foreground": {
           "value": "210 40% 98%",
@@ -692,11 +703,15 @@ export default {
         },
         "sidebar-accent": {
           "value": "220.6 100% 93.3%",
-          "desc": "選中的側欄項底色＝brand-subtle 別名"
+          "desc": "選中的側欄項底色＝brand-subtle 別名（預設外殼）"
         },
         "sidebar-accent-foreground": {
           "value": "221.5 11.9% 42.7%",
           "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
+        },
+        "sidebar-muted-foreground": {
+          "value": "221.7 15.1% 46.7%",
+          "desc": "外殼上的次要文字＝muted-foreground 別名（預設外殼）"
         }
       },
       "dark": {
@@ -746,15 +761,15 @@ export default {
         },
         "brand": {
           "value": "210 40% 98%",
-          "desc": "主題色：本組無品牌色，鏡射 primary"
+          "desc": "品牌色：鏡射 primary，所有主題同值（主題只換外殼）"
         },
         "brand-foreground": {
           "value": "222.2 47.4% 11.2%",
-          "desc": "brand 上的文字"
+          "desc": "brand 上的文字（鏡射 primary-foreground）"
         },
         "brand-subtle": {
           "value": "222.9 58.3% 14.1%",
-          "desc": "主題色淡底：選中的導覽項、分頁底線區"
+          "desc": "中性淡底：選中的導覽項、分頁底線區"
         },
         "brand-subtle-foreground": {
           "value": "219 8.3% 52.9%",
@@ -762,7 +777,7 @@ export default {
         },
         "sidebar-primary": {
           "value": "210 40% 98%",
-          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
+          "desc": "外殼上的標誌塊＝brand 別名（預設外殼）"
         },
         "sidebar-primary-foreground": {
           "value": "222.2 47.4% 11.2%",
@@ -770,871 +785,1426 @@ export default {
         },
         "sidebar-accent": {
           "value": "222.9 58.3% 14.1%",
-          "desc": "選中的側欄項底色＝brand-subtle 別名"
+          "desc": "選中的側欄項底色＝brand-subtle 別名（預設外殼）"
         },
         "sidebar-accent-foreground": {
           "value": "219 8.3% 52.9%",
           "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
+        },
+        "sidebar-muted-foreground": {
+          "value": "220 15.9% 59.4%",
+          "desc": "外殼上的次要文字＝muted-foreground 別名（預設外殼）"
         }
       }
     },
-    "indigo": {
-      "$label": "靛藍",
-      "$hue": 272,
+    "slate": {
+      "$label": "石板",
+      "$hue": 265,
+      "$family": "neutral",
+      "$term": "灰",
+      "$tier": "neutral",
       "light": {
-        "background": {
-          "value": "0 0% 100%",
-          "desc": "頁面底色"
-        },
-        "card": {
-          "value": "0 0% 100%",
-          "desc": "卡片表面"
-        },
-        "popover": {
-          "value": "0 0% 100%",
-          "desc": "浮層表面（下拉／泡泡／篩選面板）"
-        },
-        "muted": {
-          "value": "230 33.3% 96.5%",
-          "desc": "弱化表面（唯讀區、斑馬列）"
-        },
-        "secondary": {
-          "value": "230 33.3% 96.5%",
-          "desc": "次要動作表面"
-        },
-        "accent": {
-          "value": "230 33.3% 96.5%",
-          "desc": "hover／被指向的表面"
-        },
-        "border": {
-          "value": "225 28.6% 91.8%",
-          "desc": "一般分隔線／邊框"
-        },
-        "input": {
-          "value": "225 28.6% 91.8%",
-          "desc": "表單控制項邊框"
-        },
-        "field-border": {
-          "value": "226 26% 81%",
-          "desc": "可編輯欄位邊框（冷灰藍，刻意不像狀態色）"
-        },
-        "muted-foreground": {
-          "value": "227.3 13.7% 47.3%",
-          "desc": "次要／說明文字"
-        },
-        "field-editable": {
-          "value": "226.7 100% 98.2%",
-          "desc": "欄位語意：可編輯（極淡冷底）"
-        },
-        "field-readonly": {
-          "value": "220 12% 95%",
-          "desc": "欄位語意：唯讀／計算值"
-        },
         "sidebar": {
-          "value": "230 100% 98.8%",
-          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+          "value": "220 12.5% 18.8%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "217.9 9.6% 61.4%",
+          "desc": "外殼上的次要文字（群組標題等）"
         },
         "sidebar-border": {
-          "value": "225 28.6% 91.8%",
-          "desc": "側欄邊線＝border 別名（生成器保證同值）"
-        },
-        "brand": {
-          "value": "229.7 55.5% 58.6%",
-          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
-        },
-        "brand-foreground": {
-          "value": "0 0% 100%",
-          "desc": "brand 上的文字"
-        },
-        "brand-subtle": {
-          "value": "226.5 100% 93.9%",
-          "desc": "主題色淡底：選中的導覽項、分頁底線區"
-        },
-        "brand-subtle-foreground": {
-          "value": "230.5 47.5% 52.9%",
-          "desc": "brand-subtle 上的文字"
-        },
-        "sidebar-primary": {
-          "value": "229.7 55.5% 58.6%",
-          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
-        },
-        "sidebar-primary-foreground": {
-          "value": "0 0% 100%",
-          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+          "value": "220 9% 26.3%",
+          "desc": "外殼內的分隔線"
         },
         "sidebar-accent": {
-          "value": "226.5 100% 93.9%",
-          "desc": "選中的側欄項底色＝brand-subtle 別名"
+          "value": "220 8.2% 28.6%",
+          "desc": "選中的側欄項：同色相亮一階"
         },
         "sidebar-accent-foreground": {
-          "value": "230.5 47.5% 52.9%",
-          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "220 12.5% 18.8%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
         }
       },
       "dark": {
-        "background": {
-          "value": "225 19% 8.2%"
-        },
-        "card": {
-          "value": "225 19.4% 12.2%"
-        },
-        "popover": {
-          "value": "227.1 17.9% 15.3%"
-        },
-        "muted": {
-          "value": "224 16.1% 18.2%"
-        },
-        "secondary": {
-          "value": "224 16.1% 18.2%"
-        },
-        "accent": {
-          "value": "224 16.1% 18.2%"
-        },
-        "border": {
-          "value": "228.8 14% 22.4%"
-        },
-        "input": {
-          "value": "228.8 14% 22.4%"
-        },
-        "field-border": {
-          "value": "226.2 14.6% 34.9%"
-        },
-        "muted-foreground": {
-          "value": "226 15% 60%"
-        },
-        "field-editable": {
-          "value": "225.9 19.1% 17.5%"
-        },
-        "field-readonly": {
-          "value": "224 14% 15%"
-        },
         "sidebar": {
-          "value": "226.2 24.5% 10.4%",
-          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+          "value": "222 9.1% 21.6%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "217.9 10.6% 64.9%",
+          "desc": "外殼上的次要文字（群組標題等）"
         },
         "sidebar-border": {
-          "value": "228.8 14% 22.4%",
-          "desc": "側欄邊線＝border 別名（生成器保證同值）"
-        },
-        "brand": {
-          "value": "228.5 39.2% 55.5%",
-          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
-        },
-        "brand-foreground": {
-          "value": "0 0% 100%",
-          "desc": "brand 上的文字"
-        },
-        "brand-subtle": {
-          "value": "229 50% 15%",
-          "desc": "主題色淡底：選中的導覽項、分頁底線區"
-        },
-        "brand-subtle-foreground": {
-          "value": "227.5 45.3% 60.6%",
-          "desc": "brand-subtle 上的文字"
-        },
-        "sidebar-primary": {
-          "value": "228.5 39.2% 55.5%",
-          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
-        },
-        "sidebar-primary-foreground": {
-          "value": "0 0% 100%",
-          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+          "value": "216 6.8% 28.6%",
+          "desc": "外殼內的分隔線"
         },
         "sidebar-accent": {
-          "value": "229 50% 15%",
-          "desc": "選中的側欄項底色＝brand-subtle 別名"
+          "value": "216 6% 31%",
+          "desc": "選中的側欄項：同色相亮一階"
         },
         "sidebar-accent-foreground": {
-          "value": "227.5 45.3% 60.6%",
-          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "222 9.1% 21.6%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
         }
       }
     },
-    "violet": {
-      "$label": "藍紫",
-      "$hue": 292,
+    "berry": {
+      "$label": "莓紅",
+      "$hue": 5,
+      "$family": "red",
+      "$term": "紅",
+      "$tier": "base",
       "light": {
-        "background": {
-          "value": "0 0% 100%",
-          "desc": "頁面底色"
-        },
-        "card": {
-          "value": "0 0% 100%",
-          "desc": "卡片表面"
-        },
-        "popover": {
-          "value": "0 0% 100%",
-          "desc": "浮層表面（下拉／泡泡／篩選面板）"
-        },
-        "muted": {
-          "value": "240 29.4% 96.7%",
-          "desc": "弱化表面（唯讀區、斑馬列）"
-        },
-        "secondary": {
-          "value": "240 29.4% 96.7%",
-          "desc": "次要動作表面"
-        },
-        "accent": {
-          "value": "240 29.4% 96.7%",
-          "desc": "hover／被指向的表面"
-        },
-        "border": {
-          "value": "247 22% 92%",
-          "desc": "一般分隔線／邊框"
-        },
-        "input": {
-          "value": "247 22% 92%",
-          "desc": "表單控制項邊框"
-        },
-        "field-border": {
-          "value": "249 21.3% 81.6%",
-          "desc": "可編輯欄位邊框（冷灰藍，刻意不像狀態色）"
-        },
-        "muted-foreground": {
-          "value": "249 11% 48%",
-          "desc": "次要／說明文字"
-        },
-        "field-editable": {
-          "value": "248.6 100% 98.6%",
-          "desc": "欄位語意：可編輯（極淡冷底）"
-        },
-        "field-readonly": {
-          "value": "260 12% 95%",
-          "desc": "欄位語意：唯讀／計算值"
-        },
         "sidebar": {
-          "value": "240 100% 99%",
-          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+          "value": "344.7 37.1% 31.2%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "346.7 13.4% 73.7%",
+          "desc": "外殼上的次要文字（群組標題等）"
         },
         "sidebar-border": {
-          "value": "247 22% 92%",
-          "desc": "側欄邊線＝border 別名（生成器保證同值）"
-        },
-        "brand": {
-          "value": "254.3 49.3% 59.8%",
-          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
-        },
-        "brand-foreground": {
-          "value": "0 0% 100%",
-          "desc": "brand 上的文字"
-        },
-        "brand-subtle": {
-          "value": "247.5 100% 95.3%",
-          "desc": "主題色淡底：選中的導覽項、分頁底線區"
-        },
-        "brand-subtle-foreground": {
-          "value": "254.5 42.5% 54.3%",
-          "desc": "brand-subtle 上的文字"
-        },
-        "sidebar-primary": {
-          "value": "254.3 49.3% 59.8%",
-          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
-        },
-        "sidebar-primary-foreground": {
-          "value": "0 0% 100%",
-          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+          "value": "345.2 31% 38.6%",
+          "desc": "外殼內的分隔線"
         },
         "sidebar-accent": {
-          "value": "247.5 100% 95.3%",
-          "desc": "選中的側欄項底色＝brand-subtle 別名"
+          "value": "345 29% 41%",
+          "desc": "選中的側欄項：同色相亮一階"
         },
         "sidebar-accent-foreground": {
-          "value": "254.5 42.5% 54.3%",
-          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "344.7 37.1% 31.2%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
         }
       },
       "dark": {
-        "background": {
-          "value": "250 14.3% 8.2%"
-        },
-        "card": {
-          "value": "246.7 14.3% 12.4%"
-        },
-        "popover": {
-          "value": "245.5 13.9% 15.5%"
-        },
-        "muted": {
-          "value": "250 12.8% 18.4%"
-        },
-        "secondary": {
-          "value": "250 12.8% 18.4%"
-        },
-        "accent": {
-          "value": "250 12.8% 18.4%"
-        },
-        "border": {
-          "value": "249.2 11.3% 22.5%"
-        },
-        "input": {
-          "value": "249.2 11.3% 22.5%"
-        },
-        "field-border": {
-          "value": "248.6 11.6% 35.5%"
-        },
-        "muted-foreground": {
-          "value": "247.5 11.9% 60.4%"
-        },
-        "field-editable": {
-          "value": "249 14% 18%"
-        },
-        "field-readonly": {
-          "value": "247.5 10.3% 15.3%"
-        },
         "sidebar": {
-          "value": "246 18.5% 10.6%",
-          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+          "value": "345 30.1% 28.6%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "349.4 11.6% 71.2%",
+          "desc": "外殼上的次要文字（群組標題等）"
         },
         "sidebar-border": {
-          "value": "249.2 11.3% 22.5%",
-          "desc": "側欄邊線＝border 別名（生成器保證同值）"
-        },
-        "brand": {
-          "value": "252.2 33.6% 56.9%",
-          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
-        },
-        "brand-foreground": {
-          "value": "0 0% 100%",
-          "desc": "brand 上的文字"
-        },
-        "brand-subtle": {
-          "value": "255 42% 15%",
-          "desc": "主題色淡底：選中的導覽項、分頁底線區"
-        },
-        "brand-subtle-foreground": {
-          "value": "252 38.5% 61.8%",
-          "desc": "brand-subtle 上的文字"
-        },
-        "sidebar-primary": {
-          "value": "252.2 33.6% 56.9%",
-          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
-        },
-        "sidebar-primary-foreground": {
-          "value": "0 0% 100%",
-          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+          "value": "347 25% 36%",
+          "desc": "外殼內的分隔線"
         },
         "sidebar-accent": {
-          "value": "255 42% 15%",
-          "desc": "選中的側欄項底色＝brand-subtle 別名"
+          "value": "347 23.5% 38.4%",
+          "desc": "選中的側欄項：同色相亮一階"
         },
         "sidebar-accent-foreground": {
-          "value": "252 38.5% 61.8%",
-          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "345 30.1% 28.6%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
         }
       }
     },
-    "amethyst": {
-      "$label": "紫晶",
-      "$hue": 305,
+    "berry-deep": {
+      "$label": "深莓紅",
+      "$hue": 5,
+      "$family": "red",
+      "$term": "紅",
+      "$tier": "deep",
       "light": {
-        "background": {
-          "value": "0 0% 100%",
-          "desc": "頁面底色"
-        },
-        "card": {
-          "value": "0 0% 100%",
-          "desc": "卡片表面"
-        },
-        "popover": {
-          "value": "0 0% 100%",
-          "desc": "浮層表面（下拉／泡泡／篩選面板）"
-        },
-        "muted": {
-          "value": "264 26.3% 96.3%",
-          "desc": "弱化表面（唯讀區、斑馬列）"
-        },
-        "secondary": {
-          "value": "264 26.3% 96.3%",
-          "desc": "次要動作表面"
-        },
-        "accent": {
-          "value": "264 26.3% 96.3%",
-          "desc": "hover／被指向的表面"
-        },
-        "border": {
-          "value": "266.7 20.9% 91.6%",
-          "desc": "一般分隔線／邊框"
-        },
-        "input": {
-          "value": "266.7 20.9% 91.6%",
-          "desc": "表單控制項邊框"
-        },
-        "field-border": {
-          "value": "265 20% 81%",
-          "desc": "可編輯欄位邊框（冷灰藍，刻意不像狀態色）"
-        },
-        "muted-foreground": {
-          "value": "268 11% 47%",
-          "desc": "次要／說明文字"
-        },
-        "field-editable": {
-          "value": "265.7 77.8% 98.2%",
-          "desc": "欄位語意：可編輯（極淡冷底）"
-        },
-        "field-readonly": {
-          "value": "260 12% 95%",
-          "desc": "欄位語意：唯讀／計算值"
-        },
         "sidebar": {
-          "value": "264 71.4% 98.6%",
-          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+          "value": "343 49% 18%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "348.8 7.6% 58.8%",
+          "desc": "外殼上的次要文字（群組標題等）"
         },
         "sidebar-border": {
-          "value": "266.7 20.9% 91.6%",
-          "desc": "側欄邊線＝border 別名（生成器保證同值）"
-        },
-        "brand": {
-          "value": "269.4 44.5% 56.9%",
-          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
-        },
-        "brand-foreground": {
-          "value": "0 0% 100%",
-          "desc": "brand 上的文字"
-        },
-        "brand-subtle": {
-          "value": "266.1 100% 95.5%",
-          "desc": "主題色淡底：選中的導覽項、分頁底線區"
-        },
-        "brand-subtle-foreground": {
-          "value": "269.7 39.6% 52%",
-          "desc": "brand-subtle 上的文字"
-        },
-        "sidebar-primary": {
-          "value": "269.4 44.5% 56.9%",
-          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
-        },
-        "sidebar-primary-foreground": {
-          "value": "0 0% 100%",
-          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+          "value": "344.3 34.8% 25.9%",
+          "desc": "外殼內的分隔線"
         },
         "sidebar-accent": {
-          "value": "266.1 100% 95.5%",
-          "desc": "選中的側欄項底色＝brand-subtle 別名"
+          "value": "344.7 32.4% 28.4%",
+          "desc": "選中的側欄項：同色相亮一階"
         },
         "sidebar-accent-foreground": {
-          "value": "269.7 39.6% 52%",
-          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "343 49% 18%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
         }
       },
       "dark": {
-        "background": {
-          "value": "260 14.3% 8.2%"
-        },
-        "card": {
-          "value": "267 15% 12%"
-        },
-        "popover": {
-          "value": "267 14% 15%"
-        },
-        "muted": {
-          "value": "265 13% 18%"
-        },
-        "secondary": {
-          "value": "265 13% 18%"
-        },
-        "accent": {
-          "value": "265 13% 18%"
-        },
-        "border": {
-          "value": "267.7 11.5% 22.2%"
-        },
-        "input": {
-          "value": "267.7 11.5% 22.2%"
-        },
-        "field-border": {
-          "value": "267 11.4% 34.5%"
-        },
-        "muted-foreground": {
-          "value": "264.5 10.7% 59.6%"
-        },
-        "field-editable": {
-          "value": "263.1 14.6% 17.5%"
-        },
-        "field-readonly": {
-          "value": "270 11% 15%"
-        },
         "sidebar": {
-          "value": "264 19.2% 10.2%",
-          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+          "value": "344.1 39.5% 16.9%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "348.8 7.5% 58%",
+          "desc": "外殼上的次要文字（群組標題等）"
         },
         "sidebar-border": {
-          "value": "267.7 11.5% 22.2%",
-          "desc": "側欄邊線＝border 別名（生成器保證同值）"
-        },
-        "brand": {
-          "value": "268.3 31% 54.5%",
-          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
-        },
-        "brand-foreground": {
-          "value": "0 0% 100%",
-          "desc": "brand 上的文字"
-        },
-        "brand-subtle": {
-          "value": "271 44% 14%",
-          "desc": "主題色淡底：選中的導覽項、分頁底線區"
-        },
-        "brand-subtle-foreground": {
-          "value": "268.3 35% 59.6%",
-          "desc": "brand-subtle 上的文字"
-        },
-        "sidebar-primary": {
-          "value": "268.3 31% 54.5%",
-          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
-        },
-        "sidebar-primary-foreground": {
-          "value": "0 0% 100%",
-          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+          "value": "345 28.6% 24.7%",
+          "desc": "外殼內的分隔線"
         },
         "sidebar-accent": {
-          "value": "271 44% 14%",
-          "desc": "選中的側欄項底色＝brand-subtle 別名"
+          "value": "347 26.6% 27.3%",
+          "desc": "選中的側欄項：同色相亮一階"
         },
         "sidebar-accent-foreground": {
-          "value": "268.3 35% 59.6%",
-          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "344.1 39.5% 16.9%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
         }
       }
     },
-    "teal": {
-      "$label": "青玉",
-      "$hue": 195,
+    "rust": {
+      "$label": "赭",
+      "$hue": 45,
+      "$family": "orange",
+      "$term": "橙",
+      "$tier": "base",
       "light": {
-        "background": {
-          "value": "0 0% 100%",
-          "desc": "頁面底色"
-        },
-        "card": {
-          "value": "0 0% 100%",
-          "desc": "卡片表面"
-        },
-        "popover": {
-          "value": "0 0% 100%",
-          "desc": "浮層表面（下拉／泡泡／篩選面板）"
-        },
-        "muted": {
-          "value": "180 25% 95.3%",
-          "desc": "弱化表面（唯讀區、斑馬列）"
-        },
-        "secondary": {
-          "value": "180 25% 95.3%",
-          "desc": "次要動作表面"
-        },
-        "accent": {
-          "value": "180 25% 95.3%",
-          "desc": "hover／被指向的表面"
-        },
-        "border": {
-          "value": "180 22.2% 89.4%",
-          "desc": "一般分隔線／邊框"
-        },
-        "input": {
-          "value": "180 22.2% 89.4%",
-          "desc": "表單控制項邊框"
-        },
-        "field-border": {
-          "value": "178 21% 76%",
-          "desc": "可編輯欄位邊框（冷灰藍，刻意不像狀態色）"
-        },
-        "muted-foreground": {
-          "value": "178.3 17.8% 39.6%",
-          "desc": "次要／說明文字"
-        },
-        "field-editable": {
-          "value": "173.3 52.9% 96.7%",
-          "desc": "欄位語意：可編輯（極淡冷底）"
-        },
-        "field-readonly": {
-          "value": "165 14.3% 94.5%",
-          "desc": "欄位語意：唯讀／計算值"
-        },
         "sidebar": {
-          "value": "180 50% 97.6%",
-          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+          "value": "19.7 57.7% 26.9%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "18.3 16.5% 72.7%",
+          "desc": "外殼上的次要文字（群組標題等）"
         },
         "sidebar-border": {
-          "value": "180 22.2% 89.4%",
-          "desc": "側欄邊線＝border 別名（生成器保證同值）"
-        },
-        "brand": {
-          "value": "180.5 100% 26.1%",
-          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
-        },
-        "brand-foreground": {
-          "value": "0 0% 100%",
-          "desc": "brand 上的文字"
-        },
-        "brand-subtle": {
-          "value": "178.6 100% 91.6%",
-          "desc": "主題色淡底：選中的導覽項、分頁底線區"
-        },
-        "brand-subtle-foreground": {
-          "value": "180.5 100% 24.9%",
-          "desc": "brand-subtle 上的文字"
-        },
-        "sidebar-primary": {
-          "value": "180.5 100% 26.1%",
-          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
-        },
-        "sidebar-primary-foreground": {
-          "value": "0 0% 100%",
-          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+          "value": "19.3 46.3% 34.3%",
+          "desc": "外殼內的分隔線"
         },
         "sidebar-accent": {
-          "value": "178.6 100% 91.6%",
-          "desc": "選中的側欄項底色＝brand-subtle 別名"
+          "value": "19 43.6% 36.9%",
+          "desc": "選中的側欄項：同色相亮一階"
         },
         "sidebar-accent-foreground": {
-          "value": "180.5 100% 24.9%",
-          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "19.7 57.7% 26.9%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
         }
       },
       "dark": {
-        "background": {
-          "value": "180 27.3% 6.5%"
-        },
-        "card": {
-          "value": "180 26.5% 9.6%"
-        },
-        "popover": {
-          "value": "176.3 25.8% 12.2%"
-        },
-        "muted": {
-          "value": "176 22% 15%"
-        },
-        "secondary": {
-          "value": "176 22% 15%"
-        },
-        "accent": {
-          "value": "176 22% 15%"
-        },
-        "border": {
-          "value": "180 18.8% 18.8%"
-        },
-        "input": {
-          "value": "180 18.8% 18.8%"
-        },
-        "field-border": {
-          "value": "180 18.7% 29.4%"
-        },
-        "muted-foreground": {
-          "value": "180 13.1% 53.5%"
-        },
-        "field-editable": {
-          "value": "177 27% 14%"
-        },
-        "field-readonly": {
-          "value": "175 18% 13%"
-        },
         "sidebar": {
-          "value": "180 40.5% 7.3%",
-          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+          "value": "18.3 45% 25.7%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "16.4 14.5% 70.2%",
+          "desc": "外殼上的次要文字（群組標題等）"
         },
         "sidebar-border": {
-          "value": "180 18.8% 18.8%",
-          "desc": "側欄邊線＝border 別名（生成器保證同值）"
-        },
-        "brand": {
-          "value": "180.5 100% 26.1%",
-          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
-        },
-        "brand-foreground": {
-          "value": "0 0% 100%",
-          "desc": "brand 上的文字"
-        },
-        "brand-subtle": {
-          "value": "180 100% 11.4%",
-          "desc": "主題色淡底：選中的導覽項、分頁底線區"
-        },
-        "brand-subtle-foreground": {
-          "value": "179.5 47.8% 45.1%",
-          "desc": "brand-subtle 上的文字"
-        },
-        "sidebar-primary": {
-          "value": "180.5 100% 26.1%",
-          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
-        },
-        "sidebar-primary-foreground": {
-          "value": "0 0% 100%",
-          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+          "value": "18.7 36.5% 32.7%",
+          "desc": "外殼內的分隔線"
         },
         "sidebar-accent": {
-          "value": "180 100% 11.4%",
-          "desc": "選中的側欄項底色＝brand-subtle 別名"
+          "value": "19 34% 35%",
+          "desc": "選中的側欄項：同色相亮一階"
         },
         "sidebar-accent-foreground": {
-          "value": "179.5 47.8% 45.1%",
-          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "18.3 45% 25.7%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      }
+    },
+    "rust-deep": {
+      "$label": "深赭",
+      "$hue": 45,
+      "$family": "orange",
+      "$term": "橙",
+      "$tier": "deep",
+      "light": {
+        "sidebar": {
+          "value": "20.3 83.8% 14.5%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "20 9.8% 57.8%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "19 54% 23%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "19 48.8% 25.3%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "20.3 83.8% 14.5%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      },
+      "dark": {
+        "sidebar": {
+          "value": "19.6 62.2% 14.5%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "20 9.6% 57.1%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "18.8 42.1% 22.4%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "18.4 38.6% 24.9%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "19.6 62.2% 14.5%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      }
+    },
+    "olive": {
+      "$label": "橄欖",
+      "$hue": 95,
+      "$family": "yellow",
+      "$term": "黃褐",
+      "$tier": "base",
+      "light": {
+        "sidebar": {
+          "value": "49.5 100% 16.9%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "46.7 12.5% 71.8%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "48.3 64.1% 25.1%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "48.1 58.3% 27.3%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "49.5 100% 16.9%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      },
+      "dark": {
+        "sidebar": {
+          "value": "48 59% 19%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "46.7 11.2% 68.6%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "48.2 41.8% 26.3%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "47.4 38.8% 28.8%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "48 59% 19%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      }
+    },
+    "olive-deep": {
+      "$label": "深橄欖",
+      "$hue": 95,
+      "$family": "yellow",
+      "$term": "黃褐",
+      "$tier": "deep",
+      "light": {
+        "sidebar": {
+          "value": "48 100% 9.8%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "45.9 7.6% 56.3%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "49.3 100% 13.1%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "48.9 76.5% 16.7%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "48 100% 9.8%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      },
+      "dark": {
+        "sidebar": {
+          "value": "48.5 100% 9.2%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "49.4 7.4% 55.1%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "48 53% 17%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "47 46% 19.6%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "48.5 100% 9.2%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
         }
       }
     },
     "moss": {
       "$label": "苔綠",
-      "$hue": 135,
+      "$hue": 140,
+      "$family": "green",
+      "$term": "綠",
+      "$tier": "base",
       "light": {
-        "background": {
-          "value": "0 0% 100%",
-          "desc": "頁面底色"
-        },
-        "card": {
-          "value": "0 0% 100%",
-          "desc": "卡片表面"
-        },
-        "popover": {
-          "value": "0 0% 100%",
-          "desc": "浮層表面（下拉／泡泡／篩選面板）"
-        },
-        "muted": {
-          "value": "96 21.7% 95.5%",
-          "desc": "弱化表面（唯讀區、斑馬列）"
-        },
-        "secondary": {
-          "value": "96 21.7% 95.5%",
-          "desc": "次要動作表面"
-        },
-        "accent": {
-          "value": "96 21.7% 95.5%",
-          "desc": "hover／被指向的表面"
-        },
-        "border": {
-          "value": "97.5 15.4% 89.8%",
-          "desc": "一般分隔線／邊框"
-        },
-        "input": {
-          "value": "97.5 15.4% 89.8%",
-          "desc": "表單控制項邊框"
-        },
-        "field-border": {
-          "value": "100 15.3% 76.9%",
-          "desc": "可編輯欄位邊框（冷灰藍，刻意不像狀態色）"
-        },
-        "muted-foreground": {
-          "value": "99.1 10.9% 41.4%",
-          "desc": "次要／說明文字"
-        },
-        "field-editable": {
-          "value": "100 37.5% 96.9%",
-          "desc": "欄位語意：可編輯（極淡冷底）"
-        },
-        "field-readonly": {
-          "value": "90 7.1% 94.5%",
-          "desc": "欄位語意：唯讀／計算值"
-        },
         "sidebar": {
-          "value": "96 45.5% 97.8%",
-          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+          "value": "108.5 39.5% 23.3%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "106.2 9.6% 73.5%",
+          "desc": "外殼上的次要文字（群組標題等）"
         },
         "sidebar-border": {
-          "value": "97.5 15.4% 89.8%",
-          "desc": "側欄邊線＝border 別名（生成器保證同值）"
-        },
-        "brand": {
-          "value": "96 48% 34.7%",
-          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
-        },
-        "brand-foreground": {
-          "value": "0 0% 100%",
-          "desc": "brand 上的文字"
-        },
-        "brand-subtle": {
-          "value": "100 100% 92%",
-          "desc": "主題色淡底：選中的導覽項、分頁底線區"
-        },
-        "brand-subtle-foreground": {
-          "value": "95.6 51.8% 32.5%",
-          "desc": "brand-subtle 上的文字"
-        },
-        "sidebar-primary": {
-          "value": "96 48% 34.7%",
-          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
-        },
-        "sidebar-primary-foreground": {
-          "value": "0 0% 100%",
-          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+          "value": "109.8 30.3% 30.4%",
+          "desc": "外殼內的分隔線"
         },
         "sidebar-accent": {
-          "value": "100 100% 92%",
-          "desc": "選中的側欄項底色＝brand-subtle 別名"
+          "value": "109.8 28.1% 32.7%",
+          "desc": "選中的側欄項：同色相亮一階"
         },
         "sidebar-accent-foreground": {
-          "value": "95.6 51.8% 32.5%",
-          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "108.5 39.5% 23.3%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
         }
       },
       "dark": {
-        "background": {
-          "value": "100 17.6% 6.7%"
-        },
-        "card": {
-          "value": "100 18% 10%"
-        },
-        "popover": {
-          "value": "98.2 16.9% 12.7%"
-        },
-        "muted": {
-          "value": "98.2 13.6% 15.9%"
-        },
-        "secondary": {
-          "value": "98.2 13.6% 15.9%"
-        },
-        "accent": {
-          "value": "98.2 13.6% 15.9%"
-        },
-        "border": {
-          "value": "100 12% 19.6%"
-        },
-        "input": {
-          "value": "100 12% 19.6%"
-        },
-        "field-border": {
-          "value": "100 11.5% 30.6%"
-        },
-        "muted-foreground": {
-          "value": "100.9 9.6% 54.9%"
-        },
-        "field-editable": {
-          "value": "96.9 17.3% 14.7%"
-        },
-        "field-readonly": {
-          "value": "97.5 11.8% 13.3%"
-        },
         "sidebar": {
-          "value": "100 22% 8%",
-          "desc": "側邊欄／外殼表面：比頁面底沉一階的安靜區（目標 ΔE00 反解，非挑色）"
+          "value": "109.4 29.3% 22.7%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "110 7.9% 70.2%",
+          "desc": "外殼上的次要文字（群組標題等）"
         },
         "sidebar-border": {
-          "value": "100 12% 19.6%",
-          "desc": "側欄邊線＝border 別名（生成器保證同值）"
-        },
-        "brand": {
-          "value": "98.4 31% 38.6%",
-          "desc": "主題色：品牌強調與非提交型入口（確認／送出／儲存請用 primary）"
-        },
-        "brand-foreground": {
-          "value": "0 0% 100%",
-          "desc": "brand 上的文字"
-        },
-        "brand-subtle": {
-          "value": "97.5 84.2% 7.5%",
-          "desc": "主題色淡底：選中的導覽項、分頁底線區"
-        },
-        "brand-subtle-foreground": {
-          "value": "98.4 26.9% 44.5%",
-          "desc": "brand-subtle 上的文字"
-        },
-        "sidebar-primary": {
-          "value": "98.4 31% 38.6%",
-          "desc": "側欄的品牌強調＝brand 別名（生成器保證同值）"
-        },
-        "sidebar-primary-foreground": {
-          "value": "0 0% 100%",
-          "desc": "sidebar-primary 上的文字＝brand-foreground 別名"
+          "value": "109.7 23.2% 29.6%",
+          "desc": "外殼內的分隔線"
         },
         "sidebar-accent": {
-          "value": "97.5 84.2% 7.5%",
-          "desc": "選中的側欄項底色＝brand-subtle 別名"
+          "value": "110 21% 32%",
+          "desc": "選中的側欄項：同色相亮一階"
         },
         "sidebar-accent-foreground": {
-          "value": "98.4 26.9% 44.5%",
-          "desc": "sidebar-accent 上的文字＝brand-subtle-foreground 別名"
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "109.4 29.3% 22.7%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      }
+    },
+    "moss-deep": {
+      "$label": "深苔綠",
+      "$hue": 140,
+      "$family": "green",
+      "$term": "綠",
+      "$tier": "deep",
+      "light": {
+        "sidebar": {
+          "value": "108.3 58.1% 12.2%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "110 5.6% 57.6%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "108.6 36.6% 19.8%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "108.6 32.7% 22.2%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "108.3 58.1% 12.2%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      },
+      "dark": {
+        "sidebar": {
+          "value": "108.9 42.9% 12.4%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "110 5.4% 56.5%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "109 27% 20%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "109.3 24.6% 22.4%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "108.9 42.9% 12.4%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      }
+    },
+    "teal": {
+      "$label": "青玉",
+      "$hue": 190,
+      "$family": "cyan",
+      "$term": "青",
+      "$tier": "base",
+      "light": {
+        "sidebar": {
+          "value": "177.8 100% 16.3%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "173.3 12.9% 72.5%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "177.6 100% 20%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "177.2 100% 21.2%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "177.8 100% 16.3%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      },
+      "dark": {
+        "sidebar": {
+          "value": "177.6 94.9% 15.5%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "176.7 11.5% 69.4%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "176.4 52.4% 24.7%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "176 47% 27%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "177.6 94.9% 15.5%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      }
+    },
+    "teal-deep": {
+      "$label": "深青玉",
+      "$hue": 190,
+      "$family": "cyan",
+      "$term": "青",
+      "$tier": "deep",
+      "light": {
+        "sidebar": {
+          "value": "177.5 100% 9.4%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "173.3 8.1% 56.5%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "177.3 100% 13.1%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "177.6 100% 14.5%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "177.5 100% 9.4%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      },
+      "dark": {
+        "sidebar": {
+          "value": "176 100% 9%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "173.3 8% 55.7%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "176.8 76% 14.7%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "176.7 60% 17.6%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "176 100% 9%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      }
+    },
+    "lagoon": {
+      "$label": "湖水",
+      "$hue": 230,
+      "$family": "azure",
+      "$term": "青藍",
+      "$tier": "base",
+      "light": {
+        "sidebar": {
+          "value": "195.3 100% 20.8%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "198.3 17% 73.5%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "196.8 72.8% 28.8%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "197.1 65.2% 31.6%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "195.3 100% 20.8%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      },
+      "dark": {
+        "sidebar": {
+          "value": "197.8 64.9% 22.4%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "199.1 14.5% 70.2%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "198.3 46.8% 30.2%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "198.9 44.2% 32.4%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "197.8 64.9% 22.4%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      }
+    },
+    "lagoon-deep": {
+      "$label": "深湖水",
+      "$hue": 230,
+      "$family": "azure",
+      "$term": "青藍",
+      "$tier": "deep",
+      "light": {
+        "sidebar": {
+          "value": "197.1 100% 12.4%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "199.1 10.2% 57.6%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "196 100% 17%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "196 84% 20%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "197.1 100% 12.4%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      },
+      "dark": {
+        "sidebar": {
+          "value": "197 100% 11.8%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "199 10% 57%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "198 59% 20%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "198.3 51.3% 22.5%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "197 100% 11.8%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      }
+    },
+    "indigo": {
+      "$label": "靛藍",
+      "$hue": 265,
+      "$family": "blue",
+      "$term": "藍",
+      "$tier": "base",
+      "light": {
+        "sidebar": {
+          "value": "221.5 41% 32.5%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "219 15.4% 74.5%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "221.4 35% 39.8%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "221 34% 42%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "221.5 41% 32.5%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      },
+      "dark": {
+        "sidebar": {
+          "value": "221.5 34.7% 29.4%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "219 13.7% 71.4%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "221.1 29% 36.5%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "221 28% 39%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "221.5 34.7% 29.4%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      }
+    },
+    "indigo-deep": {
+      "$label": "深靛藍",
+      "$hue": 265,
+      "$family": "blue",
+      "$term": "藍",
+      "$tier": "deep",
+      "light": {
+        "sidebar": {
+          "value": "222.4 51.5% 19.4%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "218 9% 59%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "221.5 40.1% 26.9%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "221.8 37.3% 29.4%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "222.4 51.5% 19.4%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      },
+      "dark": {
+        "sidebar": {
+          "value": "222 44.4% 17.6%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "221.1 8.9% 58.2%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "220.5 33.9% 24.9%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "220.9 31% 27.8%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "222 44.4% 17.6%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      }
+    },
+    "violet": {
+      "$label": "紫羅蘭",
+      "$hue": 310,
+      "$family": "purple",
+      "$term": "紫",
+      "$tier": "base",
+      "light": {
+        "sidebar": {
+          "value": "276 30% 32%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "272.3 9.6% 73.5%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "274.8 25% 39.2%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "273.6 23.6% 41.6%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "276 30% 32%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      },
+      "dark": {
+        "sidebar": {
+          "value": "275 24% 29%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "272.3 8.8% 71.2%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "274.1 20% 36.3%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "273.2 19.2% 38.8%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "275 24% 29%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      }
+    },
+    "amethyst": {
+      "$label": "紫晶",
+      "$hue": 310,
+      "$family": "purple",
+      "$term": "紫",
+      "$tier": "deep",
+      "light": {
+        "sidebar": {
+          "value": "275 37.5% 18.8%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "270 5.7% 58.8%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "274.7 27.9% 26.7%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "273.8 26.2% 29.2%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "275 37.5% 18.8%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
+        }
+      },
+      "dark": {
+        "sidebar": {
+          "value": "276.4 31.8% 17.3%",
+          "desc": "環境色：側欄與表頭的外殼底色（目標反解，非挑色）"
+        },
+        "sidebar-foreground": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的文字（近白）"
+        },
+        "sidebar-muted-foreground": {
+          "value": "275 5.6% 58%",
+          "desc": "外殼上的次要文字（群組標題等）"
+        },
+        "sidebar-border": {
+          "value": "274 23.4% 25.1%",
+          "desc": "外殼內的分隔線"
+        },
+        "sidebar-accent": {
+          "value": "274.8 22% 27.6%",
+          "desc": "選中的側欄項：同色相亮一階"
+        },
+        "sidebar-accent-foreground": {
+          "value": "210 40% 98%",
+          "desc": "sidebar-accent 上的文字＝sidebar-foreground"
+        },
+        "sidebar-primary": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的標誌塊：與外殼反相的近白"
+        },
+        "sidebar-primary-foreground": {
+          "value": "276.4 31.8% 17.3%",
+          "desc": "標誌塊上的字＝外殼色"
+        },
+        "sidebar-ring": {
+          "value": "210 40% 98%",
+          "desc": "外殼上的聚焦環＝sidebar-foreground"
         }
       }
     }

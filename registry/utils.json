@@ -6,7 +6,7 @@
   "title": "utils 通用工具",
   "description": "cn 與數值／金額／百分比格式化。",
   "dependencies": [
-    "@dooping/tokens@^0.7.0",
+    "@dooping/tokens@^0.8.0",
     "clsx",
     "tailwind-merge"
   ],

@@ -24,6 +24,11 @@ export interface AppShellProps extends Omit<SidebarProviderProps, "children"> {
  *
  * 頂列與側欄都貼著視窗頂端（sticky）：長頁面捲動時功能選單與應用切換一直在手邊。
  * 頂列 z-40 低於所有浮層（z-50 起），浮層一律蓋得過它。
+ *
+ * 頂列與側欄合起來是**外殼**：兩者都用 `--sidebar` 家族，主題（`data-color-theme`）只換這一塊，
+ * 用大區塊的顏色讓人認出目前在哪個工作環境。頂列套 `on-shell`，放進來的一般元件
+ * （ghost／outline 按鈕、分隔線、聚焦環、次要文字）自動改用外殼上看得清楚的顏色。
+ * 主內容區維持中性——提醒、按鈕、欄位都在那裡，主題色碰不到它們。
  */
 export function AppShell({ sidebar, header, children, className, ...providerProps }: AppShellProps) {
   return (
@@ -32,7 +37,7 @@ export function AppShell({ sidebar, header, children, className, ...providerProp
         {sidebar}
         <div className="flex min-w-0 flex-1 flex-col">
           {header ? (
-            <header className="sticky top-0 z-40 flex h-12 shrink-0 items-center gap-2 border-b bg-background px-3 md:px-4">
+            <header className="on-shell sticky top-0 z-40 flex h-12 shrink-0 items-center gap-2 border-b border-sidebar-border bg-sidebar px-3 text-sidebar-foreground md:px-4">
               {header}
             </header>
           ) : null}

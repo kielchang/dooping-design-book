@@ -1,5 +1,10 @@
 export function csvEscape(v: string | number): string {
-  const s = String(v ?? "");
+  // 文字以 = + - @、Tab、CR 開頭時，試算表會把它當公式執行（CSV 公式注入）：前面補 ' 讓它成為一般文字。
+  // 數字型別、以及只有「正負號＋數字」的文字（千分位逗號、小數點、結尾 % 都算）不補——
+  // 它們不可能是公式，補了之後試算表就不能拿來計算。
+  // 說明寫在函式內而不是檔頭：shadcn CLI 安裝時會刪掉檔案開頭的註解（tests/registry-content.test.ts）。
+  let s = String(v ?? "");
+  if (typeof v === "string" && /^[=+\-@\t\r]/.test(s) && !/^[+-]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?%?$/.test(s)) s = `'${s}`;
   return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 

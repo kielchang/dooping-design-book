@@ -193,8 +193,8 @@
       "description": "含 UTF-8 BOM 的 CSV 產出與解析。",
       "url": "https://kielchang.github.io/dooping-design-book/r/csv.json",
       "meta": {
-        "hash": "ec12443583c00100",
-        "closureHash": "a6cf84df54bfb80f"
+        "hash": "fbc048687e81d5da",
+        "closureHash": "e32e16400150cae0"
       }
     },
     {
@@ -206,7 +206,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/data-table.json",
       "meta": {
         "hash": "a3144dabdd7f2758",
-        "closureHash": "30e305d88e75dadc"
+        "closureHash": "af10e0597f4b26b7"
       }
     },
     {

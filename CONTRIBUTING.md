@@ -1,7 +1,8 @@
 # 貢獻指南
 
-> 給要回饋這套設計語言的人——取用端專案的工程師、設計師，以及沒有維護方 PMIS 的外部讀者。
-> **取用端的 AI agent**（連得到 PMIS）不走這一頁：照 [AGENTS.md「回饋到上游」](https://kielchang.github.io/dooping-design-book/AGENTS.md)在 PMIS 開 task。
+> 給要回饋這套設計語言的人——取用端專案的工程師與設計師。
+> **取用端的 AI agent** 照 [AGENTS.md「回饋到上游」](https://kielchang.github.io/dooping-design-book/AGENTS.md)開標題 `[回饋]` 的 issue；
+> **安全問題**不開 issue，照 [SECURITY.md](SECURITY.md) 私密回報。
 > 完整規範在文件站[〈回饋與 RFC 流程〉](https://kielchang.github.io/dooping-design-book/governance/rfc/)；這一頁是「人怎麼提、提到哪」的操作版。
 
 ## 三種回饋，三個門口
@@ -43,7 +44,7 @@ npm run build:registry # 改了元件就要重新產生 registry JSON 並一起�
 | --- | --- | --- |
 | `bug`／`缺件`／`rfc` | 表單自動 | 類型標記，永不移除 |
 | `rfc:討論中` | 表單自動 | 開立即此態，任何人可討論 |
-| `rfc:已接受` | 守門人 | 三問通過；在 PMIS 開一個有到期日的計畫；實作 PR 合併時關閉 issue，結案時成立了難回頭的決定才在 PMIS 記 ADR |
+| `rfc:已接受` | 守門人 | 三問通過，排進實作；實作 PR 合併時關閉 issue |
 | `rfc:已婉拒` | 守門人 | issue 留一句**可被推翻**的理由後關閉（「因 X 不收，待 Y 成立可重提」） |
 | `rfc:已擱置` | 守門人 | 通常是三次證據未滿；用缺件認領 issue 湊證據，齊了改回討論中 |
 
@@ -63,4 +64,4 @@ gh label create "rfc:已擱置" --color c5def5 --description "三次證據未滿
 ```
 
 沒有 `gh` 的話走網頁：repo → Issues → Labels → New label，照上表建。
-另外到 Settings → Security → 啟用 **Private vulnerability reporting**（`SECURITY.md` 的回報通道）。
+Private vulnerability reporting（`SECURITY.md` 的回報通道）已啟用；關掉的話 SECURITY.md 的回報連結會失效。

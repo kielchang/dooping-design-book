@@ -1,6 +1,6 @@
 // 發版閘（dev → staging → main）的規則。git 那一層由 CI 實跑；這裡用合成狀態讓每條規則各轉紅一次，
 // 閘才不會「全綠但其實什麼都沒擋」。另有一條實跑 CLI：抓不到 main 時，release 必須失敗、bump-guard 必須放行。
-// 規則正本：book/docs/7-governance/01-versioning.mdx「三段式發布」。
+// 規則正本：ARCHITECTURE.md「分支與部署拓樸」。
 import { describe, it, expect } from "vitest";
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";

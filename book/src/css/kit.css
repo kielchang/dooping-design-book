@@ -1,7 +1,7 @@
 /* 活元件示例的樣式管線（Tailwind v4）：token ＋ demo 宿主基座 ＋ Tailwind 主題與 utilities。
 
    刻意不引入 tailwindcss/preflight.css、也不整包 @import "tailwindcss"——不對全站注入第二套 reset；
-   元件需要的樣式前提由 demo-base.css 在範例的 scope 內提供（ADR-0010）。
+   元件需要的樣式前提由 demo-base.css 在範例的 scope 內提供。
 
    順序與 layer 是承重結構：
    - demo-base 必須在 tailwindcss/utilities.css 之前，而且兩者都**不能**進 cascade layer——

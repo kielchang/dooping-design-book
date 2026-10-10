@@ -89,7 +89,7 @@ export function runChecks() {
       const cSubtle = contrast(at("brand-subtle"), at("brand-subtle-foreground"));
       push(cSubtle >= TEXT, `${tag} brand-subtle 上的文字只有 ${cSubtle.toFixed(2)}:1（需 ${TEXT}）`);
 
-      // ring 自 ADR-0007 起是全主題共用的中性基礎值（主題層不再覆蓋），
+      // ring 是全主題共用的中性基礎值（主題層不再覆蓋），
       // 但表面是各主題帶色相的——所以這條**每個主題仍要各驗一次**：
       // 同一個 ring、不同的對象。用 resolve() 拿有效值，主題有覆蓋就驗覆蓋、
       // 沒有就驗基礎值，機制不因這次決定而特化。
@@ -170,7 +170,7 @@ export function runChecks() {
         if (c < TEXT) warn.push(`${tag} ${fg} 在 ${bg} 上 ${c.toFixed(2)}:1（需 ${TEXT}）`);
       }
 
-      // ── 側邊欄表面（ADR-0011） ──────────────────────────────
+      // ── 側邊欄表面 ──────────────────────────────
       // sidebar 是全天候大面積表面，文字與聚焦環的門檻比照 background；
       // 「另一個區」的可辨性（對頁面底的 ΔE00）與選中項的區分度（sidebar-accent）
       // 是生成參數，這裡驗的是它們沒有被手改或漂移。
@@ -219,7 +219,7 @@ export function runChecks() {
 
   // ── 1a. 側邊欄基準層的別名恆等 ─────────────────────────────
   // 主題層的別名在上面逐主題驗過；基準層（color.*）的三個別名在這裡驗一次。
-  // sidebar-ring ≡ ring 是 ADR-0007 的延伸：聚焦環中性、不進主題，側欄不重開戰場。
+  // sidebar-ring ≡ ring：聚焦環中性、不進主題。
   for (const mode of MODES) {
     for (const [alias, base] of [
       ["sidebar-foreground", "foreground"],
@@ -403,7 +403,7 @@ export function runChecks() {
     ["card", "card-foreground"],
     ["muted", "foreground"],
     ["popover", "popover-foreground"],
-    ["sidebar", "sidebar-foreground"],   // 側欄選單項的 hover／selected 也走狀態層（ADR-0011）
+    ["sidebar", "sidebar-foreground"],   // 側欄選單項的 hover／selected 也走狀態層
   ];
   for (const mode of MODES) {
     const s = { hover: Infinity, pressed: Infinity, selected: Infinity, loudest: 0, text: Infinity, sec: Infinity };

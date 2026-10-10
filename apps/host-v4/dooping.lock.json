@@ -136,6 +136,16 @@
         "src/lib/dooping/utils.ts": "4183e1ff9acda6ee"
       }
     },
+    "date-range": {
+      "closureHash": "305271ef57069345",
+      "files": {
+        "src/components/dooping/date-range.tsx": "75bf8ec661a9899e",
+        "src/components/dooping/input.tsx": "cc0cf4da27071fe5",
+        "src/components/dooping/label.tsx": "c83329e0a596a6da",
+        "src/components/dooping/seg-group.tsx": "25c493fece75c003",
+        "src/lib/dooping/utils.ts": "4183e1ff9acda6ee"
+      }
+    },
     "delta": {
       "closureHash": "f7764d2c98fde4c3",
       "files": {

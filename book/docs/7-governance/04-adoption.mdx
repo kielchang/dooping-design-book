@@ -8,8 +8,7 @@ title: 導入三階段
 
 <FlowAdoptionStages />
 
-（這一頁是**既有系統**的漸進路；全新專案不必遷就既有畫面，
-直接從[頁面章](/pages)選頁型起手。）
+（這一頁適用**既有系統**；全新專案直接從[頁面章](/pages)選頁型起手。）
 
 ## 階段一：只導 token（1–2 天）
 
@@ -28,20 +27,17 @@ npm install @dooping/tokens
 presets: [require("@dooping/tokens/tailwind-preset")]
 ```
 
-既有的 v4 專案通常已經有一份 shadcn 產生的 `:root`／`.dark` 色值與 `@theme inline` 對映：
-**整段刪掉**，換成上面兩行 `@dooping/tokens`。不刪就是兩份真相，後宣告者蓋前者。
+既有的 v4 專案若已有 shadcn 產生的 `:root`／`.dark` 色值與 `@theme inline` 對映：
+**整段刪掉**，換成上面兩行 `@dooping/tokens`。
 
 做什麼：把硬編色換成語意 token。
 
 ```diff
 - className="bg-red-50 border-red-200 text-red-700"
-+ className="bg-danger/10 border-danger/30 text-danger"
++ className="bg-danger-subtle border-danger/30 text-danger-subtle-foreground"
 ```
 
-**收益**：新舊畫面顏色一致、深色模式一次到位、換品牌色變成改一個檔案。
-**風險**：幾乎為零，不影響任何功能。
-
-**停在這裡也完全合理。** 這是投報率最高的一步。
+**可以停在這一階段。**
 
 ## 階段二：新畫面用元件（持續）
 
@@ -52,17 +48,13 @@ npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/data-tab
 ```
 
 <Rules>
-  <Do><p>從<strong>資料表</strong>開始。它是後台系統重複最多、收益最明顯的一塊。</p></Do>
-  <Dont><p>不要為了統一而重寫還能用的舊畫面。大爆炸式改版的結果通常是改到一半、
-  兩套並存、然後永遠並存。</p></Dont>
+  <Do><p>從<strong>資料表</strong>開始。</p></Do>
+  <Dont><p>不要為了統一而重寫還能用的舊畫面。</p></Dont>
 </Rules>
-
-**收益**：新畫面行為一致，開發速度變快。
-**風險**：兩套介面並存一段時間。可接受——顏色已經在階段一統一了，使用者感覺不到割裂。
 
 ## 階段三：導入模式（按需）
 
-模式不是一次導入的，是**遇到問題時去查**：
+模式不一次導入，**遇到問題時再查**：
 
 | 遇到 | 讀 |
 | --- | --- |
@@ -74,15 +66,11 @@ npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/data-tab
 | 「印出來很醜」 | [列印與匯出](/patterns/print-and-export) |
 | 「手冊的截圖過期了」 | [零截圖文件示意](/patterns/zero-screenshot-docs) |
 
-**收益**：這些模式每一個都是別人踩過坑換來的。
-**風險**：有些模式（硬鎖定、生效日版本化）會改變業務流程，導入前要先取得共識。
+硬鎖定、生效日版本化會改變業務流程，導入前先取得共識。
 
 ## 三個階段之外：建立守門機制
 
-不管走到哪一階段，都要有人負責看門。
-沒有守門人的設計系統，三個月後會有五種按鈕。見 [RFC 流程](/governance/rfc)。
+不管走到哪一階段，都要有人負責看門。見 [RFC 流程](/governance/rfc)。
 
-導入完成之後才開始的那些問題——「我這個元件到底算不算遵循？」「我想改上游該怎麼辦？」
-——見[符合性台帳](/governance/conformance-ledger)；「怎麼知道上游出新版了？要不要跟？怎麼跟？」
-——見[跟上新版](/governance/staying-current)。
-這一頁講的是導入的那幾天，那兩頁講的是**之後的每一個月**。
+導入之後：元件算不算遵循、想改上游怎麼辦，見[符合性台帳](/governance/conformance-ledger)；
+怎麼知道上游出新版、要不要跟、怎麼跟，見[跟上新版](/governance/staying-current)。

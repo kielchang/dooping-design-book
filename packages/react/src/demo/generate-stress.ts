@@ -2,11 +2,11 @@
 //
 // 與 sample-data.ts 的分工：那邊是手挑的「乖」資料——長度剛好、沒有 0 也沒有負數；
 // 這裡照參數量產「不乖」的資料——超長名稱、13 位數金額、200 筆、0 筆。
-// 用途見〈壓力測試 Story〉（book/docs/7-governance/09-stress-stories.mdx）。
+// 用途見 packages/react/README.md「壓力測試 story」。
 // 詞彙沿用同一套抽象中性情境（項目／單位／類別／組別），de-domain 守衛同樣適用。
 //
 // 確定性：固定種子的 PRNG。同一組參數永遠生出同一批資料——
-// 截圖驗證靠「掃描整張圖找期望值」（見〈Story 撰寫慣例〉），資料會動的話什麼都比不了。
+// 截圖驗證靠「掃描整張圖找期望值」（見 packages/react/README.md「Story 撰寫規則」），資料會動的話什麼都比不了。
 import { formatMoney } from "../lib/utils";
 import type { DemoRecord, RecordStatus } from "./sample-data";
 

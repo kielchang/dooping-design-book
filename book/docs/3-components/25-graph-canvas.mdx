@@ -5,32 +5,23 @@ title: GraphCanvas 節點畫布
 # GraphCanvas 節點畫布
 
 **流程圖與關聯圖的畫布**：節點、連線、拖拉、縮放、minimap。
-底層是 [React Flow](https://reactflow.dev)（`@xyflow/react`，MIT），
-但取用端依賴的是 `<GraphCanvas>` 的領域 API——這個差異是刻意的，見下。
+底層是 [React Flow](https://reactflow.dev)（`@xyflow/react`，MIT）；
+取用端依賴的是 `<GraphCanvas>` 的領域 API，不是 React Flow 本身。
 
 <StoryFrame id="元件-特殊介面-時間軸・節點畫布--節點畫布" title="節點畫布：拖拉、連線、選取" height={430} />
 
 <StoryLink id="元件-特殊介面-時間軸・節點畫布--節點畫布-互動">互動 playground——可調節點數與連線密度</StoryLink>
 
-## 為什麼是薄封裝，不是直接用 React Flow
+## 薄封裝：相依關在一個檔案裡
 
-`@xyflow/react` 內部帶著 zustand——[元件庫邊界](/governance/drift-guards)明文禁止
-狀態管理進元件庫（「狀態管理屬於應用層」）。字面上我們沒有 import zustand，
-但把整個套件放進白名單等於默默放行它的精神。
+**相依關在一個檔案裡**：只有 `graph-canvas.tsx` 能 import `@xyflow/react`（[元件庫邊界](/governance/drift-guards)）。
+取用端與其他元件依賴 `<GraphCanvas>` 的節點／連線型別。（守衛：`tests/boundary.test.ts` 的隔離守衛）
 
-折衷是**把相依關在一個檔案裡**：只有 `graph-canvas.tsx` 能 import `@xyflow/react`，
-`tests/boundary.test.ts` 的隔離守衛保證這件事——任何第二個檔案碰它就紅。
-取用端與其他元件依賴 `<GraphCanvas>` 的節點／連線型別，升級或抽換 React Flow 的
-成本永遠只在一個檔案裡。
-
-三個 React Flow 的地雷也一併關在封裝裡，取用端不必知道：
-樣式表 import（少了它整個畫布沒樣式）、wrapper 高度（高度 0 時畫布隱形）、
-`nodeTypes` 定義在模組層（內聯會讓節點每次 render 重掛）。
+封裝已處理三件事，取用端不必再做：樣式表 import、wrapper 高度、`nodeTypes` 定義在模組層。
 
 ## 色彩：token 橋接層
 
-React Flow 自帶一整套 `--xy-*` 視覺變數（12.11.2 共 43 個可覆寫項，
-逐一從產物核對）。封裝把它們對映到本書的語意 token，
+React Flow 自帶一整套 `--xy-*` 視覺變數。封裝把它們對映到本書的語意 token，
 依[主題](/foundations/theming)的色相預算逐層對位：
 
 | 畫布元素 | 介面層 | 吃什麼 | 主題色相 |
@@ -42,26 +33,22 @@ React Flow 自帶一整套 `--xy-*` 視覺變數（12.11.2 共 43 個可覆寫�
 | 鍵盤聚焦 | 聚焦 | `--ring` 外環 | ❌ 中性 |
 | 節點分類色條 | 資料 | `--chart-N` | 與主題無關，跟資料實體走 |
 
-因為全部落在既有 token 上，**深淺模式與六組色相主題自動成立**——
-不需要用 React Flow 自己的 `colorMode`（那是它的平行深淺系統，反而會蓋掉橋接）。
+全部落在既有 token 上，**深淺模式與六組色相主題自動成立**。
+不要另用 React Flow 自己的 `colorMode`。
 
 ### 已選與聚焦是兩個通道
-
-React Flow 原生把「選中」畫成節點外框陰影，而且對聚焦寫死 `outline: none`。
-封裝把這兩件事拆回本書的規則：
 
 - **已選** ＝ 節點背景疊狀態層 20%（與資料表列同一套機制）
 - **鍵盤聚焦** ＝ `--ring` 外環（offset 畫法：先一圈背景色、再一圈環）
 
-兩者可以同時存在而不打架——「不合格＋聚焦」「已選＋聚焦」都成立，
-這正是聚焦走獨立通道的用意。
+兩者可以同時存在：「不合格＋聚焦」「已選＋聚焦」都成立。
 
 ## 何時不要用
 
-- **資料超過幾百個節點**——逐節點 DOM 渲染，上千節點請先在資料層彙總。
-- **只是要畫一張靜態流程示意**——文件裡用[零截圖示意](/patterns/zero-screenshot-docs)
-  或一張 SVG 就好；畫布的成本是互動機制，靜態圖用不到。
-- **要當白板**（自由文字、便利貼、手繪）——那是另一種產品。
+- **資料超過幾百個節點**：逐節點 DOM 渲染，上千節點先在資料層彙總。
+- **只是要畫一張靜態流程示意**：文件裡用[零截圖示意](/patterns/zero-screenshot-docs)
+  或一張 SVG。
+- **要當白板**（自由文字、便利貼、手繪）。
 
 ## 唯讀模式
 
@@ -71,8 +58,7 @@ React Flow 原生把「選中」畫成節點外框陰影，而且對聚焦寫死
 
 ## 無障礙
 
-- 外層 `role="img"` ＋ `aria-label`：畫布對讀屏是一張圖，
-  **關鍵資訊不能只存在於畫布裡**——旁邊要有等價的清單或表格
+- 外層 `role="img"` ＋ `aria-label`。**關鍵資訊不能只存在於畫布裡**：旁邊要有等價的清單或表格
   （與[圖表的無障礙義務](/components/charts#無障礙顏色不能是唯一線索)同一條規則）。
 - 節點分類靠色條＋（宿主提供的）文字，不是只有顏色。
 
@@ -82,6 +68,6 @@ React Flow 原生把「選中」畫成節點外框陰影，而且對聚焦寫死
 npx shadcn add https://kielchang.github.io/dooping-design-book/r/graph-canvas.json
 ```
 
-registry item 會一併安裝 `@xyflow/react`（唯一一個帶第三方 UI 套件的元件）。
-需要 tokens ≥ 0.6.0。抄走之後**不要**在其他檔案 import `@xyflow/react`——
-把本書的隔離守衛一起抄走最好（見[漂移防護](/governance/drift-guards)）。
+registry item 會一併安裝 `@xyflow/react`。
+需要 tokens ≥ 0.6.0。抄走之後**不要**在其他檔案 import `@xyflow/react`；
+隔離守衛建議一起抄走（見[漂移防護](/governance/drift-guards)）。

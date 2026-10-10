@@ -1,6 +1,6 @@
 // 壓力測試／多類別圖形：20 個類別、12 段的堆疊、1 類、全零、空陣列。
 // 標籤會不會糊成一團？超過色票數量怎麼處理？最窄的那段還點得到嗎？
-// 規範出處：book/docs/7-governance/09-stress-stories.mdx
+// 規範出處：packages/react/README.md「壓力測試 story」
 import type { Meta, StoryObj } from "@storybook/react";
 import { BarChart } from "../charts/bar-chart";
 import { StackedBar } from "../charts/stacked-bar";

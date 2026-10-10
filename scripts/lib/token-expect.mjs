@@ -2,7 +2,7 @@
 //
 // 期望值一律從 tokens.json 反解「主題有效值」：themes 覆蓋鏈 → color 基準值。
 // 預設主題會覆蓋中性色，拿 color.* 基準值驗會驗到後備值（verify-visual.mjs 同款反解）。
-// 容差 ±2/channel：alpha 合成會被瀏覽器抖動，逐位元比對會假性失敗（治理章〈story 慣例〉的截圖方法論）。
+// 容差 ±2/channel：alpha 合成會被瀏覽器抖動，逐位元比對會假性失敗（packages/react/README.md「截圖驗證一定要比對期望值」）。
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { hslToRgb8 } from "../../packages/tokens/scripts/lib/color.mjs";

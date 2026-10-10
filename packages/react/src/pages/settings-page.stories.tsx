@@ -4,12 +4,12 @@ import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Callout } from "../ui/callout";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
-import { Checkbox } from "../ui/checkbox";
 import { Chips } from "../ui/chips";
 import { Label } from "../ui/label";
 import { NumberInput } from "../ui/number-input";
 import { PageHeader } from "../ui/page-header";
 import { SegGroup } from "../ui/seg-group";
+import { Switch } from "../ui/switch";
 import {
   Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose,
 } from "../ui/dialog";
@@ -43,7 +43,7 @@ export const 典型組成: Story = {
       <div className="mx-auto max-w-2xl space-y-4">
         <PageHeader title="設定" meta={`${demoProfile.name}・${demoProfile.code}`} />
 
-        {/* 立即生效區：改了就生效，所以沒有儲存鈕——要在標題旁講清楚 */}
+        {/* 立即生效區：改了就生效，所以沒有儲存鈕——要在標題旁講清楚；開關用 Switch，不用 Checkbox */}
         <Card>
           <CardHeader>
             <CardTitle className="text-base">顯示偏好</CardTitle>
@@ -51,7 +51,7 @@ export const 典型組成: Story = {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-2">
-              <Checkbox id="sp-dense" checked={dense} onCheckedChange={(v) => setDense(v === true)} />
+              <Switch id="sp-dense" checked={dense} onCheckedChange={setDense} />
               <Label htmlFor="sp-dense">清單使用密集模式</Label>
             </div>
             <SegGroup label="預設檢視" options={VIEW_OPTIONS} value={view} onPick={setView} />

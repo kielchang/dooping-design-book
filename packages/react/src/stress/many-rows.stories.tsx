@@ -1,6 +1,6 @@
 // 壓力測試／超多筆：42 筆（跨越分頁門檻）、200 筆、0 筆。
 // 分頁器出現時機、合計是否算全部、捲動是否卡頓。
-// 規範出處：book/docs/7-governance/09-stress-stories.mdx
+// 規範出處：packages/react/README.md「壓力測試 story」
 import type { Meta, StoryObj } from "@storybook/react";
 import { PackageOpen } from "lucide-react";
 import { DataTable, type Column } from "../ui/data-table";
@@ -90,7 +90,7 @@ export const 零筆: Story = {
   ),
 };
 
-// 中文 arg playground（見〈Story 撰寫慣例〉）：讓驗收的人自己把「資料筆數」拉到 0 或 200
+// 中文 arg playground（見 packages/react/README.md「Story 撰寫規則」）：讓驗收的人自己把「資料筆數」拉到 0 或 200
 export const 互動: StoryObj<{ 資料筆數: number; 每頁筆數: number; 斑馬紋: boolean }> = {
   args: { 資料筆數: 42, 每頁筆數: 15, 斑馬紋: true },
   argTypes: {

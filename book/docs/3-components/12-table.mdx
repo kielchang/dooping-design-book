@@ -13,8 +13,7 @@ title: Table 表格基礎件
 <Rules>
   <Do><p>版面固定、資料筆數少、不需要搜尋排序（例如兩欄的規格對照）→ 用 Table。</p></Do>
   <Dont><p>只要出現「使用者要找某一筆」的需求，就直接用
-  <a href="/components/data-table">DataTable</a>。自己補搜尋排序分頁，
-  三個畫面之後就會長出三種不一樣的表格。</p></Dont>
+  <a href="/components/data-table">DataTable</a>，不要自己補搜尋排序分頁。</p></Dont>
 </Rules>
 
 <Demo title="基礎表格">
@@ -41,25 +40,23 @@ title: Table 表格基礎件
 
 表格本體**沒有外框、沒有直向格線、儲存格沒有邊框**。列與列之間一條 `--border` 的
 1px 底線，是這個元件唯一的線；斑馬紋是 `zebra` 的 opt-in（`muted` 30%）；
-表頭沒有自己的底色（黏性表頭例外——取頁面底色，蓋住捲過去的內容）。
+表頭沒有自己的底色（黏性表頭例外：取頁面底色）。
 
-寫下來的原因：資料表靠留白與對齊分層，「整片格線＋外框」不是這個元件的語彙——
-它通常是宿主樣式滲入的症狀（Docusaurus 底層的 Infima 就會對裸 `<table>` 畫滿格線）。
-本站的活範例由渲染守衛 `npm run verify:book` 對著這段敘述驗收，機制見 ADR-0010。
+出現整片格線＋外框時，先查宿主樣式有沒有滲入（例：Docusaurus 底層的 Infima 會對裸 `<table>` 畫滿格線）。
+（守衛：`npm run verify:book`）
 
 ## 三個擴充
 
 | 名稱 | 作用 |
 | --- | --- |
 | `NumHead` / `NumCell` | 數字欄：右對齊 ＋ 等寬數字 |
-| `freezeFirst` | 凍結首欄：長表水平捲動時保留「這一列是誰」 |
+| `freezeFirst` | 凍結首欄：長表水平捲動時首欄不動 |
 | `SortHead` | 可排序表頭：三態循環，箭頭標示狀態 |
 
 ## 黏性表頭在列印時要關掉
 
-`TableHeader sticky` 會在列印時自動 `position: static`——
+`TableHeader sticky` 會在列印時自動 `position: static`，
 印出來的表頭改由 `display: table-header-group` 每頁重複。
-兩者同時開會讓表頭壓在第一頁的內容上。
 
 ## 取用
 

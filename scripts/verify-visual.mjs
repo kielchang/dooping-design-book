@@ -5,14 +5,14 @@
 // 前提：storybook-static 已建置（npm run build-storybook）。
 //
 // 路線決策：**不做**基準圖逐像素比對——跨平台字型渲染差異會假紅、每次有意變更都要
-// 更新基準圖（維護成本高）。這裡把治理章「截圖驗證一定要比對 token 期望值」的方法論
+// 更新基準圖（維護成本高）。這裡把packages/react/README.md「截圖驗證一定要比對期望值」的方法論
 // 做成 CI 閘門：每張截圖**掃全圖**驗兩件事——
 //   1. 期望色存在：該主題該模式的有效值（tokens.json 反解，不是肉眼）必須出現在圖中
 //   2. 禁用色不存在：其他主題的 --brand 不得出現——這是「主題沒套上／套錯」的直接指紋
 //      （上次文件站配色不符就是這一類，靠肉眼才發現）
 // 版面位移這類問題不歸這支管；有三次證據再議像素比對（與 shimmer 動畫同一類「先不做」）。
 //
-// 治理章三坑的法典化：掃全圖不取樣固定座標；驗到相符為止（bounded retry）不靠長等待；
+// 上述方法論的法典化：掃全圖不取樣固定座標；驗到相符為止（bounded retry）不靠長等待；
 // 容差 ±2/channel 吸收瀏覽器的 alpha 合成抖動。另要求命中 ≥ MIN_PIXELS 像素——
 // 文字反鋸齒的邊緣像素可能湊巧撞色，一小撮像素不構成「這個色真的在畫面上」。
 import { readFileSync, existsSync, statSync } from "node:fs";
@@ -64,7 +64,7 @@ const SENTINELS = [
     }),
   },
   {
-    // 外殼（ADR-0011）：sidebar 是全畫面最大的一塊實色，選中項的 sidebar-accent
+    // 外殼：sidebar 是全畫面最大的一塊實色，選中項的 sidebar-accent
     // ＝逐主題的 brand-subtle——兩者一起構成「主題沒套上」的最強指紋。
     title: "元件/外殼/應用外殼・側邊欄", name: "典型組成",
     expect: (theme, mode) => ({

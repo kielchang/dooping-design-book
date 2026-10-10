@@ -7,7 +7,7 @@ name: pr-gate
 #   - 開到 main 的 PR：內文的「核准清單」勾完（edited 觸發：勾完就自動重跑）
 # 內容本身的驗證不在這裡重跑：PR 的 head 就是 dev／staging 的 tip，那個 SHA 在 push 時已經跑過
 # preview／staging 的全部守衛與套用驗收，ruleset 要求的就是那些檢查。
-# 規則正本：book/docs/7-governance/01-versioning.mdx「三段式發布」；實作與測試：scripts/release-gate.mjs、tests/release-gate.test.ts。
+# 規則正本：ARCHITECTURE.md「分支與部署拓樸」；實作與測試：scripts/release-gate.mjs、tests/release-gate.test.ts。
 on:
   pull_request:
     branches: [staging, main]

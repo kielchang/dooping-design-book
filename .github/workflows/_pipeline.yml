@@ -10,11 +10,16 @@ name: pipeline
 #   production  push main：守衛 → 部署根目錄（核准版）→ 部署後冒煙；tag 與 Release 在 deploy.yml 的 release job
 #
 # 寫給改這支的人：
-# - 這裡不設 concurrency 與 permissions，由呼叫端設定（GitHub 文件警告呼叫端與被呼叫端共用 group 會互相取消）。
+# - 這裡不設 concurrency，由呼叫端設定（GitHub 文件警告呼叫端與被呼叫端共用 group 會互相取消）。
+# - 權限：呼叫端只給「呼叫這支的 job」contents: write，這裡除了 deploy 之外每個 job 都要自己寫 permissions 收回唯讀——
+#   沒寫的 job 會整份繼承寫入權。只有 deploy 留著繼承：它不跑 npm、不跑測試與建置，只下載 build 產物、執行部署腳本。
+#   build／consumer／smoke 是 contents: read，簽出時不留憑證（persist-credentials: false）——
+#   dev 合進來的程式與現抓的第三方套件都在這些 job 裡執行，手上不該有能改正式站與 tag 的權杖。
+#   守衛：tests/workflow-contract.test.ts。
 # - 呼叫端的 job id＋這裡的 job id 就是 ruleset 要求的檢查名（例如「staging / consumer」）。
 #   改名前先看 .github/rulesets/ 與 tests/workflow-contract.test.ts。
 # - 被 if: 跳過的 job 會對必過檢查回報「成功」——consumer 由呼叫端傳入開關，契約測試盯著 staging 一定傳 true。
-# 流程正本：book/docs/7-governance/01-versioning.mdx「三段式發布」。
+# 流程正本：ARCHITECTURE.md「分支與部署拓樸」。
 on:
   workflow_call:
     inputs:
@@ -33,15 +38,22 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      deploy_dest: ${{ steps.stage.outputs.deploy_dest }}
+      site_url: ${{ steps.stage.outputs.site_url }}
     steps:
       - uses: actions/checkout@v4
         with:
           # 要讀上一個 v* tag 的 registry/（registry 異動清單）與 origin/main（發版閘）
           fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
 
       - name: 段設定（base path、部署目錄、網址）
+        id: stage
         env:
           STAGE: ${{ inputs.stage }}
           DEPLOY: ${{ inputs.deploy }}
@@ -61,6 +73,10 @@ jobs:
             echo "WITH_HOST=$HOST"
             echo "BOOK_STAGE=$BOOK_STAGE"
           } >> "$GITHUB_ENV"
+          {
+            echo "deploy_dest=$DEST"
+            echo "site_url=https://kielchang.github.io$P"
+          } >> "$GITHUB_OUTPUT"
 
       - run: npm ci
       - name: 建置 token（CSS 產物是後續所有步驟的前提）
@@ -200,10 +216,37 @@ jobs:
           fi
           node scripts/verify-deployed.mjs --stamp book/build
 
-      - name: 部署 → gh-pages
+      # 部署交給 deploy job：這裡只把整包產物交出去，build 手上沒有寫入權。
+      - name: 交出部署產物
         if: inputs.deploy
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-${{ inputs.stage }}
+          path: book/build
+          include-hidden-files: true
+          retention-days: 1
+          if-no-files-found: error
+
+  # 唯一能寫 gh-pages 的 job：不跑 npm、不跑測試與建置，只下載 build 驗過的產物、執行部署腳本。
+  # 刻意不寫 permissions，繼承呼叫端那個 job 給的權限：preview／staging／deploy 給 contents: write；
+  # pr-verify 只給唯讀，這個 job 在那裡也不會執行。被呼叫的流程不能要求比呼叫端更多的權限，寫死 write 會讓 pr-verify 起不來。
+  deploy:
+    needs: build
+    if: inputs.deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 取回 build 的產物
+        uses: actions/download-artifact@v4
+        with:
+          name: site-${{ inputs.stage }}
+          path: site
+      - name: 部署 → gh-pages
+        env:
+          DEPLOY_DEST: ${{ needs.build.outputs.deploy_dest }}
+          SITE_URL: ${{ needs.build.outputs.site_url }}
         run: |
-          sh scripts/deploy-gh-pages.sh book/build "$DEPLOY_DEST" "deploy(${{ inputs.stage }}) ${{ github.sha }}"
+          sh scripts/deploy-gh-pages.sh site "$DEPLOY_DEST" "deploy(${{ inputs.stage }}) ${{ github.sha }}"
           echo "### 已部署 $SITE_URL" >> "$GITHUB_STEP_SUMMARY"
 
   # 套用驗收：repo 外建一個乾淨的 Vite＋Tailwind v4 專案，token 用 npm pack 的 tarball、元件用真的 shadcn CLI 裝，
@@ -212,8 +255,12 @@ jobs:
     if: inputs.consumer
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
       - run: npm ci
@@ -242,13 +289,26 @@ jobs:
 
   # 部署後冒煙：對真的網址確認上線的就是這一版（deploy.json 的 sha、registry 指紋、相依指向本段、段標記）。
   # preview 不跑（dev 的預覽站隨時被覆蓋）；build 或 consumer 失敗時不跑（它們本身已經擋住了）。
+  # deploy 不是必過檢查，所以 deploy 沒成功時這裡要明確紅——用 if: 跳過會對必過檢查回報「成功」。
   smoke:
-    needs: [build, consumer]
+    needs: [build, consumer, deploy]
     if: ${{ !cancelled() && inputs.deploy && inputs.stage != 'preview' && needs.build.result == 'success' && contains(fromJSON('["success","skipped"]'), needs.consumer.result) }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
+      - name: 部署必須成功
+        env:
+          DEPLOY_RESULT: ${{ needs.deploy.result }}
+        run: |
+          if [ "$DEPLOY_RESULT" != "success" ]; then
+            echo "::error::deploy job 沒有成功（$DEPLOY_RESULT）——上線的不是這一版，冒煙不放行"
+            exit 1
+          fi
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - name: 部署後冒煙（verify:deployed）

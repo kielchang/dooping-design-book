@@ -216,7 +216,7 @@ async function main() {
     await context.close();
   }
 
-  // ── 5：行動版外殼（ADR-0011：窄螢幕側欄轉抽屜、焦點歸還） ────────────
+  // ── 5：行動版外殼（窄螢幕側欄轉抽屜、焦點歸還） ────────────
   {
     const { context, page, errors } = await openPage(browser, {
       theme: DEFAULT_THEME,

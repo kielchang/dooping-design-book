@@ -1,4 +1,4 @@
-// fingerprint.mjs 的型別宣告（tests 以 TypeScript 匯入）。規則正本在 ADR-0013 與 fingerprint.mjs。
+// fingerprint.mjs 的型別宣告（tests 以 TypeScript 匯入）。規則正本在 book/docs/7-governance/06-staying-current.mdx「指紋怎麼算」與 fingerprint.mjs。
 
 export interface RegistryFileLike {
   path: string;

@@ -1,6 +1,6 @@
 // packages/react/src → registry/*.json（shadcn 自訂 registry）
 //
-// 為什麼是 registry 而不是 npm 套件（見 ADR-0004）：元件是要被改的。
+// 元件走 registry 複製散佈、不發 npm 套件：取用端會改它。
 // registry 把「原始碼複製到你的專案」，之後它就是你的程式碼，改壞誰也不會怪工具箱；
 // 而 token 才是唯一值得硬相依的一層——它是契約，不是實作。
 //
@@ -133,13 +133,13 @@ const TITLES = {
   download: ["download 下載工具", "觸發瀏覽器下載 Blob。"],
   "forms-diff": ["forms/diff 欄位比對", "FieldSpec 驅動的變更偵測與顯示格式化。"],
   charts: ["Charts 圖表", "後台閱讀型的八種零相依圖＋圖例＋色票工具，含文字與鍵盤等價。"],
-  "dooping-check": ["dooping-check 更新檢查", "取用端的 lock 與例行檢查：已是最新／上游有更新／本地改過（ADR-0013 第二層）。"],
+  "dooping-check": ["dooping-check 更新檢查", "取用端的 lock 與例行檢查：已是最新／上游有更新／本地改過。"],
 };
 
 /**
  * 每個 item 都戳上產生它的「規範版號」。
  *
- * 元件是複製走的（ADR-0004），複製完就與上游脫鉤——所以取用端要問的不是
+ * 元件是複製走的，複製完就與上游脫鉤——所以取用端要問的不是
  * 「該鎖哪一版」，而是「我抄的是哪一版」，這樣上游修 bug 時才知道要不要同步。
  * 版號正本是根目錄 package.json 的 version（＝進版時部署自動蓋的 vX.Y.Z tag），
  * 戳記因此能直接對回 GitHub 上的 tag；packages/react 與 version.ts 跟隨此版號，
@@ -152,7 +152,7 @@ const SPEC_VERSION = JSON.parse(
 /**
  * 每個 item 都明確相依 `@dooping/tokens`。
  *
- * 元件抄走之後就與上游脫鉤，唯一還硬相依的一層是 token（ADR-0004）——
+ * 元件抄走之後就與上游脫鉤，唯一還硬相依的一層是 token——
  * 但 registry item 先前沒有把這件事寫出來，於是 `npx shadcn add` 只複製原始碼、
  * 不會裝 token。取用端要自己知道「還得去裝一個套件、而且要對版本」，
  * 沒人知道的結果就是 npm 上的 token 落後四個版本都沒有人發現：
@@ -180,7 +180,7 @@ rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 
 const items = [];
-// 完整的 item（含檔案與相依）：算指紋要用，index 只放摘要（ADR-0013）
+// 完整的 item（含檔案與相依）：算指紋要用，index 只放摘要
 const fullItems = [];
 for (const abs of walk(SRC)) {
   const rel = relative(SRC, abs).replace(/\\/g, "/");
@@ -275,7 +275,7 @@ for (const abs of walk(SRC)) {
   }
 }
 
-// ── 取用端工具：registry:file（ADR-0013 第二層）──────────────────────
+// ── 取用端工具：registry:file（更新訊號：lock 檢查）──────────────────────
 //
 // dooping-check 是給取用端專案用的 Node 腳本，不是元件：target 以 ~/ 開頭＝專案根目錄，
 // shadcn CLI 對 registry:file 不做任何改寫、原樣寫檔。它本身也是 registry item——更新了，取用端用同一套檢查就會知道。
@@ -300,7 +300,7 @@ for (const tool of TOOL_FILES) {
   items.push({ name: tool.name, version: SPEC_VERSION, type: item.type, title, description });
 }
 
-// 逐 item 指紋（ADR-0013 第一層）：相依指到不存在的 item 會在這裡直接丟錯。
+// 逐 item 指紋（更新訊號：指紋）：相依指到不存在的 item 會在這裡直接丟錯。
 const prints = fingerprints(fullItems);
 
 // registry 索引（給人看、也給工具列舉用）。

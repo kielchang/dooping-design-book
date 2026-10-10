@@ -21,7 +21,7 @@ import {
   demoNavGroups, demoProfile, demoRecords, STATUS_LABEL, type DemoRecord,
 } from "../demo/sample-data";
 
-// 五種頁型組進外殼——ADR-0011 判準①(ii) 的可執行證據。
+// 五種頁型組進外殼的組合 story。
 //
 // 各頁型自己的組成規格在「頁面/」的五支 story，這裡不重複；
 // 這一支只回答一個問題：**同一副外殼裝得下五種頁型嗎**，

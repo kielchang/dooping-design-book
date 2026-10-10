@@ -20,8 +20,8 @@ export function PushRow() {
 
 「你剛剛那個動作，成了沒」——只回答這一句的浮動訊息。
 
-頁面章的跨頁守則說「**操作回饋的去向全站固定一種**」；固定的那一種就是本頁。
-要改去向或時長，先改這頁的規範，再改元件常數——不要在個別畫面各自發明。
+頁面章的跨頁守則：「**操作回饋的去向全站固定一種**」，固定的那一種就是本頁。
+要改去向或時長，先改這頁的規範，再改元件常數；不要在個別畫面各自發明。
 
 <Demo title="操作回饋（點按鈕試試；danger 不會自動消失）">
   <ToastProvider>
@@ -33,29 +33,28 @@ export function PushRow() {
 
 ## 全站固定的那一種
 
-| 規則 | 值 | 為什麼 |
-| --- | --- | --- |
-| 去向 | 視窗**右下** | 不遮頁首動作列與側欄導覽；閱讀動線的終點 |
-| 堆疊上限 | 3，最舊被擠出 | 連發不會疊出一面牆；重要到不能被擠出的訊息該用 Dialog |
-| 自動消失 | `success`／`info`／`warning` 5 秒，hover／聚焦暫停 | 成功不需要人手；暫停是給「正在讀」的人 |
-| **danger** | **不自動消失**，手動關閉 | 錯誤不能自己溜走——使用者離開座位回來還看得到 |
-| 分級 | 與 [Callout](/components/callout) 同源：同圖示表、同淡底 | 同一語意全站同一張臉，不靠顏色單獨傳達 |
-| 讀屏 | 一般 `status`／`polite`；danger `alert`／`assertive` | 成功不打斷朗讀，錯誤立即播報 |
-| 層級 | `z-[70]` | 高於 Dialog（`z-50`）與資料表篩選面板（`z-[60]`） |
+| 規則 | 值 |
+| --- | --- |
+| 去向 | 視窗**右下** |
+| 堆疊上限 | 3，最舊被擠出；不能被擠出的訊息改用 Dialog |
+| 自動消失 | `success`／`info`／`warning` 5 秒，hover／聚焦暫停 |
+| **danger** | **不自動消失**，手動關閉 |
+| 分級 | 與 [Callout](/components/callout) 同源：同圖示表、同淡底，不靠顏色單獨傳達 |
+| 讀屏 | 一般 `status`／`polite`；danger `alert`／`assertive` |
+| 層級 | `z-[70]`，高於 Dialog（`z-50`）與資料表篩選面板（`z-[60]`） |
 
 ## 什麼不該用 Toast
 
 <Rules>
   <Do><p>「動作的結果」：已儲存、已匯出、已加入排程、儲存失敗。</p></Do>
   <Dont><p><strong>表單驗證錯誤不進 Toast。</strong>錯誤訊息貼著欄位
-  （<code>aria-describedby</code>），跨欄彙總用頁內 Callout——
-  訊息會消失的地方，放不下需要對照著改的內容。</p></Dont>
+  （<code>aria-describedby</code>），跨欄彙總用頁內 Callout。</p></Dont>
 </Rules>
 
 <Rules>
   <Do><p>一句話講完。標題一行、說明至多兩行。</p></Do>
   <Dont><p>不要放連結與多個動作。需要導向的結果（「檢視匯入紀錄」）用頁內
-  Callout 或直接導頁；Toast 會消失，放連結等於出考題。</p></Dont>
+  Callout 或直接導頁。</p></Dont>
 </Rules>
 
 ## 與 Callout 的分工
@@ -68,8 +67,8 @@ export function PushRow() {
 | 壽命 | 幾秒（danger 例外） | 持續存在 |
 | 適用 | 動作回饋 | 規則說明、欄位彙總、需要對照的訊息 |
 
-先前「`Callout` 加 `live`」的替代用法在**就地回饋**的場合仍然正確
-（例如儲存後表單頂部的長駐結果）；要消失的動作回饋才搬到 Toast。
+**就地回饋**（例如儲存後表單頂部的長駐結果）用 `Callout` 加 `live`；
+要消失的動作回饋用 Toast。
 
 ## 安裝與掛法
 
@@ -88,5 +87,5 @@ push({ variant: "success", title: "已儲存" });
 npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/toast.json
 ```
 
-Toast 內容 portal 到 `body` 直下——嵌進自帶 CSS 的宿主時，
+Toast 內容 portal 到 `body` 直下；嵌進自帶 CSS 的宿主時，
 樣式基座必須涵蓋 portal（宿主前置條件見 [AGENTS.md](https://kielchang.github.io/dooping-design-book/AGENTS.md)）。

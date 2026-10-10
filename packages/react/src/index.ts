@@ -26,7 +26,7 @@ export * from "./ui/tooltip";
 export * from "./ui/number-input";
 export * from "./ui/separator";
 
-// 浮層（Popover／DropdownMenu 自缺件表畢業，ADR-0011 批次收錄）
+// 浮層（Popover／DropdownMenu）
 export * from "./ui/popover";
 export * from "./ui/dropdown-menu";
 export * from "./ui/collapsible";
@@ -36,14 +36,14 @@ export * from "./ui/confirm-dialog";
 export * from "./ui/command";
 export * from "./ui/command-palette";
 
-// 應用外殼（ADR-0011，已採用）：純呈現、不綁路由與資料
+// 應用外殼：純呈現、不綁路由與資料
 export * from "./ui/sidebar";
 export * from "./ui/sidebar-nav";
 export * from "./ui/app-shell";
 // 多應用外殼的頂部功能選單（側欄切應用、頂部切功能，見〈後台系統的資訊架構〉）
 export * from "./ui/app-menubar";
 
-// 頁面骨架（ADR-0008 解鎖：PageHeader 被重複手排八次，走解鎖條件進元件章）
+// 頁面骨架（PageHeader）
 export * from "./ui/page-header";
 
 // 選擇

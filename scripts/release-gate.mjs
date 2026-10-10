@@ -8,7 +8,7 @@
 // pr 模式讀環境變數：BASE_REF、HEAD_REF、HEAD_SHA、HEAD_REPO、GITHUB_REPOSITORY、PR_BODY。
 // 一律以目前工作目錄為 repo 根。
 //
-// 規則正本：book/docs/7-governance/01-versioning.mdx「三段式發布」。
+// 規則正本：ARCHITECTURE.md「分支與部署拓樸」。
 // 純函式在上半（tests/release-gate.test.ts 直接測，每條規則都轉紅過一次），git 在下半（CI 實跑）。
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -25,7 +25,7 @@ import {
 } from "./lib/changelog.mjs";
 import { WATCH_PATHS } from "./lib/release-watch.mjs";
 
-const RULE = "book/docs/7-governance/01-versioning.mdx「三段式發布」";
+const RULE = "ARCHITECTURE.md「分支與部署拓樸」";
 const because = (fix, why, ruleAt = RULE) => `${fix}\n為什麼：${why}\n規則正本：${ruleAt}`;
 
 // ── 純函式 ─────────────────────────────────────────────────────
@@ -109,7 +109,7 @@ export function evaluateChangelog(changelog, mainChangelog, { bumped, version })
     ));
   const body = sectionBody(changelog, top) ?? [];
   if (!body.some((l) => l.trim() !== ""))
-    failures.push(because(`「${top.line}」底下沒有內容`, "每則要回答：改了什麼／我需要做什麼／為什麼改", rule));
+    failures.push(because(`「${top.line}」底下沒有內容`, "每則要寫：對你的意義，以及每項的改了什麼／我需要做什麼", rule));
   const leaked = body.filter((l) => l.startsWith("## "));
   if (leaked.length)
     failures.push(because(

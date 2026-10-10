@@ -36,17 +36,15 @@ title: Checkbox 與 Select
     <p>選項 <strong>6 個以上</strong>、或會動態增減 → Select。</p>
   </Do>
   <Dont>
-    <p>選項只有 2–5 個且標籤短 → 用 <a href="/components/seg-group">SegGroup</a>。
-    Select 要點兩下（開、選）才看得到全部選項；分段選擇一眼看完、一下點完。</p>
+    <p>選項只有 2–5 個且標籤短 → 用 <a href="/components/seg-group">SegGroup</a>。</p>
   </Dont>
 </Rules>
 
-多選需求請用 [Chips](/components/chips)，不要做 multi-select 下拉——
-選完就看不見選了什麼，是後台最常見的抱怨之一。
+多選需求請用 [Chips](/components/chips)，不要做 multi-select 下拉。
 
 ## Checkbox 一定要配 Label
 
-`<Label htmlFor>` 讓點文字也能勾選，觸控裝置上差別非常明顯（16px 的方框 vs 整行可點）。
+用 `<Label htmlFor>` 連到 Checkbox，點文字也能勾選。
 
 ## 取用
 

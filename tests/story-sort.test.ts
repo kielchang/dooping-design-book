@@ -1,6 +1,6 @@
 // Storybook 分類守衛 — 驗收 .storybook/preview.tsx 的 storySort 涵蓋與吻合。
 //
-// 規則出自文件〈Storybook 設定〉（book/docs/7-governance/07-storybook-setup.mdx）：
+// 規則出自 packages/react/README.md「Storybook 設定」：
 //   1. order 必須涵蓋所有頂層分類——沒列到的不是消失，是排到尾端，順序看起來像隨機的。
 //   2. order 的字串必須與實際分類完全吻合——「多一個空格就對不上，而且不會報錯」，
 //      這支測試就是讓它報錯的地方。雙向核對：列了但不存在（幽靈）也算錯。
@@ -134,7 +134,7 @@ describe("Storybook 分類守衛：storySort 涵蓋與吻合", () => {
     expect(
       problems,
       `storySort 與實際分類不一致（共 ${problems.length} 處）：\n${problems.join("\n")}\n\n` +
-        "改 .storybook/preview.tsx 的 order，或把分類名改回一致。規則見文件〈Storybook 設定〉。",
+        "改 .storybook/preview.tsx 的 order，或把分類名改回一致。規則見 packages/react/README.md「Storybook 設定」。",
     ).toEqual([]);
   });
 

@@ -4,7 +4,7 @@ import type { UrlStateAdapter } from "@/lib/dooping/use-table-url-state";
 
 /**
  * useTableUrlState 的 react-router 版 adapter。元件庫刻意不綁路由（UrlStateAdapter 是注入點），
- * 宿主用自家路由 API 包出同一個介面——這是 ADR-0011「純呈現、路由由宿主注入」的第二個接縫。
+ * 宿主用自家路由 API 包出同一個介面——這是「純呈現、路由由宿主注入」的第二個接縫。
  *
  * hook 交給 set 的是**整串** search（已保留同頁不屬於這張表的參數），這裡照單寫回即可。
  * 第一版曾在這裡自己合併參數：當時 hook 只交出本表的參數、prefix 只隔離了讀。

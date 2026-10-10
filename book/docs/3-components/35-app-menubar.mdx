@@ -6,7 +6,7 @@ title: AppMenubar 功能選單列
 
 多應用外殼的**頂部功能選單**：側欄切應用，這一條切「這個應用裡的功能」，
 行為像 macOS 的選單列。**規範的正本在
-[後台系統的資訊架構](/patterns/back-office-ia)「多應用系統」一節**——
+[後台系統的資訊架構](/patterns/back-office-ia)「多應用系統」一節**：
 頂列三段怎麼分、頂層選單放幾個、行動版怎麼對映，都以那一頁為準；這裡是元件載體。
 
 <StoryLink id="元件-外殼-功能選單列--典型組成" />
@@ -15,13 +15,13 @@ title: AppMenubar 功能選單列
 
 吃的是**同一份** `NavGroup[]`：一組＝一個頂層選單。工作節奏分區
 （每日作業／規劃與分析／報表／主檔與設定／說明）原封不動從側欄搬到頂部，
-同一份資料也餵 [CommandPalette](/components/command)——選單裡有的，⌘K 一定找得到。
+同一份資料也餵 [CommandPalette](/components/command)；選單裡有的，⌘K 一定找得到。
 
 | 資料 | 在選單裡長怎樣 |
 | --- | --- |
 | `NavLeaf`（有 `url`） | 連結項，經 `renderLink` 注入宿主的 Link；所在項 `aria-current="page"` |
 | `NavAction`（有 `action`） | 動作項，不導航：把代號交回 `onAction`，例如開對話框；可帶純顯示的 `shortcut` |
-| `NavCollapsible`（有 `items`） | **分區標題＋子項**，前後以分隔線隔開——不是往右彈的子選單 |
+| `NavCollapsible`（有 `items`） | **分區標題＋子項**，前後以分隔線隔開；不是往右彈的子選單 |
 | `external: true` | 另開分頁，項目尾端帶外連圖示 |
 
 標題結尾的 `…` 是慣例：選了之後**還要再填東西**（開對話框），不是立刻生效。
@@ -32,30 +32,27 @@ title: AppMenubar 功能選單列
 
 <Rules>
   <Do><p>多應用系統：側欄是應用清單，應用內的功能放這裡。</p></Do>
-  <Dont><p>只有一個應用的小系統不必用——分區留在側欄（〈後台系統的資訊架構〉的單應用版型）
-  更直接，少一層。</p></Dont>
+  <Dont><p>只有一個應用的小系統不必用，分區留在側欄（〈後台系統的資訊架構〉的單應用版型）。</p></Dont>
 </Rules>
 
 <Rules>
   <Do><p>選單保持一層，兩層群組用分區標題分開。</p></Do>
   <Dont><p>不要做巢狀子選單（同 <a href="/components/popover-dropdown">DropdownMenu</a> 的規則）。
-  功能多到要分層，代表頂層選單該拆、或功能該收斂。</p></Dont>
+  功能多到要分層時，拆頂層選單或收斂功能。</p></Dont>
 </Rules>
 
 <Rules>
   <Do><p>頂層選單用使用者說得出口的詞，最多六個。</p></Do>
-  <Dont><p>不要把「檔案／編輯／檢視」這種桌面軟體的通用選單搬進來——
-  後台的頂層是<strong>工作節奏</strong>，不是文件操作。</p></Dont>
+  <Dont><p>不要把「檔案／編輯／檢視」這種桌面軟體的通用選單搬進來。</p></Dont>
 </Rules>
 
 ## 狀態
 
-- **所在分區**：目前頁面所屬的頂層選單標題**加粗＋底線**（兩種編碼，
-  強制色彩模式下底色會被系統換掉，字重留得下來）；所在項 `aria-current="page"`。
+- **所在分區**：目前頁面所屬的頂層選單標題**加粗＋底線**；所在項 `aria-current="page"`。
 - **開啟**：標題疊已選那一階的狀態層。開著時滑過另一個標題就切換過去（macOS 行為）。
 - **收成單一選單**：行動版（與側欄同一個 `mobileQuery`），或頂層標題**擠不下**時，
-  全部收進一個「選單」鈕，裡面依原順序列出每一區——不為窄螢幕另設計一套導覽。
-  擠不擠得下是量出來的（隱形的尺＋ResizeObserver），不是寫死的斷點。
+  全部收進一個「選單」鈕，裡面依原順序列出每一區；不為窄螢幕另設計一套導覽。
+  擠不擠得下用量的（隱形的尺＋ResizeObserver），不寫死斷點。
 
 <StoryFrame id="元件-外殼-功能選單列--兩態並列" title="完整與收合成單一選單" height={330} />
 
@@ -72,19 +69,17 @@ title: AppMenubar 功能選單列
 ```
 
 `renderLink` 收到的 props 要**原樣轉發**，而且要回傳**元件**（如 `Link`），
-由它**先**呼叫轉發來的 `onClick` 再導航——react-router 的 `Link` 本來就是這個順序。
-選單「選了就關」靠這個：先 `preventDefault` 再呼叫，選單會以為選取被攔下而不關。
+由它**先**呼叫轉發來的 `onClick` 再導航（react-router 的 `Link` 就是這個順序）。
+不要先 `preventDefault` 再呼叫 `onClick`。
 
 ## 無障礙
 
 - 整條是 `role="menubar"`（可及名稱預設「應用功能」），**一個 Tab 停駐點**；
-  左右鍵在頂層選單間移動並循環，Enter／↓ 開啟，Esc 關閉並把焦點還給標題。
-  這些是 [Radix Menubar](https://www.radix-ui.com/primitives/docs/components/menubar) 的行為，
-  stories 的 play 直接驗。
-- 選單開著時外部內容是 `aria-hidden`（Radix 的 modal 行為）——
+  左右鍵在頂層選單間移動並循環，Enter／↓ 開啟，Esc 關閉並把焦點還給標題
+  （[Radix Menubar](https://www.radix-ui.com/primitives/docs/components/menubar) 的行為；守衛：stories 的 play 直接驗）。
+- 選單開著時外部內容是 `aria-hidden`（Radix 的 modal 行為）；
   play 的外部斷言一律放在選單關閉之後。
-- 選單項的 highlight 用 `focus:`（不是 `focus-visible:`）：滑鼠移動與方向鍵走同一條焦點路徑，
-  同 DropdownMenu。
+- 選單項的 highlight 用 `focus:`（不是 `focus-visible:`），同 DropdownMenu。
 
 <StoryFrame id="元件-外殼-功能選單列--鍵盤操作" title="鍵盤：左右鍵移動、循環、Esc 歸還焦點" height={260} />
 
@@ -94,7 +89,7 @@ title: AppMenubar 功能選單列
 npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/app-menubar.json
 ```
 
-會自動帶入 `sidebar`（共用 `mobileQuery` 與 `useSidebar`——必須放在 `AppShell`／`SidebarProvider` 裡）、
+會自動帶入 `sidebar`（共用 `mobileQuery` 與 `useSidebar`；必須放在 `AppShell`／`SidebarProvider` 裡）、
 `sidebar-nav`（`renderLink` 的 props 型別）、`dropdown-menu`（共用選單樣式）與 `nav`。
 npm 相依多一個 `@radix-ui/react-menubar`。整副外殼的組法見
 [AppShell／Sidebar](/components/app-shell-sidebar) 與 story「頁面/多應用外殼」。

@@ -12,8 +12,7 @@ title: SegGroup 分段選擇
 
 <Rules>
   <Do><p>選項 <strong>2–5 個</strong>、標籤短、清單固定。</p></Do>
-  <Dont><p>選項超過 5 個、標籤長、或會動態增減 → 用 <a href="/components/checkbox-select">Select</a>。
-  分段列一旦換行就失去「一眼看完」的優勢，反而比下拉更亂。</p></Dont>
+  <Dont><p>選項超過 5 個、標籤長、或會動態增減 → 用 <a href="/components/checkbox-select">Select</a>。</p></Dont>
 </Rules>
 
 <Demo title="狀態">
@@ -37,11 +36,10 @@ title: SegGroup 分段選擇
   </div>
 </Demo>
 
-## 無障礙：這才是重點
+## 無障礙
 
 - `role="radiogroup"` ＋ 每項 `role="radio"` `aria-checked`
-- **Roving tabindex**：整組只佔**一個** Tab 停留點。四個選項各佔一個停留點，
-  對鍵盤使用者是災難——他要按四次 Tab 才能離開一個欄位。
+- **Roving tabindex**：整組只佔**一個** Tab 停留點。
 - 方向鍵在選項間移動、Space/Enter 選定、Esc 取消
 - 選中項**同時打勾與填色**，不只靠顏色
 

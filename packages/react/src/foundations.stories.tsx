@@ -40,7 +40,7 @@ export const 語意色: Story = {
         <code>brand</code> ≤0.151 &gt; <code>primary</code> 0.040 &gt; 中性 ≤0.013）。
         所以這一頁該讀起來像「一整頁灰，加幾個重點」——與隔壁的<strong>圖表色票</strong>觀感差很多，
         那個落差是兩種色票目的不同的必然結果，
-        理由見<a href="/foundations/color#為什麼分類色看起來比語意色吵">為什麼分類色看起來比語意色「吵」</a>。
+        見<a href="/foundations/color#分類色與語意色的彩度差異">分類色與語意色的彩度差異</a>。
       </p>
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {list(tokens.color.light as Record<string, unknown>).map(([k, v]) => <Swatch key={k} name={k} entry={v} />)}
@@ -89,7 +89,7 @@ export const 圖表色票: Story = {
           等亮等飽和才對——如果第 3 條序列比第 5 條飽和，讀者會以為它比較重要。
           兩邊都對，放在一起就會有落差，因為兩種色票回答的是不同問題：
           語意色答「這件事有多重要」，分類色答「這是哪一類」。
-          完整說明見<a href="/foundations/color#為什麼分類色看起來比語意色吵">基礎／色彩</a>。
+          完整說明見<a href="/foundations/color#分類色與語意色的彩度差異">基礎／色彩</a>。
         </p>
         <p className="max-w-2xl text-tiny text-muted-foreground">
           淺深是<strong>兩組獨立的值，沒有任何一色相同</strong>。共用會把 OKLCH 的 L 鎖在
@@ -136,12 +136,12 @@ export const 色相主題: Story = {
             <span className="rounded-md bg-danger px-2.5 py-1 text-xs font-medium text-danger-foreground">異常</span>
             <span className="rounded-md bg-warning px-2.5 py-1 text-xs font-medium text-warning-foreground">注意</span>
           </div>
-          {/* 聚焦環自 ADR-0007 起是中性色：不隨主題轉相，才不會和欄位提醒色互相搶語意 */}
+          {/* 聚焦環是中性色、不隨主題轉相，不和欄位提醒色搶語意 */}
           <div className="pt-1">
             <input
               aria-label="聚焦環示意"
               className="w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm ring-2 ring-ring ring-offset-2 ring-offset-background"
-              defaultValue="聚焦環是中性色（ADR-0007）"
+              defaultValue="聚焦環是中性色"
               readOnly
             />
           </div>

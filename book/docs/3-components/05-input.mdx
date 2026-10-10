@@ -29,27 +29,24 @@ title: Input 輸入框
 ## 高度是 36px，而且不要改
 
 Input、Select、EditableField 全部 36px（`--size-control`）。
-把三種控制項排在同一列時，任何 1–2px 的差異都會被看見——而後台表單一定會這樣排。
 
 ## placeholder 不是 label
 
 <Rules>
   <Do><p>永遠有 <code>&lt;Label&gt;</code>。placeholder 放<strong>格式範例</strong>（「例：U-1042」）。</p></Do>
-  <Dont><p>不要用 placeholder 當 label。使用者一開始打字它就消失了，
-  然後他忘記這格要填什麼——這是無障礙與可用性雙輸的做法。</p></Dont>
+  <Dont><p>不要用 placeholder 當 label。</p></Dont>
 </Rules>
 
 ## 錯誤態：FormField 把固定寫法接好
 
 欄位錯誤是**欄位層**的語意事件：`aria-invalid` 讓邊框轉 `--danger`，
 錯誤小字＋圖示就地顯示在欄位下（色＋圖示＋文字三重編碼）。
-聚焦環照常是中性的——**語意用彩色、焦點用中性**，同框不打架
-（[提醒色辭典](/foundations/alert-colors)的分工在欄位上的落地）。
-錯誤欄**不整格染紅**：主訊號是邊框與文字，整格淡底會吃掉高飽和面積預算，
-深色下還會讓邊框對底的對比掉到門檻以下（verify:color 有一條盯著）。
+聚焦環照常是中性的：**語意用彩色、焦點用中性**
+（[提醒色辭典](/foundations/alert-colors)的分工）。
+錯誤欄**不整格染紅**（不加淡底）；主訊號是邊框與錯誤小字。（守衛：`npm run verify:color`）
 
-`FormField` 把「Label＋`aria-describedby`＋`aria-invalid`＋錯誤小字」的固定寫法元件化——
-id 連動自動接好，取用端不再手寫三條 aria、也就不會漏：
+`FormField` 把「Label＋`aria-describedby`＋`aria-invalid`＋錯誤小字」的固定寫法元件化，
+id 連動自動接好，取用端不手寫這三條 aria：
 
 <Demo title="錯誤欄聚焦看看：danger 邊框（語意）與中性聚焦環（焦點）同框">
   <div className="max-w-sm space-y-4">
@@ -62,14 +59,14 @@ id 連動自動接好，取用端不再手寫三條 aria、也就不會漏：
   </div>
 </Demo>
 
-多欄錯誤的**彙總**仍由區塊層的 [Callout](/components/callout)（`live`）負責——
-它報「有幾個欄位要修」，不重複每一條內容；兩層是分工，不是取代。
+多欄錯誤的**彙總**由區塊層的 [Callout](/components/callout)（`live`）負責：
+它報「有幾個欄位要修」，不重複每一條內容。
 
 ### 可聚焦的不是根元件時：children 傳函式
 
-`FormField` 預設把 `id`／`aria-*` 注入唯一的子元素。Radix 的 Select 能聚焦的是
-`SelectTrigger`、不是 `Select` 根元件——注入到根上，Label 點了沒反應、錯誤訊息也接不到。
-這時 `children` 改傳函式，把收到的屬性展開到真正可聚焦的那個元素上：
+`FormField` 預設把 `id`／`aria-*` 注入唯一的子元素。可聚焦的不是根元件時
+（例：Radix 的 Select 能聚焦的是 `SelectTrigger`，不是 `Select` 根元件），
+`children` 改傳函式，把收到的屬性展開到真正可聚焦的那個元素上：
 
 ```tsx
 <FormField label="所屬單位" required error={unitError}>
@@ -82,7 +79,7 @@ id 連動自動接好，取用端不再手寫三條 aria、也就不會漏：
 </FormField>
 ```
 
-不要為了下拉退回手寫 `Label htmlFor`＋`id`——那正是 FormField 要消滅的三條 aria 手工連動。
+不要為了下拉退回手寫 `Label htmlFor`＋`id`。
 
 ## 取用
 

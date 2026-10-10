@@ -1,6 +1,6 @@
 // 壓力測試／超多選項：多選 24 項、單選 6 個長標籤、零選項。
 // 換行後高度變化能否接受？換行的分段選擇是不是該改用下拉？
-// 規範出處：book/docs/7-governance/09-stress-stories.mdx
+// 規範出處：packages/react/README.md「壓力測試 story」
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Chips } from "../ui/chips";

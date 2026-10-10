@@ -11,7 +11,7 @@
 //   - kit.css 的引入順序與「utilities 不進 cascade layer」是承重結構 → 這裡鎖。
 //
 // 為什麼讀**根**的 node_modules：CI 的 npm test 跑在 book/ 的 npm ci 之前，book/node_modules 當下不存在。
-// 兩邊裝到同一版由「宣告範圍字串相等」那條保證。背景與取捨見 ADR-0010。
+// 兩邊裝到同一版由「宣告範圍字串相等」那條保證。
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";

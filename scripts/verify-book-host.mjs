@@ -1,4 +1,4 @@
-// 渲染守衛 —— 文件站 demo 宿主基座的驗收（ADR-0010）。
+// 渲染守衛 —— 文件站 demo 宿主基座的驗收。
 //
 //   node scripts/verify-book-host.mjs      # 對 book/build 逐頁驗 computed style，不合格 exit 1
 //
@@ -13,7 +13,7 @@
 // 裸按鈕吃瀏覽器原生灰底凸框、元件自畫的邊框因缺 border-style 整批安靜消失。
 // 三者都不會報錯、不會紅燈，只能在渲染層驗。
 //
-// 方法論承自治理章「截圖驗證一定要比對期望值」：
+// 方法論承自 packages/react/README.md「截圖驗證一定要比對期望值」：
 //   1) 全部用 DOM query 找目標，不用固定座標——版面一動座標就失效；
 //   2) 期望值來自 tokens.json 經 resolve(defaultTheme) 的**有效值**，不是肉眼；
 //   3) hydration 與深色切換是非同步的——驗到相符為止（bounded retry），不靠「等久一點」。

@@ -117,3 +117,20 @@ export function isNavActive(url: string, currentPath: string, opts: { exact?: bo
   if (opts.exact) return false;
   return target !== "/" && current.startsWith(`${target}/`);
 }
+
+const SAFE_NAV_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:"]);
+
+/**
+ * 導覽連結的網址白名單：相對路徑、http、https、mailto、tel 原樣放行，其他一律換成 `"#"`。
+ *
+ * 導覽資料常從後台設定或資料庫來；`javascript:`、`data:` 這類網址點下去會執行內容，
+ * React 18 不會擋。判斷交給瀏覽器同一套網址解析（會先剝掉開頭空白與夾在中間的 Tab、換行），
+ * 所以 ` javascript:` 或拆開的寫法也擋得住。SidebarNav、AppMenubar、CommandPalette 都經過它。
+ */
+export function safeNavUrl(url: string): string {
+  try {
+    return SAFE_NAV_PROTOCOLS.has(new URL(url, "http://relative.invalid").protocol) ? url : "#";
+  } catch {
+    return "#";
+  }
+}

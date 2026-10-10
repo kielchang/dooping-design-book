@@ -1,9 +1,10 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { isAbsolute, join, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
-// dooping-check：元件更新檢查（dooping-design-book 的 ADR-0013 第二層）。
+// dooping-check：元件更新檢查。lock 記下抄進專案的每個 item 的上游指紋與每個檔的內容指紋，
+// 例行比對兩件事：上游有沒有更新、本地有沒有改過。
 //
 //   node scripts/dooping-check.mjs init data-table page-header   # 剛 npx shadcn add 完：以這幾個 item 建立 dooping.lock.json
 //   node scripts/dooping-check.mjs                               # 例行檢查：每個 item 回報「已是最新／上游有更新／本地改過」
@@ -24,6 +25,23 @@ export const LOCK_FILE = "dooping.lock.json";
 const byCodeUnit = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 const sortKeys = (obj) => Object.fromEntries(Object.entries(obj).sort(([a], [b]) => byCodeUnit(a, b)));
 const isUrl = (registry) => /^https?:\/\//.test(registry);
+
+/**
+ * lock 裡的路徑只能落在專案內：解析後跑出專案根目錄的（`..`、絕對路徑、別的磁碟）一律不讀，回傳 null（當成缺檔）。
+ * lock 檔會跟著 PR 進來，被改過的話不能拿它去讀專案外的檔。
+ */
+export function insideProject(cwd, path) {
+  if (typeof path !== "string" || path === "") return null;
+  const full = resolve(cwd, path);
+  const rel = relative(cwd, full);
+  return rel === "" || /^\.\.(?:[\\/]|$)/.test(rel) || isAbsolute(rel) ? null : full;
+}
+
+/** 印進 GitHub Actions 指令的文字：%、CR、LF 照 GitHub 的規則跳脫，不讓名稱或錯誤訊息被當成另一行指令。 */
+export const ghEscape = (text) => String(text).replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A");
+
+/** 建議指令裡的參數一律加雙引號；含引號、`$`、`%`、反引號、空白這類字元的不印指令（回傳 null）——`%` 在 Windows cmd 的引號裡照樣會展開。 */
+const shellArg = (value) => (/^[\w@+=:,./~-]+$/.test(value) ? `"${value}"` : null);
 
 /** 檔案內容指紋：換行正規化成 LF 後，SHA-256 的前 16 個十六進位字元（與上游 registry 產生器同一條規則）。 */
 export const contentHash = (content) =>
@@ -130,15 +148,29 @@ const needsAttention = (r) => r.removed || r.upstream || r.modified.length > 0;
 /** 人讀的報告：只列要看的 item，最後一行是總結。 */
 export function renderReport(results, { registry }) {
   const lines = [];
+  if (registry !== DEFAULT_REGISTRY) {
+    lines.push(`  注意：registry 來源不是官方正式站（${registry}）——確認是你信任的來源；取用端只參照正式站 ${DEFAULT_REGISTRY}`);
+  }
   for (const r of results.filter(needsAttention)) {
     const label = r.removed
       ? "上游已移除"
       : [r.upstream && "上游有更新", r.modified.length > 0 && "本地改過"].filter(Boolean).join("＋");
     lines.push(`  ${r.name}：${label}`);
     if (r.upstream) {
-      const ref = isUrl(registry) ? `${registry.replace(/\/$/, "")}/${r.name}.json` : r.name;
-      lines.push(`    先看差異：npx shadcn@latest add ${ref} --dry-run --diff`);
-      lines.push(`    決定跟進：把上一行的 --dry-run --diff 換成 --overwrite，再跑 node scripts/dooping-check.mjs update ${r.name}`);
+      const name = shellArg(r.name);
+      const ref = isUrl(registry) ? shellArg(`${registry.replace(/\/$/, "")}/${r.name}.json`) : null;
+      if (!name) {
+        lines.push("    名稱含特殊字元，不提供指令——先確認 dooping.lock.json 沒有被改過");
+      } else if (!isUrl(registry)) {
+        // 只給名稱的 shadcn 指令會解析到 shadcn 預設來源的同名元件，不是這個資料夾裡的
+        lines.push("    來源是本機資料夾：不印 shadcn 指令，用產生這個資料夾的流程重抄");
+        lines.push(`    重抄完：node scripts/dooping-check.mjs update ${name}`);
+      } else if (!ref) {
+        lines.push("    registry 網址含特殊字元，不提供指令——先確認 dooping.lock.json 記的來源");
+      } else {
+        lines.push(`    先看差異：npx shadcn@latest add ${ref} --dry-run --diff`);
+        lines.push(`    決定跟進：把上一行的 --dry-run --diff 換成 --overwrite，再跑 node scripts/dooping-check.mjs update ${name}`);
+      }
     }
     if (r.modified.length > 0) {
       lines.push(`    本地改過的檔：${r.modified.join("、")}`);
@@ -190,13 +222,13 @@ export async function main(argv) {
 
   if (!existing) throw new Error(`找不到 ${LOCK_FILE}——剛 npx shadcn add 完的話，先跑 init <item…>`);
   const results = evaluate(existing, index, (path) => {
-    const file = join(cwd, path);
-    return existsSync(file) ? readFileSync(file, "utf8") : null;
+    const file = insideProject(cwd, path);
+    return file && existsSync(file) ? readFileSync(file, "utf8") : null;
   });
   console.log(renderReport(results, { registry }));
   if (process.env.GITHUB_ACTIONS === "true") {
     for (const r of results.filter(needsAttention)) {
-      console.log(`::warning title=dooping-check::${r.name} 上游有更新或本地改過，細節見這一步的輸出`);
+      console.log(`::warning title=dooping-check::${ghEscape(r.name)} 上游有更新或本地改過，細節見這一步的輸出`);
     }
   }
   return args.strict && results.some(needsAttention) ? 1 : 0;
@@ -210,7 +242,7 @@ if (invokedDirectly) {
       console.error(`[dooping-check] ${error.message}`);
       // 例行檢查讀不到 registry（離線、上游暫時掛掉）只提醒；init／update 與 --strict 一律失敗
       const routine = !["init", "update"].includes(process.argv[2]) && !process.argv.includes("--strict");
-      if (routine && process.env.GITHUB_ACTIONS === "true") console.log(`::warning title=dooping-check::${error.message}`);
+      if (routine && process.env.GITHUB_ACTIONS === "true") console.log(`::warning title=dooping-check::${ghEscape(error.message)}`);
       process.exit(routine ? 0 : 2);
     },
   );

@@ -76,6 +76,20 @@ const columns: Column<Order>[] = [
 - **門檻式分頁**：資料筆數沒超過一頁就**不顯示分頁器**。
 - **合計算「篩選後全部」**，不是當頁。
 - **匯出跟著畫面**：匯出的是使用者**現在看到的**（篩選＋排序後），不是原始全量。
+- **平台自己做的匯出也跟著畫面**：要保留數字、日期格式的 Excel 匯出由平台自己實作。`toolbar` 給函式，
+  拿到的 `rows` 就是目前篩選排序後的全部列（不分頁），用它取資料，不要自己重算篩選與排序。
+  欄位格式怎麼對應，照[列印與匯出](/patterns/print-and-export)「平台自己做的匯出：照畫面的呈現方式」。
+
+```tsx
+<DataTable
+  {...props}
+  toolbar={({ rows }) => (
+    <Button variant="outline" size="sm" onClick={() => exportExcel(rows)}>匯出 Excel</Button>
+  )}
+/>
+```
+
+<StoryLink id="元件-資料-資料表-datatable--平台自訂匯出" />
 
 ## 每頁筆數：5／15／30／50
 
@@ -217,6 +231,10 @@ const { state, onStateChange } = useTableUrlState();
   需要看到一樣的東西嗎？」。
 - 預設走 `history.replaceState`；TanStack Router／Next 宿主注入自己的
   `adapter`（get／set／subscribe 三個函式）。同頁多張表用 `prefix` 隔開。
+- **網址是任何人都能改的輸入**，讀不懂的值一律當沒給：每頁筆數不在 `pageSizeOptions` 裡（也不是 `pageSize`）就退回 `pageSize`；
+  頁碼超出就回第 1 頁；排序鍵不是欄位就不排序；壞掉的 `%` 跳脫保留原字；`__proto__` 這類特殊欄名略過。
+
+<StoryLink id="元件-資料-資料表-datatable--網址被改壞" />
 
 `state`／`onStateChange` 是**逐鍵受控**：給了哪個鍵、哪個鍵由宿主管理，其餘維持元件內部狀態。
 

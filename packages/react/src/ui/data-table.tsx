@@ -153,6 +153,12 @@ export interface DataTableState {
   selection: string[];
 }
 
+/** `toolbar` 給函式時拿到的內容。 */
+export interface DataTableToolbarContext<T> {
+  /** 目前篩選排序後的全部列（不分頁），與「匯出 CSV」用的是同一份 */
+  rows: T[];
+}
+
 export type DataTableProps<T> = {
   rows: T[];
   columns: Column<T>[];
@@ -178,8 +184,12 @@ export type DataTableProps<T> = {
    * 已有資料（重新查詢）→ 保留舊內容就地變暗＋資料列脈動＋ `aria-busy`，**不要**蓋骨架（會閃）。
    */
   loading?: boolean;
-  /** 工具列額外元素（期間選擇器、其他按鈕…），置於搜尋列右側 */
-  toolbar?: ReactNode;
+  /**
+   * 工具列額外元素（期間選擇器、其他按鈕…），置於搜尋列右側。
+   * 給函式時拿到 `rows`＝**目前篩選排序後的全部列**（不分頁）。平台自己做匯出（例如保留數字格式的 Excel）時
+   * 用它取資料，匯出內容才會跟畫面一致——不要自己重算篩選與排序。
+   */
+  toolbar?: ReactNode | ((ctx: DataTableToolbarContext<T>) => ReactNode);
   /** 提供則顯示「匯出 CSV」按鈕，匯出**目前篩選排序後**的資料 */
   csv?: { headers: string[]; row: (row: T) => (string | number)[]; fileName: string };
   rowClassName?: (row: T) => string;
@@ -249,7 +259,9 @@ export function DataTable<T>({
   const [selectionState, setSelectionState] = useState<string[]>([]);
 
   const query = stateProp?.query ?? queryState;
-  const size = stateProp?.pageSize ?? sizeState;
+  // 受控的每頁筆數可能來自網址（任何人都能改成 99999）：只接受選項裡的值或 pageSize 本身，其餘退回 pageSize
+  const rawSize = stateProp?.pageSize ?? sizeState;
+  const size = pageSizeOptions.includes(rawSize) || rawSize === pageSize ? rawSize : pageSize;
   const page = stateProp?.page ?? pageState;
   const colFilters = stateProp?.filters ?? filtersState;
   const sort = stateProp?.sort !== undefined ? stateProp.sort : sortState;
@@ -516,7 +528,7 @@ export function DataTable<T>({
               </Popover>
             );
           })}
-          {toolbar}
+          {typeof toolbar === "function" ? toolbar({ rows: sorted }) : toolbar}
           <div className="ml-auto flex items-center gap-2">
             {columnVisibility && (
               <DropdownMenu>

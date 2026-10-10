@@ -102,14 +102,14 @@ AGENTS.md ──(book/scripts/sync-root-docs.mjs)──► book/static/AGENTS.md
 | `tests/doc-hooks.test.ts` | 文件的 `<StoryFrame／StoryLink id>` 都對到真的 story | story 內容是否正確 |
 | `tests/story-sort.test.ts` | `.storybook/preview.tsx` 的 storySort 涵蓋每個分類且字串逐字吻合 | story 的順序是否合理 |
 | `tests/play-conventions.test.ts` | stories 不用 `userEvent.type／clear／paste`（改 `setInputValue`） | play 的斷言內容 |
-| `tests/nav.test.ts` | `isNavActive` 的多層 fallback | 側欄的渲染 |
-| `tests/table-url-state.test.ts` | 表格狀態 ↔ 網址的 codec、prefix 隔離讀與寫、與 DataTableState 的型別相容 | adapter 的路由整合（宿主） |
+| `tests/nav.test.ts` | `isNavActive` 的多層 fallback；`safeNavUrl` 網址白名單（`javascript:` 等換成 `#`，含變形寫法） | 側欄的渲染（story「連結網址白名單」） |
+| `tests/table-url-state.test.ts` | 表格狀態 ↔ 網址的 codec、prefix 隔離讀與寫、與 DataTableState 的型別相容；改壞的網址（特殊欄名、壞掉的 `%`）不改原型、不丟例外 | adapter 的路由整合（宿主）；每頁筆數與排序鍵的防護在 DataTable（story「網址被改壞」） |
 | `tests/host-baseline.test.ts` | Tailwind v4 preflight＋tokens 基座 ↔ `book/src/css/demo-base.css`；kit.css 的 import 順序與 layer | 渲染結果（`verify:book`） |
 | `tests/host-install-set.test.ts` | 頁面章的 `shadcn add` 指令 ⊆ 宿主安裝集；檔案真的在宿主裡；宿主的 tokens 配對與 workspace 連結 | 宿主頁面的行為（`verify:host`） |
 | `tests/registry-content.test.ts` | registry 檔案內容不以註解開頭（shadcn CLI 會刪） | 內容正確性 |
 | `tests/registry-fingerprint.test.ts` | `/r/index.json` 的逐 item 指紋＝第二份獨立實作；base 與說明不進指紋；相依變了 closureHash 跟著變 | 指紋的用途（`registry-changes`） |
 | `tests/registry-changes.test.ts` | 兩版 registry 的四類異動分類、Markdown 輸出、上一個 tag 照數字大小挑 | 真實歷史（CI 在 dev 預演） |
-| `tests/dooping-check.test.ts` | 取用端工具的內容指紋與產生器一致；路徑對應；已是最新／上游有更新／本地改過三態 | lock 的到期 |
+| `tests/dooping-check.test.ts` | 取用端工具的內容指紋與產生器一致；路徑對應；已是最新／上游有更新／本地改過三態；不信任 lock：專案外路徑不讀、非官方來源提醒、本機資料夾不印 shadcn 指令、特殊字元不印指令、Actions 輸出跳脫 | lock 的到期 |
 | `tests/feedback-intake.test.ts` | 取用端回饋的格式正本只在 AGENTS.md「回饋到上游」一份：送出指令是單行 `gh issue create`（`--repo` 本 repo、`[回饋]` 前綴、`--body-file`）、骨架八段依序；台帳四題各處同一說法；流程頁指向正本；別處沒有第二份 | issue 實際寫了什麼；守門人的分流節奏（人工） |
 | `tests/self-contained-refs.test.ts` | 公開檔（追蹤中＋未追蹤未忽略的文字檔）不得出現 `ADR-NNNN` 決策編號；尚未清的元件／token／template 檔列在 PENDING，清單只准縮短；維護者本機若有 gitignored 的 `.private-terms`，一併掃內部詞 | git 歷史、已發佈的套件與 Release 內文、建置產物 |
 | `tests/rule-pointers.test.ts` | 寫著「規則正本：」「流程正本：」的 `<路徑>「<標題>」` 都指到存在的檔與標題（標題相同，或以它開頭後接「：」「（」） | 沒有「」的指向、`because()` 的第三個參數；指向的內容是否還寫著那條規則 |

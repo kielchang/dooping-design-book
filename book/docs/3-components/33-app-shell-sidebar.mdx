@@ -105,11 +105,14 @@ const app = findActiveNavLeaf(apps, pathname, isAppActive)?.item;
 <SidebarNav
   groups={navGroups}
   currentPath={location.pathname}
-  renderLink={(props, item) => <Link to={item.url} {...props} />}
+  renderLink={({ href, ...props }) => <Link to={href} {...props} />}
 />
 ```
 
 `renderLink` 收到的 props（含 `aria-current` 與行動版關抽屜的 `onClick`）要**原樣轉發**。
+網址用收到的 `href`，不要用 `item.url`：`href` 已經過網址白名單（`safeNavUrl`）——
+相對路徑、http、https、mailto、tel 原樣放行，`javascript:` 這類點下去會執行內容的網址換成 `#`。
+導覽資料常從後台設定來，這一層不能省。`AppMenubar` 與 `CommandPalette` 的 `onNavigate` 收到的也是過濾後的網址。
 
 ## 無障礙
 

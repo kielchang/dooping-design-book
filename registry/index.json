@@ -13,8 +13,8 @@
       "description": "多應用外殼的頂部功能選單：NavGroup[] 一組一個頂層選單（Radix Menubar），窄版收成單一選單。",
       "url": "https://kielchang.github.io/dooping-design-book/r/app-menubar.json",
       "meta": {
-        "hash": "071001a627466744",
-        "closureHash": "aed1e95a7542c993"
+        "hash": "011a855a3276722a",
+        "closureHash": "45fe7f499f22a544"
       }
     },
     {
@@ -26,7 +26,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/app-shell.json",
       "meta": {
         "hash": "aea39ca0a89f859b",
-        "closureHash": "967a7aeea5c83f84"
+        "closureHash": "92d38b6fb20733e3"
       }
     },
     {
@@ -86,7 +86,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/change-summary.json",
       "meta": {
         "hash": "e24dd6427379f84a",
-        "closureHash": "9ea07d81182d44bf"
+        "closureHash": "89246fb744431617"
       }
     },
     {
@@ -169,8 +169,8 @@
       "description": "全域搜尋：⌘K 開啟，導覽資料與側邊欄、功能選單單一來源。",
       "url": "https://kielchang.github.io/dooping-design-book/r/command-palette.json",
       "meta": {
-        "hash": "9beca0109dbf8fa0",
-        "closureHash": "b6dc5e5650e06bdd"
+        "hash": "58f38b84664beb09",
+        "closureHash": "6962ae31a39a2730"
       }
     },
     {
@@ -205,8 +205,8 @@
       "description": "搜尋・篩選（表頭＋facet 鈕）・排序・分頁・合計・多選批次・欄位顯示・CSV 匯出・可同步網址。",
       "url": "https://kielchang.github.io/dooping-design-book/r/data-table.json",
       "meta": {
-        "hash": "9d8c0840a1227aea",
-        "closureHash": "b16a364711d9b567"
+        "hash": "6675763f713d9a68",
+        "closureHash": "9736ff2109b0ef33"
       }
     },
     {
@@ -253,8 +253,8 @@
       "description": "取用端的 lock 與例行檢查：已是最新／上游有更新／本地改過。",
       "url": "https://kielchang.github.io/dooping-design-book/r/dooping-check.json",
       "meta": {
-        "hash": "d721255e03e9f8d8",
-        "closureHash": "83be2d732a64ac13"
+        "hash": "2aaa32389fb1e1c3",
+        "closureHash": "804c55df2beed2ba"
       }
     },
     {
@@ -290,7 +290,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/editable-field.json",
       "meta": {
         "hash": "00d417154c595329",
-        "closureHash": "2d9e3df8ae5485c9"
+        "closureHash": "40fac2e68797f6cd"
       }
     },
     {
@@ -397,8 +397,8 @@
       "description": "NavGroup 型別（連結／兩層群組／動作項）與 isNavActive()、findActiveNavLeaf()：側邊欄、功能選單與指令面板共用的導覽資料形狀。",
       "url": "https://kielchang.github.io/dooping-design-book/r/nav.json",
       "meta": {
-        "hash": "50da3d5db198731f",
-        "closureHash": "0a375650feb7be72"
+        "hash": "4b6d3e9b7e665439",
+        "closureHash": "9808aa9a2196a506"
       }
     },
     {
@@ -493,8 +493,8 @@
       "description": "外殼側欄家族：Provider、收合成圖示欄或收到 0（碰左緣窺看）、行動版左滑抽屜（純呈現，不綁路由）。",
       "url": "https://kielchang.github.io/dooping-design-book/r/sidebar.json",
       "meta": {
-        "hash": "4f6087b4cbb31a6b",
-        "closureHash": "b030cc8a62b70df3"
+        "hash": "1e2767e76b476b14",
+        "closureHash": "597d14b4dfc2443c"
       }
     },
     {
@@ -505,8 +505,8 @@
       "description": "NavGroup[] 的三態渲染：連結／展開群組／收合態右彈選單，含例行・試算標籤。",
       "url": "https://kielchang.github.io/dooping-design-book/r/sidebar-nav.json",
       "meta": {
-        "hash": "e502793c8206431f",
-        "closureHash": "668c9bdffbc20f5f"
+        "hash": "473cd09a3540f22a",
+        "closureHash": "db2d796182ac1896"
       }
     },
     {
@@ -566,7 +566,7 @@
       "url": "https://kielchang.github.io/dooping-design-book/r/table.json",
       "meta": {
         "hash": "fa5679c4989d6948",
-        "closureHash": "38ef546aa8871250"
+        "closureHash": "f3858a323e7ebc4b"
       }
     },
     {
@@ -601,8 +601,8 @@
       "description": "hover／鍵盤聚焦／長壓顯示，含邊緣防溢與截斷文字元件。",
       "url": "https://kielchang.github.io/dooping-design-book/r/tooltip.json",
       "meta": {
-        "hash": "bbfef48909bc584d",
-        "closureHash": "3298b3bfcfc98a41"
+        "hash": "fdd815608951341d",
+        "closureHash": "fc601882634ccb99"
       }
     },
     {
@@ -637,8 +637,8 @@
       "description": "無→大到小→小到大 的三態排序。",
       "url": "https://kielchang.github.io/dooping-design-book/r/use-sort.json",
       "meta": {
-        "hash": "cbcdb07687bc1dc2",
-        "closureHash": "3a107a2f13ec34b2"
+        "hash": "29e397100f789b15",
+        "closureHash": "310afb915596624c"
       }
     },
     {
@@ -649,8 +649,8 @@
       "description": "表格狀態 ↔ 網址：預設值省略、條件變更回第 1 頁、adapter 可注入。",
       "url": "https://kielchang.github.io/dooping-design-book/r/use-table-url-state.json",
       "meta": {
-        "hash": "02c14878aa94544c",
-        "closureHash": "58ebf98f7c076e31"
+        "hash": "f1dfcac9db05efab",
+        "closureHash": "880cdf00e60f1dcb"
       }
     },
     {

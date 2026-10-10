@@ -7,6 +7,7 @@ import {
 import { AppShell } from "./app-shell";
 import { Sidebar, SidebarContent, SidebarHeader, SidebarTrigger } from "./sidebar";
 import { SidebarNav, type SidebarNavLinkProps } from "./sidebar-nav";
+import type { NavGroup } from "../lib/nav";
 import { Badge } from "./badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./card";
 import { demoNavGroups } from "../demo/sample-data";
@@ -46,11 +47,13 @@ function Shell({
   mobileQuery = FORCE_DESKTOP,
   defaultOpen,
   collapsible,
+  navGroups = groups,
 }: {
   currentPath: string;
   mobileQuery?: string;
   defaultOpen?: boolean;
   collapsible?: "icon" | "offcanvas";
+  navGroups?: NavGroup[];
 }) {
   return (
     <AppShell
@@ -65,7 +68,7 @@ function Shell({
             </div>
           </SidebarHeader>
           <SidebarContent>
-            <SidebarNav groups={groups} currentPath={currentPath} renderLink={storyLink} />
+            <SidebarNav groups={navGroups} currentPath={currentPath} renderLink={storyLink} />
           </SidebarContent>
         </Sidebar>
       }
@@ -143,6 +146,45 @@ export const 收合成圖示欄: Story = {
   },
 };
 
+// 導覽資料可能來自後台設定：一筆危險網址、一個收合後要往右彈出的外部子連結
+const guardedGroups: NavGroup[] = [
+  ...groups,
+  {
+    title: "外部資源",
+    items: [
+      { title: "未檢查的連結", url: "javascript:alert(1)", icon: CircleHelp },
+      { title: "參考資料", icon: BookOpen, items: [{ title: "外部文件", url: "https://example.com/docs", external: true }] },
+    ],
+  },
+];
+
+export const 連結網址白名單: Story = {
+  render: () => <Shell currentPath="/workbench" navGroups={guardedGroups} />,
+  // 契約：javascript: 這類網址渲染成 #（點了不會執行）；收合態往右彈出的外部子連結跟展開態一樣開新分頁、不給 opener。
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const doc = canvasElement.ownerDocument;
+    await expect(canvas.getByRole("link", { name: /未檢查的連結/ })).toHaveAttribute("href", "#");
+
+    const pull = canvas.getByRole("button", { name: "收合側邊欄" });
+    await userEvent.click(pull);
+    await userEvent.unhover(pull);
+    const aside = canvasElement.querySelector("aside");
+    await waitFor(() => expect(aside).toHaveAttribute("data-state", "collapsed"));
+    await userEvent.click(canvas.getByRole("button", { name: /參考資料/ }));
+    const item = await within(doc.body).findByRole("menuitem", { name: "外部文件" });
+    await expect(item).toHaveAttribute("target", "_blank");
+    await expect(item).toHaveAttribute("rel", "noreferrer");
+    await expect(item).not.toHaveAttribute("aria-current");
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(within(doc.body).queryByRole("menu")).toBeNull());
+    // 收尾：展開回來，別讓視覺掃描拿到收合畫面
+    await userEvent.click(pull);
+    await userEvent.unhover(pull);
+    await waitFor(() => expect(aside).toHaveAttribute("data-state", "expanded"));
+  },
+};
+
 export const 拉環拖拉與鍵盤: Story = {
   render: () => <Shell currentPath="/workbench" />,
   // 契約：拉環有文字提示；往左拖收合、往右拖展開（拖完不能又被當成點擊切回去）；鍵盤 Enter 切換、名稱跟著狀態變。
@@ -162,7 +204,11 @@ export const 拉環拖拉與鍵盤: Story = {
     };
 
     await userEvent.hover(pull());
-    await expect(await canvas.findByRole("tooltip")).toHaveTextContent("收合側邊欄");
+    const tip = await canvas.findByRole("tooltip");
+    await expect(tip).toHaveTextContent("收合側邊欄");
+    // 提示貼在拉環右側 8px：泡泡還沒定位時若佔版面，錨點會被撐寬、提示整個往右偏
+    await waitFor(() =>
+      expect(Math.abs(tip.getBoundingClientRect().left - (pull().getBoundingClientRect().right + 8))).toBeLessThanOrEqual(2));
     await userEvent.unhover(pull());
 
     await drag(-60);

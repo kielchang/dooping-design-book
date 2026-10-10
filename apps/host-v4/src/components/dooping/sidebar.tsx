@@ -168,8 +168,7 @@ function SidebarPullTab({
   const Icon = open ? ChevronsLeft : ChevronsRight;
   return (
     <div data-sidebar-pull="" className={cn("z-10", className)} onPointerEnter={onPointerEnter}>
-      {/* 提示的錨點固定成拉環大小：泡泡掛上去、還沒定位的那一刻不會把錨點撐寬，量到的位置才準 */}
-      <Tooltip content={label} side="right" className="h-10 w-5">
+      <Tooltip content={label} side="right">
         <button
           type="button"
           aria-label={label}

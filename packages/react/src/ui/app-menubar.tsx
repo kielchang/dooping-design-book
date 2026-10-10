@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as MenubarPrimitive from "@radix-ui/react-menubar";
 import { ExternalLink, Menu } from "lucide-react";
-import { findActiveNavLeaf, isNavAction, isNavActive, type NavAction, type NavGroup, type NavLeaf } from "../lib/nav";
+import { findActiveNavLeaf, isNavAction, isNavActive, safeNavUrl, type NavAction, type NavGroup, type NavLeaf } from "../lib/nav";
 import { cn } from "../lib/utils";
 import { menuContentClass, menuItemClass } from "./dropdown-menu";
 import { useSidebar } from "./sidebar";
@@ -100,7 +100,7 @@ export function AppMenubar({
       <MenubarPrimitive.Item key={item.title} asChild className={menuItemClass}>
         {renderLink(
           {
-            href: item.url,
+            href: safeNavUrl(item.url),
             "aria-current": isCurrent ? "page" : undefined,
             children: (
               <>

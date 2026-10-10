@@ -355,8 +355,8 @@ export const 欄位顯示: Story = {
 };
 
 /** 網址同步示範：畫面上直接顯示序列化字串，play 對它斷言（不碰真的 location）。 */
-function UrlSyncDemo() {
-  const [search, setSearch] = React.useState("");
+function UrlSyncDemo({ initialSearch = "" }: { initialSearch?: string }) {
+  const [search, setSearch] = React.useState(initialSearch);
   const listeners = React.useRef(new Set<() => void>());
   const adapter = React.useMemo<UrlStateAdapter>(() => ({
     get: () => search,
@@ -388,6 +388,18 @@ export const 網址同步: Story = {
     await waitFor(() => expect(url()).toContain("q="));
     await waitFor(() => expect(url()).not.toContain("page="));
     setInputValue(input, "");
+  },
+};
+
+export const 網址被改壞: Story = {
+  render: () => <UrlSyncDemo initialSearch="size=99999&page=500&sort=valueOf.asc&f.__proto__=x" />,
+  // 契約：網址是任何人都能改的輸入。每頁筆數不在選項裡就退回 pageSize、頁碼超出回第 1 頁、
+  // 排序鍵不是欄位（valueOf 這類原型上的名稱）就不排序——表格照常顯示，不丟例外。
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() => expect(canvasElement.querySelectorAll("tbody tr")).toHaveLength(5));
+    await expect(canvasElement.querySelector("tbody tr")).toHaveTextContent(demoRecords[0].id);
+    await expect(canvas.getByRole("combobox", { name: "每頁筆數" })).toHaveTextContent(/^每頁 5$/);
   },
 };
 

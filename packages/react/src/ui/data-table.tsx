@@ -259,7 +259,9 @@ export function DataTable<T>({
   const [selectionState, setSelectionState] = useState<string[]>([]);
 
   const query = stateProp?.query ?? queryState;
-  const size = stateProp?.pageSize ?? sizeState;
+  // 受控的每頁筆數可能來自網址（任何人都能改成 99999）：只接受選項裡的值或 pageSize 本身，其餘退回 pageSize
+  const rawSize = stateProp?.pageSize ?? sizeState;
+  const size = pageSizeOptions.includes(rawSize) || rawSize === pageSize ? rawSize : pageSize;
   const page = stateProp?.page ?? pageState;
   const colFilters = stateProp?.filters ?? filtersState;
   const sort = stateProp?.sort !== undefined ? stateProp.sort : sortState;

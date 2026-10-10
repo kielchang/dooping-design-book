@@ -23,7 +23,6 @@ const TEXT = /\.(md|mdx|ts|tsx|js|jsx|mjs|cjs|mts|json|ya?ml|css|txt|sh|html)$/;
 
 /** 隨下一次實質變更才清的檔（元件、template、token 與它們的產物或同步副本）。只准縮短。 */
 export const PENDING = [
-  "apps/host-v4/scripts/dooping-check.mjs",
   "apps/host-v4/src/components/dooping/badge.tsx",
   "apps/host-v4/src/components/dooping/command.tsx",
   "apps/host-v4/src/components/dooping/page-header.tsx",
@@ -44,12 +43,10 @@ export const PENDING = [
   "registry/badge.json",
   "registry/coachmark.json",
   "registry/command.json",
-  "registry/dooping-check.json",
   "registry/gantt.json",
   "registry/graph-canvas.json",
   "registry/page-header.json",
   "registry/switch.json",
-  "templates/dooping-check.mjs",
   "templates/eslint.dooping.cjs",
 ];
 

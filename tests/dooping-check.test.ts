@@ -9,9 +9,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { contentHash as registryContentHash } from "../scripts/lib/fingerprint.mjs";
 import {
-  contentHash, createLockEntries, evaluate, parseArgs, renderReport, resolveTargets,
+  contentHash, createLockEntries, evaluate, ghEscape, insideProject, parseArgs, renderReport, resolveTargets,
   type Lock, type RegistryIndexLike,
 } from "../templates/dooping-check.mjs";
+import { because } from "./lib/guard";
+
+const RULE = "book/docs/7-governance/06-staying-current.mdx「例行檢查：dooping-check」";
+const WHY = "dooping-check 抄進取用端、在他們的 CI 裡跑：lock 檔與 registry 來源都可能被改過，工具不能因此讀專案外的檔、印出危險指令或偽造 CI 指令";
 
 const ROOT = join(__dirname, "..");
 const HOST = join(ROOT, "apps/host-v4");
@@ -109,10 +113,48 @@ describe("renderReport 與 parseArgs", () => {
       { registry: "https://kielchang.github.io/dooping-design-book/r" },
     );
     expect(text).toContain("data-table：上游有更新");
-    expect(text).toContain("npx shadcn@latest add https://kielchang.github.io/dooping-design-book/r/data-table.json --dry-run --diff");
-    expect(text).toContain("update data-table");
+    expect(text).toContain('npx shadcn@latest add "https://kielchang.github.io/dooping-design-book/r/data-table.json" --dry-run --diff');
+    expect(text).toContain('update "data-table"');
     expect(text).not.toContain("badge：");
+    expect(text).not.toContain("不是官方");
     expect(text).toContain("2 個 item：已是最新 1、要看的 1");
+  });
+
+  const upstream = (name: string) => [{ name, removed: false, upstream: true, modified: [] }];
+
+  it("來源不是官方正式站：報告第一行提醒", () => {
+    const text = renderReport(upstream("data-table"), { registry: "https://mirror.example.test/r" });
+    expect(text.split("\n")[0], because("非官方來源要提醒", WHY, RULE)).toContain("不是官方正式站");
+  });
+
+  it("來源是本機資料夾：不印只有名稱的 shadcn 指令（會裝到 shadcn 預設來源的同名元件）", () => {
+    const text = renderReport(upstream("data-table"), { registry: "../../registry" });
+    expect(text, because("本機資料夾來源不能印 shadcn add <名稱>", WHY, RULE)).not.toContain("npx shadcn");
+    expect(text).toContain("來源是本機資料夾");
+    expect(text).toContain('update "data-table"');
+  });
+
+  it("名稱或網址含特殊字元：不提供指令", () => {
+    for (const name of ['x"; rm -rf ~; "', "a b", "$(whoami)", "50%"]) {
+      const text = renderReport(upstream(name), { registry: "https://kielchang.github.io/dooping-design-book/r" });
+      expect(text, because(`「${name}」不能出現在建議指令裡`, WHY, RULE)).not.toContain("npx shadcn");
+      expect(text).toContain("不提供指令");
+    }
+  });
+});
+
+describe("防護：lock 路徑與 GitHub Actions 輸出", () => {
+  it("insideProject：lock 裡的路徑只能落在專案內", () => {
+    const cwd = join(tmpdir(), "dooping-project");
+    expect(insideProject(cwd, "src/components/dooping/data-table.tsx")).toBe(join(cwd, "src/components/dooping/data-table.tsx"));
+    for (const path of ["../outside.txt", "src/../../outside.txt", "/etc/passwd", "C:/Windows/win.ini", "C:\\x", "..\\x", ""]) {
+      expect(insideProject(cwd, path), because(`「${path}」在專案外，不能讀`, WHY, RULE)).toBeNull();
+    }
+  });
+
+  it("ghEscape：%、CR、LF 跳脫，名稱不能變成另一行指令", () => {
+    expect(ghEscape("a%b\r\n::error::x")).toBe("a%25b%0D%0A::error::x");
+    expect(ghEscape("data-table")).toBe("data-table");
   });
 
   it("解析指令與選項；不認得的選項直接丟錯", () => {

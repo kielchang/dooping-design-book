@@ -117,11 +117,11 @@
       }
     },
     "data-table": {
-      "closureHash": "af10e0597f4b26b7",
+      "closureHash": "b16a364711d9b567",
       "files": {
         "src/components/dooping/button.tsx": "a9d5979132efdbf2",
         "src/components/dooping/checkbox.tsx": "500a5c85eb380044",
-        "src/components/dooping/data-table.tsx": "43a2b014ee5b61ca",
+        "src/components/dooping/data-table.tsx": "6ca0b5ed806c3684",
         "src/components/dooping/dropdown-menu.tsx": "fa04330ac405e0af",
         "src/components/dooping/empty-state.tsx": "b640ef2bfb251657",
         "src/components/dooping/input.tsx": "cc0cf4da27071fe5",
